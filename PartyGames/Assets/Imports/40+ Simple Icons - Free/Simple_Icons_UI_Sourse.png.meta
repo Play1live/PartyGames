@@ -1,0 +1,1149 @@
+fileFormatVersion: 2
+guid: 84f880e7df3ad444c9fb84b23dfef984
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 12
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMasterTextureLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 1
+  cookieLightType: 1
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Server
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Windows Store Apps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 800
+        width: 122
+        height: 111
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5793ef8044c1fbd49976ef90fe709760
+      internalID: -273049497
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_1
+      rect:
+        serializedVersion: 2
+        x: 206
+        y: 799
+        width: 110
+        height: 110
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6430d68abe5ca9b449d0864c2e43d366
+      internalID: 741206483
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_4
+      rect:
+        serializedVersion: 2
+        x: 607
+        y: 800
+        width: 134
+        height: 111
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 08132bdd3c5a525498f99c91b24f1fe2
+      internalID: -1427253059
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_5
+      rect:
+        serializedVersion: 2
+        x: 808
+        y: 802
+        width: 107
+        height: 107
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b6fa2d48da90feb4b856581fe2bfdd3d
+      internalID: -1761011405
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_6
+      rect:
+        serializedVersion: 2
+        x: 1018
+        y: 800
+        width: 86
+        height: 110
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ab8788d06d816b043b65a68457e4bab3
+      internalID: -1595424690
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_7
+      rect:
+        serializedVersion: 2
+        x: 1219
+        y: 800
+        width: 86
+        height: 110
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3158e1e805901424a81999a7e83f18c6
+      internalID: 464076851
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_9
+      rect:
+        serializedVersion: 2
+        x: 1599
+        y: 800
+        width: 126
+        height: 111
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9cf121bbcc4a8514fbd1f82fec063a5e
+      internalID: -1509628772
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_11
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 600
+        width: 111
+        height: 111
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 64d3829586dc87a4189d0c8b1d25b2fa
+      internalID: 1940736818
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_12
+      rect:
+        serializedVersion: 2
+        x: 207
+        y: 598
+        width: 100
+        height: 111
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a71e053f72253bd4b8fa9485db30a8f3
+      internalID: 1416417519
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_13
+      rect:
+        serializedVersion: 2
+        x: 408
+        y: 600
+        width: 71
+        height: 111
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d9aae2882ac37ab4bb16f891abb671a2
+      internalID: 834815854
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_14
+      rect:
+        serializedVersion: 2
+        x: 638
+        y: 598
+        width: 71
+        height: 111
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: debc5155018005c4684be47713309796
+      internalID: -2011086250
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_17
+      rect:
+        serializedVersion: 2
+        x: 1010
+        y: 598
+        width: 103
+        height: 111
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d8e5cd3e7674ec745a77c1f6a302996d
+      internalID: 683495437
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_18
+      rect:
+        serializedVersion: 2
+        x: 1211
+        y: 600
+        width: 100
+        height: 111
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3565a4aa3aef1484f8a5cd7cdc8a9bbc
+      internalID: -191672254
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_19
+      rect:
+        serializedVersion: 2
+        x: 1420
+        y: 600
+        width: 111
+        height: 111
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 222ee5223ed37004e85632dd9b14aea8
+      internalID: -1407178186
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_20
+      rect:
+        serializedVersion: 2
+        x: 1606
+        y: 598
+        width: 112
+        height: 112
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6f55de834a0eb6c42b1f124aa7882239
+      internalID: -1072892582
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_23
+      rect:
+        serializedVersion: 2
+        x: 202
+        y: 400
+        width: 117
+        height: 106
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e9372ed60a329d844890d1e7eed738b9
+      internalID: 677400076
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_24
+      rect:
+        serializedVersion: 2
+        x: 404
+        y: 401
+        width: 115
+        height: 105
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bbeb733060a442242a31ad8a3c535804
+      internalID: -130900840
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_25
+      rect:
+        serializedVersion: 2
+        x: 600
+        y: 396
+        width: 121
+        height: 121
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ee904070b99e02745ada30f3d5ab5d2d
+      internalID: 1001208001
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_26
+      rect:
+        serializedVersion: 2
+        x: 805
+        y: 397
+        width: 124
+        height: 111
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9672a55b5ec09f3488a2ee6d8592b033
+      internalID: -1752104768
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_27
+      rect:
+        serializedVersion: 2
+        x: 999
+        y: 397
+        width: 124
+        height: 111
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 66a610867194a3840b46285f04da45ca
+      internalID: 1776103953
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_28
+      rect:
+        serializedVersion: 2
+        x: 1207
+        y: 399
+        width: 111
+        height: 124
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0e40163d264949f43868b3853e2af1f9
+      internalID: -1028021338
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_29
+      rect:
+        serializedVersion: 2
+        x: 1406
+        y: 391
+        width: 111
+        height: 124
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bd835f4b4c1a60f4b9b64386a73ce918
+      internalID: 703964110
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_30
+      rect:
+        serializedVersion: 2
+        x: 1609
+        y: 400
+        width: 104
+        height: 119
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f4ce527d9cbc22147b3e21ca79f5a96b
+      internalID: 448242406
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_33
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 199
+        width: 111
+        height: 110
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 51ee4b282d7681049a913b5530e0e9f8
+      internalID: 439320565
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_34
+      rect:
+        serializedVersion: 2
+        x: 611
+        y: 201
+        width: 99
+        height: 110
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f676f2d2517d08a418b0e388cd77c3da
+      internalID: 1812102767
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_35
+      rect:
+        serializedVersion: 2
+        x: 811
+        y: 207
+        width: 88
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fa566b411825df643bcf078abdaafd80
+      internalID: -1039294098
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_43
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 223
+        width: 121
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: adc36d599f6c70f4b9f5341fe7d9e662
+      internalID: 852337690
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_44
+      rect:
+        serializedVersion: 2
+        x: 401
+        y: 222
+        width: 121
+        height: 66
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bbd87da7890061d4aab36c45c6e05d7f
+      internalID: -1631575503
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_57
+      rect:
+        serializedVersion: 2
+        x: 602
+        y: 21
+        width: 113
+        height: 91
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b85da7a1c1930c6469c8af826b3d8ba2
+      internalID: 1158291931
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_58
+      rect:
+        serializedVersion: 2
+        x: 805
+        y: 27
+        width: 107
+        height: 79
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3d6436f0266db6542ac5f3f37a192c68
+      internalID: -1318051344
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_61
+      rect:
+        serializedVersion: 2
+        x: 1206
+        y: 1
+        width: 113
+        height: 112
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4840545b41d66f24888cfc2f57312b1e
+      internalID: 792308477
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_66
+      rect:
+        serializedVersion: 2
+        x: 1403
+        y: 26
+        width: 115
+        height: 57
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9acf35ed8fb4d3f40ae819867f4f25d8
+      internalID: -472070814
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_77
+      rect:
+        serializedVersion: 2
+        x: 11
+        y: 0
+        width: 114
+        height: 110
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 94d370f7688188c469d3483a8f5730e2
+      internalID: 996519541
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_51
+      rect:
+        serializedVersion: 2
+        x: 207
+        y: 10
+        width: 102
+        height: 97
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 77ee919daa537834d93b9d66a4781a5f
+      internalID: -982852934
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_52
+      rect:
+        serializedVersion: 2
+        x: 408
+        y: 12
+        width: 103
+        height: 91
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7dfce8c8f9961084487859907395bd44
+      internalID: -408712617
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_2
+      rect:
+        serializedVersion: 2
+        x: 406
+        y: 796
+        width: 110
+        height: 117
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 09d4b1be741b2ca4ba954fe5ac2481c7
+      internalID: 281878474
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_3
+      rect:
+        serializedVersion: 2
+        x: 1416
+        y: 797
+        width: 89
+        height: 116
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 276226e60fabd134993300c0280e57c4
+      internalID: -31798419
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_8
+      rect:
+        serializedVersion: 2
+        x: 817
+        y: 598
+        width: 89
+        height: 115
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b2f2f1d9a989903468bf51e2898d1588
+      internalID: -2135510189
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_10
+      rect:
+        serializedVersion: 2
+        x: 3
+        y: 404
+        width: 112
+        height: 108
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 74bc6d39d8ea5f94a8f1461c0a37ed5b
+      internalID: -1643926364
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_15
+      rect:
+        serializedVersion: 2
+        x: 1616
+        y: 209
+        width: 103
+        height: 87
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5805e27f06142e4488b99b3a61ad092f
+      internalID: 1861542647
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_16
+      rect:
+        serializedVersion: 2
+        x: 1414
+        y: 207
+        width: 115
+        height: 88
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4a196686a1fdcd74c94d98311033b51a
+      internalID: 1518702435
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_21
+      rect:
+        serializedVersion: 2
+        x: 1206
+        y: 197
+        width: 110
+        height: 121
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b6c437d2799fbc14cb36d164412e23a8
+      internalID: 429300032
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_22
+      rect:
+        serializedVersion: 2
+        x: 998
+        y: 206
+        width: 127
+        height: 104
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0dfb013b109b416479c23f43823d1822
+      internalID: 1187746282
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Simple_Icons_UI_Sourse_31
+      rect:
+        serializedVersion: 2
+        x: 1004
+        y: 0
+        width: 116
+        height: 115
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e57ef7c6e2a387b4da49b24d4607f479
+      internalID: -1218401851
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      Simple_Icons_UI_Sourse_0: -273049497
+      Simple_Icons_UI_Sourse_1: 741206483
+      Simple_Icons_UI_Sourse_10: -1643926364
+      Simple_Icons_UI_Sourse_11: 1940736818
+      Simple_Icons_UI_Sourse_12: 1416417519
+      Simple_Icons_UI_Sourse_13: 834815854
+      Simple_Icons_UI_Sourse_14: -2011086250
+      Simple_Icons_UI_Sourse_15: 1861542647
+      Simple_Icons_UI_Sourse_16: 1518702435
+      Simple_Icons_UI_Sourse_17: 683495437
+      Simple_Icons_UI_Sourse_18: -191672254
+      Simple_Icons_UI_Sourse_19: -1407178186
+      Simple_Icons_UI_Sourse_2: 281878474
+      Simple_Icons_UI_Sourse_20: -1072892582
+      Simple_Icons_UI_Sourse_21: 429300032
+      Simple_Icons_UI_Sourse_22: 1187746282
+      Simple_Icons_UI_Sourse_23: 677400076
+      Simple_Icons_UI_Sourse_24: -130900840
+      Simple_Icons_UI_Sourse_25: 1001208001
+      Simple_Icons_UI_Sourse_26: -1752104768
+      Simple_Icons_UI_Sourse_27: 1776103953
+      Simple_Icons_UI_Sourse_28: -1028021338
+      Simple_Icons_UI_Sourse_29: 703964110
+      Simple_Icons_UI_Sourse_3: -31798419
+      Simple_Icons_UI_Sourse_30: 448242406
+      Simple_Icons_UI_Sourse_31: -1218401851
+      Simple_Icons_UI_Sourse_32: -1349759047
+      Simple_Icons_UI_Sourse_33: 439320565
+      Simple_Icons_UI_Sourse_34: 1812102767
+      Simple_Icons_UI_Sourse_35: -1039294098
+      Simple_Icons_UI_Sourse_36: 1729333999
+      Simple_Icons_UI_Sourse_37: 1094056535
+      Simple_Icons_UI_Sourse_38: 1143291889
+      Simple_Icons_UI_Sourse_39: -675053901
+      Simple_Icons_UI_Sourse_4: -1427253059
+      Simple_Icons_UI_Sourse_40: -2080422038
+      Simple_Icons_UI_Sourse_41: -359252767
+      Simple_Icons_UI_Sourse_42: 2140558732
+      Simple_Icons_UI_Sourse_43: 852337690
+      Simple_Icons_UI_Sourse_44: -1631575503
+      Simple_Icons_UI_Sourse_45: -852315300
+      Simple_Icons_UI_Sourse_46: 388061185
+      Simple_Icons_UI_Sourse_47: -1220401034
+      Simple_Icons_UI_Sourse_48: 606895821
+      Simple_Icons_UI_Sourse_49: -70152267
+      Simple_Icons_UI_Sourse_5: -1761011405
+      Simple_Icons_UI_Sourse_50: 1816056481
+      Simple_Icons_UI_Sourse_51: -982852934
+      Simple_Icons_UI_Sourse_52: -408712617
+      Simple_Icons_UI_Sourse_53: 770044639
+      Simple_Icons_UI_Sourse_54: -1387520108
+      Simple_Icons_UI_Sourse_55: 1157747061
+      Simple_Icons_UI_Sourse_56: -670019847
+      Simple_Icons_UI_Sourse_57: 1158291931
+      Simple_Icons_UI_Sourse_58: -1318051344
+      Simple_Icons_UI_Sourse_59: 1191735004
+      Simple_Icons_UI_Sourse_6: -1595424690
+      Simple_Icons_UI_Sourse_60: 190258264
+      Simple_Icons_UI_Sourse_61: 792308477
+      Simple_Icons_UI_Sourse_62: -53399857
+      Simple_Icons_UI_Sourse_63: 2043178021
+      Simple_Icons_UI_Sourse_64: 1255715393
+      Simple_Icons_UI_Sourse_65: 52736003
+      Simple_Icons_UI_Sourse_66: -472070814
+      Simple_Icons_UI_Sourse_67: -1007943001
+      Simple_Icons_UI_Sourse_68: 1113985687
+      Simple_Icons_UI_Sourse_69: -682046976
+      Simple_Icons_UI_Sourse_7: 464076851
+      Simple_Icons_UI_Sourse_70: -142002620
+      Simple_Icons_UI_Sourse_71: -1370590264
+      Simple_Icons_UI_Sourse_72: -1864226656
+      Simple_Icons_UI_Sourse_73: 544992812
+      Simple_Icons_UI_Sourse_74: -184764971
+      Simple_Icons_UI_Sourse_75: -635682229
+      Simple_Icons_UI_Sourse_76: 1890771077
+      Simple_Icons_UI_Sourse_77: 1442518480
+      Simple_Icons_UI_Sourse_8: -2135510189
+      Simple_Icons_UI_Sourse_9: -1509628772
+  spritePackingTag: 
+  pSDRemoveMatte: 0
+  pSDShowRemoveMatteOption: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

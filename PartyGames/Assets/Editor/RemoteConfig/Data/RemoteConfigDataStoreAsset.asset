@@ -12,8 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 469c24fdb3bd6431b92cc1465bd9166b, type: 3}
   m_Name: RemoteConfigDataStoreAsset
   m_EditorClassIdentifier: 
-  _rsKeyList: '[]'
-  _rsLastCachedKeyList: '[]'
+  _rsKeyList: "[\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"1db6b25b-9228-48bd-9a94-018f4051a21b\"\r\n   
+    },\r\n    \"rs\": {\r\n      \"key\": \"Server_Connection_IP\",\r\n      \"type\":
+    \"string\",\r\n      \"value\": \"92.168.1.217\"\r\n    }\r\n  },\r\n  {\r\n   
+    \"metadata\": {\r\n      \"entityId\": \"fca0022e-ff06-4c2c-aa3a-5c30c60d2d4a\"\r\n   
+    },\r\n    \"rs\": {\r\n      \"key\": \"Server_Connection_Port\",\r\n      \"type\":
+    \"int\",\r\n      \"value\": 14002\r\n    }\r\n  }\r\n]"
+  _rsLastCachedKeyList: "[\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"1db6b25b-9228-48bd-9a94-018f4051a21b\"\r\n   
+    },\r\n    \"rs\": {\r\n      \"key\": \"Server_Connection_IP\",\r\n      \"type\":
+    \"string\",\r\n      \"value\": \"92.168.1.217\"\r\n    }\r\n  },\r\n  {\r\n   
+    \"metadata\": {\r\n      \"entityId\": \"fca0022e-ff06-4c2c-aa3a-5c30c60d2d4a\"\r\n   
+    },\r\n    \"rs\": {\r\n      \"key\": \"Server_Connection_Port\",\r\n      \"type\":
+    \"int\",\r\n      \"value\": 14002\r\n    }\r\n  }\r\n]"
   _environments: "[\r\n  {\r\n    \"projectId\": \"760eff2f-db4d-47b7-8854-a3f5a42b7f80\",\r\n   
     \"name\": \"production\",\r\n    \"id\": \"90d90299-0bff-4ddf-b505-8ca560908f14\",\r\n   
     \"isDefault\": true,\r\n    \"createdAt\": \"2023-02-26T17:23:41Z\",\r\n    \"updatedAt\":
