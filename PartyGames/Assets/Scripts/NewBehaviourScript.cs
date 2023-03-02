@@ -27,7 +27,6 @@ public class NewBehaviourScript : MonoBehaviour
             if (stream.DataAvailable)
             {
                 StreamReader reader = new StreamReader(stream, true);
-                SendToServer("update message");
                 string data = reader.ReadLine();
                 if (data != null)
                     OnIncomingData(data);

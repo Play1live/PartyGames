@@ -10,7 +10,7 @@ public class Player
     public bool isDisconnected;
     public TcpClient tcp;
     public string name;
-    public Sprite image;
+    public Sprite icon;
     public int points;
 
     public Player(int id)
@@ -21,7 +21,7 @@ public class Player
         this.tcp = null;
         this.name = "";
         this.points = 0;
-        this.image = Resources.Load<Sprite>("Resources/Images/Profileimages/empty");
+        this.icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
     }
 
     public static int getPosInLists(int id)

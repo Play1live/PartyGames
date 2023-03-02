@@ -18,7 +18,8 @@ public class Config
     public static TcpListener SERVER_TCP;
     public static bool SERVER_STARTED;
     public static bool SERVER_ALL_CONNECTED;
-    public static string SERVER_DISPLAY_NAME;
+    public static Sprite SERVER_DEFAULT_ICON = Resources.Load<Sprite>("Images/ProfileIcons/empty");
+    public static int SERVER_PLAYER_POINTS = 0;
 
     // Client Infos
     public static TcpClient CLIENT_TCP;
@@ -26,6 +27,18 @@ public class Config
 
     // Spieler
     public static Player[] PLAYERLIST;
+    public static List<Sprite> PLAYER_ICONS;
     public static string PLAYER_NAME = "Spieler" + UnityEngine.Random.Range(1000, 10000);
+    public static int MAX_PLAYER_NAME_LENGTH = 12;
+    public static int PLAYER_ID = 0;
 
+    // Spiele
+    public static QuizSpiel QUIZ_SPIEL;
+
+    // Scenenspezifisches
+    // Hauptmenue
+    public static string HAUPTMENUE_FEHLERMELDUNG = "";
+    // Lobby
+    public static bool ALLOW_PLAYERNAME_CHANGE = false;
+    public static bool ALLOW_ICON_CHANGE = false;
 }
