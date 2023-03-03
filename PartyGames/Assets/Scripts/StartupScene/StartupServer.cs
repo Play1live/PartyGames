@@ -24,29 +24,34 @@ public class StartupServer : MonoBehaviour
     void Start()
     {
         #region Startet Server
-        try
+        if (!Config.SERVER_STARTED)
         {
-            Config.SERVER_TCP = new TcpListener(IPAddress.Any, Config.SERVER_CONNECTION_PORT); // TODO:
-            Config.SERVER_TCP.Start();
-            startListening();
-            Config.SERVER_STARTED = true;
-            Logging.add(new Logging(Logging.Type.Normal, "Server", "Start", "Server gestartet. Port: " + Config.SERVER_CONNECTION_PORT));
-            GameObject.Find("ConnectingToServer_LBL").gameObject.GetComponent<TMP_Text>().text = "Server wurde gestartet.";
-        }
-        catch (Exception e)
-        {
-            Logging.add(new Logging(Logging.Type.Fatal, "Server", "Start", "Server kann nicht gestartet werden", e));
-            Config.HAUPTMENUE_FEHLERMELDUNG = "Server kann nicht gestartet werden.";
             try
             {
-                Config.SERVER_TCP.Server.Close();
+                Config.SERVER_TCP = new TcpListener(IPAddress.Any, Config.SERVER_CONNECTION_PORT); // TODO:
+                Config.SERVER_TCP.Start();
+                startListening();
+                Config.SERVER_STARTED = true;
+                Logging.add(new Logging(Logging.Type.Normal, "Server", "Start", "Server gestartet. Port: " + Config.SERVER_CONNECTION_PORT));
+                Config.HAUPTMENUE_FEHLERMELDUNG = "Server wurde gestartet.";
             }
-            catch (Exception e1)
+            catch (Exception e)
             {
-                Logging.add(new Logging(Logging.Type.Fatal, "Server", "Start", "Socket kann nicht geschlossen werden.", e1));
+                Logging.add(new Logging(Logging.Type.Fatal, "Server", "Start", "Server kann nicht gestartet werden", e));
+                Config.HAUPTMENUE_FEHLERMELDUNG = "Server kann nicht gestartet werden.";
+                Config.SERVER_STARTED = false;
+                try
+                {
+                    Config.SERVER_TCP.Server.Close();
+                }
+                catch (Exception e1)
+                {
+                    Logging.add(new Logging(Logging.Type.Fatal, "Server", "Start", "Socket kann nicht geschlossen werden.", e1));
+                }
+                SceneManager.LoadScene("Startup");
+                //Logging.add(new Logging(Logging.Type.Normal, "Server", "Start", "Client wird in das Hauptmenü geladen."));
+                return;
             }
-            //Logging.add(new Logging(Logging.Type.Normal, "Server", "Start", "Client wird in das Hauptmenü geladen."));
-            return;
         }
         #endregion
 
@@ -69,10 +74,21 @@ public class StartupServer : MonoBehaviour
         UpdateSpieler();
     }
 
+    private void OnEnable()
+    {
+        Hauptmenue.SetActive(false);
+        Lobby.SetActive(true);
+        ServerControl.SetActive(true);
+        SpielerMiniGames[0].transform.parent.gameObject.SetActive(false);
+
+        if (ServerControlGameSelection.activeInHierarchy)
+            DisplayGameFiles();
+        UpdateSpieler();
+    }
+
     // Update is called once per frame
     void Update()
     {
-        
         #region Server
         if (!Config.SERVER_STARTED)
             return;
@@ -310,6 +326,9 @@ public class StartupServer : MonoBehaviour
                 break;
             case "#ClientFocusChange":
                 Debug.Log("FocusChange (" + player.id + ") " + player.name + ": InGame: " + data);
+                break;
+            case "#GetSpielerUpdate":
+                UpdateSpielerBroadcast();
                 break;
 
             case "#ClientSetName":
@@ -587,7 +606,7 @@ public class StartupServer : MonoBehaviour
         // CheckForWin
         if (TickTackToe.CheckForEnd(freieFelder, belegteFelder))
         {
-            SendMessage("#TickTackToeZugEnde " + data, player);
+            SendMessage("#TickTackToeZugEnde |" + TickTackToe.getResult(belegteFelder) + "| " + data, player);
             return;
         }
         // Ziehen
@@ -595,7 +614,7 @@ public class StartupServer : MonoBehaviour
         freieFelder = TickTackToe.GetFreieFelder(belegteFelder);
         //Check for End
         if (TickTackToe.CheckForEnd(freieFelder, belegteFelder))
-            SendMessage("#TickTackToeZugEnde " + TickTackToe.PrintBelegteFelder(belegteFelder), player);
+            SendMessage("#TickTackToeZugEnde |" + TickTackToe.getResult(belegteFelder) + "|" + TickTackToe.PrintBelegteFelder(belegteFelder), player);
         else
             SendMessage("#TickTackToeZug " + TickTackToe.PrintBelegteFelder(belegteFelder), player);
     }
@@ -616,6 +635,7 @@ public class StartupServer : MonoBehaviour
         {
             ServerControlControlField.SetActive(true);
             ServerControlGameSelection.SetActive(false);
+            UpdateSpieler();
         }
         else
         {
@@ -633,9 +653,12 @@ public class StartupServer : MonoBehaviour
     public void StarteQuiz(TMP_Dropdown drop)
     {
         Config.QUIZ_SPIEL.setSelected(Config.QUIZ_SPIEL.getQuizByIndex(drop.value));
+        Debug.Log("Quiz starts: "+Config.QUIZ_SPIEL.getSelected().getTitel());
         // TODO: Sendet Befehle das Spieler mitladen sollen
-        Debug.LogWarning(Config.QUIZ_SPIEL.getSelected().getTitel());
         SceneManager.LoadScene("Quiz");
+        Broadcast("#StarteSpiel Quiz");
+        Debug.Log("Spieler sollen auch wechseln");
+
     }
     #endregion
 }

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class QuizScene : MonoBehaviour
 {
@@ -9,6 +10,10 @@ public class QuizScene : MonoBehaviour
     [SerializeField] GameObject[] ServerSided;
     [SerializeField] GameObject[] DeactivateForServer;
     [SerializeField] GameObject[] DeactivateForClient;
+
+    private void Start()
+    {
+    }
 
     void OnEnable()
     {
@@ -35,5 +40,11 @@ public class QuizScene : MonoBehaviour
     void Update()
     {
         
+    }
+
+    // TODO: temo
+    public void LoadStartuo()
+    {
+        SceneManager.LoadScene("Startup");
     }
 }

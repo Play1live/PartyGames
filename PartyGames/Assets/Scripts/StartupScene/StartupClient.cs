@@ -16,7 +16,8 @@ public class StartupClient : MonoBehaviour
 
     [SerializeField] GameObject[] SpielerAnzeigeLobby;
     [SerializeField] GameObject[] MiniGames;
-    private string ticktackoe = "";
+    private string ticktacktoe = "";
+    private string ticktacktoeRes = "W0WL0LD0D";
 
     [SerializeField] GameObject UmbenennenFeld;
 
@@ -24,33 +25,42 @@ public class StartupClient : MonoBehaviour
     void OnEnable()
     {
         MiniGames[0].SetActive(true);
-        if (Config.CLIENT_STARTED)
-            return;
         #region Client Verbindungsaufbau zum Server
-        // Create the socket
-        try
+        if (!Config.CLIENT_STARTED)
         {
-            Config.CLIENT_TCP = new TcpClient(Config.SERVER_CONNECTION_IP, Config.SERVER_CONNECTION_PORT);
-            Config.CLIENT_STARTED = true;
-            Logging.add(new Logging(Logging.Type.Normal, "Client", "Start", "Verbindung zum Server wurde hergestellt."));
-            Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server wurde hergestellt.";
-        }
-        catch (Exception e)
-        {
-            Logging.add(new Logging(Logging.Type.Fatal, "Client", "Start", "Verbindung zum Server nicht möglich.", e));
-            Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server nicht möglich. \n" + e;
+            // Create the socket
             try
             {
-                CloseSocket();
+                Config.CLIENT_TCP = new TcpClient(Config.SERVER_CONNECTION_IP, Config.SERVER_CONNECTION_PORT);
+                Config.CLIENT_STARTED = true;
+                Logging.add(new Logging(Logging.Type.Normal, "Client", "Start", "Verbindung zum Server wurde hergestellt."));
+                Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server wurde hergestellt.";
             }
-            catch (Exception e1)
+            catch (Exception e)
             {
-                Logging.add(new Logging(Logging.Type.Fatal, "Client", "Start", "Socket konnte nicht geschlossen werden.", e1));
-                //ConnectingToServerLBL.GetComponent<TMP_Text>().text = ConnectingToServerLBL.GetComponent<TMP_Text>().text + "\n\nVerbindung zum Server nicht möglich." + e;
+                Logging.add(new Logging(Logging.Type.Fatal, "Client", "Start", "Verbindung zum Server nicht möglich.", e));
+                Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server nicht möglich. \n" + e;
+                Config.CLIENT_STARTED = false;
+                try
+                {
+                    CloseSocket();
+                }
+                catch (Exception e1)
+                {
+                    Logging.add(new Logging(Logging.Type.Fatal, "Client", "Start", "Socket konnte nicht geschlossen werden.", e1));
+                    //ConnectingToServerLBL.GetComponent<TMP_Text>().text = ConnectingToServerLBL.GetComponent<TMP_Text>().text + "\n\nVerbindung zum Server nicht möglich." + e;
+                }
+                transform.gameObject.SetActive(false);
+                Logging.add(new Logging(Logging.Type.Normal, "Client", "Start", "Client wird ins Hauptmenü geladen."));
+                SceneManager.LoadScene("Startup");
+                return;
             }
-            transform.gameObject.SetActive(false);
-            Logging.add(new Logging(Logging.Type.Normal, "Client", "Start", "Client wird ins Hauptmenü geladen."));
-            return;
+        }
+        else
+        {
+            Hauptmenue.SetActive(false);
+            Lobby.SetActive(true);
+            SendToServer("#GetSpielerUpdate");
         }
         #endregion
     }
@@ -138,7 +148,7 @@ public class StartupClient : MonoBehaviour
             #region Universal Commands
             case "#ServerClosed":
                 CloseSocket();
-                SceneManager.LoadScene("StartUpScene");
+                SceneManager.LoadScene("StartUp");
                 break;
             #endregion
 
@@ -159,6 +169,10 @@ public class StartupClient : MonoBehaviour
                 break;
             case "#SpielerChangeName":
                 SpielerChangeName(data);
+                break;
+
+            case "#StarteSpiel":
+                StarteSpiel(data);
                 break;
 
             // MiniGames
@@ -292,11 +306,25 @@ public class StartupClient : MonoBehaviour
                     SpielerAnzeigeLobby[id].SetActive(false);
                 }
             }
-            GameObject.Find("Lobby/Title_LBL/Spieleranzahl").GetComponent<TMP_Text>().text = spieleranzahl +"/"+(Config.PLAYERLIST.Length+1);
-
-
+            if (Lobby.activeInHierarchy)
+                GameObject.Find("Lobby/Title_LBL/Spieleranzahl").GetComponent<TMP_Text>().text = spieleranzahl + "/" + (Config.PLAYERLIST.Length + 1);
         }
-        
+    }
+
+    private void StarteSpiel(string data)
+    {
+        switch (data)
+        {
+            default:
+                Logging.add(new Logging(Logging.Type.Fatal, "Client", "StarteSpiel", "Unbekanntes Spiel das geladen werden soll. Beende Verbindung"));
+                SendToServer("#ClientClosed");
+                CloseSocket();
+                break;
+            case "Quiz":
+                Logging.add(new Logging(Logging.Type.Normal, "Client", "StarteSpiel", "Spiel wird geladen: "+ data));
+                SceneManager.LoadScene("Quiz");
+                break;
+        }
     }
 
     #region MiniGames
@@ -310,14 +338,14 @@ public class StartupClient : MonoBehaviour
     }
     public void StartTickTackToe()
     {
-        ticktackoe = "";
+        ticktacktoe = "";
         SendToServer("#StartTickTackToe");
     }
     private void TickTackToeZug(string data)
     {
         MiniGames[0].transform.GetChild(2).gameObject.SetActive(false);
-        MiniGames[0].transform.GetChild(2).GetChild(0).gameObject.SetActive(false);
-        ticktackoe = data;
+        MiniGames[0].transform.GetChild(3).gameObject.SetActive(false);
+        ticktacktoe = data;
 
         for (int i = 1; i <= 9; i++)
         {
@@ -338,21 +366,29 @@ public class StartupClient : MonoBehaviour
     }
     private void TickTackToeZugEnde(string data)
     {
+        // Save Result
+        string result = data.Split('|')[1];
+        data = data.Split('|')[2];
+        int type = Int32.Parse(ticktacktoeRes.Split(result)[1])+1;
+        ticktacktoeRes = ticktacktoeRes.Replace(result + (type - 1) + result, result + type + result);
+
         TickTackToeZug(data);
         MiniGames[0].transform.GetChild(2).gameObject.SetActive(true);
-        MiniGames[0].transform.GetChild(2).GetChild(0).gameObject.SetActive(true);
+        MiniGames[0].transform.GetChild(3).gameObject.SetActive(true);
+        MiniGames[0].transform.GetChild(4).GetComponent<TMP_Text>().text = "W:" + ticktacktoeRes.Split('W')[1] + " L:" + ticktacktoeRes.Split('L')[1] + " D:" + ticktacktoeRes.Split('D')[1];
+        
     }
     public void TickTackToeButtonPress(GameObject button)
     {
         // Feld bereits belegt
-        if (ticktackoe.Replace("["+button.name+"]","|").Split('|')[1] != "")
+        if (ticktacktoe.Replace("["+button.name+"]","|").Split('|')[1] != "")
         {
             return;
         }
         MiniGames[0].transform.GetChild(2).gameObject.SetActive(true);
 
-        ticktackoe = ticktackoe.Replace("[" + button.name + "][" + button.name + "]", "["+ button.name + "]O[" + button.name + "]");
-        SendToServer("#TickTackToeSpielerZug "+ ticktackoe);
+        ticktacktoe = ticktacktoe.Replace("[" + button.name + "][" + button.name + "]", "["+ button.name + "]O[" + button.name + "]");
+        SendToServer("#TickTackToeSpielerZug "+ ticktacktoe);
     }
 
     #endregion

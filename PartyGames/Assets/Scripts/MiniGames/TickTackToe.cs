@@ -88,6 +88,62 @@ public class TickTackToe
         return isend;
     }
 
+    // Win w, Lose l, draw d
+    public static string getResult(List<string> belegteFelder)
+    {
+        // Check for playerwin
+        bool playerwin = false;
+        // Diag
+        if (belegteFelder[0] == belegteFelder[4] && belegteFelder[4] == belegteFelder[8] && belegteFelder[0] == "O")
+            playerwin = true;
+        if (belegteFelder[2] == belegteFelder[4] && belegteFelder[4] == belegteFelder[6] && belegteFelder[2] == "O")
+            playerwin = true;
+        // Hori
+        if (belegteFelder[0] == belegteFelder[1] && belegteFelder[1] == belegteFelder[2] && belegteFelder[0] == "O")
+            playerwin = true;
+        if (belegteFelder[3] == belegteFelder[4] && belegteFelder[4] == belegteFelder[5] && belegteFelder[3] == "O")
+            playerwin = true;
+        if (belegteFelder[6] == belegteFelder[7] && belegteFelder[7] == belegteFelder[8] && belegteFelder[6] == "O")
+            playerwin = true;
+        // Verti
+        if (belegteFelder[0] == belegteFelder[3] && belegteFelder[3] == belegteFelder[6] && belegteFelder[0] == "O")
+            playerwin = true;
+        if (belegteFelder[1] == belegteFelder[4] && belegteFelder[4] == belegteFelder[7] && belegteFelder[1] == "O")
+            playerwin = true;
+        if (belegteFelder[2] == belegteFelder[5] && belegteFelder[5] == belegteFelder[8] && belegteFelder[2] == "O")
+            playerwin = true;
+
+        if (playerwin)
+            return "W";
+
+        // Check for serverwin
+        bool serverwin = false;
+        // Diag
+        if (belegteFelder[0] == belegteFelder[4] && belegteFelder[4] == belegteFelder[8] && belegteFelder[0] == "X")
+            serverwin = true;
+        if (belegteFelder[2] == belegteFelder[4] && belegteFelder[4] == belegteFelder[6] && belegteFelder[2] == "X")
+            serverwin = true;
+        // Hori
+        if (belegteFelder[0] == belegteFelder[1] && belegteFelder[1] == belegteFelder[2] && belegteFelder[0] == "X")
+            serverwin = true;
+        if (belegteFelder[3] == belegteFelder[4] && belegteFelder[4] == belegteFelder[5] && belegteFelder[3] == "X")
+            serverwin = true;
+        if (belegteFelder[6] == belegteFelder[7] && belegteFelder[7] == belegteFelder[8] && belegteFelder[6] == "X")
+            serverwin = true;
+        // Verti
+        if (belegteFelder[0] == belegteFelder[3] && belegteFelder[3] == belegteFelder[6] && belegteFelder[0] == "X")
+            serverwin = true;
+        if (belegteFelder[1] == belegteFelder[4] && belegteFelder[4] == belegteFelder[7] && belegteFelder[1] == "X")
+            serverwin = true;
+        if (belegteFelder[2] == belegteFelder[5] && belegteFelder[5] == belegteFelder[8] && belegteFelder[2] == "X")
+            serverwin = true;
+
+        if (serverwin)
+            return "L";
+
+        return "D";
+    }
+
     public static List<string> ServerZiehen(List<int> freieFelder, List<string> belegteFelder)
     {
         List<int> moeglicheFelder = new List<int>();

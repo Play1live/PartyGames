@@ -30,36 +30,61 @@ public class StartupScene : MonoBehaviour
         Debug.Log("DataPath: "+Config.MedienPath);
 #endif
         /*Testzwecke*/// TODO
-        Config.isServer = true;
+                       //Config.isServer = false;
 
         // Init Playerlist
-        Config.PLAYERLIST = new Player[] { new Player(1), new Player(2), new Player(3), new Player(4), new Player(5), new Player(6), new Player(7), new Player(8) };
-        // Init Playericons
-        Config.PLAYER_ICONS = new List<Sprite>();
-        foreach (Sprite sprite in Resources.LoadAll<Sprite>("Images/ProfileIcons/"))
+        if (Config.PLAYERLIST == null)
         {
-            Config.PLAYER_ICONS.Add(sprite);
+            Config.PLAYERLIST = new Player[] { new Player(1), new Player(2), new Player(3), new Player(4), new Player(5), new Player(6), new Player(7), new Player(8) };
+            // Init Playericons
+            Config.PLAYER_ICONS = new List<Sprite>();
+            foreach (Sprite sprite in Resources.LoadAll<Sprite>("Images/ProfileIcons/"))
+            {
+                Config.PLAYER_ICONS.Add(sprite);
+            }
+            Hauptmenue.SetActive(true); 
+            Lobby.SetActive(false);
+            ServerControl.SetActive(false);
         }
 
-        // Gamebojects
-        Hauptmenue.SetActive(true);
         if (Config.isServer)
         {
             GameObject.Find("Version_LBL").gameObject.GetComponent<TMP_Text>().text = "Version: " + Config.APPLICATION_VERSION + "    Medien: " + Config.MedienPath;
         }
         else
         {
-            GameObject.Find("ChooseYourName_TXT").gameObject.GetComponent<TMP_InputField>().text = Config.PLAYER_NAME;
-            GameObject.Find("Version_LBL").gameObject.GetComponent<TMP_Text>().text = "Version: " + Config.APPLICATION_VERSION;
+            if (Hauptmenue.activeInHierarchy)
+            {
+                GameObject.Find("ChooseYourName_TXT").gameObject.GetComponent<TMP_InputField>().text = Config.PLAYER_NAME;
+                GameObject.Find("Version_LBL").gameObject.GetComponent<TMP_Text>().text = "Version: " + Config.APPLICATION_VERSION;
+            }
         }
-        GameObject.Find("ChooseYourName_TXT").gameObject.GetComponent<TMP_InputField>().text = Config.PLAYER_NAME;
-        Lobby.SetActive(false);
-        ServerControl.SetActive(false);
+        if (Hauptmenue.activeInHierarchy)
+        {
+            GameObject.Find("ChooseYourName_TXT").gameObject.GetComponent<TMP_InputField>().text = Config.PLAYER_NAME;
+        }
 
     }
     private void OnEnable()
     {
-        // TODO: wenn man zurück ins Hauotmenü kommt
+        Lobby.SetActive(false);
+        ServerControl.SetActive(false);
+        if (Config.isServer)
+        {
+            if (Config.SERVER_STARTED)
+            {
+                Server.SetActive(true);
+                return;
+            }
+        }
+        else
+        {
+            if (Config.CLIENT_STARTED)
+            {
+                Client.SetActive(true);
+                return;
+            }
+        }
     }
 
     void Update()
