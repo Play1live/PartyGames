@@ -1,0 +1,4 @@
+Farben: Rot, Weiß, Grün
+Hauptstadt: Minsk
+Fläche: 207.595 km²
+Einwohnerzahl: 9.400.000

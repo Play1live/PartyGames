@@ -12,25 +12,27 @@ public class StartupScene : MonoBehaviour
     [SerializeField] GameObject Lobby;
     [SerializeField] GameObject ServerControl;
  
-    private void Awake()
-    {
-        LoadConfigs.FetchRemoteConfig();
-        MedienUtil.CreateMediaDirectory();
-        SetupSpiele.LoadGameFiles();
-        Application.targetFrameRate = 60;
-        Config.log = new List<Logging>();
-        Client.SetActive(false);
-        Server.SetActive(false);
-    }
-
     void Start()
     {
+        if (!Config.CLIENT_STARTED && !Config.SERVER_STARTED)
+        {
+            Config.log = new List<Logging>();
+            LoadConfigs.FetchRemoteConfig();
+            MedienUtil.CreateMediaDirectory();
+            SetupSpiele.LoadGameFiles();
+            Client.SetActive(false);
+            Server.SetActive(false);
+        }
+
+
+        Application.targetFrameRate = 60;
 #if UNITY_EDITOR
         Config.isServer = true;
         Debug.Log("DataPath: "+Config.MedienPath);
+        Application.targetFrameRate = 120;
 #endif
         /*Testzwecke*/// TODO
-                       //Config.isServer = false;
+        Config.isServer = !Config.isServer;
 
         // Init Playerlist
         if (Config.PLAYERLIST == null)
@@ -49,7 +51,11 @@ public class StartupScene : MonoBehaviour
 
         if (Config.isServer)
         {
-            GameObject.Find("Version_LBL").gameObject.GetComponent<TMP_Text>().text = "Version: " + Config.APPLICATION_VERSION + "    Medien: " + Config.MedienPath;
+            if (Hauptmenue.activeInHierarchy)
+            {
+                GameObject.Find("Version_LBL").gameObject.GetComponent<TMP_Text>().text = "Version: " + Config.APPLICATION_VERSION + "    Medien: " + Config.MedienPath;
+                GameObject.Find("ChooseYourName_TXT").gameObject.GetComponent<TMP_InputField>().text = Config.PLAYER_NAME;
+            }
         }
         else
         {
@@ -59,16 +65,16 @@ public class StartupScene : MonoBehaviour
                 GameObject.Find("Version_LBL").gameObject.GetComponent<TMP_Text>().text = "Version: " + Config.APPLICATION_VERSION;
             }
         }
-        if (Hauptmenue.activeInHierarchy)
-        {
-            GameObject.Find("ChooseYourName_TXT").gameObject.GetComponent<TMP_InputField>().text = Config.PLAYER_NAME;
-        }
-
     }
     private void OnEnable()
     {
+        Hauptmenue.SetActive(true);
         Lobby.SetActive(false);
         ServerControl.SetActive(false);
+
+        // Spiele Hintergrundmusik
+        GameObject.Find("Audio/Hintergrundmusik").GetComponent<AudioSource>().Play();
+
         if (Config.isServer)
         {
             if (Config.SERVER_STARTED)
@@ -98,17 +104,30 @@ public class StartupScene : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        Debug.Log("Quit");
+        //Logging.add(Logging.Type.Normal, "StartupScene", "OnApplicationQuit", "Programm wird beendet");
+        //MedienUtil.WriteLogsInDirectory();
     }
 
-    // Begrenzt die Namenslänge
+    /**
+     * Begrenzt die Länge des Namens
+     */
     public void OnChangeName(TMP_InputField input) 
     {
         if (input.text.Length > Config.MAX_PLAYER_NAME_LENGTH)
             input.text = input.text.Substring(0, Config.MAX_PLAYER_NAME_LENGTH);
     }
 
-    // Startet den Client/Server
+    /**
+     *  Beendet das Spiel auf Button
+     */
+    public void SpielBeenden()
+    {
+        Application.Quit();
+    }
+
+    /**
+     * Startet den Server/Client
+     */
     public void StartConnection()
     {
         Config.PLAYER_NAME = GameObject.Find("ChooseYourName_TXT").gameObject.GetComponent<TMP_InputField>().text;
@@ -117,6 +136,7 @@ public class StartupScene : MonoBehaviour
         {
             // Initiate Gameobjects
             Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server wird aufgebaut...";
+            Logging.add(Logging.Type.Normal, "StartupScene", "StartConnection", "Verbindung zum Server wird aufgebaut...");
             Client.SetActive(true);
         }
         // Game is Server
@@ -124,6 +144,7 @@ public class StartupScene : MonoBehaviour
         {
             // Initiate Gameobjects
             Config.HAUPTMENUE_FEHLERMELDUNG = "Server wird gestartet...";
+            Logging.add(Logging.Type.Normal, "StartupScene", "StartConnection", "Server wird gestartet...");
             Server.SetActive(true);
         }
     }

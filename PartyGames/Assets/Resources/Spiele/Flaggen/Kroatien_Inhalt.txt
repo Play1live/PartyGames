@@ -1,0 +1,4 @@
+Farben: Rot, Weiß, Blau, Gelb
+Hauptstadt: Zagreb
+Fläche: 56.594 km²
+Einwohnerzahl: 3.888.529

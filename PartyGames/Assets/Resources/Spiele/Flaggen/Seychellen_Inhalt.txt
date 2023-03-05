@@ -1,0 +1,4 @@
+Farben: Rot, Blau, Weiß, Gelb, Grün
+Hauptstadt: Victoria
+Fläche: 455 km²
+Einwohnerzahl: 98.500

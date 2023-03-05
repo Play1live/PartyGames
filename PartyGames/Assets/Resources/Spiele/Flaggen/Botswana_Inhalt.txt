@@ -1,0 +1,4 @@
+Farben: Blau, Weiß, Schwarz
+Hauptstadt: Gaborone
+Fläche: 581.730 km²
+Einwohnerzahl: 2.300.000

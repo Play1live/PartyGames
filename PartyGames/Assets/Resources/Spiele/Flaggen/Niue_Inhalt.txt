@@ -1,0 +1,4 @@
+Farben: Blau, Weiß, Rot, Gelb
+Hauptstadt: Alofi
+Fläche: 261 km²
+Einwohnerzahl: 1784

@@ -1,0 +1,4 @@
+Farben: Blau, Weiß, Gelb, Schwarz, Rot, Grün, Orange
+Hauptstadt: San Salvador
+Fläche: 21.041 km²
+Einwohnerzahl: 6.500.000

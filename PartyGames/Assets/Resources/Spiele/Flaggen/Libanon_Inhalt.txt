@@ -1,0 +1,4 @@
+Farben: Rot, Weiß, Grün
+Hauptstadt: Beirut
+Fläche: 10.452 km²
+Einwohnerzahl: 6.800.000

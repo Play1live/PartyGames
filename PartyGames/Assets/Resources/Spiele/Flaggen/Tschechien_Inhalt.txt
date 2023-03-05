@@ -1,0 +1,4 @@
+Farben: Rot, Weiß, Blau
+Hauptstadt: Prag
+Fläche: 78.866 km²
+Einwohnerzahl: 10.500.000

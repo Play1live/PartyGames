@@ -1,0 +1,4 @@
+Farben: Blau, Weiß, Rot
+Hauptstadt: Santiago de Chile
+Fläche: 756.102 km²
+Einwohnerzahl: 19.100.000

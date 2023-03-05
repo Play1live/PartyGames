@@ -1,0 +1,4 @@
+Farben: Weiß, Rot
+Hauptstadt: Tokio
+Fläche: 377.975 km²
+Einwohnerzahl: 125.708.382

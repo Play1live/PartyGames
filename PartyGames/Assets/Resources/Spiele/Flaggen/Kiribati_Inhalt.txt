@@ -1,0 +1,4 @@
+Farben: Rot, Gelb, Weiß, BLau
+Hauptstadt: South Taeawa
+Fläche: 726 km²
+Einwohnerzahl: 119.438

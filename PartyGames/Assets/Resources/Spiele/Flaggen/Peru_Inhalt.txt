@@ -1,0 +1,4 @@
+Farben: Rot, Weiß
+Hauptstadt: Lima
+Fläche: 1.285.216 km²
+Einwohnerzahl: 32.800.000

@@ -1,0 +1,4 @@
+Farben: Blau, Weiß, Rot
+Hauptstadt: Monorovia
+Fläche: 111.369 km²
+Einwohnerzahl: 5.214.000

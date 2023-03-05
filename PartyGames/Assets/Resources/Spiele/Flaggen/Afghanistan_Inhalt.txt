@@ -1,0 +1,4 @@
+Farben: Schwarz, Rot, Grün, Weiß
+Hauptstadt: Kabul
+Fläche: 652.864 km²
+Einwohnerzahl: 38.900.000

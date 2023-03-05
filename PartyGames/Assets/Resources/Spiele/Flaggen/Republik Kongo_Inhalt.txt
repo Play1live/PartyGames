@@ -1,0 +1,4 @@
+Farben: Grün, Gelb, Rot
+Hauptstadt: Brazzaville
+Fläche: 342.000 km²
+Einwohnerzahl: 5.293.070

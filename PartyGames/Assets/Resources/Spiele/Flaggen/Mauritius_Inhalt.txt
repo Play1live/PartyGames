@@ -1,0 +1,4 @@
+Farben: Rot, Blau, Gelb, Grün
+Hauptstadt: Port Louis
+Fläche: 2.040 km²
+Einwohnerzahl: 1.300.000

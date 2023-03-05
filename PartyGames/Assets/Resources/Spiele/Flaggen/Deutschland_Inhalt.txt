@@ -1,0 +1,4 @@
+Farben: Schwarz, Rot, Gelb
+Hauptstadt: Berlin
+Fläche: 357.588 km²
+Einwohnerzahl: 83.129.285

@@ -1,0 +1,4 @@
+Farben: Rot, Weiß, Blau
+Hauptstadt: Panama-Stadt
+Fläche: 75.517 km²
+Einwohnerzahl: 4.300.000

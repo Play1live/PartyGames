@@ -1,0 +1,4 @@
+Farben: Weiß, Blau, Grün, Rot
+Hauptstadt: Dschibuti
+Fläche: 23.200 km²
+Einwohnerzahl: 865.267

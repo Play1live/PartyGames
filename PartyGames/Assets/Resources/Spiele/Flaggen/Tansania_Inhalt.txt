@@ -1,0 +1,4 @@
+Farben: Grün, Gelb, Schwarz, Blau
+Hauptstadt: Dodoma
+Fläche: 945.087 km²
+Einwohnerzahl: 55.900.000

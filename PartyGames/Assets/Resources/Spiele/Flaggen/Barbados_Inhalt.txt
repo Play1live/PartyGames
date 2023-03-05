@@ -1,0 +1,4 @@
+Farben: Blau, Gelb, Schwarz
+Hauptstadt: Bridgetown
+Fläche: 430 km²
+Einwohnerzahl: 287.000

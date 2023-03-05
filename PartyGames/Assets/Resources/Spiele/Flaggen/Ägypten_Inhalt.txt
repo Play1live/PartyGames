@@ -1,0 +1,4 @@
+Farben: Rot, Weiß, Schwarz, Gold
+Hauptstadt: Kairo
+Fläche: 1.001.449 km²
+Einwohnerzahl: 102.300.000

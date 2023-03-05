@@ -1,0 +1,4 @@
+Farben: Rot, Schwarz, Grün
+Hauptstadt: Lilongew
+Fläche: 118.484 km²
+Einwohnerzahl: 20.900.000

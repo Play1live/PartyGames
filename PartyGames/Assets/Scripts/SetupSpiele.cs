@@ -6,14 +6,19 @@ public class SetupSpiele
 {
     public static void LoadGameFiles()
     {
-        Debug.Log("Loading Games...");
+        Logging.add(Logging.Type.Normal, "SetupSpiele", "LoadGameFiles", "Loading Games...");
         reloadQuiz();
-        Debug.Log("Games are ready!");
+        reloadFlaggen();
+        Logging.add(Logging.Type.Normal, "SetupSpiele", "LoadGameFiles", "Games are ready!");
     }
 
     public static void reloadQuiz()
     {
         Config.QUIZ_SPIEL = new QuizSpiel();
+    }
+    public static void reloadFlaggen()
+    {
+        Config.FLAGGEN_SPIEL = new FlaggenSpiel();
     }
 
     /*public static void reloadDerZugLuegt()
@@ -21,10 +26,6 @@ public class SetupSpiele
         Settings.derzugluegtSpiel = new DerZugLuegtSpiel();
     }
 
-    public static void reloadFlaggen()
-    {
-        Settings.flaggenSpiel = new FlaggenSpiel();
-    }
 
     public static void reloadListen()
     {

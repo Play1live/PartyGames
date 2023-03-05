@@ -1,0 +1,4 @@
+Farben: Rot, Weiß
+Hauptstadt: Ottawa
+Fläche: 9.984.670 km²
+Einwohnerzahl: 37.000.000

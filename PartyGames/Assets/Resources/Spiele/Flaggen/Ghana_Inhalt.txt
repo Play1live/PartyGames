@@ -1,0 +1,4 @@
+Farben: Rot, Gelb, Grün, Schwarz
+Hauptstadt: Accra
+Fläche: 238.537 km²
+Einwohnerzahl: 30.790.000

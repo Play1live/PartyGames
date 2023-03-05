@@ -1,0 +1,4 @@
+Farben: Rot, Weiß, Blau
+Hauptstadt: Havanna
+Fläche: 109.884 km²
+Einwohnerzahl: 11.300.000

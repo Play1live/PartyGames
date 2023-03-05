@@ -1,0 +1,4 @@
+Farben: Blau, Rot, Weiß, Grün, Braun, Schwarz, Gelb
+Hauptstadt: Belmopan
+Fläche: 22.966 km²
+Einwohnerzahl: 419.000

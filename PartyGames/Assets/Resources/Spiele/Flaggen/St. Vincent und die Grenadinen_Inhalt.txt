@@ -1,0 +1,4 @@
+Farben: Blau, Gelb, Grün
+Hauptstadt: Kingstown
+Fläche: 389 km²
+Einwohnerzahl: 111.000

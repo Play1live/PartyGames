@@ -1,0 +1,4 @@
+Farben: Gelb, Grün, Rot
+Hauptstadt: Vilnius
+Fläche: 65.300 km²
+Einwohnerzahl: 2.790.407

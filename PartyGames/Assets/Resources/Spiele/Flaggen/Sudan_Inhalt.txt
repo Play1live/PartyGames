@@ -1,0 +1,4 @@
+Farben: Rot, Weiß, Grün, Schwarz
+Hauptstadt: Khartum
+Fläche: 1.861.484 km²
+Einwohnerzahl: 19.400.000

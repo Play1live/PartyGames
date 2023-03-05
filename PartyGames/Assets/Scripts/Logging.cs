@@ -63,6 +63,15 @@ public class Logging
         return s;
     }
 
+    public static void add(Type type, string klasse, string methode, string msg, Exception e)
+    {
+        add(new Logging(type, klasse, methode, msg, e));
+    }
+    public static void add(Type type, string klasse, string methode, string msg)
+    {
+        add(new Logging(type, klasse, methode, msg));
+    }
+
     public static void add(Logging log)
     {
         Config.log.Add(log);
@@ -102,9 +111,5 @@ public class Logging
         }
     }
 
-    public static void add(Type type, string klasse, string method, string msg, Exception exeption)
-    {
-        add(new Logging(type, klasse, method, msg, exeption));
-    }
 }
 

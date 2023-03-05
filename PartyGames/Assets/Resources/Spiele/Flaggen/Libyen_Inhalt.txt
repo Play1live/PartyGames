@@ -1,0 +1,4 @@
+Farben: Rot, Schwarz, Grün, Weiß
+Hauptstadt: Tripolis
+Fläche: 1.759.541 km²
+Einwohnerzahl: 6.900.000

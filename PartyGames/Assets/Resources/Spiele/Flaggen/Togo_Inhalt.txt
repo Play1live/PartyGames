@@ -1,0 +1,4 @@
+Farben: Rot, Weiß, Grün, Gelb
+Hauptstadt: Lomé
+Fläche: 56.785 km²
+Einwohnerzahl: 7.070.000

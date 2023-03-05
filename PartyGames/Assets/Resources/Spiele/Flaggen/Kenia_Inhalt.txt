@@ -1,0 +1,4 @@
+Farben: Schwarz, Weiß, Rot, Grün
+Hauptstadt: Nairobi
+Fläche: 580.367 km²
+Einwohnerzahl: 46.564.296

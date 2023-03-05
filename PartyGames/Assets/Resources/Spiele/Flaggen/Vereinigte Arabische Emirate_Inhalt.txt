@@ -1,0 +1,4 @@
+Farben: Rot, Grün, Weiß, Schwarz
+Hauptstadt: Abu Dhabi
+Fläche: 71.024 km²
+Einwohnerzahl: 9.900.000

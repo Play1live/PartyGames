@@ -1,0 +1,4 @@
+Farben: Grün, Weiß, Rot, Gelb
+Hauptstadt: Asgabat
+Fläche: 488.100 km²
+Einwohnerzahl: 6.000.000

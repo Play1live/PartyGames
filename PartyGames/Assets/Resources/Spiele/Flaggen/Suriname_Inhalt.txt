@@ -1,0 +1,4 @@
+Farben: Grün, Weiß, Rot, Gelb
+Hauptstadt: Paramaribo
+Fläche: 163.820 km²
+Einwohnerzahl: 587.000

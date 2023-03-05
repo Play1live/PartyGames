@@ -1,0 +1,4 @@
+Farben: Blau, Rot, Weiß
+Hauptstadt: Washington, D.C.
+Fläche: 9.525.067 km²
+Einwohnerzahl: 331.449.281

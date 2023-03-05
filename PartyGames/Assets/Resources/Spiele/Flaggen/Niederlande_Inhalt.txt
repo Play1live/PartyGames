@@ -1,0 +1,4 @@
+Farben: Rot, Weiß, Blau
+Hauptstadt: Amsterdam
+Fläche: 41.543 km²
+Einwohnerzahl: 17.591.394

@@ -1,0 +1,4 @@
+Farben: Rot, Weiß
+Hauptstadt: Riga
+Fläche: 64.589 km²
+Einwohnerzahl: 1.900.000

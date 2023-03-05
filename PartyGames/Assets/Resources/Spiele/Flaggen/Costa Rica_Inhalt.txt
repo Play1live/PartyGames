@@ -1,0 +1,4 @@
+Farben: Blau, Rot, Weiß
+Hauptstadt: San Josè
+Fläche: 51.100 km²
+Einwohnerzahl: 5.100.000

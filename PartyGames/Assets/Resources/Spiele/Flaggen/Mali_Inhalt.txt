@@ -1,0 +1,4 @@
+Farben: Rot, Gelb, Grün
+Hauptstadt: Bamako
+Fläche: 1.240.192 km²
+Einwohnerzahl: 19.550.000

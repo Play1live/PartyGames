@@ -1,0 +1,4 @@
+Farben: Grün, Gelb, Blau, Weiß
+Hauptstadt: Brasília
+Fläche: 8.515.770 km²
+Einwohnerzahl: 214.500.000

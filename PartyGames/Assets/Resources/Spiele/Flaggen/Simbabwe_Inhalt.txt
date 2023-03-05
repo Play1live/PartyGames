@@ -1,0 +1,4 @@
+Farben: Grün, Gelb, Rot, Schwarz, Weiß
+Hauptstadt: Harare
+Fläche: 390.757 km²
+Einwohnerzahl: 16.530.000

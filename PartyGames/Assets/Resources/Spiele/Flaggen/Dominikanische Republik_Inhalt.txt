@@ -1,0 +1,4 @@
+Farben: Blau, Rot, Weiß, Gelb, Grün
+Hauptstadt: Santo Domingo
+Fläche: 48.730 km²
+Einwohnerzahl: 10.800.000

@@ -1,0 +1,4 @@
+Farben: Grün, Gelb, Rot, Blau
+Hauptstadt: Addis Abeba
+Fläche: 1.104.300 km²
+Einwohnerzahl: 112.079.000

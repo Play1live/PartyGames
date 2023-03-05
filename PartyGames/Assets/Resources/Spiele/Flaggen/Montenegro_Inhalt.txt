@@ -1,0 +1,4 @@
+Farben: Rot, Blau, Gold, Grün
+Hauptstadt: Podgorica
+Fläche: 13.812 km²
+Einwohnerzahl: 621.000

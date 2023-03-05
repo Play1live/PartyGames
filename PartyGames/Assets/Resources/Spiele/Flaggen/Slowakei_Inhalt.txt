@@ -1,0 +1,4 @@
+Farben: Weiß, Rot, Blau
+Hauptstadt: Bratislava
+Fläche: 49.034 km²
+Einwohnerzahl: 5.500.000

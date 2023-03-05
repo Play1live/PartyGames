@@ -1,0 +1,4 @@
+Farben: Gelb, Grün, Rot, Weiß
+Hauptstadt: Naypyiday
+Fläche: 676.578 km²
+Einwohnerzahl: 54.400.000

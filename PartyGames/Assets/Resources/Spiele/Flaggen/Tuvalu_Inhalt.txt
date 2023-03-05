@@ -1,0 +1,4 @@
+Farben: Blau, Rot, Weiß, Gelb
+Hauptstadt: Funafuti
+Fläche: 26 km²
+Einwohnerzahl: 11.650

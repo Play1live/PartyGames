@@ -1,0 +1,4 @@
+Farben: Rot, Weiß, Blau
+Hauptstadt: Luxemburg
+Fläche: 2.586 km²
+Einwohnerzahl: 645.397

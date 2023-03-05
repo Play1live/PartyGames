@@ -1,0 +1,4 @@
+Farben: Blau, Grün, Weiß, Rot, Braun, Gold
+Hauptstadt: Buenos Aires
+Fläche: 2.780.400 km²
+Einwohnerzahl: 45.400.000

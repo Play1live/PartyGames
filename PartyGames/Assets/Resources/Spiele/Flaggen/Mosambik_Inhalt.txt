@@ -1,0 +1,4 @@
+Farben: Rot, Grün, Schwarz, Gelb, Weiß
+Hauptstadt: Maputo
+Fläche: 801.590 km²
+Einwohnerzahl: 30.400.000

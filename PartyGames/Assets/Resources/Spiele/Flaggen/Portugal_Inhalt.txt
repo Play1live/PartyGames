@@ -1,0 +1,4 @@
+Farben: Rot, Weiß, Grün, Gelb
+Hauptstadt: Lissabon
+Fläche: 92.212 km²
+Einwohnerzahl: 10.356.117

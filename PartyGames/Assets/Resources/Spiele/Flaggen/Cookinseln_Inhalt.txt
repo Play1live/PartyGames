@@ -1,0 +1,4 @@
+Farben: Blau, Rot, Weiß
+Hauptstadt: Avarua
+Fläche: 18.600 km²
+Einwohnerzahl: 18.600

@@ -1,0 +1,4 @@
+Farben: Blau, Gelb, Rot
+Hauptstadt: Bukarest
+Fläche: 238.391 km²
+Einwohnerzahl: 19.300.000

@@ -1,0 +1,4 @@
+Farben: Rot, Blau, Weiß, Gold
+Hauptstadt: Belgrad
+Fläche: 88.361 km²
+Einwohnerzahl: 6.900.000

@@ -1,0 +1,4 @@
+Farben: Blau, Gelb, Grün, Weiß
+Hauptstadt: Honiara
+Fläche: 28.896 km²
+Einwohnerzahl: 687.000

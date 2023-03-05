@@ -1,0 +1,4 @@
+Farben: Gelb, Weiß, Rot, Grau
+Hauptstadt: Città del Vaticano
+Fläche: 0,44 km²
+Einwohnerzahl: 453

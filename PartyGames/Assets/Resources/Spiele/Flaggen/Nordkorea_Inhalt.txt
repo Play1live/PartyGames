@@ -1,0 +1,4 @@
+Farben: Blau, Weiß, Rot
+Hauptstadt: Pjöngjang
+Fläche: 120.538 km²
+Einwohnerzahl: 25.549.604

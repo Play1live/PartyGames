@@ -1,0 +1,4 @@
+Farben: Rot, Gelb, Grün
+Hauptstadt: Conakry
+Fläche: 245.857 km²
+Einwohnerzahl: 12.530.000

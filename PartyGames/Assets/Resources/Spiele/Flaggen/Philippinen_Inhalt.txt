@@ -1,0 +1,4 @@
+Farben: Rot, Weiß, Blau, Gelb
+Hauptstadt: Manila
+Fläche: 343.000 km²
+Einwohnerzahl: 109.035.343

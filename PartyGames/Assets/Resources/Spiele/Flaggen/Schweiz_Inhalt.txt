@@ -1,0 +1,4 @@
+Farben: Rot, Weiß
+Hauptstadt: Bern
+Fläche: 41.285 km²
+Einwohnerzahl: 8.606.033

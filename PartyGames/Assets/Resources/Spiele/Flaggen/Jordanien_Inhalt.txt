@@ -1,0 +1,4 @@
+Farben: Rot, Weiß, Schwarz, Grün
+Hauptstadt: Amman
+Fläche: 89.342 km²
+Einwohnerzahl: 10.200.000

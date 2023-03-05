@@ -1,0 +1,4 @@
+Farben: Schwarz, Weiß, Rot, Grün, Blau, Gelb
+Hauptstadt: Juba
+Fläche: 644.329 km²
+Einwohnerzahl: 11.200.000

@@ -1,0 +1,4 @@
+Farben: Rot, Gelb
+Hauptstadt: Zchinwali
+Fläche: 3885 km²
+Einwohnerzahl: 53.532

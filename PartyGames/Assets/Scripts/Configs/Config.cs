@@ -34,6 +34,7 @@ public class Config
 
     // Spiele
     public static QuizSpiel QUIZ_SPIEL;
+    public static FlaggenSpiel FLAGGEN_SPIEL;
 
     // Scenenspezifisches
     // Hauptmenue

@@ -1,0 +1,4 @@
+Farben: Blau, Rot, Gelb
+Hauptstadt: Vaduz
+Fläche: 161 km²
+Einwohnerzahl: 38.650

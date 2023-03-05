@@ -1,0 +1,4 @@
+Farben: Weiß, Rot, BLau, Gelb
+Hauptstadt: Ljubljana
+Fläche: 20.273 km²
+Einwohnerzahl: 2.100.000

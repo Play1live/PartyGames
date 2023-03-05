@@ -1,0 +1,4 @@
+Farben: Weiß, Rot, Schwarz
+Hauptstadt: Sanaa
+Fläche: 528.076 km²
+Einwohnerzahl: 29.800.000

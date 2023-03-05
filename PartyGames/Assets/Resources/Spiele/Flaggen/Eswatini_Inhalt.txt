@@ -1,0 +1,4 @@
+Farben: Blau, Gelb, Rot, Schwarz, Weiß, Grau
+Hauptstadt: Mbabne
+Fläche: 17.363 km²
+Einwohnerzahl: 1.160.000

@@ -1,0 +1,4 @@
+Farben: Rot, Weiß, Schwarz, Grün
+Hauptstadt: Bagdad
+Fläche: 434.128 km²
+Einwohnerzahl: 41.000.000

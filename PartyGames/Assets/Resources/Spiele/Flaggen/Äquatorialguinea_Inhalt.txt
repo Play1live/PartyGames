@@ -1,0 +1,4 @@
+Farben: Blau, Grün, Weiß, Rot, Braun, Gold
+Hauptstadt: Malabo
+Fläche: 28.051 km²
+Einwohnerzahl: 1.400.000

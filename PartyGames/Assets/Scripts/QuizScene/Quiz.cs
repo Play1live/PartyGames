@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 public class Quiz
 {
@@ -24,12 +25,34 @@ public class Quiz
         string[] zeilen = LadeDateien.listInhalt(path);
         for (int i = 0; i < zeilen.Length; )
         {
-            string frage = zeilen[i];
+            string frage = zeilen[i].Replace("\\n", "\n");
             i++;
-            string antwort = zeilen[i];
+            string antwort = zeilen[i].Replace("\\n", "\n");
             i++;
-            string info = zeilen[i];
+            string info = zeilen[i].Replace("\\n", "\n");
             i++;
+
+            if (frage.StartsWith("Frage"))
+                frage = frage.Substring("Frage".Length);
+            if (frage.StartsWith(":"))
+                frage = frage.Substring(":".Length);
+            if (frage.StartsWith(" "))
+                frage = frage.Substring(" ".Length);
+
+            if (antwort.StartsWith("Antwort"))
+                antwort = antwort.Substring("Antwort".Length);
+            if (antwort.StartsWith(":"))
+                antwort = antwort.Substring(":".Length);
+            if (antwort.StartsWith(" "))
+                antwort = antwort.Substring(" ".Length);
+
+            if (info.StartsWith("Info"))
+                info = info.Substring("Info".Length);
+            if (info.StartsWith(":"))
+                info = info.Substring(":".Length);
+            if (info.StartsWith(" "))
+                info = info.Substring(" ".Length);
+
             fragen.Add(new QuizFragen(frage, antwort, info));
         }
     }

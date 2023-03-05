@@ -1,0 +1,4 @@
+Farben: Blau, Rot, Weiß
+Hauptstadt: Taipeh
+Fläche: 36.179 km²
+Einwohnerzahl: 23.574.274

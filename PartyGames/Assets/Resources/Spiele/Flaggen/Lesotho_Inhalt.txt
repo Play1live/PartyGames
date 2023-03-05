@@ -1,0 +1,4 @@
+Farben: Blau, Weiß, Grün, Schwarz
+Hauptstadt: Maseru
+Fläche: 30.355 km²
+Einwohnerzahl: 2.100.000

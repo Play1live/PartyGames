@@ -1,0 +1,4 @@
+Farben: Rot, Grün, Weiß
+Hauptstadt: Sochumi
+Fläche: 8600 km²
+Einwohnerzahl: 240.705

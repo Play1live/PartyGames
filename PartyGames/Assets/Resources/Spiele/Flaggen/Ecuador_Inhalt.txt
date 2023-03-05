@@ -1,0 +1,4 @@
+Farben: Gelb, Blau, Rot, Grau, Braun, Weiß, Schwarz, Grün, Blau
+Hauptstadt: Quito
+Fläche: 256.370 km²
+Einwohnerzahl: 17.600.000

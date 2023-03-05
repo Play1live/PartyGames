@@ -1,0 +1,4 @@
+Farben: Rot, Grün, Schwarz, Gelb
+Hauptstadt: Port Vila
+Fläche: 12.190 km²
+Einwohnerzahl: 300.000

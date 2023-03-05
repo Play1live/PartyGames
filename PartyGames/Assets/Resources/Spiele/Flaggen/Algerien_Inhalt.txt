@@ -1,0 +1,4 @@
+Farben: Grün, Weiß, Rot
+Hauptstadt: Algier
+Fläche: 2.381.741 km²
+Einwohnerzahl: 42.973.000

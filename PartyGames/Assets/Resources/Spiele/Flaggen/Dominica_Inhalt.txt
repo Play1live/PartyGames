@@ -1,0 +1,4 @@
+Farben: Grün, Gelb, Schwarz, Weiß, Rot, Lila, Braun
+Hauptstadt: Roseau
+Fläche: 750 km²
+Einwohnerzahl: 72.000

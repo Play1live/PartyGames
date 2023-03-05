@@ -13,6 +13,10 @@ public class QuizScene : MonoBehaviour
 
     private void Start()
     {
+        Application.targetFrameRate = 60;
+#if UNITY_EDITOR
+        Application.targetFrameRate = 120;
+#endif
     }
 
     void OnEnable()
@@ -40,6 +44,12 @@ public class QuizScene : MonoBehaviour
     void Update()
     {
         
+    }
+
+    private void OnApplicationQuit()
+    {
+        //Logging.add(Logging.Type.Normal, "StartupScene", "OnApplicationQuit", "Programm wird beendet");
+        //MedienUtil.WriteLogsInDirectory();
     }
 
     // TODO: temo

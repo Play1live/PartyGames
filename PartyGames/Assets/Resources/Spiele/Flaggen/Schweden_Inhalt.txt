@@ -1,0 +1,4 @@
+Farben: Blau, Gelb
+Hauptstadt: Stockholm
+Fläche: 447.435 km²
+Einwohnerzahl: 10.452.326

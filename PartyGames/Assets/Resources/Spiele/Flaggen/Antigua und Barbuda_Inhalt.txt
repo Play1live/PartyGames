@@ -1,0 +1,4 @@
+Farben: Rot, Schwarz, Gelb, Blau, Weiß
+Hauptstadt: Saint John's
+Fläche: 442 km²
+Einwohnerzahl: 98.000

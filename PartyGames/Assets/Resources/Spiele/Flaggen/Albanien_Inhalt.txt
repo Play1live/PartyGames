@@ -1,0 +1,4 @@
+Farben: Rot, Schwarz
+Hauptstadt: Tirana
+Fläche: 28.748 km²
+Einwohnerzahl: 2.800.000

@@ -1,0 +1,4 @@
+Farben: Weiß, Blau, Rot
+Hauptstadt: Moskau
+Fläche: 17.075.400 km²
+Einwohnerzahl: 144.526.636

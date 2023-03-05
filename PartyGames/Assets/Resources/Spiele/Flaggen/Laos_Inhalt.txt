@@ -1,0 +1,4 @@
+Farben: Rot, Blau, Weiß
+Hauptstadt: Vientiane
+Fläche: 236.000 km²
+Einwohnerzahl: 7.300.000

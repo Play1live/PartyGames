@@ -1,0 +1,4 @@
+Farben: Rot, Weiß, Grün, Gelb
+Hauptstadt: Bangui
+Fläche: 622.984 km²
+Einwohnerzahl: 4.700.000

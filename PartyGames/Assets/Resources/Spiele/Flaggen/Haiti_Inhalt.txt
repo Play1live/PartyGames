@@ -1,0 +1,4 @@
+Farben: Blau, Rot, Weiß, Grün, Gelb, Schwarz
+Hauptstadt: Port-au-Prince
+Fläche: 27.750 km²
+Einwohnerzahl: 11.400.000

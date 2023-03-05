@@ -1,0 +1,4 @@
+Farben: Weiß, Rot, Grün
+Hauptstadt: Antananarivo
+Fläche: 587.295 km²
+Einwohnerzahl: 27.690.000

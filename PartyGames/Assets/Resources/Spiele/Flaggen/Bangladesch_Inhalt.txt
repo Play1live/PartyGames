@@ -1,0 +1,4 @@
+Farben: Grün, Rot
+Hauptstadt: Dhaka
+Fläche: 147.570 km²
+Einwohnerzahl: 164.700.000

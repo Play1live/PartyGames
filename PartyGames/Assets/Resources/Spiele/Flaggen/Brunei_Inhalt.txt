@@ -1,0 +1,4 @@
+Farben: Gelb, Weiß, Schwarz, Rot
+Hauptstadt: Bandar Seri Begawan
+Fläche: 5.765 km²
+Einwohnerzahl: 437.000

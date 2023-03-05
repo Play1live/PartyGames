@@ -1,0 +1,4 @@
+Farben: Weiß, BLau, Gelb, Orange
+Hauptstadt: Montevideo
+Fläche: 176.215 km²
+Einwohnerzahl: 3.500.000

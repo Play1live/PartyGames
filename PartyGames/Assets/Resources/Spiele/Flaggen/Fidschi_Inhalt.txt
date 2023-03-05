@@ -1,0 +1,4 @@
+Farben: Blau, Weiß, Rot, Gelb, Grün, Braun
+Hauptstadt: Suva
+Fläche: 18.274 km²
+Einwohnerzahl: 896.000

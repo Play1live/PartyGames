@@ -1,0 +1,4 @@
+Farben: Rot, Gelb
+Hauptstadt: Hanoi
+Fläche: 331.690 km²
+Einwohnerzahl: 97.300.000

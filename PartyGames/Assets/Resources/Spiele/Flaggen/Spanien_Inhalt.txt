@@ -1,0 +1,4 @@
+Farben: Rot, Gelb, Blau, Gold, Pink, Grau, Grün, Weiß
+Hauptstadt: Madrid
+Fläche: 505.970 km²
+Einwohnerzahl: 47.100.000

@@ -1,0 +1,4 @@
+Farben: Rot, Weiß, Blau, Schwarz, Grün, Gelb
+Hauptstadt: Paraguay
+Fläche: 406.752 km²
+Einwohnerzahl: 7.100.000

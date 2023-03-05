@@ -1,0 +1,4 @@
+Farben: Rot, Gelb, Grün
+Hauptstadt: St. George's
+Fläche: 344 km²
+Einwohnerzahl: 113.000

@@ -1,0 +1,4 @@
+Farben: Blau, Gelb, Rot, Beige, Braun
+Hauptstadt: Andorra la Vella
+Fläche: 468 km²
+Einwohnerzahl: 77.142

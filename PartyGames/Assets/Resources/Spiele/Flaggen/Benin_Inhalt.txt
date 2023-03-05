@@ -1,0 +1,4 @@
+Farben: Grün, Gelb, Rot
+Hauptstadt: Porto-Novo
+Fläche: 112.622 km²
+Einwohnerzahl: 11.800.000

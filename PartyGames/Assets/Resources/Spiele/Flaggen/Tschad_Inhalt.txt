@@ -1,0 +1,4 @@
+Farben: Rot, Gelb, Blau
+Hauptstadt: N'Djamena
+Fläche: 1.284.000 km²
+Einwohnerzahl: 16.400.000

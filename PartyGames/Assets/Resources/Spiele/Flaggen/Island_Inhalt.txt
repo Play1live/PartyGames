@@ -1,0 +1,4 @@
+Farben: Blau, Weiß, Rot
+Hauptstadt: Reykjavík
+Fläche: 103.125 km²
+Einwohnerzahl: 361.000

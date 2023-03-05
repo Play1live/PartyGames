@@ -1,0 +1,4 @@
+Farben: Schwarz, Gelb, Rot
+Hauptstadt: Brüssel
+Fläche: 30.688 km²
+Einwohnerzahl: 11.492.641

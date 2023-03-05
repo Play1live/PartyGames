@@ -16,23 +16,29 @@ public class QuizServer : MonoBehaviour
     GameObject FragenIndex2;
     GameObject BuzzerAnzeige;
     bool buzzerIsOn = false;
+    int aktuelleFrage = 0;
     GameObject FalscheAntworten;
+    GameObject AustabbenAnzeigen;
     GameObject TextEingabeAnzeige;
     GameObject TextAntwortenAnzeige;
     GameObject[,] SpielerAnzeige;
+    GameObject[] SchaetzfragenAnzeige;
+    [SerializeField] GameObject SchaetzfragenAnimationController;
     bool[] PlayerConnected;
     int PunkteProRichtige = 4;
     int PunkteProFalsche = 1;
 
-    // Start is called before the first frame update
+    [SerializeField] AudioSource BuzzerSound;
+    [SerializeField] AudioSource RichtigeAntwortSound;
+    [SerializeField] AudioSource FalscheAntwortSound;
+
     void OnEnable()
     {
         PlayerConnected = new bool[Config.SERVER_MAX_CONNECTIONS];
         InitAnzeigen();
-        // InitQuiz
+        InitQuiz();
     }
 
-    // Update is called once per frame
     void Update()
     {
         #region Server
@@ -84,7 +90,7 @@ public class QuizServer : MonoBehaviour
                 {
                     if (Config.PLAYERLIST[i].isDisconnected == true)
                     {
-                        Logging.add(new Logging(Logging.Type.Normal, "Server", "Update", "Spieler hat die Verbindung getrennt. ID: " + Config.PLAYERLIST[i].id));
+                        Logging.add(Logging.Type.Normal, "QuizServer", "Update", "Spieler hat die Verbindung getrennt. ID: " + Config.PLAYERLIST[i].id);
                         Broadcast(Config.PLAYERLIST[i].name + " has disconnected", Config.PLAYERLIST);
                         Config.PLAYERLIST[i].isConnected = false;
                         Config.PLAYERLIST[i].isDisconnected = false;
@@ -98,7 +104,6 @@ public class QuizServer : MonoBehaviour
         #endregion
     }
 
-    // Sent to all GameObjects before the application quits.
     private void OnApplicationQuit()
     {
         Broadcast("#ServerClosed", Config.PLAYERLIST);
@@ -108,7 +113,9 @@ public class QuizServer : MonoBehaviour
 
     #region Server Stuff
     #region Verbindungen
-    // Prüft ob ein Client noch mit dem Server verbunden ist
+    /**
+     * Prüft ob eine Verbindung zum gegebenen Client noch besteht
+     */
     private bool isConnected(TcpClient c)
     {
         /*try
@@ -154,57 +161,11 @@ public class QuizServer : MonoBehaviour
             return false;
         }
     }
-    // Startet das empfangen von Nachrichten von Clients
-    /*private void startListening()
-    {
-        Config.SERVER_TCP.BeginAcceptTcpClient(AcceptTcpClient, Config.SERVER_TCP);
-    }
-    // Fügt Client der Empfangsliste hinzu
-    private void AcceptTcpClient(IAsyncResult ar)
-    {
-        // Spieler sind voll
-        if (Config.SERVER_ALL_CONNECTED)
-            return;
-
-        // Sucht freien Spieler Platz
-        Player freierS = null;
-        foreach (Player sp in Config.PLAYERLIST)
-        {
-            if (sp.isConnected == false && sp.isDisconnected == false)
-            {
-                freierS = sp;
-                break;
-            }
-        }
-        // Spieler sind voll
-        if (freierS == null)
-            return;
-
-        TcpListener listener = (TcpListener)ar.AsyncState;
-        freierS.isConnected = true;
-        freierS.tcp = listener.EndAcceptTcpClient(ar);
-
-        // Prüft ob der Server voll ist
-        bool tempAllConnected = true;
-        for (int i = 0; i < Config.PLAYERLIST.Length; i++)
-        {
-            if (!Config.PLAYERLIST[i].isConnected)
-            {
-                tempAllConnected = false;
-                break;
-            }
-        }
-        Config.SERVER_ALL_CONNECTED = tempAllConnected;
-
-        startListening();
-
-        // Sendet neuem Spieler zugehörige ID
-        SendMessage("#SetID " + freierS.id, freierS);
-        Logging.add(new Logging(Logging.Type.Normal, "Server", "AcceptTcpClient", "Spieler: " + freierS.id + " ist jetzt verbunden. IP:" + freierS.tcp.Client.RemoteEndPoint));
-    }*/
     #endregion
     #region Kommunikation
-    // Sendet eine Nachricht an den angegebenen Spieler.
+    /**
+     * Sendet eine Nachricht an den übergebenen Spieler
+     */
     private void SendMessage(string data, Player sc)
     {
         try
@@ -218,7 +179,9 @@ public class QuizServer : MonoBehaviour
             Logging.add(new Logging(Logging.Type.Error, "Server", "SendMessage", "Nachricht an Client: " + sc.id + " (" + sc.name + ") konnte nicht gesendet werden." + e));
         }
     }
-    // Sendet eine Nachticht an alle verbundenen Spieler.
+    /**
+     * Sendet eine Nachricht an alle verbundenen Spieler
+     */
     private void Broadcast(string data, Player[] spieler)
     {
         foreach (Player sc in spieler)
@@ -227,7 +190,9 @@ public class QuizServer : MonoBehaviour
                 SendMessage(data, sc);
         }
     }
-    // Sendet eine Nachticht an alle verbundenen Spieler.
+    /**
+     * Sendet eine Nachricht an alle verbundenen Spieler
+     */
     private void Broadcast(string data)
     {
         foreach (Player sc in Config.PLAYERLIST)
@@ -236,7 +201,9 @@ public class QuizServer : MonoBehaviour
                 SendMessage(data, sc);
         }
     }
-    //Einkommende Nachrichten die von Spielern an den Server gesendet werden.
+    /**
+     * Einkommende Nachrichten die von Spielern an den Server gesendet werden.
+     */
     private void OnIncommingData(Player spieler, string data)
     {
         string cmd;
@@ -249,7 +216,9 @@ public class QuizServer : MonoBehaviour
         Commands(spieler, data, cmd);
     }
     #endregion
-    // Eingehende Commands der Spieler
+    /**
+     * Einkommende Befehle von Spielern
+     */
     public void Commands(Player player, string data, string cmd)
     {
         // Zeigt alle einkommenden Nachrichten an
@@ -258,45 +227,59 @@ public class QuizServer : MonoBehaviour
         switch (cmd)
         {
             default:
-                Debug.LogWarning("Unkown Command -> " + cmd + " - " + data);
+                Logging.add(Logging.Type.Warning, "QuizServer", "Commands", "Unkown Command -> " + cmd + " - " + data);
                 break;
 
             case "#ClientClosed":
-                for (int i = 0; i < Config.PLAYERLIST.Length; i++)
-                {
-                    if (Config.PLAYERLIST[i].id == player.id)
-                    {
-                        Config.PLAYERLIST[i].name = "";
-                        Config.PLAYERLIST[i].isConnected = false;
-                        Config.PLAYERLIST[i].isDisconnected = true;
-                        break;
-                    }
-                }
+                ClientClosed(player);
                 UpdateSpielerBroadcast();
                 break;
             case "#ClientFocusChange":
-                Debug.Log("FocusChange (" + player.id + ") " + player.name + ": InGame: " + data);
+                ClientFocusChange(player, data);
                 break;
 
             case "#JoinQuiz":
                 PlayerConnected[player.id - 1] = true;
                 UpdateSpielerBroadcast();
                 break;
+            case "#SpielerBuzzered":
+                SpielerBuzzered(player);
+                break;
+            case "#SpielerAntwortEingabe":
+                SpielerAntwortEingabe(player, data);
+                break;
         }
     }
     #endregion
-    // Fordert alle Clients auf die RemoteConfig neuzuladen
+    /**
+     * Fordert alle Clients auf die RemoteConfig neuzuladen
+     */
     public void UpdateRemoteConfig()
     {
         Broadcast("#UpdateRemoteConfig");
         LoadConfigs.FetchRemoteConfig();
     }
-    // Sendet aktualisierte Spielerinfos an alle Spieler
-    // -> UpdateSpieler()
+    /**
+     * Spieler beendet das Spiel
+     */
+    private void ClientClosed(Player player)
+    {
+        player.icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
+        player.name = "";
+        player.points = 0;
+        player.isConnected = false;
+        player.isDisconnected = true;
+    }
+    /**
+     * Sendet aktualisierte Spielerinfos an alle Spieler
+     */
     private void UpdateSpielerBroadcast()
     {
         Broadcast(UpdateSpieler(), Config.PLAYERLIST);
     }
+    /**
+     * Aktualisiert die Spieler Anzeige Informationen & gibt diese als Text zurück
+     */
     private string UpdateSpieler()
     {
         string msg = "#UpdateSpieler [ID]0[ID][NAME]" + Config.PLAYER_NAME + "[NAME][PUNKTE]" + Config.SERVER_PLAYER_POINTS + "[PUNKTE][ICON]" + Config.SERVER_DEFAULT_ICON.name + "[ICON]";
@@ -321,11 +304,13 @@ public class QuizServer : MonoBehaviour
         FalscheAntworten.GetComponent<TMP_Text>().text = "Falsche Antworten: "+Config.SERVER_PLAYER_POINTS;
         return msg;
     }
-
-
-
+    /**
+     * Initialisiert die Anzeigen zu beginn
+     */
     private void InitAnzeigen()
     {
+        SchaetzfragenAnimationController.SetActive(false);
+
         // Fragen Anzeige
         Frage = GameObject.Find("Frage");
         Frage.GetComponentInChildren<TMP_Text>().text = "";
@@ -333,9 +318,9 @@ public class QuizServer : MonoBehaviour
         FragenAnzeige = GameObject.Find("ServerSide/FrageWirdAngezeigt");
         FragenAnzeige.SetActive(false);
         FragenIndex1 = GameObject.Find("QuizAnzeigen/FragenIndex1");
-        FragenIndex1.GetComponentInChildren<TMP_Text>().text = "0/0";
+        FragenIndex1.GetComponentInChildren<TMP_Text>().text = "";
         FragenIndex2 = GameObject.Find("QuizAnzeigen/FragenIndex2");
-        FragenIndex2.GetComponentInChildren<TMP_Text>().text = "0/0";
+        FragenIndex2.GetComponentInChildren<TMP_Text>().text = "";
         FalscheAntworten = GameObject.Find("QuizAnzeigen/FalscheAntwortenCounter");
         Config.SERVER_PLAYER_POINTS = 0;
         FalscheAntworten.GetComponent<TMP_Text>().text = "Falsche Antworten: "+Config.SERVER_PLAYER_POINTS;
@@ -343,6 +328,11 @@ public class QuizServer : MonoBehaviour
         GameObject.Find("ServerSide/BuzzerAktivierenToggle").GetComponent<Toggle>().isOn = false;
         BuzzerAnzeige = GameObject.Find("ServerSide/BuzzerIstAktiviert");
         BuzzerAnzeige.SetActive(false);
+        buzzerIsOn = false;
+        // Austabben wird gezeigt
+        GameObject.Find("ServerSide/AusgetabtSpielernZeigenToggle").GetComponent<Toggle>().isOn = false;
+        AustabbenAnzeigen = GameObject.Find("ServerSide/AusgetabtWirdSpielernGezeigen");
+        AustabbenAnzeigen.SetActive(false);
         // Spieler Texteingabe
         GameObject.Find("ServerSide/TexteingabeAnzeigenToggle").GetComponent<Toggle>().isOn = false;
         TextEingabeAnzeige = GameObject.Find("ServerSide/TexteingabeWirdAngezeigt");
@@ -370,24 +360,169 @@ public class QuizServer : MonoBehaviour
             SpielerAnzeige[i, 0].SetActive(false); // Spieler Anzeige
             SpielerAnzeige[i, 1].SetActive(false); // BuzzerPressed Umrandung
             SpielerAnzeige[i, 3].SetActive(false); // Ausgetabt Einblendung
-            SpielerAnzeige[i, 6].SetActive(false); // Spieler Antwort
+            SpielerAnzeige[i, 6].SetActive(true); // Spieler Antwort
         }
+
+        // Schätzfragen
+        if (GameObject.Find("SchaetzfragenAnimation") != null)
+            GameObject.Find("SchaetzfragenAnimation").SetActive(false);
+        /*SchaetzfragenAnzeige = new GameObject[20];
+        SchaetzfragenAnzeige[0] = GameObject.Find("SchaetzfragenAnimation");
+        SchaetzfragenAnzeige[1] = GameObject.Find("SchaetzfragenAnimation/Grid/MinGrenze");
+        SchaetzfragenAnzeige[2] = GameObject.Find("SchaetzfragenAnimation/Grid/ZielGrenze");
+        SchaetzfragenAnzeige[3] = GameObject.Find("SchaetzfragenAnimation/Grid/MaxGrenze");
+        SchaetzfragenAnzeige[4] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (1)");
+        SchaetzfragenAnzeige[5] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (1)/Data");
+        SchaetzfragenAnzeige[5].SetActive(false);
+        SchaetzfragenAnzeige[6] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (2)");
+        SchaetzfragenAnzeige[7] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (2)/Data");
+        SchaetzfragenAnzeige[7].SetActive(false);
+        SchaetzfragenAnzeige[8] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (3)");
+        SchaetzfragenAnzeige[9] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (3)/Data");
+        SchaetzfragenAnzeige[9].SetActive(false);
+        SchaetzfragenAnzeige[10] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (4)");
+        SchaetzfragenAnzeige[11] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (4)/Data");
+        SchaetzfragenAnzeige[11].SetActive(false);
+        SchaetzfragenAnzeige[12] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (5)");
+        SchaetzfragenAnzeige[13] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (5)/Data");
+        SchaetzfragenAnzeige[13].SetActive(false);
+        SchaetzfragenAnzeige[14] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (6)");
+        SchaetzfragenAnzeige[15] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (6)/Data");
+        SchaetzfragenAnzeige[15].SetActive(false);
+        SchaetzfragenAnzeige[16] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (7)");
+        SchaetzfragenAnzeige[17] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (7)/Data");
+        SchaetzfragenAnzeige[17].SetActive(false);
+        SchaetzfragenAnzeige[18] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (8)");
+        SchaetzfragenAnzeige[19] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (8)/Data");
+        SchaetzfragenAnzeige[19].SetActive(false);*/
     }
 
-    // Aktiviert/Deaktiviert den Buzzer für alle Spieler
+    #region Quiz Fragen Anzeige
+    /**
+     * Initialisiert die Anzeigen des Quizzes
+     */
+    private void InitQuiz()
+    {
+        aktuelleFrage = 0;
+        GameObject.Find("QuizAnzeigen/Titel").GetComponent<TMP_Text>().text = Config.QUIZ_SPIEL.getSelected().getTitel();
+        GameObject.Find("QuizAnzeigen/FragenIndex2").GetComponentInChildren<TMP_Text>().text = "";
+        GameObject.Find("Frage").GetComponentInChildren<TMP_Text>().text = "";
+        if (Config.QUIZ_SPIEL.getSelected().getFragenCount() > 0)
+        {
+            LoadQuestionIntoScene(0);
+        }
+    }
+    /**
+     * Navigiert durch die Fragen, zeigt/versteckt diese
+     */
+    public void NavigateThroughQuestions(string type)
+    {
+        switch (type)
+        {
+            default:
+                Debug.LogError("NavigateThroughQuestions: unbekannter Typ");
+                Logging.add(Logging.Type.Error, "QuizServer", "NavigateThroughQuestions", "unbekannter Typ -> " + type);
+                break;
+            case "previous":
+                if (aktuelleFrage <= 0)
+                    return;
+                aktuelleFrage--;
+                LoadQuestionIntoScene(aktuelleFrage);
+                break;
+            case "next":
+                if (aktuelleFrage >= (Config.QUIZ_SPIEL.getSelected().getFragenCount() - 1))
+                    return;
+                aktuelleFrage++;
+                LoadQuestionIntoScene(aktuelleFrage);
+                break;
+            case "show":
+                GameObject.Find("Frage").GetComponentInChildren<TMP_Text>().text = Config.QUIZ_SPIEL.getSelected().getFrage(aktuelleFrage).getFrage();
+                GameObject.Find("QuizAnzeigen/FragenIndex1").GetComponentInChildren<TMP_Text>().text = (aktuelleFrage + 1) + "/" + Config.QUIZ_SPIEL.getSelected().getFragenCount();
+                Broadcast("#FragenAnzeige [BOOL]" + FragenAnzeige.activeInHierarchy + "[BOOL][FRAGE]" + Frage.GetComponentInChildren<TMP_Text>().text);
+                break;
+            case "clear":
+                GameObject.Find("Frage").GetComponentInChildren<TMP_Text>().text = "";
+                GameObject.Find("QuizAnzeigen/FragenIndex1").GetComponentInChildren<TMP_Text>().text = "";
+                Broadcast("#FragenAnzeige [BOOL]" + FragenAnzeige.activeInHierarchy + "[BOOL][FRAGE] ");
+                break;
+        }
+    }
+    /**
+     * Lädt die Frage nach Index, für die Server Vorschau
+     */
+    private void LoadQuestionIntoScene(int index)
+    {
+        GameObject.Find("QuizAnzeigen/FragenVorschau").GetComponent<TMP_Text>().text = "Frage:\n"+Config.QUIZ_SPIEL.getSelected().getFrage(index).getFrage();
+        GameObject.Find("QuizAnzeigen/AntwortVorschau").GetComponent<TMP_Text>().text = "Antwort:\n"+ Config.QUIZ_SPIEL.getSelected().getFrage(index).getAntwort();
+        GameObject.Find("QuizAnzeigen/InfoVorschau").GetComponent<TMP_Text>().text = "Info:\n"+Config.QUIZ_SPIEL.getSelected().getFrage(index).getInfo();
+        GameObject.Find("QuizAnzeigen/FragenIndex2").GetComponentInChildren<TMP_Text>().text = (aktuelleFrage+1)+"/" + Config.QUIZ_SPIEL.getSelected().getFragenCount();
+    }
+    #endregion
+    #region Buzzer
+    /**
+     * Aktiviert/Deaktiviert den Buzzer für alle Spieler
+     */
     public void BuzzerAktivierenToggle(Toggle toggle)
     {
         buzzerIsOn = toggle.isOn;
         BuzzerAnzeige.SetActive(toggle.isOn);
-        //Broadcast("#BuzzerToggle " + toggle.isOn); Ist für Spieler immer an, nur Server reagiert nicht drauf wenn aus
     }
-    // Zeigt/Versteckt die Frage für alle Spieler
+    /**
+     * Spielt Sound ab, sperrt den Buzzer und zeigt den Spieler an
+     */
+    private void SpielerBuzzered(Player p)
+    {
+        if (!buzzerIsOn)
+            return;
+        buzzerIsOn = false;
+        Broadcast("#AudioBuzzerPressed " + p.id);
+        BuzzerSound.Play();
+        SpielerAnzeige[p.id - 1, 1].SetActive(true);
+    }
+    /**
+     * Gibt den Buzzer für alle Spieler frei
+     */
+    public void SpielerBuzzerFreigeben()
+    {
+        for (int i = 0; i < Config.SERVER_MAX_CONNECTIONS; i++)
+            SpielerAnzeige[i, 1].SetActive(false);
+        buzzerIsOn = BuzzerAnzeige.activeInHierarchy;
+        Broadcast("#BuzzerFreigeben");
+    }
+    #endregion
+    #region Spieler Ausgetabt Anzeige
+    /**
+     * Austaben wird allen/keinen Spielern angezeigt
+     */
+    public void AustabenAllenZeigenToggle(Toggle toggle)
+    {
+        AustabbenAnzeigen.SetActive(toggle.isOn);
+        if (toggle.isOn == false)
+            Broadcast("#SpielerAusgetabt 0");
+    }
+    /**
+     * Spieler Tabt aus, wird ggf allen gezeigt
+     */
+    private void ClientFocusChange(Player player, string data)
+    {
+        bool ausgetabt = !Boolean.Parse(data);
+        SpielerAnzeige[(player.id - 1), 3].SetActive(ausgetabt); // Ausgetabt Einblednung
+        if (AustabbenAnzeigen.activeInHierarchy)
+            Broadcast("#SpielerAusgetabt " + player.id + " " + ausgetabt);
+    }
+    #endregion
+    #region Frage
+    /**
+     * Zeigt/Versteckt die Frage für alle Spieler
+     */
     public void FrageAnzeigenToggle(Toggle toggle)
     {
         FragenAnzeige.SetActive(toggle.isOn);
         Broadcast("#FragenAnzeige [BOOL]"+toggle.isOn+"[BOOL][FRAGE]"+Frage.GetComponentInChildren<TMP_Text>().text);
     }
-    // Blendet die selbst eingegebene Frage ein
+    /**
+     * Blendet die selbst eingegebene Frage ein
+     */
     public void EigeneFrageEinblenden(TMP_InputField input)
     {
         Frage.GetComponentInChildren<TMP_Text>().text = input.text;
@@ -395,39 +530,246 @@ public class QuizServer : MonoBehaviour
             Broadcast("#FragenAnzeige [BOOL]" + FragenAnzeige.activeInHierarchy + "[BOOL][FRAGE]" + input.text);
         input.text = "";
     }
-    // Blendet die Texteingabe für die Spieler ein
+    #endregion
+    #region Textantworten der Spieler
+    /**
+     * Blendet die Texteingabe für die Spieler ein
+     */
     public void TexteingabeAnzeigenToggle(Toggle toggle)
     {
         TextEingabeAnzeige.SetActive(toggle.isOn);
         Broadcast("#TexteingabeAnzeigen "+ toggle.isOn);
     }
-    // Blendet die Textantworten der Spieler ein
+    /**
+    * Aktualisiert die Antwort die der Spieler eingibt
+    */
+    public void SpielerAntwortEingabe(Player p, string data)
+    {
+        SpielerAnzeige[p.id - 1, 6].GetComponentInChildren<TMP_InputField>().text = data;
+    }
+    /**
+     * Blendet die Textantworten der Spieler ein
+     */
     public void TextantwortenAnzeigeToggle(Toggle toggle)
     {
         TextAntwortenAnzeige.SetActive(toggle.isOn);
+        if (!toggle.isOn)
+        {
+            Broadcast("#TextantwortenAnzeigen [BOOL]" + toggle.isOn + "[BOOL]");
+            return;
+        }
         string msg = "";
-
         for (int i = 0; i < Config.SERVER_MAX_CONNECTIONS; i++)
         {
             msg = msg + "[ID" + (i + 1) + "]" + SpielerAnzeige[i, 6].GetComponentInChildren<TMP_InputField>().text + "[ID" + (i + 1) + "]";
         }
-        Broadcast("#TextantwortenAnzeigen "+ msg);
+        Broadcast("#TextantwortenAnzeigen [BOOL]"+toggle.isOn+"[BOOL][TEXT]"+ msg);
     }
-    // Punkte Pro Richtige Antworten Anzeigen
+    #endregion
+    #region Punkte
+    /**
+     * Punkte Pro Richtige Antworten Anzeigen
+     */
     public void ChangePunkteProRichtigeAntwort(TMP_InputField input)
     {
         PunkteProRichtige = Int32.Parse(input.text);
     }
-    // Punkte Pro Falsche Antworten Anzeigen
+    /**
+     * Punkte Pro Falsche Antworten Anzeigen
+     */
     public void ChangePunkteProFalscheAntwort(TMP_InputField input)
     {
         PunkteProFalsche = Int32.Parse(input.text);
     }
-    // Spiel Verlassen
+    
+    /**
+     * Vergibt an den Spieler Punkte für eine richtige Antwort
+     */
+    public void PunkteRichtigeAntwort(GameObject player)
+    {
+        Broadcast("#AudioRichtigeAntwort");
+        RichtigeAntwortSound.Play();
+        int pId = Int32.Parse(player.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
+        int pIndex = Player.getPosInLists(pId);
+        Config.PLAYERLIST[pIndex].points += PunkteProRichtige;
+        UpdateSpielerBroadcast();
+    }
+    /**
+     * Vergibt an alle anderen Spieler Punkte bei einer falschen Antwort
+     */
+    public void PunkteFalscheAntwort(GameObject player)
+    {
+        Broadcast("#AudioFalscheAntwort");
+        FalscheAntwortSound.Play();
+        int pId = Int32.Parse(player.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
+        foreach (Player p in Config.PLAYERLIST)
+        {
+            if (pId != p.id && p.isConnected)
+                p.points += PunkteProFalsche;
+        }
+        Config.SERVER_PLAYER_POINTS += PunkteProFalsche;
+        UpdateSpielerBroadcast();
+    }
+    /**
+     * Ändert die Punkte des Spielers (+-1)
+     */
+    public void PunkteManuellAendern(GameObject button)
+    {
+        int pId = Int32.Parse(button.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
+        int pIndex = Player.getPosInLists(pId);
+
+        if (button.name == "+1")
+        {
+            Config.PLAYERLIST[pIndex].points += 1;
+        }
+        if (button.name == "-1")
+        {
+            Config.PLAYERLIST[pIndex].points -= 1;
+        }
+        UpdateSpielerBroadcast();
+    }
+    /**
+     * Ändert die Punkte des Spielers, variable Punkte
+     */
+    public void PunkteManuellAendern(TMP_InputField input)
+    {
+        int pId = Int32.Parse(input.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
+        int pIndex = Player.getPosInLists(pId);
+        int punkte = Int32.Parse(input.text);
+        input.text = "";
+
+        Config.PLAYERLIST[pIndex].points += punkte;
+        UpdateSpielerBroadcast();
+    }
+    #endregion
+    #region Spieler ist (Nicht-)Dran
+    /**
+     * Aktiviert den Icon Rand beim Spieler
+     */
+    public void SpielerIstDran(GameObject button)
+    {
+        int pId = Int32.Parse(button.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
+        SpielerAnzeige[(pId - 1), 1].SetActive(true);
+        buzzerIsOn = false;
+        Broadcast("#SpielerIstDran "+pId);
+    }
+    /**
+     * Versteckt den Icon Rand beim Spieler
+     */
+    public void SpielerIstNichtDran(GameObject button)
+    {
+        int pId = Int32.Parse(button.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
+        SpielerAnzeige[(pId - 1), 1].SetActive(false);
+
+        for (int i = 0; i < Config.SERVER_MAX_CONNECTIONS; i++)
+            if (SpielerAnzeige[i, 1].activeInHierarchy)
+                return;
+        buzzerIsOn = BuzzerAnzeige.activeInHierarchy; // Buzzer wird erst aktiviert wenn keiner mehr dran ist
+        Broadcast("#SpielerIstNichtDran " + pId);
+    }
+    #endregion
+    /**
+     *  Spiel Verlassen & Zurück in die Lobby laden
+     */
     public void SpielVerlassenButton()
     {
         SceneManager.LoadScene("Startup");
         Broadcast("#ZurueckInsHauptmenue");
     }
+    #region Schätzfragen Animation
+   /* public void getPositionInfo()
+    {
+        Debug.LogWarning("Min Grenze: "+SchaetzfragenAnzeige[1].transform.localPosition);
+        Debug.LogWarning("Ziel Grenze: " + SchaetzfragenAnzeige[2].transform.localPosition);
+        Debug.LogWarning("Max Grenze: " + SchaetzfragenAnzeige[3].transform.localPosition);
+        Debug.LogWarning("Icon 1: " + SchaetzfragenAnzeige[4].transform.localPosition);
 
+        BerechneSchritteProEinheit();
+        // Clients sollen auch starten
+        // Broadcast();
+        // Animation Starten
+        SchaetzfragenAnimationController.SetActive(true);
+    }
+    public void setMinGrenze(TMP_InputField input)
+    {
+        SchaetzfragenAnzeige[1].GetComponentInChildren<TMP_Text>().text = input.text + " " + GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text;
+    }
+    public void setZielGrenze(TMP_InputField input)
+    {
+        SchaetzfragenAnzeige[2].GetComponentInChildren<TMP_Text>().text = input.text + " " + GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text;
+    }
+    public void setMaxGrenze(TMP_InputField input)
+    {
+        SchaetzfragenAnzeige[3].GetComponentInChildren<TMP_Text>().text = input.text + " " + GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text;
+    }
+    private void BerechneSchritteProEinheit()
+    {
+        float StartWert = float.Parse(SchaetzfragenAnzeige[1].GetComponentInChildren<TMP_Text>().text.Split(' ')[0]);
+        float ZielWert = float.Parse(SchaetzfragenAnzeige[2].GetComponentInChildren<TMP_Text>().text.Split(' ')[0]);
+        float MaxWert = float.Parse(SchaetzfragenAnzeige[3].GetComponentInChildren<TMP_Text>().text.Split(' ')[0]);
+        float StartPosition = SchaetzfragenAnzeige[1].transform.localPosition.x;
+        float MaxPosition = SchaetzfragenAnzeige[3].transform.localPosition.x;
+        float DifftoNull = Math.Abs(StartPosition);
+        float DiffToMax = MaxPosition - StartPosition;
+        float SchritteProEinheit = DiffToMax / (MaxWert-StartWert);
+        float spielerwert = 0;
+
+        Debug.Log(DiffToMax);
+        Debug.Log(SchritteProEinheit);
+
+        // Ziel Bewegen
+        SchaetzfragenAnzeige[2].transform.localPosition = new Vector3(SchritteProEinheit*(ZielWert-StartWert) - DifftoNull ,SchaetzfragenAnzeige[2].transform.localPosition.y, 0);
+
+        // SpielerData berechnen
+        string data_text = "";
+        data_text += "[START_WERT]" + StartWert + "[START_WERT]";
+        data_text += "[ZIEL_WERT]" + ZielWert + "[ZIEL_WERT]";
+        data_text += "[MAX_WERT]" + MaxWert + "[MAX_WERT]";
+        data_text += "[START_POSITION]" + StartPosition + "[START_POSITION]";
+        data_text += "[MAX_POSITION]" + MaxPosition + "[MAX_POSITION]";
+        data_text += "[DIFF_NULL]" + DifftoNull + "[DIFF_NULL]";
+        data_text += "[DIFF_MAX]" + DiffToMax + "[DIFF_MAX]";
+        data_text += "[DISTANCE_PER_MOVE]" + SchritteProEinheit + "[DISTANCE_PER_MOVE]";
+        data_text += "[SPIELER_WERT]" + spielerwert + "[SPIELER_WERT]";
+
+        // Spieler 1
+        spielerwert = float.Parse(GameObject.Find("SchaetzfragenAnimation/Grid/Icon (1)").GetComponentInChildren<TMP_Text>().text);
+        data_text = data_text.Replace("[SPIELER_WERT]", "|").Split('|')[0] + "[SPIELER_WERT]"+ spielerwert + "[SPIELER_WERT]";
+        SchaetzfragenAnzeige[5].GetComponent<TMP_Text>().text = data_text;
+        // Spieler 2
+        spielerwert = float.Parse(GameObject.Find("SchaetzfragenAnimation/Grid/Icon (2)").GetComponentInChildren<TMP_Text>().text);
+        data_text = data_text.Replace("[SPIELER_WERT]", "|").Split('|')[0] + "[SPIELER_WERT]" + spielerwert + "[SPIELER_WERT]";
+        SchaetzfragenAnzeige[7].GetComponent<TMP_Text>().text = data_text;
+        // Spieler 3
+        spielerwert = float.Parse(GameObject.Find("SchaetzfragenAnimation/Grid/Icon (3)").GetComponentInChildren<TMP_Text>().text);
+        data_text = data_text.Replace("[SPIELER_WERT]", "|").Split('|')[0] + "[SPIELER_WERT]" + spielerwert + "[SPIELER_WERT]";
+        SchaetzfragenAnzeige[9].GetComponent<TMP_Text>().text = data_text;
+        // Spieler 4
+        spielerwert = float.Parse(GameObject.Find("SchaetzfragenAnimation/Grid/Icon (4)").GetComponentInChildren<TMP_Text>().text);
+        data_text = data_text.Replace("[SPIELER_WERT]", "|").Split('|')[0] + "[SPIELER_WERT]" + spielerwert + "[SPIELER_WERT]";
+        SchaetzfragenAnzeige[11].GetComponent<TMP_Text>().text = data_text;
+        // Spieler 5
+        spielerwert = float.Parse(GameObject.Find("SchaetzfragenAnimation/Grid/Icon (5)").GetComponentInChildren<TMP_Text>().text);
+        data_text = data_text.Replace("[SPIELER_WERT]", "|").Split('|')[0] + "[SPIELER_WERT]" + spielerwert + "[SPIELER_WERT]";
+        SchaetzfragenAnzeige[13].GetComponent<TMP_Text>().text = data_text;
+        // Spieler 6
+        spielerwert = float.Parse(GameObject.Find("SchaetzfragenAnimation/Grid/Icon (6)").GetComponentInChildren<TMP_Text>().text);
+        data_text = data_text.Replace("[SPIELER_WERT]", "|").Split('|')[0] + "[SPIELER_WERT]" + spielerwert + "[SPIELER_WERT]";
+        SchaetzfragenAnzeige[15].GetComponent<TMP_Text>().text = data_text;
+        // Spieler 7
+        spielerwert = float.Parse(GameObject.Find("SchaetzfragenAnimation/Grid/Icon (7)").GetComponentInChildren<TMP_Text>().text);
+        data_text = data_text.Replace("[SPIELER_WERT]", "|").Split('|')[0] + "[SPIELER_WERT]" + spielerwert + "[SPIELER_WERT]";
+        SchaetzfragenAnzeige[17].GetComponent<TMP_Text>().text = data_text;
+        // Spieler 8
+        spielerwert = float.Parse(GameObject.Find("SchaetzfragenAnimation/Grid/Icon (8)").GetComponentInChildren<TMP_Text>().text);
+        data_text = data_text.Replace("[SPIELER_WERT]", "|").Split('|')[0] + "[SPIELER_WERT]" + spielerwert + "[SPIELER_WERT]";
+        SchaetzfragenAnzeige[19].GetComponent<TMP_Text>().text = data_text;
+
+
+
+        // Spieler Bewegen
+        //float spielerwert = float.Parse(GameObject.Find("SchaetzfragenAnimation/Grid/Icon (1)").GetComponentInChildren<TMP_Text>().text);
+       // SchaetzfragenAnzeige[4].transform.localPosition = new Vector3(SchritteProEinheit*(spielerwert-StartWert) - DifftoNull, SchaetzfragenAnzeige[4].transform.localPosition.y, 0);
+    }*/
+    #endregion
 }

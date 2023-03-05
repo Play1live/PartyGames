@@ -1,0 +1,4 @@
+Farben: Blau, Weiß, Rot, Gelb
+Hauptstadt: Praia
+Fläche: 4.033 km²
+Einwohnerzahl: 483.628

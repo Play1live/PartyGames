@@ -1,0 +1,4 @@
+Farben: Rot, Weiß, Grün, Gelb, Schwarz, Blau
+Hauptstadt: Exekutive: Pretoria, Legislative: Kapstadt, Judikative: Bloemfontein
+Fläche: 1.221.037 km²
+Einwohnerzahl: 60.142.978

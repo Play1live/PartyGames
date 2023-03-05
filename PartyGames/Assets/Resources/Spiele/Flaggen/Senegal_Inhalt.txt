@@ -1,0 +1,4 @@
+Farben: Rot, Gelb, Grün
+Hauptstadt: Dakar
+Fläche: 196.722 km²
+Einwohnerzahl: 16.710.000

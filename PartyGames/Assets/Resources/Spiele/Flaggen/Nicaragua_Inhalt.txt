@@ -1,0 +1,4 @@
+Farben: Blau, Weiß, Rot, Gold, Gelb, Grün, Blau
+Hauptstadt: Managua
+Fläche: 120.254 km²
+Einwohnerzahl: 6.500.000

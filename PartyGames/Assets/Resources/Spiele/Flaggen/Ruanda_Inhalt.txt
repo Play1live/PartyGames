@@ -1,0 +1,4 @@
+Farben: Blau, Gelb, Grün
+Hauptstadt: Kigali
+Fläche: 26.338 km²
+Einwohnerzahl: 12.600.000

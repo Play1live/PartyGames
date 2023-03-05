@@ -1,0 +1,4 @@
+Farben: Rot, Weiß, Grün
+Hauptstadt: Malé
+Fläche: 298 km²
+Einwohnerzahl: 541.000

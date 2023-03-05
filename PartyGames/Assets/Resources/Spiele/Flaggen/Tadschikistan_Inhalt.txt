@@ -1,0 +1,4 @@
+Farben: Rot, Weiß, Grün, Gelb
+Hauptstadt: Duschanbe
+Fläche: 143.100 km²
+Einwohnerzahl: 9.500.000

@@ -1,0 +1,4 @@
+Farben: Schwarz, Gelb, Rot, Grau, Weiß
+Hauptstadt: Kampala
+Fläche: 241.037 km²
+Einwohnerzahl: 41.580.000

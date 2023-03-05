@@ -1,0 +1,4 @@
+Farben: Rot, Grün, Gelb
+Hauptstadt: Ouagadougou
+Fläche: 267.950 km²
+Einwohnerzahl: 20.488.000

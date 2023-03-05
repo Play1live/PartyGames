@@ -1,0 +1,4 @@
+Farben: Weiß, Blau, Gelb, Grün, Schwarz
+Hauptstadt: San Marino
+Fläche: 61 km²
+Einwohnerzahl: 33.598

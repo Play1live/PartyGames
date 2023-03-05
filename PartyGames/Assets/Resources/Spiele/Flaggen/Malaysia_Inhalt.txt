@@ -1,0 +1,4 @@
+Farben: Rot, Weiß, Blau, Gelb
+Hauptstadt: Kuala Lumpur
+Fläche: 330.290 km²
+Einwohnerzahl: 32.400.000

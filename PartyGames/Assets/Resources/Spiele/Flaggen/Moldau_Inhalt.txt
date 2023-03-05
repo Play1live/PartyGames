@@ -1,0 +1,4 @@
+Farben: Blau, Gelb, Rot, Braun, Grün
+Hauptstadt: Chisinau
+Fläche: 33.843 km²
+Einwohnerzahl: 2.600.000

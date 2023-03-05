@@ -1,0 +1,4 @@
+Farben: Rot, Schwarz, Orange, Weiß
+Hauptstadt: Dili
+Fläche: 14.919 km²
+Einwohnerzahl: 1.300.000

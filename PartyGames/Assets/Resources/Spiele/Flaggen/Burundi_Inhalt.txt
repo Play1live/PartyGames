@@ -1,0 +1,4 @@
+Farben: Rot, Grün, Weiß
+Hauptstadt: Gitega
+Fläche: 27.834 km²
+Einwohnerzahl: 11.500.000

@@ -1,0 +1,4 @@
+Farben: Blau, Rot, Grün, Weiß
+Hauptstadt: Baku
+Fläche: 86.600 km²
+Einwohnerzahl: 10.119.100

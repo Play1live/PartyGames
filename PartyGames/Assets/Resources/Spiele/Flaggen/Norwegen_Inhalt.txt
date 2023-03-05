@@ -1,0 +1,4 @@
+Farben: Rot, Weiß, Blau
+Hauptstadt: Oslo
+Fläche: 385.207 km²
+Einwohnerzahl: 5.425.270

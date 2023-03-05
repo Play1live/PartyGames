@@ -1,0 +1,4 @@
+Farben: Grün, Weiß, Rot
+Hauptstadt: Rom
+Fläche: 301.338 km²
+Einwohnerzahl: 60.026.546

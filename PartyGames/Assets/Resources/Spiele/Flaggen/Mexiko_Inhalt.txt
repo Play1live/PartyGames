@@ -1,0 +1,4 @@
+Farben: Rot, Grün, Weiß, Gelb, Blau, Braun, Schwarz
+Hauptstadt: Mexiko-Stadt
+Fläche: 1.972.550 km²
+Einwohnerzahl: 128.900.000

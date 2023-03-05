@@ -1,0 +1,4 @@
+Farben: Gelb, Blau, Weiß, Rot
+Hauptstadt: Caracas
+Fläche: 912.050 km²
+Einwohnerzahl: 28.400.000

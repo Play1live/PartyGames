@@ -1,0 +1,4 @@
+Farben: Blau, Weiß, Gelb
+Hauptstadt: Sarajevo
+Fläche: 51.197 km²
+Einwohnerzahl: 3.300.000

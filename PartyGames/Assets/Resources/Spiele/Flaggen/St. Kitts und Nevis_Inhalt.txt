@@ -1,0 +1,4 @@
+Farben: Grün, Gelb, Weiß, Schwarz, Rot
+Hauptstadt: Basseterre
+Fläche: 261 km²
+Einwohnerzahl: 53.000

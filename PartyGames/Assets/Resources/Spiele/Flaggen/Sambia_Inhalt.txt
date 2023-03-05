@@ -1,0 +1,4 @@
+Farben: Grün, Gold, Rot, Schwarz
+Hauptstadt: Lusaka
+Fläche: 752.614 km²
+Einwohnerzahl: 17.900.000

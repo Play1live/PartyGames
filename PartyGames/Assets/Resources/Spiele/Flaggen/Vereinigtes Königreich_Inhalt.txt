@@ -1,0 +1,4 @@
+Farben: Blau, Rot, Weiß
+Hauptstadt: London
+Fläche: 248.528 km²
+Einwohnerzahl: 66.800.000

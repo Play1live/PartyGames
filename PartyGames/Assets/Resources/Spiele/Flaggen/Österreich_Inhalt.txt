@@ -1,0 +1,4 @@
+Farben: Rot, Weiß
+Hauptstadt: Wien
+Fläche: 83.882 km²
+Einwohnerzahl: 8.978.929

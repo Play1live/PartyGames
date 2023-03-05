@@ -1,0 +1,4 @@
+Farben: Rot, Blau, Gelb
+Hauptstadt: Ulaanbaatar
+Fläche: 1.564.116 km²
+Einwohnerzahl: 3.300.000

@@ -1,0 +1,4 @@
+Farben: Blau, Weiß, Grün, Braun, Gelb, Grau
+Hauptstadt: Guatemala-Stadt
+Fläche: 109.021 km²
+Einwohnerzahl: 16.900.000

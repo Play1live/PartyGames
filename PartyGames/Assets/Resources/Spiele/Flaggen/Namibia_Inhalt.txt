@@ -1,0 +1,4 @@
+Farben: Blau, Weiß, Rot, Grün, Gelb
+Hauptstadt: Windhoek
+Fläche: 824.116 km²
+Einwohnerzahl: 2.324.388

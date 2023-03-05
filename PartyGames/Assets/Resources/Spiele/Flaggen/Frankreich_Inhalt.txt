@@ -1,0 +1,4 @@
+Farben: Blau, Weiß, Rot
+Hauptstadt: Paris
+Fläche: 632.734 km²
+Einwohnerzahl: 67.422.000

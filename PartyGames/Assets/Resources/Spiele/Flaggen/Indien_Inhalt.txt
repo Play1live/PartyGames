@@ -1,0 +1,4 @@
+Farben: Gelb, Weiß, Grün, Blau
+Hauptstadt: Neu-Delhi
+Fläche: 3.287.263 km²
+Einwohnerzahl: 1.380.004.000

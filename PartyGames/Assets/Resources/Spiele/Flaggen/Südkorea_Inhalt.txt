@@ -1,0 +1,4 @@
+Farben: Weiß, Schwarz, Rot, Blau
+Hauptstadt: Seoul
+Fläche: 100.210 km²
+Einwohnerzahl: 51.800.000

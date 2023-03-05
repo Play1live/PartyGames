@@ -8,7 +8,7 @@ public class LoadConfigs
 
     public static void FetchRemoteConfig()
     {
-        Debug.Log("Fetching Config...");
+        Logging.add(Logging.Type.Normal, "LoadConfigs", "FetchRemoteConfig", "Fetching Config...");
         ConfigManager.FetchCompleted += ApplyRemoteSettings;
         ConfigManager.FetchConfigs<userAttributes, appAttriutes>(new userAttributes(), new appAttriutes());
     }
@@ -18,6 +18,6 @@ public class LoadConfigs
         Config.SERVER_CONNECTION_IP = ConfigManager.appConfig.GetString("Server_Connection_IP");
         Config.SERVER_CONNECTION_PORT = ConfigManager.appConfig.GetInt("Server_Connection_Port");
 
-        Debug.Log("Fetching completed!");
+        Logging.add(Logging.Type.Normal, "LoadConfigs", "FetchRemoteConfig", "Fetching Config completed...");
     }
 }

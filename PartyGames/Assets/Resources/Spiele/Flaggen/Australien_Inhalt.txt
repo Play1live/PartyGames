@@ -1,0 +1,4 @@
+Farben: Blau, Weiß, Rot
+Hauptstadt: Canberra
+Fläche: 7.688.287 km²
+Einwohnerzahl: 25.800.000

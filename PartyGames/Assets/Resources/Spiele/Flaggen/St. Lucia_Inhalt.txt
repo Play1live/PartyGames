@@ -1,0 +1,4 @@
+Farben: Blau, Weiß, Schwarz, Gelb
+Hauptstadt: Castries
+Fläche: 616 km²
+Einwohnerzahl: 184.000

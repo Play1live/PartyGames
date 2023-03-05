@@ -1,0 +1,4 @@
+Farben: Rot, Weiß, Grün, Schwarz
+Hauptstadt: Damaskus
+Fläche: 185.180 km²
+Einwohnerzahl: 17.500.000

@@ -1,0 +1,4 @@
+Farben: Rot, Blau, Gelb
+Hauptstadt: Jerewan
+Fläche: 29.743 km²
+Einwohnerzahl: 3.000.000

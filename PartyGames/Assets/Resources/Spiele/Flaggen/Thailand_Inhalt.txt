@@ -1,0 +1,4 @@
+Farben: Rot, Weiß, Blau
+Hauptstadt: Bankok
+Fläche: 513.115 km²
+Einwohnerzahl: 69.800.000

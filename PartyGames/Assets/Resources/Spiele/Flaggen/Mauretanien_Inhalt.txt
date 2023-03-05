@@ -1,0 +1,4 @@
+Farben: Rot, Grün, Gelb
+Hauptstadt: Nouakchott
+Fläche: 1.030.700 km²
+Einwohnerzahl: 4.077.000

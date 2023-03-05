@@ -1,0 +1,4 @@
+Farben: Rot, Gelb, Grün
+Hauptstadt: Sucre
+Fläche: 1.098.581 km²
+Einwohnerzahl: 11.700.000

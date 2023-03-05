@@ -1,4 +1,5 @@
 
+using System;
 using System.IO;
 using System.Text;
 
@@ -24,6 +25,49 @@ public class MedienUtil
                 // Add some information to the file.
                 fs.Write(info, 0, info.Length);
             }
+        }
+    }
+
+    public static void WriteLogsInDirectory()
+    {
+        // Erstellt Logs Ordner
+        if (!Directory.Exists(Config.MedienPath + @"/Logs"))
+            Directory.CreateDirectory(Config.MedienPath + @"/Logs");
+
+        string titel = DateTime.Now.ToString().Replace(":", "-");
+        string datum = DateTime.Now.ToString().Split(' ')[1].Replace(":","-");
+        string text = "Logs vom "+DateTime.Now.ToString().Split(' ')[0];
+        foreach (Logging logs in Config.log)
+        {
+            // Bestimme Typ
+            string type = "";
+            if (logs.type == Logging.Type.Normal)
+                type = "Normal: ";
+            else if (logs.type == Logging.Type.Warning)
+                type = "Warning: ";
+            else if (logs.type == Logging.Type.Error)
+                type = "Error: ";
+            else if (logs.type == Logging.Type.Fatal)
+                type = "Fatal: ";
+            else
+                type = "Unkown: ";
+
+            if (logs.exception == null)
+            {
+                text += "\n[" + type + logs.time + "] "+logs.klasse +" - "+logs.methode+" -> "+logs.msg;
+            }
+            else
+            {
+                text += "\n[" + type + logs.time + "] " + logs.klasse + " - " + logs.methode + " -> " + logs.msg +" >> "+ logs.exception;
+            }
+        }
+
+        using (FileStream fs = File.Create(Config.MedienPath +@"/Logs/"+ titel + ".txt"))
+        {
+            byte[] info = new UTF8Encoding(true).GetBytes(text);
+            
+            // Add some information to the file.
+            fs.Write(info, 0, info.Length);
         }
     }
 

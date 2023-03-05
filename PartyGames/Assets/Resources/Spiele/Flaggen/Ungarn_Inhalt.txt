@@ -1,0 +1,4 @@
+Farben: Rot, Weiß, Grün
+Hauptstadt: Budapest
+Fläche: 93.036 km²
+Einwohnerzahl: 9.700.000

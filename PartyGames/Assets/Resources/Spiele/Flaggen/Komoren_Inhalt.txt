@@ -1,0 +1,4 @@
+Farben: Grün, Weiß, Gelb, Rot, Blau
+Hauptstadt: Moroni
+Fläche: 2.236 km²
+Einwohnerzahl: 851.000

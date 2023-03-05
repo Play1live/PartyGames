@@ -1,0 +1,4 @@
+Farben: Rot, Schwarz, Gelb
+Hauptstadt: Luanda
+Fläche: 1.246.700 km²
+Einwohnerzahl: 31.130.000

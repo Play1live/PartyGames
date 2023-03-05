@@ -1,0 +1,4 @@
+Farben: Rot, Weiß, Grün
+Hauptstadt: Maskat
+Fläche: 309.500 km²
+Einwohnerzahl: 4.800.000

@@ -1,0 +1,4 @@
+Farben: Rot, Gelb, Grün, Schwarz
+Hauptstadt: Bissau
+Fläche: 36.125 km²
+Einwohnerzahl: 1.970.000

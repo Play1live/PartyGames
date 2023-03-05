@@ -1,0 +1,4 @@
+Farben: Grün, Gelb, Schwarz
+Hauptstadt: Kingston
+Fläche: 10.991 km²
+Einwohnerzahl: 3.000.000

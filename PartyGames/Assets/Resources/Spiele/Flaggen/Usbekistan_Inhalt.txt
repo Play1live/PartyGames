@@ -1,0 +1,4 @@
+Farben: Weiß, Blau, Grün, Rot
+Hauptstadt: Taschkent
+Fläche: 448.978 km²
+Einwohnerzahl: 35.400.000

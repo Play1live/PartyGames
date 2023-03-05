@@ -1,0 +1,4 @@
+Farben: Rot, Blau, Grün, Weiß
+Hauptstadt: Banjul
+Fläche: 10.689 km²
+Einwohnerzahl: 2.230.000

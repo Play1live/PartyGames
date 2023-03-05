@@ -1,0 +1,4 @@
+Farben: Blau, Schwarz, Weiß
+Hauptstadt: Tallinn
+Fläche: 45.339 km²
+Einwohnerzahl: 1.300.000

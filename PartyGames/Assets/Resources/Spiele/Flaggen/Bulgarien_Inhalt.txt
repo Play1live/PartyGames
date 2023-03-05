@@ -1,0 +1,4 @@
+Farben: Weiß, Grün, Rot
+Hauptstadt: Sofia
+Fläche: 110.994 km²
+Einwohnerzahl: 6.520.314

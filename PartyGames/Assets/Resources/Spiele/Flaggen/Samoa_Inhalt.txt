@@ -1,0 +1,4 @@
+Farben: Rot, Blau, Weiß
+Hauptstadt: Apia
+Fläche: 2.842 km²
+Einwohnerzahl: 198.000
