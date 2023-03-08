@@ -303,6 +303,8 @@ public class FlaggenServer : MonoBehaviour
             if (p.isConnected && PlayerConnected[i])
             {
                 SpielerAnzeige[i, 0].SetActive(true);
+                SpielerAnzeige[i, 2].GetComponent<Image>().sprite = p.icon;
+                SpielerAnzeige[i, 4].GetComponent<TMP_Text>().text = p.name;
                 SpielerAnzeige[i, 5].GetComponent<TMP_Text>().text = p.points+"";
             }
             else

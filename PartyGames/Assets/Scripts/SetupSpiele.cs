@@ -9,6 +9,7 @@ public class SetupSpiele
         Logging.add(Logging.Type.Normal, "SetupSpiele", "LoadGameFiles", "Loading Games...");
         reloadQuiz();
         reloadFlaggen();
+        reloadListen();
         Logging.add(Logging.Type.Normal, "SetupSpiele", "LoadGameFiles", "Games are ready!");
     }
 
@@ -20,23 +21,19 @@ public class SetupSpiele
     {
         Config.FLAGGEN_SPIEL = new FlaggenSpiel();
     }
+    public static void reloadListen()
+    {
+        Config.LISTEN_SPIEL = new ListenSpiel();
+    }
 
     /*public static void reloadDerZugLuegt()
     {
         Settings.derzugluegtSpiel = new DerZugLuegtSpiel();
     }
-
-
-    public static void reloadListen()
-    {
-        Settings.listenSpiel = new ListenSpiel();
-    }
-
     public static void reloadWWMFragen()
     {
         Settings.wwmfragenSpiel = new WWMFragenSpiel();
     }
-
     public static void reloadGeheimwoerter()
     {
         Settings.geheimwoerterSpiel = new GeheimwörterSpiel();

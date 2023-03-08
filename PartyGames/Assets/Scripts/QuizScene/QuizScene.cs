@@ -51,10 +51,4 @@ public class QuizScene : MonoBehaviour
         //Logging.add(Logging.Type.Normal, "StartupScene", "OnApplicationQuit", "Programm wird beendet");
         //MedienUtil.WriteLogsInDirectory();
     }
-
-    // TODO: temo
-    public void LoadStartuo()
-    {
-        SceneManager.LoadScene("Startup");
-    }
 }

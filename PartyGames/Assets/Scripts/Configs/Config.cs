@@ -33,8 +33,9 @@ public class Config
     public static int PLAYER_ID = 0;
 
     // Spiele
-    public static QuizSpiel QUIZ_SPIEL;
     public static FlaggenSpiel FLAGGEN_SPIEL;
+    public static QuizSpiel QUIZ_SPIEL;
+    public static ListenSpiel LISTEN_SPIEL;
 
     // Scenenspezifisches
     // Hauptmenue

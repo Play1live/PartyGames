@@ -323,20 +323,24 @@ public class StartupClient : MonoBehaviour
      */
     private void StarteSpiel(string data)
     {
+        Logging.add(new Logging(Logging.Type.Normal, "Client", "StarteSpiel", "Spiel wird geladen: " + data));
         switch (data)
         {
             default:
                 Logging.add(new Logging(Logging.Type.Fatal, "Client", "StarteSpiel", "Unbekanntes Spiel das geladen werden soll. Beende Verbindung"));
                 SendToServer("#ClientClosed");
                 CloseSocket();
+                SceneManager.LoadSceneAsync("StartUpScene");
                 break;
             case "Flaggen":
-                Logging.add(new Logging(Logging.Type.Normal, "Client", "StarteSpiel", "Spiel wird geladen: " + data));
                 SceneManager.LoadScene("Flaggen");
                 break;
             case "Quiz":
-                Logging.add(new Logging(Logging.Type.Normal, "Client", "StarteSpiel", "Spiel wird geladen: "+ data));
                 SceneManager.LoadScene("Quiz");
+                break;
+            case "Listen":
+                
+                SceneManager.LoadScene("Listen");
                 break;
         }
     }

@@ -172,6 +172,9 @@ public class QuizClient : MonoBehaviour
             case "#BuzzerFreigeben":
                 BuzzerFreigeben();
                 break;
+            case "#SpielReglenZeigen":
+                SpielReglenZeigen(data);
+                break;
         } 
     }
 
@@ -210,6 +213,8 @@ public class QuizClient : MonoBehaviour
             SpielerAnzeige[i, 3].SetActive(false);
             SpielerAnzeige[i, 6].SetActive(false);
         }
+        //Regeln
+        GameObject.Find("Regeln").GetComponent<TMP_Text>().text = "";
     }
     /**
      * Aktualisiert die Spieler Anzeigen
@@ -231,9 +236,9 @@ public class QuizClient : MonoBehaviour
             {
                 int pos = Player.getPosInLists(pId);
                 // Update PlayerInfos
-                Config.PLAYERLIST[pos].name = sp.Replace("[NAME]", "|").Split('|')[1];
+                //Config.PLAYERLIST[pos].name = sp.Replace("[NAME]", "|").Split('|')[1];
                 Config.PLAYERLIST[pos].points = Int32.Parse(sp.Replace("[PUNKTE]", "|").Split('|')[1]);
-                Config.PLAYERLIST[pos].icon = Resources.Load<Sprite>("Images/ProfileIcons/" + sp.Replace("[ICON]", "|").Split('|')[1]);
+                //Config.PLAYERLIST[pos].icon = Resources.Load<Sprite>("Images/ProfileIcons/" + sp.Replace("[ICON]", "|").Split('|')[1]);
                 // Display PlayerInfos                
                 SpielerAnzeige[pos, 2].GetComponent<Image>().sprite = Config.PLAYERLIST[pos].icon;
                 SpielerAnzeige[pos, 4].GetComponent<TMP_Text>().text = Config.PLAYERLIST[pos].name;
@@ -326,6 +331,18 @@ public class QuizClient : MonoBehaviour
 
             SpielerAnzeige[pos, 3].SetActive(type);
         }
+    }
+    /**
+     * Blendet die Regeln ein
+     */
+    private void SpielReglenZeigen(string data)
+    {
+        bool show = bool.Parse(data.Replace("[BOOL]", "|").Split('|')[1]);
+        string regelwerk = data.Replace("[REGELN]", "|").Split('|')[1];
+        if (show)
+            GameObject.Find("Regeln").GetComponent<TMP_Text>().text = regelwerk;
+        else
+            GameObject.Find("Regeln").GetComponent<TMP_Text>().text = "";
     }
     /**
      * Zeigt die gestellte Frage an

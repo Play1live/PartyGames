@@ -8,7 +8,7 @@ public class MedienUtil
     public static void CreateMediaDirectory()
     {
         // Erstellt die Spiele Ordner
-        string[] spielOrdner = { "Quiz" };
+        string[] spielOrdner = { "Quiz", "Listen" };
         foreach (string game in spielOrdner)
         {
             if (!Directory.Exists(Config.MedienPath + @"/Spiele/" + game))
@@ -22,6 +22,20 @@ public class MedienUtil
             using (FileStream fs = File.Create(quizvorlage))
             {
                 byte[] info = new UTF8Encoding(true).GetBytes("Frage: Das ist meine \"Frage\"? \nAntwort: Haus des  Rundfunks \nInfo: Hier kann was richtig cooles stehen \nFrage: Das ist meine \"Frage\"? \nAntwort: Haus des  Rundfunks \nInfo: Hier kann was richtig cooles stehen");
+                // Add some information to the file.
+                fs.Write(info, 0, info.Length);
+            }
+        }
+
+        // Speichert Vorlage für Listen
+        string listenvorlage = Config.MedienPath+ @"/Spiele/Listen/#Vorlage.txt";
+        if (!File.Exists(listenvorlage))
+        {
+            using (FileStream fs = File.Create(listenvorlage))
+            {
+                byte[] info = new UTF8Encoding(true).GetBytes("SortBy: int\nSortByAnzeige: Wenig - Viel\n- 1 # 1\n- 2 # 2\n- 3 # 3\n- 4 # 4\n- 5 # 5" +
+                    "\n- 6 # 6\n- 7 # 7\n- 8 # 8\n- 9 # 9\n- 10 # 10\n- 11 # 11\n- 12 # 12\n- 13 # 13\n- 14 # 14\n- 15 # 15\n- 16 # 16\n- 17 # 17\n- 18 # 18" +
+                    "\n- 19 # 19\n- 20 # 20\n- 21 # 21\n- 22 # 22\n- 23 # 23\n- 24 # 24\n- 25 # 25\n- 26 # 26\n- 27 # 27\n- 28 # 28\n- 29 # 29\n- 30 # 30");
                 // Add some information to the file.
                 fs.Write(info, 0, info.Length);
             }

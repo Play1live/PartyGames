@@ -32,7 +32,8 @@ public class StartupScene : MonoBehaviour
         Application.targetFrameRate = 120;
 #endif
         /*Testzwecke*/// TODO
-        Config.isServer = !Config.isServer;
+        //Config.isServer = !Config.isServer;
+        //Config.isServer = false;
 
         // Init Playerlist
         if (Config.PLAYERLIST == null)
@@ -71,9 +72,6 @@ public class StartupScene : MonoBehaviour
         Hauptmenue.SetActive(true);
         Lobby.SetActive(false);
         ServerControl.SetActive(false);
-
-        // Spiele Hintergrundmusik
-        GameObject.Find("Audio/Hintergrundmusik").GetComponent<AudioSource>().Play();
 
         if (Config.isServer)
         {

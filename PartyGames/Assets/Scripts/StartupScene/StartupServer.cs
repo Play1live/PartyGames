@@ -20,14 +20,20 @@ public class StartupServer : MonoBehaviour
     [SerializeField] GameObject ServerControlControlField;
     [SerializeField] GameObject[] SpielerAnzeigeLobby;
 
+    [SerializeField] GameObject gesperrtfuerSekundenAnzeige;
+    DateTime allowedStartTime;
+
     void Start()
     {
+        if (Config.SERVER_STARTED)
+            SperreGameSelection();
+
         #region Startet Server
         if (!Config.SERVER_STARTED)
         {
             try
             {
-                Config.SERVER_TCP = new TcpListener(IPAddress.Any, Config.SERVER_CONNECTION_PORT); // TODO:
+                Config.SERVER_TCP = new TcpListener(IPAddress.Any, Config.SERVER_CONNECTION_PORT);
                 Config.SERVER_TCP.Start();
                 startListening();
                 Config.SERVER_STARTED = true;
@@ -50,6 +56,7 @@ public class StartupServer : MonoBehaviour
                 SceneManager.LoadScene("Startup");
                 return;
             }
+            SperreGameSelection();
         }
         #endregion
 
@@ -67,7 +74,7 @@ public class StartupServer : MonoBehaviour
         ServerControl.SetActive(true);
         SpielerMiniGames[0].transform.parent.gameObject.SetActive(false);
 
-        if (ServerControlGameSelection.activeInHierarchy)
+        if (ServerControlGameSelection.activeInHierarchy && ServerControlGameSelection.transform.GetChild(1).gameObject.activeInHierarchy)
             DisplayGameFiles();
         UpdateSpieler();
     }
@@ -80,7 +87,7 @@ public class StartupServer : MonoBehaviour
         ServerControl.SetActive(true);
         SpielerMiniGames[0].transform.parent.gameObject.SetActive(false);
 
-        if (ServerControlGameSelection.activeInHierarchy)
+        if (ServerControlGameSelection.activeInHierarchy && ServerControlGameSelection.transform.GetChild(1).gameObject.activeInHierarchy)
             DisplayGameFiles();
         UpdateSpieler();
     }
@@ -90,6 +97,17 @@ public class StartupServer : MonoBehaviour
         #region Server
         if (!Config.SERVER_STARTED)
             return;
+
+        // Schaut ob die Wartezeit vorbei ist
+        if (allowedStartTime != null && allowedStartTime != DateTime.MinValue)
+        {
+            UpdateGesperrtGameSelection();
+            if (DateTime.Compare(allowedStartTime, DateTime.Now) < 0)
+            {
+                EntsperreGameSelection();
+            }
+        }
+
 
         foreach (Player spieler in Config.PLAYERLIST)
         {
@@ -357,6 +375,36 @@ public class StartupServer : MonoBehaviour
         LoadConfigs.FetchRemoteConfig();
     }
     /**
+     * Sperrt die Gameselection für X sekunden, um fehler bei Scenen wechseln in der Verbindung zu verhindern
+     */
+    private void SperreGameSelection()
+    {
+        allowedStartTime = DateTime.Now.AddSeconds(10);
+        for (int i = 0; i < ServerControlGameSelection.transform.childCount; i++)
+        {
+            ServerControlGameSelection.transform.GetChild(i).gameObject.SetActive(false);
+        }
+        gesperrtfuerSekundenAnzeige.SetActive(true);
+    }
+    private void UpdateGesperrtGameSelection()
+    {
+        gesperrtfuerSekundenAnzeige.GetComponent<TMP_Text>().text = "Spiele sind noch " + ((allowedStartTime.Hour - DateTime.Now.Hour)*60*60 + (allowedStartTime.Minute - DateTime.Now.Minute) * 60 + (allowedStartTime.Second - DateTime.Now.Second)) + " Sekunden gesperrt.";
+    }
+    /**
+     * Entsperrt die Gameselection
+     */
+    public void EntsperreGameSelection()
+    {
+        allowedStartTime = DateTime.MinValue;
+        for (int i = 0; i < ServerControlGameSelection.transform.childCount; i++)
+        {
+            ServerControlGameSelection.transform.GetChild(i).gameObject.SetActive(true);
+        }
+        gesperrtfuerSekundenAnzeige.SetActive(false);
+        DisplayGameFiles();
+    }
+
+    /**
      * Spieler beendet das Spiel
      */
     private void ClientClosed(Player player)
@@ -429,7 +477,9 @@ public class StartupServer : MonoBehaviour
 
             GameObject.Find("ServerControl/ControlField/SpielerIconWechseln/Bilder").GetComponent<TMP_Dropdown>().ClearOptions();
             List<string> bilderliste = new List<string>();
+            bilderliste.Add("empty");
             foreach (Sprite sprite in Config.PLAYER_ICONS)
+                if (sprite.name != "empty")
                 bilderliste.Add(sprite.name);
             GameObject.Find("ServerControl/ControlField/SpielerIconWechseln/Bilder").GetComponent<TMP_Dropdown>().AddOptions(bilderliste);
         }
@@ -782,6 +832,10 @@ public class StartupServer : MonoBehaviour
         TMP_Dropdown QuizDropdown = GameObject.Find("GameSelection/Quiz/QuizAuswahl").GetComponent<TMP_Dropdown>();
         QuizDropdown.ClearOptions();
         QuizDropdown.AddOptions(Config.QUIZ_SPIEL.getQuizzeAsStringList());
+
+        TMP_Dropdown ListenDropdown = GameObject.Find("GameSelection/Listen/ListenAuswahl").GetComponent<TMP_Dropdown>();
+        ListenDropdown.ClearOptions();
+        ListenDropdown.AddOptions(Config.LISTEN_SPIEL.getListenAsStringList());
     }
 
     #region Starte Spiele
@@ -800,7 +854,7 @@ public class StartupServer : MonoBehaviour
      */
     public void StarteFlaggen()
     {
-        Logging.add(Logging.Type.Normal, "StartupServer", "StarteQuiz", "Flaggen starts");
+        Logging.add(Logging.Type.Normal, "StartupServer", "StarteFlaggen", "Flaggen starts");
 
         SceneManager.LoadScene("Flaggen");
         Broadcast("#StarteSpiel Flaggen");
@@ -815,6 +869,32 @@ public class StartupServer : MonoBehaviour
 
         SceneManager.LoadScene("Quiz");
         Broadcast("#StarteSpiel Quiz");
+    }
+    /**
+     * Startet das Listen Spiel -> Alle Spieler laden in die neue Scene
+     */
+    public void StarteListen(TMP_Dropdown drop)
+    {
+        Config.LISTEN_SPIEL.setSelected(Config.LISTEN_SPIEL.getListe(drop.value));
+        Logging.add(Logging.Type.Normal, "StartupServer", "StarteListen", "Listen starts: "); //Config.QUIZ_SPIEL.getSelected().getTitel());
+        /*
+        Debug.LogWarning(Config.LISTEN_SPIEL.getListe(0).getTitel());
+        Debug.Log("Alle Elemente");
+        List<Element> e = Config.LISTEN_SPIEL.getListe(0).getAlleElemente();
+        foreach (Element i in e)
+        {
+            Debug.Log(i.getItem() + " - " + i.getDisplay() + " - " + i.getSortBy());
+        }
+        Debug.Log("Auswahl Elemente");
+        List<Element> e1 = Config.LISTEN_SPIEL.getListe(0).getAuswahlElemente();
+        foreach (Element i in e1)
+        {
+            Debug.Log(i.getItem() + " - " + i.getDisplay() + " - " + i.getSortBy());
+        }*/
+
+
+        SceneManager.LoadScene("Listen");
+        Broadcast("#StarteSpiel Listen");
     }
     #endregion
 }

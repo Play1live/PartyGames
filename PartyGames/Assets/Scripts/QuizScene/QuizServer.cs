@@ -282,12 +282,12 @@ public class QuizServer : MonoBehaviour
      */
     private string UpdateSpieler()
     {
-        string msg = "#UpdateSpieler [ID]0[ID][NAME]" + Config.PLAYER_NAME + "[NAME][PUNKTE]" + Config.SERVER_PLAYER_POINTS + "[PUNKTE][ICON]" + Config.SERVER_DEFAULT_ICON.name + "[ICON]";
+        string msg = "#UpdateSpieler [ID]0[ID][PUNKTE]" + Config.SERVER_PLAYER_POINTS + "[PUNKTE]";
         int connectedplayer = 0;
         for (int i = 0; i < Config.PLAYERLIST.Length; i++)
         {
             Player p = Config.PLAYERLIST[i];
-            msg += "[TRENNER][ID]" + p.id + "[ID][NAME]" + p.name + "[NAME][PUNKTE]" + p.points + "[PUNKTE][ICON]" + p.icon.name + "[ICON]";
+            msg += "[TRENNER][ID]" + p.id + "[ID][PUNKTE]" + p.points + "[PUNKTE]";
             if (p.isConnected && PlayerConnected[i])
             {
                 connectedplayer++;
@@ -362,6 +362,17 @@ public class QuizServer : MonoBehaviour
             SpielerAnzeige[i, 3].SetActive(false); // Ausgetabt Einblendung
             SpielerAnzeige[i, 6].SetActive(true); // Spieler Antwort
         }
+        // Change Quiz
+        GameObject ChangeQuiz = GameObject.Find("ServerSide/ChangeQuiz");
+        ChangeQuiz.GetComponent<TMP_Dropdown>().ClearOptions();
+        List<string> quizzes = new List<string>();
+        foreach (Quiz quiz in Config.QUIZ_SPIEL.getQuizze())
+            quizzes.Add(quiz.getTitel());
+        ChangeQuiz.GetComponent<TMP_Dropdown>().AddOptions(quizzes);
+        ChangeQuiz.GetComponent<TMP_Dropdown>().value = Config.QUIZ_SPIEL.getIndex(Config.QUIZ_SPIEL.getSelected());
+        // Regeln
+        GameObject.Find("ServerSide/RegelnAnzeigen").GetComponent<Toggle>().isOn = false;
+        //GameObject.Find("ServerSide/RegelnWerdenAngezeigt").SetActive(false); // TODO: get null error
 
         // Schätzfragen
         if (GameObject.Find("SchaetzfragenAnimation") != null)
@@ -406,6 +417,25 @@ public class QuizServer : MonoBehaviour
         aktuelleFrage = 0;
         GameObject.Find("QuizAnzeigen/Titel").GetComponent<TMP_Text>().text = Config.QUIZ_SPIEL.getSelected().getTitel();
         GameObject.Find("QuizAnzeigen/FragenIndex2").GetComponentInChildren<TMP_Text>().text = "";
+        GameObject.Find("Frage").GetComponentInChildren<TMP_Text>().text = "";
+        if (Config.QUIZ_SPIEL.getSelected().getFragenCount() > 0)
+        {
+            LoadQuestionIntoScene(0);
+        }
+    }
+    /**
+     * Ändert das ausgewählte Quiz
+     */
+    public void ChangeQuiz(TMP_Dropdown drop)
+    {
+        // Wählt neues Quiz aus
+        Config.QUIZ_SPIEL.setSelected(Config.QUIZ_SPIEL.getQuizByIndex(drop.value));
+        Logging.add(Logging.Type.Normal, "QuizServer", "ChangeQuiz", "Quiz starts: " + Config.QUIZ_SPIEL.getSelected().getTitel());
+        // Aktualisiert die Anzeigen
+        aktuelleFrage = 0;
+        GameObject.Find("QuizAnzeigen/Titel").GetComponent<TMP_Text>().text = Config.QUIZ_SPIEL.getSelected().getTitel();
+        GameObject.Find("QuizAnzeigen/FragenIndex2").GetComponentInChildren<TMP_Text>().text = "";
+        GameObject.Find("QuizAnzeigen/FragenIndex1").GetComponentInChildren<TMP_Text>().text = "";
         GameObject.Find("Frage").GetComponentInChildren<TMP_Text>().text = "";
         if (Config.QUIZ_SPIEL.getSelected().getFragenCount() > 0)
         {
@@ -642,6 +672,17 @@ public class QuizServer : MonoBehaviour
         UpdateSpielerBroadcast();
     }
     #endregion
+    #region Regeln Zeigen
+    /**
+     * Blendet die Regeln ein & Sendet aktualisierte Version an Spieler
+     */
+    public void ToggleSpielRegeln(Image image)
+    {
+        Toggle tog = GameObject.Find("ServerSide/RegelnAnzeigen").GetComponent<Toggle>();
+        image.gameObject.SetActive(tog.isOn);
+        Broadcast("#SpielReglenZeigen [BOOL]" + tog.isOn + "[BOOL][REGELN]" + GameObject.Find("Regeln").GetComponent<TMP_Text>().text);
+    }
+    #endregion
     #region Spieler ist (Nicht-)Dran
     /**
      * Aktiviert den Icon Rand beim Spieler
@@ -649,6 +690,8 @@ public class QuizServer : MonoBehaviour
     public void SpielerIstDran(GameObject button)
     {
         int pId = Int32.Parse(button.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
+        for (int i = 0; i < Config.SERVER_MAX_CONNECTIONS; i++)
+            SpielerAnzeige[(pId - 1), 1].SetActive(false);
         SpielerAnzeige[(pId - 1), 1].SetActive(true);
         buzzerIsOn = false;
         Broadcast("#SpielerIstDran "+pId);

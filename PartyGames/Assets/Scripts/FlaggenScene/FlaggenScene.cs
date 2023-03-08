@@ -47,9 +47,4 @@ public class FlaggenScene : MonoBehaviour
         //MedienUtil.WriteLogsInDirectory();
     }
 
-    // TODO: temo
-    public void LoadStartuo()
-    {
-        SceneManager.LoadScene("Startup");
-    }
 }
