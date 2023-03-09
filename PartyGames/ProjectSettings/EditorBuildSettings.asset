@@ -17,4 +17,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Listen.unity
     guid: 5193030ef3118a44193f16bafc6b435a
+  - enabled: 1
+    path: Assets/Scenes/Mosaik.unity
+    guid: 0275f50fcd77c82449246f1e54374ac8
   m_configObjects: {}

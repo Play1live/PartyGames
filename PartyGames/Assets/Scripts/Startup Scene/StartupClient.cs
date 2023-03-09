@@ -333,14 +333,16 @@ public class StartupClient : MonoBehaviour
                 SceneManager.LoadSceneAsync("StartUpScene");
                 break;
             case "Flaggen":
-                SceneManager.LoadScene("Flaggen");
+                SceneManager.LoadScene(data);
                 break;
             case "Quiz":
-                SceneManager.LoadScene("Quiz");
+                SceneManager.LoadScene(data);
                 break;
             case "Listen":
-                
-                SceneManager.LoadScene("Listen");
+                SceneManager.LoadScene(data);
+                break;
+            case "Mosaik":
+                SceneManager.LoadScene(data);
                 break;
         }
     }

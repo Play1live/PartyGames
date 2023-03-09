@@ -81,7 +81,7 @@ public class Listen
         auswahlElemente = ShuffelList(alleElemente);
 
         // Lösche Daten zu int
-        alleElemente = DatumZuInt(alleElemente);
+        //alleElemente = DatumZuInt(alleElemente);
 
         Sorting(); // Sortiert Liste
     }
@@ -258,25 +258,28 @@ public class Element
 
         // Datem abbrechen
         if (sort.Split('.').Length == 3)
+        {
+            // Datum zu int machen
+            sortby = sort.Split('.')[2] + sort.Split('.')[1] + sort.Split('.')[0];
             return;
+        }
 
         /// Nummern punktieren
-        string parseint = sortby;
+        string parseint = display;
         string nachkommastelle = "";
         if (sortby.Contains("."))
         {
             parseint = sortby.Split('.')[0];
             nachkommastelle = ","+ sortby.Split('.')[1];
         }
+        int number = Int32.Parse(parseint);
+        string formattedNumber = string.Format("{0:n}", number);
+        //string formatted = string.Format("{0:n}", parseint);
+        //string formatted = parseint.ToString("N3");
+        formattedNumber = formattedNumber.Replace(",00", "");
+        //formattedNumber = formattedNumber.Replace(",", ".");
 
-        string formatted = string.Format("{0:n}", parseint);
-        formatted = formatted.Replace(".00", "");
-        formatted = formatted.Replace(",", ".");
-
-        sortby = formatted+nachkommastelle;
-        display = sortby + einheit;
-
-
+        display = formattedNumber + nachkommastelle + " "+einheit;
     }
 
     public string getItem() { return item; }

@@ -824,6 +824,8 @@ public class StartupServer : MonoBehaviour
             Logging.add(Logging.Type.Warning, "StartupServer", "WechselGameSelectionFie", "Unbekannte Auswahl: WechselGameSelControlFie -> " + s);
         }
     }
+
+
     /**
      * Die geladenen Spiele in der Game‹bersicht an
      */
@@ -836,19 +838,12 @@ public class StartupServer : MonoBehaviour
         TMP_Dropdown ListenDropdown = GameObject.Find("GameSelection/Listen/ListenAuswahl").GetComponent<TMP_Dropdown>();
         ListenDropdown.ClearOptions();
         ListenDropdown.AddOptions(Config.LISTEN_SPIEL.getListenAsStringList());
+
+        TMP_Dropdown MosaikDropdown = GameObject.Find("GameSelection/Mosaik/Auswahl").GetComponent<TMP_Dropdown>();
+        MosaikDropdown.ClearOptions();
+        MosaikDropdown.AddOptions(Config.MOSAIK_SPIEL.getListenAsStringList());
     }
-
     #region Starte Spiele
-    /* TODO: Spiele
-     * Listen
-     * Geheimwˆrter
-     * Mosaik
-     * Auktion
-     * Codenames
-     * Lexikon
-     * Kartenkunde
-     */
-
     /**
      * Startet das Flaggen Spiel
      */
@@ -873,28 +868,16 @@ public class StartupServer : MonoBehaviour
     /**
      * Startet das Listen Spiel -> Alle Spieler laden in die neue Scene
      */
-    public void StarteListen(TMP_Dropdown drop)
+    public void StarteMosaik(TMP_Dropdown drop)
     {
-        Config.LISTEN_SPIEL.setSelected(Config.LISTEN_SPIEL.getListe(drop.value));
-        Logging.add(Logging.Type.Normal, "StartupServer", "StarteListen", "Listen starts: "); //Config.QUIZ_SPIEL.getSelected().getTitel());
-        /*
-        Debug.LogWarning(Config.LISTEN_SPIEL.getListe(0).getTitel());
-        Debug.Log("Alle Elemente");
-        List<Element> e = Config.LISTEN_SPIEL.getListe(0).getAlleElemente();
-        foreach (Element i in e)
-        {
-            Debug.Log(i.getItem() + " - " + i.getDisplay() + " - " + i.getSortBy());
-        }
-        Debug.Log("Auswahl Elemente");
-        List<Element> e1 = Config.LISTEN_SPIEL.getListe(0).getAuswahlElemente();
-        foreach (Element i in e1)
-        {
-            Debug.Log(i.getItem() + " - " + i.getDisplay() + " - " + i.getSortBy());
-        }*/
+        Config.MOSAIK_SPIEL.setSelected(Config.MOSAIK_SPIEL.getMosaik(drop.value));
+        Logging.add(Logging.Type.Normal, "StartupServer", "StarteMosaik", "Mosaik starts: " + Config.MOSAIK_SPIEL.getSelected().getTitel());
 
-
-        SceneManager.LoadScene("Listen");
-        Broadcast("#StarteSpiel Listen");
+        SceneManager.LoadScene("Mosaik");
+        Broadcast("#StarteSpiel Mosaik");
     }
+    /**
+     * Starte das Mosaik Spiel -> Alle Spieler laden in die neue Scene
+     */
     #endregion
 }
