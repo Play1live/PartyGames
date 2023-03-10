@@ -344,6 +344,9 @@ public class StartupClient : MonoBehaviour
             case "Mosaik":
                 SceneManager.LoadScene(data);
                 break;
+            case "Geheimwörter":
+                SceneManager.LoadScene(data);
+                break;
         }
     }
 

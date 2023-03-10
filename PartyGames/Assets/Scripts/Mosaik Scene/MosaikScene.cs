@@ -7,6 +7,9 @@ using UnityEngine.UI;
 
 public class MosaikScene : MonoBehaviour
 {
+    [SerializeField] GameObject IntroGo;
+    [SerializeField] AudioSource IntroSound;
+
     [SerializeField] GameObject Client;
     [SerializeField] GameObject Server;
     [SerializeField] GameObject[] ServerSided;
@@ -42,8 +45,22 @@ public class MosaikScene : MonoBehaviour
                 go.SetActive(false);
         }
 
-        Debug.LogWarning(imageUrl);
-        StartCoroutine(GetTexture());
+
+        StartCoroutine(IntroAnimation());
+
+        //Debug.LogWarning(imageUrl);
+        //StartCoroutine(GetTexture());
+    }
+
+    IEnumerator IntroAnimation()
+    {
+        IntroSound.Play();
+        IntroGo.SetActive(true);
+
+        //Wait for 10 secs.
+        yield return new WaitForSeconds(10);
+
+        IntroGo.SetActive(false);
     }
 
     IEnumerator GetTexture()

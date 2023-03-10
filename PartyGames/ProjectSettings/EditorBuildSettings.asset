@@ -20,4 +20,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Mosaik.unity
     guid: 0275f50fcd77c82449246f1e54374ac8
+  - enabled: 1
+    path: "Assets/Scenes/Geheimw\xF6rter.unity"
+    guid: beefacfc062f31e48854921b0923e894
   m_configObjects: {}

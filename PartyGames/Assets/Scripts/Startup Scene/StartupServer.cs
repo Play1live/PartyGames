@@ -842,6 +842,10 @@ public class StartupServer : MonoBehaviour
         TMP_Dropdown MosaikDropdown = GameObject.Find("GameSelection/Mosaik/Auswahl").GetComponent<TMP_Dropdown>();
         MosaikDropdown.ClearOptions();
         MosaikDropdown.AddOptions(Config.MOSAIK_SPIEL.getListenAsStringList());
+
+        TMP_Dropdown GeheimwoerterDropdown = GameObject.Find("GameSelection/Geheimwörter/Auswahl").GetComponent<TMP_Dropdown>();
+        GeheimwoerterDropdown.ClearOptions();
+        GeheimwoerterDropdown.AddOptions(Config.GEHEIMWOERTER_SPIEL.getListenAsStringList());
     }
     #region Starte Spiele
     /**
@@ -868,6 +872,17 @@ public class StartupServer : MonoBehaviour
     /**
      * Startet das Listen Spiel -> Alle Spieler laden in die neue Scene
      */
+    public void StarteListen(TMP_Dropdown drop)
+    {
+        Config.LISTEN_SPIEL.setSelected(Config.LISTEN_SPIEL.getListe(drop.value));
+        Logging.add(Logging.Type.Normal, "StartupServer", "StarteListen", "Listen starts: " + Config.LISTEN_SPIEL.getSelected().getTitel());
+
+        SceneManager.LoadScene("Listen");
+        Broadcast("#StarteSpiel Listen");
+    }
+    /**
+     * Starte das Mosaik Spiel -> Alle Spieler laden in die neue Scene
+     */
     public void StarteMosaik(TMP_Dropdown drop)
     {
         Config.MOSAIK_SPIEL.setSelected(Config.MOSAIK_SPIEL.getMosaik(drop.value));
@@ -877,7 +892,15 @@ public class StartupServer : MonoBehaviour
         Broadcast("#StarteSpiel Mosaik");
     }
     /**
-     * Starte das Mosaik Spiel -> Alle Spieler laden in die neue Scene
+     * Starte das Geheimwörter Spiel -> Alle Spieler laden in die neue Scene
      */
+    public void StarteGeheimwörter(TMP_Dropdown drop)
+    {
+        Config.GEHEIMWOERTER_SPIEL.setSelected(Config.GEHEIMWOERTER_SPIEL.getListe(drop.value));
+        Logging.add(Logging.Type.Normal, "StartupServer", "StarteGeheimwörter", "Geheimwörter starts: " + Config.GEHEIMWOERTER_SPIEL.getSelected().getTitel());
+
+        SceneManager.LoadScene("Geheimwörter");
+        Broadcast("#StarteSpiel Geheimwörter");
+    }
     #endregion
 }

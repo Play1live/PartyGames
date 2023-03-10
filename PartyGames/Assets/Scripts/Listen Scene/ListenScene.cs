@@ -5,6 +5,9 @@ using UnityEngine.SceneManagement;
 
 public class ListenScene : MonoBehaviour
 {
+    [SerializeField] GameObject IntroGO;
+    [SerializeField] AudioSource IntroSound;
+
     [SerializeField] GameObject Client;
     [SerializeField] GameObject Server;
     [SerializeField] GameObject[] ServerSided;
@@ -39,6 +42,19 @@ public class ListenScene : MonoBehaviour
             foreach (GameObject go in DeactivateForClient)
                 go.SetActive(false);
         }
+
+        StartCoroutine(IntroAnimation());
+    }
+
+    IEnumerator IntroAnimation()
+    {
+        IntroSound.Play();
+        IntroGO.SetActive(true);
+
+        //Wait for 10 secs.
+        yield return new WaitForSeconds(10);
+
+        IntroGO.SetActive(false);
     }
 
     void Update()

@@ -37,6 +37,7 @@ public class Config
     public static QuizSpiel QUIZ_SPIEL;
     public static ListenSpiel LISTEN_SPIEL;
     public static MosaikSpiel MOSAIK_SPIEL;
+    public static GeheimwörterSpiel GEHEIMWOERTER_SPIEL;
 
     // Scenenspezifisches
     // Hauptmenue
