@@ -379,7 +379,7 @@ public class StartupServer : MonoBehaviour
      */
     private void SperreGameSelection()
     {
-        allowedStartTime = DateTime.Now.AddSeconds(10);
+        allowedStartTime = DateTime.Now.AddSeconds(5);
         for (int i = 0; i < ServerControlGameSelection.transform.childCount; i++)
         {
             ServerControlGameSelection.transform.GetChild(i).gameObject.SetActive(false);
@@ -831,6 +831,8 @@ public class StartupServer : MonoBehaviour
      */
     public void DisplayGameFiles()
     {
+        if (!ServerControlGameSelection.activeInHierarchy)
+            return;
         TMP_Dropdown QuizDropdown = GameObject.Find("GameSelection/Quiz/QuizAuswahl").GetComponent<TMP_Dropdown>();
         QuizDropdown.ClearOptions();
         QuizDropdown.AddOptions(Config.QUIZ_SPIEL.getQuizzeAsStringList());
@@ -846,6 +848,10 @@ public class StartupServer : MonoBehaviour
         TMP_Dropdown GeheimwoerterDropdown = GameObject.Find("GameSelection/Geheimwörter/Auswahl").GetComponent<TMP_Dropdown>();
         GeheimwoerterDropdown.ClearOptions();
         GeheimwoerterDropdown.AddOptions(Config.GEHEIMWOERTER_SPIEL.getListenAsStringList());
+
+        TMP_Dropdown WerBietetMehrDropdown = GameObject.Find("GameSelection/WerBietetMehr/Auswahl").GetComponent<TMP_Dropdown>();
+        WerBietetMehrDropdown.ClearOptions();
+        WerBietetMehrDropdown.AddOptions(Config.WERBIETETMEHR_SPIEL.getQuizzeAsStringList());
     }
     #region Starte Spiele
     /**
@@ -901,6 +907,17 @@ public class StartupServer : MonoBehaviour
 
         SceneManager.LoadScene("Geheimwörter");
         Broadcast("#StarteSpiel Geheimwörter");
+    }
+    /**
+     * Starte das WerBietetMehr Spiel -> Alle Spieler laden in die neue Scene
+     */
+    public void StarteWerBietetMehr(TMP_Dropdown drop)
+    {
+        Config.WERBIETETMEHR_SPIEL.setSelected(Config.WERBIETETMEHR_SPIEL.getQuizByIndex(drop.value));
+        Logging.add(Logging.Type.Normal, "StartupServer", "StarteWerBietetMehr", "WerBietetMehr starts: " + Config.WERBIETETMEHR_SPIEL.getSelected().getTitel());
+
+        SceneManager.LoadScene("WerBietetMehr");
+        Broadcast("#StarteSpiel WerBietetMehr");
     }
     #endregion
 }

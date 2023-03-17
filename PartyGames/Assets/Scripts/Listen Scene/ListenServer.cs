@@ -1232,12 +1232,14 @@ public class ListenServer : MonoBehaviour
         LoesungGrid[1].SetActive(true);
         LoesungGrid[1].GetComponentInChildren<TMP_Text>().text = "▼ " + Config.LISTEN_SPIEL.getSelected().getSortByDisplay().Replace(" - ", "|").Split('|')[1];
 
-        for (int i = 0; i < Config.LISTEN_SPIEL.getSelected().getAlleElemente().Count; i++)
+        for (int i = 0; i < 30; i++)
         {
-            Element element = Config.LISTEN_SPIEL.getSelected().getAlleElemente()[i];
-            LoesungGrid[2 + i].SetActive(true);
-            LoesungGrid[2 + i].transform.GetChild(1).GetComponent<TMP_Text>().text = element.getItem() + " - " + element.getDisplay();
-            LoesungGrid[2 + i].transform.GetChild(2).GetComponentInChildren<TMP_Text>().text = "";// + (i+1);
+            if (i < Config.LISTEN_SPIEL.getSelected().getAlleElemente().Count) {
+                Element element = Config.LISTEN_SPIEL.getSelected().getAlleElemente()[i];
+                LoesungGrid[2 + i].SetActive(true);
+                LoesungGrid[2 + i].transform.GetChild(1).GetComponent<TMP_Text>().text = element.getItem() + " - " + element.getDisplay();
+                LoesungGrid[2 + i].transform.GetChild(2).GetComponentInChildren<TMP_Text>().text = "";// + (i+1);
+            }
         }
         Broadcast("#ListenStart");
     }
@@ -1311,6 +1313,7 @@ public class ListenServer : MonoBehaviour
      */
     public void ListenElementEinfuegen(GameObject element)
     {
+        Debug.Log(element.name);
         int auswahlIndex = Int32.Parse(element.transform.GetChild(2).GetComponentInChildren<TMP_Text>().text)-1;
         Element item = Config.LISTEN_SPIEL.getSelected().getAuswahlElemente()[auswahlIndex];
         int loesIndex = Config.LISTEN_SPIEL.getSelected().getAlleFromAuswahl(item);

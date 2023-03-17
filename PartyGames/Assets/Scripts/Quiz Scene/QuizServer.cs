@@ -271,6 +271,14 @@ public class QuizServer : MonoBehaviour
         player.isDisconnected = true;
     }
     /**
+     *  Spiel Verlassen & Zurück in die Lobby laden
+     */
+    public void SpielVerlassenButton()
+    {
+        SceneManager.LoadScene("Startup");
+        Broadcast("#ZurueckInsHauptmenue");
+    }
+    /**
      * Sendet aktualisierte Spielerinfos an alle Spieler
      */
     private void UpdateSpielerBroadcast()
@@ -370,18 +378,16 @@ public class QuizServer : MonoBehaviour
             quizzes.Add(quiz.getTitel());
         ChangeQuiz.GetComponent<TMP_Dropdown>().AddOptions(quizzes);
         ChangeQuiz.GetComponent<TMP_Dropdown>().value = Config.QUIZ_SPIEL.getIndex(Config.QUIZ_SPIEL.getSelected());
-        // Regeln
-        GameObject.Find("ServerSide/RegelnAnzeigen").GetComponent<Toggle>().isOn = false;
-        //GameObject.Find("ServerSide/RegelnWerdenAngezeigt").SetActive(false); // TODO: get null error
 
         // Schätzfragen
-        if (GameObject.Find("SchaetzfragenAnimation") != null)
-            GameObject.Find("SchaetzfragenAnimation").SetActive(false);
-        /*SchaetzfragenAnzeige = new GameObject[20];
-        SchaetzfragenAnzeige[0] = GameObject.Find("SchaetzfragenAnimation");
+        //if (GameObject.Find("SchaetzfragenAnimation") != null)
+            //GameObject.Find("SchaetzfragenAnimation").SetActive(false);
+        SchaetzfragenAnzeige = new GameObject[20];
+        SchaetzfragenAnzeige[0] = GameObject.Find("SchaetzfragenAnimation/Grid");
         SchaetzfragenAnzeige[1] = GameObject.Find("SchaetzfragenAnimation/Grid/MinGrenze");
         SchaetzfragenAnzeige[2] = GameObject.Find("SchaetzfragenAnimation/Grid/ZielGrenze");
         SchaetzfragenAnzeige[3] = GameObject.Find("SchaetzfragenAnimation/Grid/MaxGrenze");
+
         SchaetzfragenAnzeige[4] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (1)");
         SchaetzfragenAnzeige[5] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (1)/Data");
         SchaetzfragenAnzeige[5].SetActive(false);
@@ -405,7 +411,21 @@ public class QuizServer : MonoBehaviour
         SchaetzfragenAnzeige[17].SetActive(false);
         SchaetzfragenAnzeige[18] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (8)");
         SchaetzfragenAnzeige[19] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (8)/Data");
-        SchaetzfragenAnzeige[19].SetActive(false);*/
+        SchaetzfragenAnzeige[19].SetActive(false);
+
+        SchaetzfragenAnzeige[0].SetActive(false);
+
+        foreach (Player p in Config.PLAYERLIST)
+        {
+            if (p.isConnected)
+            {
+                GameObject.Find("SchaetzfragenAnimation/Spieler/Spieler (" + p.id + ")").GetComponent<Image>().sprite = p.icon;
+            }
+            else
+            {
+                GameObject.Find("SchaetzfragenAnimation/Spieler/Spieler (" + p.id + ")").gameObject.SetActive(false);
+            }
+        }
     }
 
     #region Quiz Fragen Anzeige
@@ -672,17 +692,6 @@ public class QuizServer : MonoBehaviour
         UpdateSpielerBroadcast();
     }
     #endregion
-    #region Regeln Zeigen
-    /**
-     * Blendet die Regeln ein & Sendet aktualisierte Version an Spieler
-     */
-    public void ToggleSpielRegeln(Image image)
-    {
-        Toggle tog = GameObject.Find("ServerSide/RegelnAnzeigen").GetComponent<Toggle>();
-        image.gameObject.SetActive(tog.isOn);
-        Broadcast("#SpielReglenZeigen [BOOL]" + tog.isOn + "[BOOL][REGELN]" + GameObject.Find("Regeln").GetComponent<TMP_Text>().text);
-    }
-    #endregion
     #region Spieler ist (Nicht-)Dran
     /**
      * Aktiviert den Icon Rand beim Spieler
@@ -711,57 +720,78 @@ public class QuizServer : MonoBehaviour
         Broadcast("#SpielerIstNichtDran " + pId);
     }
     #endregion
-    /**
-     *  Spiel Verlassen & Zurück in die Lobby laden
-     */
-    public void SpielVerlassenButton()
-    {
-        SceneManager.LoadScene("Startup");
-        Broadcast("#ZurueckInsHauptmenue");
-    }
-    #region Schätzfragen Animation
-   /* public void getPositionInfo()
-    {
-        Debug.LogWarning("Min Grenze: "+SchaetzfragenAnzeige[1].transform.localPosition);
-        Debug.LogWarning("Ziel Grenze: " + SchaetzfragenAnzeige[2].transform.localPosition);
-        Debug.LogWarning("Max Grenze: " + SchaetzfragenAnzeige[3].transform.localPosition);
-        Debug.LogWarning("Icon 1: " + SchaetzfragenAnzeige[4].transform.localPosition);
 
+    #region Schätzfragen Animation
+    public void toggleZielAnzeige(Toggle toggle)
+    {
+        SchaetzfragenAnzeige[2].SetActive(toggle.isOn);
+        Broadcast("#AnimationZiel "+ toggle.isOn);
+    }
+    public void updateGrenzen()
+    {
+        SchaetzfragenAnzeige[1].GetComponentInChildren<TMP_Text>().text = GameObject.Find("SchaetzfragenAnimation/MinGrenzeFestlegen").GetComponent<TMP_InputField>().text + GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text;
+        SchaetzfragenAnzeige[2].GetComponentInChildren<TMP_Text>().text = GameObject.Find("SchaetzfragenAnimation/ZielGrenzeFestlegen").GetComponent<TMP_InputField>().text + GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text;
+        SchaetzfragenAnzeige[3].GetComponentInChildren<TMP_Text>().text = GameObject.Find("SchaetzfragenAnimation/MaxGrenzeFestlegen").GetComponent<TMP_InputField>().text + GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text;
+        SchaetzfragenAnzeige[2].SetActive(GameObject.Find("SchaetzfragenAnimation/ZielAnzeigen").GetComponent<Toggle>().isOn);
+    }
+    public void zeigeAnimationAn()
+    {
+        SchaetzfragenAnzeige[0].SetActive(true);
+        SchaetzfragenAnimationController.SetActive(false);
+        // Zeigt die Spielerschätzungen an
+        foreach (Player p in Config.PLAYERLIST)
+        {
+            if (p.isConnected)
+            {
+                SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].transform.GetChild(1).GetComponent<TMP_Text>().text = GameObject.Find("SchaetzfragenAnimation/Spieler/Spieler (" + p.id + ")").transform.GetChild(0).GetComponent<TMP_InputField>().text + GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text;
+                SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].transform.GetChild(3).gameObject.SetActive(false);
+            }
+        }
         BerechneSchritteProEinheit();
-        // Clients sollen auch starten
-        // Broadcast();
-        // Animation Starten
-        SchaetzfragenAnimationController.SetActive(true);
+
+
+        // Zeigt Sieger für Server an
+        string einheit = GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text;
+        float schatung = float.Parse(SchaetzfragenAnzeige[4].GetComponentInChildren<TMP_Text>().text.Replace(einheit , ""));
+        float ziel = float.Parse(SchaetzfragenAnzeige[2].GetComponentInChildren<TMP_Text>().text.Replace(einheit, ""));
+        float diff = Math.Abs(schatung - ziel);
+        foreach (Player p in Config.PLAYERLIST)
+        {
+            if (!SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].activeInHierarchy)
+                continue;
+            float spieler = float.Parse(SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].GetComponentInChildren<TMP_Text>().text.Replace(einheit, ""));
+            float spielerdiff = Math.Abs(spieler - ziel);
+            if (spielerdiff < diff)
+            {
+                schatung = spieler;
+                diff = spielerdiff;
+            }
+        }
+        foreach (Player p in Config.PLAYERLIST)
+        {
+            if (!SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].activeInHierarchy)
+                continue;
+            float spieler = float.Parse(SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].GetComponentInChildren<TMP_Text>().text.Replace(einheit, ""));
+            float spielerdiff = Math.Abs(spieler - ziel);
+            if (spielerdiff == diff)
+                SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].transform.GetChild(3).gameObject.SetActive(true);
+        }
     }
-    public void setMinGrenze(TMP_InputField input)
+   
+    public void BerechneSchritteProEinheit()
     {
-        SchaetzfragenAnzeige[1].GetComponentInChildren<TMP_Text>().text = input.text + " " + GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text;
-    }
-    public void setZielGrenze(TMP_InputField input)
-    {
-        SchaetzfragenAnzeige[2].GetComponentInChildren<TMP_Text>().text = input.text + " " + GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text;
-    }
-    public void setMaxGrenze(TMP_InputField input)
-    {
-        SchaetzfragenAnzeige[3].GetComponentInChildren<TMP_Text>().text = input.text + " " + GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text;
-    }
-    private void BerechneSchritteProEinheit()
-    {
-        float StartWert = float.Parse(SchaetzfragenAnzeige[1].GetComponentInChildren<TMP_Text>().text.Split(' ')[0]);
-        float ZielWert = float.Parse(SchaetzfragenAnzeige[2].GetComponentInChildren<TMP_Text>().text.Split(' ')[0]);
-        float MaxWert = float.Parse(SchaetzfragenAnzeige[3].GetComponentInChildren<TMP_Text>().text.Split(' ')[0]);
+        float StartWert = float.Parse(SchaetzfragenAnzeige[1].GetComponentInChildren<TMP_Text>().text.Replace(GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text, ""));
+        float ZielWert = float.Parse(SchaetzfragenAnzeige[2].GetComponentInChildren<TMP_Text>().text.Replace(GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text, ""));
+        float MaxWert = float.Parse(SchaetzfragenAnzeige[3].GetComponentInChildren<TMP_Text>().text.Replace(GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text, ""));
         float StartPosition = SchaetzfragenAnzeige[1].transform.localPosition.x;
         float MaxPosition = SchaetzfragenAnzeige[3].transform.localPosition.x;
         float DifftoNull = Math.Abs(StartPosition);
         float DiffToMax = MaxPosition - StartPosition;
-        float SchritteProEinheit = DiffToMax / (MaxWert-StartWert);
+        float WertToMax = DiffToMax / (MaxWert-StartWert);
         float spielerwert = 0;
 
-        Debug.Log(DiffToMax);
-        Debug.Log(SchritteProEinheit);
-
         // Ziel Bewegen
-        SchaetzfragenAnzeige[2].transform.localPosition = new Vector3(SchritteProEinheit*(ZielWert-StartWert) - DifftoNull ,SchaetzfragenAnzeige[2].transform.localPosition.y, 0);
+        SchaetzfragenAnzeige[2].transform.localPosition = new Vector3(WertToMax*(ZielWert-StartWert) - DifftoNull ,SchaetzfragenAnzeige[2].transform.localPosition.y, 0);
 
         // SpielerData berechnen
         string data_text = "";
@@ -772,47 +802,43 @@ public class QuizServer : MonoBehaviour
         data_text += "[MAX_POSITION]" + MaxPosition + "[MAX_POSITION]";
         data_text += "[DIFF_NULL]" + DifftoNull + "[DIFF_NULL]";
         data_text += "[DIFF_MAX]" + DiffToMax + "[DIFF_MAX]";
-        data_text += "[DISTANCE_PER_MOVE]" + SchritteProEinheit + "[DISTANCE_PER_MOVE]";
+        data_text += "[DISTANCE_PER_MOVE]" + WertToMax + "[DISTANCE_PER_MOVE]";
+        data_text += "[EINHEIT]" + GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text + "[EINHEIT]";
+        data_text += "[KOMMASTELLEN]" + GameObject.Find("SchaetzfragenAnimation/KommastellenFestlegen").GetComponent<TMP_InputField>().text + "[KOMMASTELLEN]";
         data_text += "[SPIELER_WERT]" + spielerwert + "[SPIELER_WERT]";
 
-        // Spieler 1
-        spielerwert = float.Parse(GameObject.Find("SchaetzfragenAnimation/Grid/Icon (1)").GetComponentInChildren<TMP_Text>().text);
-        data_text = data_text.Replace("[SPIELER_WERT]", "|").Split('|')[0] + "[SPIELER_WERT]"+ spielerwert + "[SPIELER_WERT]";
-        SchaetzfragenAnzeige[5].GetComponent<TMP_Text>().text = data_text;
-        // Spieler 2
-        spielerwert = float.Parse(GameObject.Find("SchaetzfragenAnimation/Grid/Icon (2)").GetComponentInChildren<TMP_Text>().text);
-        data_text = data_text.Replace("[SPIELER_WERT]", "|").Split('|')[0] + "[SPIELER_WERT]" + spielerwert + "[SPIELER_WERT]";
-        SchaetzfragenAnzeige[7].GetComponent<TMP_Text>().text = data_text;
-        // Spieler 3
-        spielerwert = float.Parse(GameObject.Find("SchaetzfragenAnimation/Grid/Icon (3)").GetComponentInChildren<TMP_Text>().text);
-        data_text = data_text.Replace("[SPIELER_WERT]", "|").Split('|')[0] + "[SPIELER_WERT]" + spielerwert + "[SPIELER_WERT]";
-        SchaetzfragenAnzeige[9].GetComponent<TMP_Text>().text = data_text;
-        // Spieler 4
-        spielerwert = float.Parse(GameObject.Find("SchaetzfragenAnimation/Grid/Icon (4)").GetComponentInChildren<TMP_Text>().text);
-        data_text = data_text.Replace("[SPIELER_WERT]", "|").Split('|')[0] + "[SPIELER_WERT]" + spielerwert + "[SPIELER_WERT]";
-        SchaetzfragenAnzeige[11].GetComponent<TMP_Text>().text = data_text;
-        // Spieler 5
-        spielerwert = float.Parse(GameObject.Find("SchaetzfragenAnimation/Grid/Icon (5)").GetComponentInChildren<TMP_Text>().text);
-        data_text = data_text.Replace("[SPIELER_WERT]", "|").Split('|')[0] + "[SPIELER_WERT]" + spielerwert + "[SPIELER_WERT]";
-        SchaetzfragenAnzeige[13].GetComponent<TMP_Text>().text = data_text;
-        // Spieler 6
-        spielerwert = float.Parse(GameObject.Find("SchaetzfragenAnimation/Grid/Icon (6)").GetComponentInChildren<TMP_Text>().text);
-        data_text = data_text.Replace("[SPIELER_WERT]", "|").Split('|')[0] + "[SPIELER_WERT]" + spielerwert + "[SPIELER_WERT]";
-        SchaetzfragenAnzeige[15].GetComponent<TMP_Text>().text = data_text;
-        // Spieler 7
-        spielerwert = float.Parse(GameObject.Find("SchaetzfragenAnimation/Grid/Icon (7)").GetComponentInChildren<TMP_Text>().text);
-        data_text = data_text.Replace("[SPIELER_WERT]", "|").Split('|')[0] + "[SPIELER_WERT]" + spielerwert + "[SPIELER_WERT]";
-        SchaetzfragenAnzeige[17].GetComponent<TMP_Text>().text = data_text;
-        // Spieler 8
-        spielerwert = float.Parse(GameObject.Find("SchaetzfragenAnimation/Grid/Icon (8)").GetComponentInChildren<TMP_Text>().text);
-        data_text = data_text.Replace("[SPIELER_WERT]", "|").Split('|')[0] + "[SPIELER_WERT]" + spielerwert + "[SPIELER_WERT]";
-        SchaetzfragenAnzeige[19].GetComponent<TMP_Text>().text = data_text;
+        string broadcastmsg = "";
+        // Spieler
+        foreach (Player p in Config.PLAYERLIST)
+        {
+            SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].transform.localPosition = new Vector3(StartPosition, SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].transform.localPosition.y, 0);
+            if (p.isConnected)
+            {
+                spielerwert = float.Parse(GameObject.Find("SchaetzfragenAnimation/Grid/Icon (" + p.id + ")").GetComponentInChildren<TMP_Text>().text.Replace(GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text, ""));
+                data_text = data_text.Replace("[SPIELER_WERT]", "|").Split('|')[0] + "[SPIELER_WERT]" + spielerwert + "[SPIELER_WERT]";
+                SchaetzfragenAnzeige[(5 + 2 * (p.id - 1))].GetComponent<TMP_Text>().text = data_text;
+                broadcastmsg += "[" + p.id + "]"+spielerwert+"[" + p.id + "]";
+            }
+            else
+            {
+                // Hide disconnected
+                SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].SetActive(false);
+                broadcastmsg += "[" + p.id + "]0[" + p.id + "]";
+            }
+        }
+        Broadcast("#AnimationInfo " + data_text.Replace("[SPIELER_WERT]", "|").Split('|')[0] + broadcastmsg);
+    }
 
-
-
-        // Spieler Bewegen
-        //float spielerwert = float.Parse(GameObject.Find("SchaetzfragenAnimation/Grid/Icon (1)").GetComponentInChildren<TMP_Text>().text);
-       // SchaetzfragenAnzeige[4].transform.localPosition = new Vector3(SchritteProEinheit*(spielerwert-StartWert) - DifftoNull, SchaetzfragenAnzeige[4].transform.localPosition.y, 0);
-    }*/
+    public void AnimationStarten()
+    {
+        Broadcast("#AnimationStart");
+        SchaetzfragenAnimationController.SetActive(true);
+    }
+    public void AnimationBeenden()
+    {
+        Broadcast("#AnimationBeenden");
+        SchaetzfragenAnzeige[0].SetActive(false);
+        SchaetzfragenAnimationController.SetActive(false);
+    }
     #endregion
 }

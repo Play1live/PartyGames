@@ -295,6 +295,7 @@ public class MosaikServer : MonoBehaviour
             if (p.isConnected && PlayerConnected[i])
             {
                 SpielerAnzeige[i, 0].SetActive(true);
+                SpielerAnzeige[i, 2].GetComponent<Image>().sprite = p.icon;
                 SpielerAnzeige[i, 4].GetComponent<TMP_Text>().text = p.name;
                 SpielerAnzeige[i, 5].GetComponent<TMP_Text>().text = p.points+"";
             }
@@ -454,7 +455,6 @@ public class MosaikServer : MonoBehaviour
      */
     public void PunkteFalscheAntwort(GameObject player)
     {
-        Debug.LogError(transform.parent.name);
         Broadcast("#AudioFalscheAntwort");
         FalscheAntwortSound.Play();
         int pId = Int32.Parse(player.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));

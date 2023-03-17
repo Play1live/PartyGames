@@ -35,17 +35,19 @@ public class GeheimwörterClient : MonoBehaviour
     void Update()
     {
         // Leertaste kann Buzzern
-        if (!pressingbuzzer)
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            pressingbuzzer = true;
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (!pressingbuzzer)
+            {
+                pressingbuzzer = true;
                 SpielerBuzzered();
+            }
         }
-        else if (pressingbuzzer && Input.GetKeyUp(KeyCode.Space))
+        else if (Input.GetKeyUp(KeyCode.Space) && pressingbuzzer)
         {
             pressingbuzzer = false;
         }
-        
+
 
         #region Prüft auf Nachrichten vom Server
         if (Config.CLIENT_STARTED)
@@ -167,8 +169,29 @@ public class GeheimwörterClient : MonoBehaviour
             case "#BuzzerFreigeben":
                 BuzzerFreigeben();
                 break;
-            #endregion
+            case "#TexteingabeAnzeigen":
+                TexteingabeAnzeigen(data);
+                break;
+            case "#TextantwortenAnzeigen":
+                TextantwortenAnzeigen(data);
+                break;
 
+            #endregion
+            case "#GeheimwoerterHide":
+                GeheimwoerterHide();
+                break;
+            case "#GeheimwoerterNeue":
+                GeheimwoerterNeue();
+                break;
+            case "#GeheimwoerterCode":
+                GeheimwoerterCode(data);
+                break;
+            case "#GeheimwoerterWorteZeigen":
+                GeheimwoerterWorteZeigen(data);
+                break;
+            case "#GeheimwoerterLoesung":
+                GeheimwoerterLoesung(data);
+                break;
         }
     }
 
@@ -293,16 +316,65 @@ public class GeheimwörterClient : MonoBehaviour
     {
         SendToServer("#SpielerAntwortEingabe " + input.text);
     }
-
+    /**
+     * Zeigt das Texteingabefeld an
+     */
+    private void TexteingabeAnzeigen(string data)
+    {
+        bool anzeigen = Boolean.Parse(data);
+        if (anzeigen)
+        {
+            SpielerAntwortEingabe.SetActive(true);
+            SpielerAntwortEingabe.GetComponentInChildren<TMP_InputField>().text = "";
+        }
+        else
+            SpielerAntwortEingabe.SetActive(false);
+    }
+    /**
+     * Zeigt die Textantworten aller Spieler an
+     */
+    private void TextantwortenAnzeigen(string data)
+    {
+        bool boolean = bool.Parse(data.Replace("[BOOL]", "|").Split('|')[1]);
+        if (boolean == false)
+        {
+            for (int i = 0; i < Config.SERVER_MAX_CONNECTIONS; i++)
+            {
+                SpielerAnzeige[i, 7].SetActive(false);
+                SpielerAnzeige[i, 7].GetComponentInChildren<TMP_InputField>().text = "";
+            }
+            return;
+        }
+        string text = data.Replace("[TEXT]", "|").Split('|')[1];
+        for (int i = 1; i <= Config.SERVER_MAX_CONNECTIONS; i++)
+        {
+            SpielerAnzeige[Player.getPosInLists(i), 7].SetActive(true);
+            SpielerAnzeige[Player.getPosInLists(i), 7].GetComponentInChildren<TMP_InputField>().text = text.Replace("[ID" + i + "]", "|").Split('|')[1];
+        }
+    }
     /**
      * Initialisiert die Anzeigen der Scene
      */
     private void InitAnzeigen()
     {
-       
-
+        WoerterAnzeige = GameObject.Find("GeheimwörterAnzeige/Outline/Woerter").GetComponent<TMP_Text>();
+        WoerterAnzeige.text = "";
+        KategorieAnzeige = GameObject.Find("GeheimwörterAnzeige/Outline/Kategorien").GetComponent<TMP_Text>();
+        KategorieAnzeige.text = "";
+        LoesungsWortAnzeige = GameObject.Find("GeheimwörterAnzeige/Outline/Loesungswort/Text").GetComponent<TMP_Text>();
+        LoesungsWortAnzeige.text = "";
+        LoesungsWortAnzeige.transform.parent.gameObject.SetActive(false);
+        Liste = new GameObject[30];
+        for (int i = 0; i < 30; i++)
+        {
+            Liste[i] = GameObject.Find("GeheimwörterAnzeige/Outline/Liste/Element (" + i + ")");
+            Liste[i].SetActive(false);
+        }
+        // Spieler Texteingabe
+        SpielerAntwortEingabe = GameObject.Find("SpielerAntwortEingabe");
+        SpielerAntwortEingabe.SetActive(false);
         // Spieler Anzeige
-        SpielerAnzeige = new GameObject[Config.SERVER_MAX_CONNECTIONS, 7]; // Anzahl benötigter Elemente
+        SpielerAnzeige = new GameObject[Config.SERVER_MAX_CONNECTIONS, 8]; // Anzahl benötigter Elemente
         for (int i = 0; i < Config.SERVER_MAX_CONNECTIONS; i++)
         {
             SpielerAnzeige[i, 0] = GameObject.Find("SpielerAnzeige/Player (" + (i + 1) + ")"); // Spieler Anzeige
@@ -312,12 +384,55 @@ public class GeheimwörterClient : MonoBehaviour
             SpielerAnzeige[i, 4] = GameObject.Find("SpielerAnzeige/Player (" + (i + 1) + ")/Infobar/Name"); // Spieler Name
             SpielerAnzeige[i, 5] = GameObject.Find("SpielerAnzeige/Player (" + (i + 1) + ")/Infobar/Punkte"); // Spieler Punkte
             SpielerAnzeige[i, 6] = GameObject.Find("SpielerAnzeige/Player (" + (i + 1) + ")/ServerControl"); // Server Settings
+            SpielerAnzeige[i, 7] = GameObject.Find("SpielerAnzeige/Player (" + (i + 1) + ")/SpielerAntwort"); // Server Settings
 
             SpielerAnzeige[i, 0].SetActive(false); // Spieler Anzeige
             SpielerAnzeige[i, 1].SetActive(false); // BuzzerPressed Umrandung
             SpielerAnzeige[i, 3].SetActive(false); // Ausgetabt Einblendung
             SpielerAnzeige[i, 6].SetActive(false); // Server Settings
+            SpielerAnzeige[i, 7].SetActive(false);
+        }
+    } 
+    
+    private void GeheimwoerterHide()
+    {
+        WoerterAnzeige.text = "";
+        KategorieAnzeige.text = "";
+        LoesungsWortAnzeige.text = "";
+        LoesungsWortAnzeige.transform.parent.gameObject.SetActive(false);
+        for (int i = 0; i < 30; i++)
+        {
+            Liste[i].SetActive(false);
         }
     }
-   
+    private void GeheimwoerterNeue()
+    {
+        WoerterAnzeige.text = "";
+        KategorieAnzeige.text = "";
+        LoesungsWortAnzeige.text = "";
+        LoesungsWortAnzeige.transform.parent.gameObject.SetActive(false);
+    }
+    private void GeheimwoerterCode(string data)
+    {
+        string[] code = data.Replace("<#>", "|").Split('|');
+        for (int i = 0; i < code.Length; i++)
+        {
+            Liste[i].transform.GetChild(0).gameObject.GetComponent<TMP_Text>().text = code[i].Split('=')[1];
+            Liste[i].transform.GetChild(1).gameObject.GetComponent<TMP_Text>().text = code[i].Split('=')[0];
+            Liste[i].SetActive(true);
+        }
+    }
+    private void GeheimwoerterWorteZeigen(string data)
+    {
+        WoerterAnzeige.text = data.Replace("<>", "\n");
+        KategorieAnzeige.text = "";
+    }
+    private void GeheimwoerterLoesung(string data)
+    {
+        LoesungsWortAnzeige.text = data.Replace("[TRENNER]", "|").Split('|')[0];
+        LoesungsWortAnzeige.transform.parent.gameObject.SetActive(true);
+        KategorieAnzeige.text = data.Replace("[TRENNER]", "|").Split('|')[1].Replace("<>", "\n");
+    }
+
+
 }

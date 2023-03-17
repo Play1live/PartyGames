@@ -38,6 +38,8 @@ public class Config
     public static ListenSpiel LISTEN_SPIEL;
     public static MosaikSpiel MOSAIK_SPIEL;
     public static GeheimwörterSpiel GEHEIMWOERTER_SPIEL;
+    public static WerBietetMehrSpiel WERBIETETMEHR_SPIEL;
+    public static AuktionSpiel AUKTION_SPIEL;
 
     // Scenenspezifisches
     // Hauptmenue

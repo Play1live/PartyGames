@@ -248,6 +248,9 @@ public class GeheimwörterServer : MonoBehaviour
             case "#SpielerBuzzered":
                 SpielerBuzzered(player);
                 break;
+            case "#SpielerAntwortEingabe":
+                SpielerAntwortEingabe(player, data);
+                break;
         }
     }
     #endregion
@@ -349,13 +352,6 @@ public class GeheimwörterServer : MonoBehaviour
             SpielerAnzeige[i, 1].SetActive(false); // BuzzerPressed Umrandung
             SpielerAnzeige[i, 3].SetActive(false); // Ausgetabt Einblendung
         }
-    }
-    /**
-     * Wechselt das Geheimwörter Game
-     */
-    public void ChangeGeheimwörter(TMP_Dropdown drop)
-    {
-        
     }
 
     #region Buzzer
@@ -578,12 +574,28 @@ public class GeheimwörterServer : MonoBehaviour
             Liste[i] = GameObject.Find("GeheimwörterAnzeige/Outline/Liste/Element (" + i + ")");
             Liste[i].SetActive(false);
         }
-        /*
-        for (int i = 0; i < Config.GEHEIMWOERTER_SPIEL.getSelected().getCode().Count; i++)
+    }
+    /**
+    * Wechselt das Geheimwörter Game
+    */
+    public void ChangeGeheimwörter(TMP_Dropdown drop)
+    {
+        Config.GEHEIMWOERTER_SPIEL.setSelected(Config.GEHEIMWOERTER_SPIEL.getListe(drop.value));
+
+        GeheimTitel.text = Config.GEHEIMWOERTER_SPIEL.getSelected().getTitel();
+        GeheimIndexInt = 0;
+        GeheimIndex.text = (GeheimIndexInt + 1) + "/" + Config.GEHEIMWOERTER_SPIEL.getSelected().getGeheimwörter().Count;
+        GeheimLoesung.text = Config.GEHEIMWOERTER_SPIEL.getSelected().getGeheimwörter()[GeheimIndexInt].getLoesung();
+
+        WoerterAnzeige.text = "";
+        KategorieAnzeige.text = "";
+        LoesungsWortAnzeige.text = "";
+        LoesungsWortAnzeige.transform.parent.gameObject.SetActive(false);
+        for (int i = 0; i < 30; i++)
         {
-            Liste[i].transform.GetChild(0).gameObject.GetComponent<TMP_Text>().text = Config.GEHEIMWOERTER_SPIEL.getSelected().getCode()[i].Split('=')[1];
-            Liste[i].transform.GetChild(1).gameObject.GetComponent<TMP_Text>().text = Config.GEHEIMWOERTER_SPIEL.getSelected().getCode()[i].Split('=')[0];
-        }*/
+            Liste[i].SetActive(false);
+        }
+        Broadcast("#GeheimwoerterHide");
     }
     public void CodeZeigen()
     {
@@ -605,14 +617,14 @@ public class GeheimwörterServer : MonoBehaviour
     }
     public void NaechstesVorherigesElement(int bewegen)
     {
-        if ((GeheimIndexInt + bewegen) < 0 || (GeheimIndexInt + bewegen) > Config.GEHEIMWOERTER_SPIEL.getSelected().getGeheimwörter().Count)
+        if ((GeheimIndexInt + bewegen) < 0 || (GeheimIndexInt + bewegen) >= Config.GEHEIMWOERTER_SPIEL.getSelected().getGeheimwörter().Count)
             return;
         GeheimIndexInt += bewegen;
 
         Broadcast("#GeheimwoerterNeue");
 
         WoerterAnzeige.text = "";
-        KategorieAnzeige.tag = "";
+        KategorieAnzeige.text = "";
         LoesungsWortAnzeige.text = "";
         LoesungsWortAnzeige.transform.parent.gameObject.SetActive(false);
 
@@ -624,14 +636,14 @@ public class GeheimwörterServer : MonoBehaviour
         WoerterAnzeige.text = Config.GEHEIMWOERTER_SPIEL.getSelected().getGeheimwörter()[GeheimIndexInt].getWorte();
         KategorieAnzeige.text = Config.GEHEIMWOERTER_SPIEL.getSelected().getGeheimwörter()[GeheimIndexInt].getKategorien();
 
-        Broadcast("#GeheimwoerterWorteZeigen " + WoerterAnzeige.text);
+        Broadcast("#GeheimwoerterWorteZeigen " + WoerterAnzeige.text.Replace("\n", "<>"));
     }
     public void LoesungZeigen()
     {
         LoesungsWortAnzeige.text = Config.GEHEIMWOERTER_SPIEL.getSelected().getGeheimwörter()[GeheimIndexInt].getLoesung();
         LoesungsWortAnzeige.transform.parent.gameObject.SetActive(true);
 
-        Broadcast("#GeheimwoerterLoesung " + LoesungsWortAnzeige.text + "[TRENNER]" + KategorieAnzeige.text);
+        Broadcast("#GeheimwoerterLoesung " + LoesungsWortAnzeige.text + "[TRENNER]" + KategorieAnzeige.text.Replace("\n", "<>"));
     }
     #endregion
 

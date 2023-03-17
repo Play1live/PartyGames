@@ -16,9 +16,9 @@ public class FlaggenScene : MonoBehaviour
 
     private void Start()
     {
-        Application.targetFrameRate = 60;
-#if UNITY_EDITOR
         Application.targetFrameRate = 120;
+#if UNITY_EDITOR
+        Application.targetFrameRate = 200;
 #endif
     }
 

@@ -30,50 +30,54 @@ public class Listen
 
         foreach (string s in LadeDateien.listInhalt(path))
         {
-            // try
-            //{
-            // SortBy Angabe
-            if (s.StartsWith("SortBy: "))
+            try
             {
-                this.sortby = s.Substring("SortBy: ".Length);
-            }
-            // SortByText Anzeige
-            else if (s.StartsWith("SortByAnzeige: "))
-            {
-                this.sortbyText = s.Substring("SortByAnzeige: ".Length);
-            }
-            else if (s.StartsWith("Quelle: "))
-            {
-                this.quelle = s.Substring("Quelle: ".Length);
-            }
-            else if (s.StartsWith("Einheit:"))
-            {
-                this.einheit = s.Substring("Einheit:".Length);
-            }
-            // ListenElement
-            else if (s.StartsWith("- "))
-            {
-                string tmp = s.Substring(2);
-                string[] split = tmp.Replace(" # ", "|").Split('|');
-                string item = split[0];
-                string sortby = split[1];
-                if (split[1].Contains("-"))
+                // SortBy Angabe
+                if (s.StartsWith("SortBy: "))
                 {
-                    sortby = split[1].Split('-')[0]; // Erweiterbar
+                    this.sortby = s.Substring("SortBy: ".Length);
                 }
-                string display = split[1];
+                // SortByText Anzeige
+                else if (s.StartsWith("SortByAnzeige: "))
+                {
+                    this.sortbyText = s.Substring("SortByAnzeige: ".Length);
+                }
+                else if (s.StartsWith("Quelle: "))
+                {
+                    this.quelle = s.Substring("Quelle: ".Length);
+                }
+                else if (s.StartsWith("Einheit:"))
+                {
+                    this.einheit = s.Substring("Einheit:".Length);
+                }
+                // ListenElement
+                else if (s.StartsWith("- "))
+                {
+                    if (alleElemente.Count > 30)
+                    {
+                        return;
+                    }
+                    string tmp = s.Substring(2);
+                    string[] split = tmp.Replace(" # ", "|").Split('|');
+                    string item = split[0];
+                    string sortby = split[1];
+                    if (split[1].Contains("-"))
+                    {
+                        sortby = split[1].Split('-')[0]; // Erweiterbar
+                    }
+                    string display = split[1];
 
-                alleElemente.Add(new Element(item, sortby, display, einheit));
+                    alleElemente.Add(new Element(item, sortby, display, einheit));
+                }
+                else
+                {
+                    Debug.LogWarning("Listen.cs ~ Unknown Type: " + s);
+                }
             }
-            else
-            {
-                Debug.LogWarning("Listen.cs ~ Unknown Type: " + s);
-            }
- /*           }
             catch (Exception e)
             {
                 Debug.LogError("Fehler beim Laden von Listen: " + titel + " ->  " + s);
-            }*/
+            }
         }
 
         auswahlElemente.AddRange(alleElemente);
@@ -255,6 +259,13 @@ public class Element
         this.item = item;
         sortby = sort;
         display = dis;
+
+        // Verhindert die Punktierung
+        if (einheit.EndsWith("Jahr"))
+        {
+            display = sortby;
+            return;
+        }
 
         // Datem abbrechen
         if (sort.Split('.').Length == 3)

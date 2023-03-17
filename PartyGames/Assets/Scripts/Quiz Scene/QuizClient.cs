@@ -13,6 +13,8 @@ public class QuizClient : MonoBehaviour
     GameObject Frage;
     GameObject SpielerAntwortEingabe;
     GameObject[,] SpielerAnzeige;
+    GameObject[] SchaetzfragenAnzeige;
+    [SerializeField] GameObject SchaetzfragenAnimationController;
     bool pressingbuzzer = false;
 
     [SerializeField] AudioSource BuzzerSound;
@@ -31,17 +33,19 @@ public class QuizClient : MonoBehaviour
     void Update()
     {
         // Leertaste kann Buzzern
-        if (!pressingbuzzer)
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            pressingbuzzer = true;
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (!pressingbuzzer)
+            {
+                pressingbuzzer = true;
                 SpielerBuzzered();
+            }
         }
-        else if (pressingbuzzer && Input.GetKeyUp(KeyCode.Space))
+        else if (Input.GetKeyUp(KeyCode.Space) && pressingbuzzer)
         {
             pressingbuzzer = false;
         }
-        
+
 
         #region Prüft auf Nachrichten vom Server
         if (Config.CLIENT_STARTED)
@@ -172,8 +176,18 @@ public class QuizClient : MonoBehaviour
             case "#BuzzerFreigeben":
                 BuzzerFreigeben();
                 break;
-            case "#SpielReglenZeigen":
-                SpielReglenZeigen(data);
+
+            case "#AnimationInfo":
+                AnimationAnzeigen(data);
+                break;
+            case "#AnimationStart":
+                AnimationStarten();
+                break;
+            case "#AnimationBeenden":
+                AnimationBeenden();
+                break;
+            case "#AnimationZiel":
+                AnimationZiel(data);
                 break;
         } 
     }
@@ -213,8 +227,41 @@ public class QuizClient : MonoBehaviour
             SpielerAnzeige[i, 3].SetActive(false);
             SpielerAnzeige[i, 6].SetActive(false);
         }
-        //Regeln
-        GameObject.Find("Regeln").GetComponent<TMP_Text>().text = "";
+
+        // Schätzfragen
+        //if (GameObject.Find("SchaetzfragenAnimation") != null)
+        //GameObject.Find("SchaetzfragenAnimation").SetActive(false);
+        SchaetzfragenAnzeige = new GameObject[20];
+        SchaetzfragenAnzeige[0] = GameObject.Find("SchaetzfragenAnimation/Grid");
+        SchaetzfragenAnzeige[1] = GameObject.Find("SchaetzfragenAnimation/Grid/MinGrenze");
+        SchaetzfragenAnzeige[2] = GameObject.Find("SchaetzfragenAnimation/Grid/ZielGrenze");
+        SchaetzfragenAnzeige[3] = GameObject.Find("SchaetzfragenAnimation/Grid/MaxGrenze");
+
+        SchaetzfragenAnzeige[4] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (1)");
+        SchaetzfragenAnzeige[5] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (1)/Data");
+        SchaetzfragenAnzeige[5].SetActive(false);
+        SchaetzfragenAnzeige[6] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (2)");
+        SchaetzfragenAnzeige[7] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (2)/Data");
+        SchaetzfragenAnzeige[7].SetActive(false);
+        SchaetzfragenAnzeige[8] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (3)");
+        SchaetzfragenAnzeige[9] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (3)/Data");
+        SchaetzfragenAnzeige[9].SetActive(false);
+        SchaetzfragenAnzeige[10] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (4)");
+        SchaetzfragenAnzeige[11] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (4)/Data");
+        SchaetzfragenAnzeige[11].SetActive(false);
+        SchaetzfragenAnzeige[12] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (5)");
+        SchaetzfragenAnzeige[13] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (5)/Data");
+        SchaetzfragenAnzeige[13].SetActive(false);
+        SchaetzfragenAnzeige[14] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (6)");
+        SchaetzfragenAnzeige[15] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (6)/Data");
+        SchaetzfragenAnzeige[15].SetActive(false);
+        SchaetzfragenAnzeige[16] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (7)");
+        SchaetzfragenAnzeige[17] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (7)/Data");
+        SchaetzfragenAnzeige[17].SetActive(false);
+        SchaetzfragenAnzeige[18] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (8)");
+        SchaetzfragenAnzeige[19] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (8)/Data");
+        SchaetzfragenAnzeige[19].SetActive(false);
+        SchaetzfragenAnzeige[0].SetActive(false);
     }
     /**
      * Aktualisiert die Spieler Anzeigen
@@ -333,18 +380,6 @@ public class QuizClient : MonoBehaviour
         }
     }
     /**
-     * Blendet die Regeln ein
-     */
-    private void SpielReglenZeigen(string data)
-    {
-        bool show = bool.Parse(data.Replace("[BOOL]", "|").Split('|')[1]);
-        string regelwerk = data.Replace("[REGELN]", "|").Split('|')[1];
-        if (show)
-            GameObject.Find("Regeln").GetComponent<TMP_Text>().text = regelwerk;
-        else
-            GameObject.Find("Regeln").GetComponent<TMP_Text>().text = "";
-    }
-    /**
      * Zeigt die gestellte Frage an
      */
     private void FragenAnzeige(string data)
@@ -402,5 +437,83 @@ public class QuizClient : MonoBehaviour
     {
         SendToServer("#SpielerAntwortEingabe "+input.text);
     }
+
+    #region SchaetzAnimation
+    public void AnimationZiel(string data)
+    {
+        SchaetzfragenAnzeige[2].SetActive(bool.Parse(data));
+    }
+    public void AnimationAnzeigen(string data)
+    {
+        SchaetzfragenAnzeige[0].SetActive(true);
+        SchaetzfragenAnimationController.SetActive(false);
+        float startwert = float.Parse(data.Replace("[START_WERT]", "|").Split('|')[1]);
+        float zielwert = float.Parse(data.Replace("[ZIEL_WERT]", "|").Split('|')[1]);
+        float maxwert = float.Parse(data.Replace("[MAX_WERT]", "|").Split('|')[1]);
+        float startpos = float.Parse(data.Replace("[START_POSITION]", "|").Split('|')[1]);
+        float endpos = float.Parse(data.Replace("[MAX_POSITION]", "|").Split('|')[1]);
+        float difftonull = float.Parse(data.Replace("[DIFF_NULL]", "|").Split('|')[1]);
+        float diffmax = float.Parse(data.Replace("[DIFF_MAX]", "|").Split('|')[1]);
+        float werttomax = float.Parse(data.Replace("[DISTANCE_PER_MOVE]", "|").Split('|')[1]);
+        string einheit = data.Replace("[EINHEIT]", "|").Split('|')[1];
+        int stellen = Int32.Parse(data.Replace("[KOMMASTELLEN]", "|").Split('|')[1]);
+
+        // Ziel Bewegen
+        SchaetzfragenAnzeige[2].transform.localPosition = new Vector3(werttomax * (zielwert - startwert) - difftonull, SchaetzfragenAnzeige[2].transform.localPosition.y, 0);
+        
+        // Versteckt alte Schätzungen
+        foreach (Player p in Config.PLAYERLIST)
+        {
+            if (!p.name.Equals(""))
+            {
+                SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].transform.GetChild(1).GetComponent<TMP_Text>().text = "";
+                SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].transform.GetChild(3).gameObject.SetActive(false);
+            }
+        }
+
+
+        // SpielerData berechnen
+        string data_text = "";
+        data_text += "[START_WERT]" + startwert + "[START_WERT]";
+        data_text += "[ZIEL_WERT]" + zielwert + "[ZIEL_WERT]";
+        data_text += "[MAX_WERT]" + maxwert + "[MAX_WERT]";
+        data_text += "[START_POSITION]" + startpos + "[START_POSITION]";
+        data_text += "[MAX_POSITION]" + endpos + "[MAX_POSITION]";
+        data_text += "[DIFF_NULL]" + difftonull + "[DIFF_NULL]";
+        data_text += "[DIFF_MAX]" + diffmax + "[DIFF_MAX]";
+        data_text += "[DISTANCE_PER_MOVE]" + werttomax+ "[DISTANCE_PER_MOVE]";
+        data_text += "[EINHEIT]" + einheit+ "[EINHEIT]";
+        data_text += "[KOMMASTELLEN]" + stellen + "[KOMMASTELLEN]";
+        data_text += "[SPIELER_WERT]0[SPIELER_WERT]";
+        float spielerwert = 0;
+
+        // Spieler
+        foreach (Player p in Config.PLAYERLIST)
+        {
+            SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].transform.localPosition = new Vector3(startpos, SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].transform.localPosition.y, 0);
+            if (!p.name.Equals(""))
+            {
+                spielerwert = float.Parse(data.Replace("["+p.id+"]", "|").Split('|')[1]);
+                data_text = data_text.Replace("[SPIELER_WERT]", "|").Split('|')[0] + "[SPIELER_WERT]" + spielerwert + "[SPIELER_WERT]";
+                SchaetzfragenAnzeige[(5 + 2 * (p.id - 1))].GetComponent<TMP_Text>().text = data_text;
+            }
+            else
+            {
+                // Hide disconnected
+                SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].SetActive(false);
+            }
+        }
+    }
+
+    public void AnimationStarten()
+    {
+        SchaetzfragenAnimationController.SetActive(true);
+    }
+    public void AnimationBeenden()
+    {
+        SchaetzfragenAnimationController.SetActive(false);
+        SchaetzfragenAnzeige[0].SetActive(false);
+    }
+    #endregion
 
 }

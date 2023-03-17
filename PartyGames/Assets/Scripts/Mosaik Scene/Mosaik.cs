@@ -16,7 +16,12 @@ public class Mosaik
 
         foreach (Sprite sp in Resources.LoadAll<Sprite>("Spiele/Mosaik/"+index))
         {
-            sprites.Add(sp);
+            if (sprites.Count < 20)
+            {
+                sprites.Add(sp);
+            }
+            else
+                return;
         }
     }
 

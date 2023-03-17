@@ -12,6 +12,8 @@ public class SetupSpiele
         reloadListen();
         reloadMosaik();
         reloadGeheimwoerter();
+        reloadWerBietetMehr();
+        reloadAuktion();
         Logging.add(Logging.Type.Normal, "SetupSpiele", "LoadGameFiles", "Games are ready!");
     }
 
@@ -35,17 +37,12 @@ public class SetupSpiele
     {
         Config.GEHEIMWOERTER_SPIEL = new GeheimwörterSpiel();
     }
-    /*public static void reloadDerZugLuegt()
+    public static void reloadWerBietetMehr()
     {
-        Settings.derzugluegtSpiel = new DerZugLuegtSpiel();
-    }
-    public static void reloadWWMFragen()
-    {
-        Settings.wwmfragenSpiel = new WWMFragenSpiel();
+        Config.WERBIETETMEHR_SPIEL = new WerBietetMehrSpiel();
     }
     public static void reloadAuktion()
     {
-        Settings.auktionSpiel1 = new AuktionSpiel(1);
-        Settings.auktionSpiel2 = new AuktionSpiel(2);
-    }*/
+        Config.AUKTION_SPIEL = new AuktionSpiel();
+    }
 }

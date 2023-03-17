@@ -34,13 +34,15 @@ public class FlaggenClient : MonoBehaviour
     void Update()
     {
         // Leertaste kann Buzzern
-        if (!pressingbuzzer)
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            pressingbuzzer = true;
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (!pressingbuzzer)
+            {
+                pressingbuzzer = true;
                 SpielerBuzzered();
+            }
         }
-        else if (pressingbuzzer && Input.GetKeyUp(KeyCode.Space))
+        else if (Input.GetKeyUp(KeyCode.Space) && pressingbuzzer)
         {
             pressingbuzzer = false;
         }

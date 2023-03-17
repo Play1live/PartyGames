@@ -225,6 +225,8 @@ public class StartupClient : MonoBehaviour
     private void SpielerChangeName(string data)
     {
         Config.PLAYER_NAME = data;
+
+        ChangeIcon();
     }
     /**
      * Beendet beitrittsversuche, wenn der Server eine andere Version hat
@@ -345,6 +347,9 @@ public class StartupClient : MonoBehaviour
                 SceneManager.LoadScene(data);
                 break;
             case "Geheimwörter":
+                SceneManager.LoadScene(data);
+                break;
+            case "WerBietetMehr":
                 SceneManager.LoadScene(data);
                 break;
         }
