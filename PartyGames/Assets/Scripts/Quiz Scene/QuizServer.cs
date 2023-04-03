@@ -23,6 +23,7 @@ public class QuizServer : MonoBehaviour
     GameObject TextAntwortenAnzeige;
     GameObject[,] SpielerAnzeige;
     GameObject[] SchaetzfragenAnzeige;
+    TMP_InputField[] SchaetzfragenSpielerInput;
     [SerializeField] GameObject SchaetzfragenAnimationController;
     bool[] PlayerConnected;
     int PunkteProRichtige = 4;
@@ -37,6 +38,22 @@ public class QuizServer : MonoBehaviour
         PlayerConnected = new bool[Config.SERVER_MAX_CONNECTIONS];
         InitAnzeigen();
         InitQuiz();
+
+        StartCoroutine(TestConnectionToClients());
+    }
+
+    IEnumerator TestConnectionToClients()
+    {
+        while (true)
+        {
+            foreach (Player p in Config.PLAYERLIST)
+            {
+                yield return new WaitForSeconds(15);
+                if (!p.isConnected)
+                    continue;
+                SendMessage("#TestConnection", p);
+            }
+        }
     }
 
     void Update()
@@ -177,6 +194,8 @@ public class QuizServer : MonoBehaviour
         catch (Exception e)
         {
             Logging.add(new Logging(Logging.Type.Error, "Server", "SendMessage", "Nachricht an Client: " + sc.id + " (" + sc.name + ") konnte nicht gesendet werden." + e));
+            // Verbindung zum Client wird getrennt
+            ClientClosed(sc);
         }
     }
     /**
@@ -222,7 +241,7 @@ public class QuizServer : MonoBehaviour
     public void Commands(Player player, string data, string cmd)
     {
         // Zeigt alle einkommenden Nachrichten an
-        Debug.Log(player.name + " " + player.id + " -> " + cmd + "   ---   " + data);
+        //Debug.Log(player.name + " " + player.id + " -> " + cmd + "   ---   " + data);
         // Sucht nach Command
         switch (cmd)
         {
@@ -233,6 +252,8 @@ public class QuizServer : MonoBehaviour
             case "#ClientClosed":
                 ClientClosed(player);
                 UpdateSpielerBroadcast();
+                break;
+            case "#TestConnection":
                 break;
             case "#ClientFocusChange":
                 ClientFocusChange(player, data);
@@ -426,6 +447,13 @@ public class QuizServer : MonoBehaviour
                 GameObject.Find("SchaetzfragenAnimation/Spieler/Spieler (" + p.id + ")").gameObject.SetActive(false);
             }
         }
+
+
+        SchaetzfragenSpielerInput = new TMP_InputField[Config.PLAYERLIST.Length];
+        for (int i = 0; i < Config.PLAYERLIST.Length; i++)
+        {
+            SchaetzfragenSpielerInput[i] = GameObject.Find("SchaetzfragenAnimation/Spieler/Spieler ("+(i+1)+")/Input").GetComponent<TMP_InputField>();
+        }
     }
 
     #region Quiz Fragen Anzeige
@@ -523,7 +551,11 @@ public class QuizServer : MonoBehaviour
     private void SpielerBuzzered(Player p)
     {
         if (!buzzerIsOn)
+        {
+            Debug.Log(p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
             return;
+        }
+        Debug.LogWarning("B: "+p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
         buzzerIsOn = false;
         Broadcast("#AudioBuzzerPressed " + p.id);
         BuzzerSound.Play();
@@ -537,6 +569,7 @@ public class QuizServer : MonoBehaviour
         for (int i = 0; i < Config.SERVER_MAX_CONNECTIONS; i++)
             SpielerAnzeige[i, 1].SetActive(false);
         buzzerIsOn = BuzzerAnzeige.activeInHierarchy;
+        Debug.LogWarning("Buzzer freigegeben.");
         Broadcast("#BuzzerFreigeben");
     }
     #endregion
@@ -596,7 +629,50 @@ public class QuizServer : MonoBehaviour
     public void SpielerAntwortEingabe(Player p, string data)
     {
         SpielerAnzeige[p.id - 1, 6].GetComponentInChildren<TMP_InputField>().text = data;
+
+        // Parse Eingabe, wenn Schätzfragen aktiviert sind
+        ParseEingabeZuSchaetz(p, data);
     }
+    char[] moeglicheEingaben = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ',', '.' };
+    private void ParseEingabeZuSchaetz(Player p, string data)
+    {
+        int zahlstart = -1;
+        int zahlende = -1;
+        for (int i = 0; i < data.Length; i++)
+        {
+
+            //Debug.LogError(zahlstart +"   "+ zahlstart +"   "+ data);
+            // Buchstabe an Index i ist nicht in Liste enthalten
+            if (Array.IndexOf(moeglicheEingaben, data[i]) > -1)
+            {
+                if (zahlstart == -1)
+                    zahlstart = i;
+
+                zahlende = i;
+            }
+            // Wenn Zahl Vorbei ist, abbrechen
+            if (zahlende != i && zahlende > -1)
+                break;
+            //Debug.LogWarning("Länge: " + (zahlende - zahlstart + 1));
+            try
+            {
+                //double antwort = float.Parse(data.Substring(zahlstart, zahlende - zahlstart + 1));
+                //Debug.LogWarning(antwort);
+                string antwort = data.Substring(zahlstart, zahlende - zahlstart + 1).Replace(".", "");
+                // maximiert komma trennung
+                if (antwort.Contains(","))
+                {
+                    if (antwort.Split(',').Length > 2)
+                        antwort = antwort.Split(',')[0] + "," + antwort.Split(',')[1];
+                }
+
+                SchaetzfragenSpielerInput[Player.getPosInLists(p.id)].text = antwort+"";
+            }
+            catch (Exception e) { }
+
+        }
+    }
+
     /**
      * Blendet die Textantworten der Spieler ein
      */
@@ -738,13 +814,26 @@ public class QuizServer : MonoBehaviour
     {
         SchaetzfragenAnzeige[0].SetActive(true);
         SchaetzfragenAnimationController.SetActive(false);
+        int komma = Int32.Parse(GameObject.Find("SchaetzfragenAnimation/KommastellenFestlegen").GetComponent<TMP_InputField>().text);
+
         // Zeigt die Spielerschätzungen an
         foreach (Player p in Config.PLAYERLIST)
         {
             if (p.isConnected)
             {
-                SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].transform.GetChild(1).GetComponent<TMP_Text>().text = GameObject.Find("SchaetzfragenAnimation/Spieler/Spieler (" + p.id + ")").transform.GetChild(0).GetComponent<TMP_InputField>().text + GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text;
+                // Schneidet zuviele Kommastellen ab
+                string schaetzung = SchaetzfragenSpielerInput[Player.getPosInLists(p.id)].text;
+                if (schaetzung.Contains(","))
+                {
+                    string kommas = schaetzung.Split(',')[1]+"00000000000";
+                    kommas = kommas.Substring(0, komma);
+                    schaetzung = schaetzung.Split(',')[0]+ "," + kommas;
+                }
+
+                SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].transform.GetChild(1).GetComponent<TMP_Text>().text = schaetzung + GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text;
                 SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].transform.GetChild(3).gameObject.SetActive(false);
+                SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].GetComponent<Image>().sprite = p.icon;
+
             }
         }
         BerechneSchritteProEinheit();
@@ -759,6 +848,7 @@ public class QuizServer : MonoBehaviour
         {
             if (!SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].activeInHierarchy)
                 continue;
+
             float spieler = float.Parse(SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].GetComponentInChildren<TMP_Text>().text.Replace(einheit, ""));
             float spielerdiff = Math.Abs(spieler - ziel);
             if (spielerdiff < diff)
@@ -780,6 +870,9 @@ public class QuizServer : MonoBehaviour
    
     public void BerechneSchritteProEinheit()
     {
+        if (GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text == "")
+            GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text = " ";
+
         float StartWert = float.Parse(SchaetzfragenAnzeige[1].GetComponentInChildren<TMP_Text>().text.Replace(GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text, ""));
         float ZielWert = float.Parse(SchaetzfragenAnzeige[2].GetComponentInChildren<TMP_Text>().text.Replace(GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text, ""));
         float MaxWert = float.Parse(SchaetzfragenAnzeige[3].GetComponentInChildren<TMP_Text>().text.Replace(GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text, ""));

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
@@ -7,6 +8,7 @@ public class Config
 {
     // Program Data
     public static string APPLICATION_VERSION = Application.version;
+    public static bool FULLSCREEN = false;
     public static string MedienPath = Application.persistentDataPath + @"\Medien";
     public static List<Logging> log;
 
@@ -18,12 +20,13 @@ public class Config
     public static TcpListener SERVER_TCP;
     public static bool SERVER_STARTED;
     public static bool SERVER_ALL_CONNECTED;
-    public static Sprite SERVER_DEFAULT_ICON = Resources.Load<Sprite>("Images/ProfileIcons/empty");
+    public static Sprite SERVER_ICON = Resources.Load<Sprite>("Images/ProfileIcons/empty");
     public static int SERVER_PLAYER_POINTS = 0;
 
     // Client Infos
     public static TcpClient CLIENT_TCP;
     public static bool CLIENT_STARTED;
+    public static DateTime PingTime = DateTime.MinValue;
 
     // Spieler
     public static Player[] PLAYERLIST;
@@ -46,5 +49,5 @@ public class Config
     public static string HAUPTMENUE_FEHLERMELDUNG = "";
     // Lobby
     public static bool ALLOW_PLAYERNAME_CHANGE = false;
-    public static bool ALLOW_ICON_CHANGE = false;
+    public static bool ALLOW_ICON_CHANGE = true;
 }

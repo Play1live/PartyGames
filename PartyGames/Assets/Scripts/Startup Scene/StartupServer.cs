@@ -56,14 +56,25 @@ public class StartupServer : MonoBehaviour
                 SceneManager.LoadScene("Startup");
                 return;
             }
+            // Wenn Server "Henryk" bild legen
+            if (Config.PLAYER_NAME.ToLower().Equals("henryk") || Config.PLAYER_NAME.ToLower().Equals("play1live") || Config.PLAYER_NAME.ToLower().Equals("play"))
+            {
+                Config.SERVER_ICON = FindIconByName("Henryk");
+                UpdateSpieler();
+            }
+
+            // Verbindung erfolgreich
+            Config.HAUPTMENUE_FEHLERMELDUNG = "";
             SperreGameSelection();
+
+           // StartCoroutine(TestConnectionToClients());
         }
         #endregion
 
         // Potenziell Fehleranfällig, wenn Dateien nicht korrekt sind
         try
         {
-            SetupSpiele.LoadGameFiles();
+            //SetupSpiele.LoadGameFiles();
         } catch (Exception e)
         {
             Logging.add(Logging.Type.Error, "StartupServer", "Start", "Es kam zu einem Fehler beim Laden der Spieldateien!\n", e);
@@ -77,6 +88,20 @@ public class StartupServer : MonoBehaviour
         if (ServerControlGameSelection.activeInHierarchy && ServerControlGameSelection.transform.GetChild(1).gameObject.activeInHierarchy)
             DisplayGameFiles();
         UpdateSpieler();
+    }
+
+    IEnumerator TestConnectionToClients()
+    {
+        while (true)
+        {
+            foreach (Player p in Config.PLAYERLIST)
+            {
+                yield return new WaitForSeconds(15);
+                if (!p.isConnected)
+                    continue;
+                SendMessage("#TestConnection", p);
+            }
+        }
     }
 
     private void OnEnable()
@@ -111,7 +136,6 @@ public class StartupServer : MonoBehaviour
 
         foreach (Player spieler in Config.PLAYERLIST)
         {
-
             if (spieler.isConnected == false)
                 continue;
 
@@ -130,8 +154,19 @@ public class StartupServer : MonoBehaviour
             #region Sucht nach neuen Nachrichten
             /*else*/ if (spieler.isConnected == true)
             {
+                NetworkStream stream = spieler.tcp.GetStream();
+                if (stream.DataAvailable)
+                {
+                    //StreamReader reader = new StreamReader(stream, true);
+                    StreamReader reader = new StreamReader(stream);
+                    string data = reader.ReadLine();
+
+                    if (data != null)
+                        OnIncommingData(spieler, data);
+                }
                 try
                 {
+                    /*
                     NetworkStream stream = spieler.tcp.GetStream();
                     if (stream.DataAvailable)
                     {
@@ -141,7 +176,7 @@ public class StartupServer : MonoBehaviour
 
                         if (data != null)
                             OnIncommingData(spieler, data);
-                    }
+                    }*/
                 }
                 catch (Exception e)
                 {
@@ -289,6 +324,8 @@ public class StartupServer : MonoBehaviour
         catch (Exception e)
         {
             Logging.add(Logging.Type.Error, "Server", "SendMessage", "Nachricht an Client: " + sc.id + " (" + sc.name + ") konnte nicht gesendet werden." + e);
+            // Verbindung zum Client wird getrennt
+            //ClientClosed(sc);
         }
     }
     // Sendet eine Nachticht an alle verbundenen Spieler.
@@ -328,17 +365,20 @@ public class StartupServer : MonoBehaviour
     public void Commands(Player player, string data, string cmd)
     {
         // Zeigt alle einkommenden Nachrichten an
-        Logging.add(Logging.Type.Normal, "StartupServer", "Commands", player.name + " " + player.id + " -> " + cmd + "   ---   " + data);
+        //Logging.add(Logging.Type.Normal, "StartupServer", "Commands", player.name + " " + player.id + " -> " + cmd + "   ---   " + data);
         // Sucht nach Command
         switch (cmd)
         {
             default:
-                Logging.add(Logging.Type.Warning, "StartupServer", "Commands", "Unkown Command -> " + cmd + " - " + data);
+                Logging.add(Logging.Type.Warning, "StartupServer", "Commands", "Unkown Command: (" + player.id + ") " + player.name + " -> " + cmd + " - " + data);
                 break;
 
             case "#ClientClosed":
                 ClientClosed(player);
                 UpdateSpielerBroadcast();
+                break;
+            case "#TestConnection":
+                SendMessage("#ConnectionEstablished", player);
                 break;
             case "#ClientFocusChange":
                 //Debug.Log("FocusChange (" + player.id + ") " + player.name + ": InGame: " + data);
@@ -351,7 +391,7 @@ public class StartupServer : MonoBehaviour
                 ClientSetName(player, data);
                 break;
             case "#SpielerIconChange":
-                SpielerIconChange(player);
+                SpielerIconChange(player, data);
                 break;
             case "#ChangePlayerName":
                 ChangePlayerName(player, data);
@@ -440,7 +480,7 @@ public class StartupServer : MonoBehaviour
      */
     private string UpdateSpieler()
     {
-        string msg = "#UpdateSpieler [ID]0[ID][NAME]" + Config.PLAYER_NAME + "[NAME][PUNKTE]" + Config.SERVER_PLAYER_POINTS + "[PUNKTE][ICON]" + Config.SERVER_DEFAULT_ICON.name + "[ICON]";
+        string msg = "#UpdateSpieler [ID]0[ID][NAME]" + Config.PLAYER_NAME + "[NAME][PUNKTE]" + Config.SERVER_PLAYER_POINTS + "[PUNKTE][ICON]" + Config.SERVER_ICON.name + "[ICON]";
         int connectedplayer = 1;
         List<string> spielerIDNameList = new List<string>();
         spielerIDNameList.Add("");
@@ -463,7 +503,7 @@ public class StartupServer : MonoBehaviour
 
         GameObject.Find("Lobby/Title_LBL/Spieleranzahl").GetComponent<TMP_Text>().text = connectedplayer + "/" + (Config.PLAYERLIST.Length + 1);
         SpielerAnzeigeLobby[0].SetActive(true);
-        SpielerAnzeigeLobby[0].GetComponentsInChildren<Image>()[1].sprite = Config.SERVER_DEFAULT_ICON;
+        SpielerAnzeigeLobby[0].GetComponentsInChildren<Image>()[1].sprite = Config.SERVER_ICON;
         SpielerAnzeigeLobby[0].GetComponentsInChildren<TMP_Text>()[0].text = Config.PLAYER_NAME;
 
         if (ServerControlControlField.activeInHierarchy)
@@ -483,7 +523,7 @@ public class StartupServer : MonoBehaviour
                 bilderliste.Add(sprite.name);
             GameObject.Find("ServerControl/ControlField/SpielerIconWechseln/Bilder").GetComponent<TMP_Dropdown>().AddOptions(bilderliste);
         }
-
+        Debug.Log(msg);
         return msg;
     }
 
@@ -678,7 +718,7 @@ public class StartupServer : MonoBehaviour
         TMP_Dropdown drop = GameObject.Find("ServerControl/ControlField/SpielerIconWechseln/Dropdown").GetComponent<TMP_Dropdown>();
         if (drop.options[drop.value].text == "")
         {
-            Config.SERVER_DEFAULT_ICON = Resources.Load<Sprite>("Images/ProfileIcons/" + Icon.options[Icon.value].text);
+            Config.SERVER_ICON = Resources.Load<Sprite>("Images/ProfileIcons/" + Icon.options[Icon.value].text);
             UpdateSpielerBroadcast();
             return;
         }
@@ -689,13 +729,109 @@ public class StartupServer : MonoBehaviour
     /**
      * Icon Wechsel eines Spielers
      */
-    private void SpielerIconChange(Player p)
+    private void SpielerIconChange(Player p, string data)
     {
+        Sprite neuesIcon;
+        if (data.Equals("0")) // Initial Änderung Icon
+        {
+            if (p.name.ToLower().Contains("spieler"))
+            {
+                neuesIcon = FindIconByName("Samurai");
+                IconFestlegen(p, neuesIcon);
+                return;
+            }
+            else if (p.name.ToLower().Contains("alan"))
+            {
+                neuesIcon = FindIconByName("Alan");
+                IconFestlegen(p, neuesIcon);
+                return;
+            }
+            else if (p.name.ToLower().Contains("fiona"))
+            {
+                neuesIcon = FindIconByName("Fiona");
+                IconFestlegen(p, neuesIcon);
+                return;
+            }
+            else if (p.name.ToLower().Contains("hannah") 
+                || (p.name.ToLower().StartsWith("ha") && p.name.ToLower().EndsWith("nah")) 
+                || (p.name.ToLower().StartsWith("han") && p.name.ToLower().EndsWith("ah"))
+                || (p.name.ToLower().StartsWith("haa") && p.name.ToLower().EndsWith("aah") && p.name.ToLower().Substring(3, p.name.Length-3).Contains("nn")) )
+            {
+                neuesIcon = FindIconByName("Hannah");
+                IconFestlegen(p, neuesIcon);
+                return;
+            }
+            else if (p.name.ToLower().Contains("henryk"))
+            {
+                neuesIcon = FindIconByName("Henryk");
+                IconFestlegen(p, neuesIcon);
+                return;
+            }
+            else if (p.name.ToLower().Contains("maxe"))
+            {
+                neuesIcon = FindIconByName("Maxe");
+                IconFestlegen(p, neuesIcon);
+                return;
+            }
+            else if (p.name.ToLower().Contains("michi") ||
+                p.name.ToLower().Contains("michelle") )
+            {
+                neuesIcon = FindIconByName("Michi");
+                IconFestlegen(p, neuesIcon);
+                return;
+            }
+            else if (p.name.ToLower().Contains("munk"))
+            {
+                neuesIcon = FindIconByName("Munk");
+                IconFestlegen(p, neuesIcon);
+                return;
+            }
+            else if (p.name.ToLower().Contains("nils")
+                || p.name.ToLower().Contains("nille")
+                || p.name.ToLower().Contains("kater")
+                || p.name.ToLower().Contains("katerjunge"))
+            {
+                neuesIcon = FindIconByName("Nils");
+                IconFestlegen(p, neuesIcon);
+                return;
+            }
+            else if (p.name.ToLower().Contains("ronald")
+                || p.name.ToLower().Contains("ron")
+                || p.name.ToLower().Contains("sterni")
+                || p.name.ToLower().Contains("sternfaust"))
+            {
+                neuesIcon = FindIconByName("Ronald");
+                IconFestlegen(p, neuesIcon);
+                return;
+            }
+            else
+            {
+                Debug.LogWarning("Unknown Playername for init Icon Change: "+ p.name);
+            }
+        }
+
+        // Spieler gewollte änderung des Icons
         if (!Config.ALLOW_ICON_CHANGE)
             return;
 
-        Sprite neuesIcon = Config.PLAYER_ICONS[(Config.PLAYER_ICONS.IndexOf(p.icon) + 1) % Config.PLAYER_ICONS.Count];
-        for (int i = 0; i < Config.PLAYER_ICONS.Count; i++)
+        neuesIcon = Config.PLAYER_ICONS[(Config.PLAYER_ICONS.IndexOf(p.icon) + 1) % Config.PLAYER_ICONS.Count];
+        IconFestlegen(p, neuesIcon);
+    }
+    private Sprite FindIconByName(string name)
+    {
+        foreach (Sprite sprite in Config.PLAYER_ICONS)
+        {
+            if (sprite.name.Equals(name))
+                return sprite;
+        }
+        return null;
+    }
+    private void IconFestlegen(Player p, Sprite neuesIcon)
+    {
+        if (neuesIcon == null)
+            neuesIcon = Config.PLAYER_ICONS[(Config.PLAYER_ICONS.IndexOf(neuesIcon) + 1) % Config.PLAYER_ICONS.Count];
+
+        for (int i = 1; i < Config.PLAYER_ICONS.Count; i++)
         {
             if (IconWirdGeradeGenutzt(neuesIcon))
                 neuesIcon = Config.PLAYER_ICONS[(Config.PLAYER_ICONS.IndexOf(neuesIcon) + 1) % Config.PLAYER_ICONS.Count];
@@ -706,14 +842,14 @@ public class StartupServer : MonoBehaviour
         p.icon = neuesIcon;
         // Update an alle
         UpdateSpielerBroadcast();
-
     }
+
     /**
      * Prüft ob das übergebene Icon bereits vom Server oder einem anderen Spieler benutzt wird
      */
     private bool IconWirdGeradeGenutzt(Sprite icon)
     {
-        if (Config.SERVER_DEFAULT_ICON == icon)
+        if (Config.SERVER_ICON == icon)
             return true;
         for (int i = 0; i < Config.PLAYERLIST.Length; i++)
             if (icon == Config.PLAYERLIST[i].icon || icon.name == "empty")
@@ -727,7 +863,7 @@ public class StartupServer : MonoBehaviour
     {
         if (!Config.isServer)
             return;
-        Config.SERVER_DEFAULT_ICON = Config.PLAYER_ICONS[(Config.PLAYER_ICONS.IndexOf(Config.SERVER_DEFAULT_ICON) + 1) % Config.PLAYER_ICONS.Count];
+        Config.SERVER_ICON = Config.PLAYER_ICONS[(Config.PLAYER_ICONS.IndexOf(Config.SERVER_ICON) + 1) % Config.PLAYER_ICONS.Count];
         UpdateSpielerBroadcast();
     }
     #endregion
@@ -852,6 +988,10 @@ public class StartupServer : MonoBehaviour
         TMP_Dropdown WerBietetMehrDropdown = GameObject.Find("GameSelection/WerBietetMehr/Auswahl").GetComponent<TMP_Dropdown>();
         WerBietetMehrDropdown.ClearOptions();
         WerBietetMehrDropdown.AddOptions(Config.WERBIETETMEHR_SPIEL.getQuizzeAsStringList());
+
+        TMP_Dropdown AuktionDropdown = GameObject.Find("GameSelection/Auktion/Auswahl").GetComponent<TMP_Dropdown>();
+        AuktionDropdown.ClearOptions();
+        AuktionDropdown.AddOptions(Config.AUKTION_SPIEL.getListenAsStringList());
     }
     #region Starte Spiele
     /**
@@ -918,6 +1058,18 @@ public class StartupServer : MonoBehaviour
 
         SceneManager.LoadScene("WerBietetMehr");
         Broadcast("#StarteSpiel WerBietetMehr");
+    }
+    /**
+     * Starte das Auktion Spiel -> Alle Spieler laden in die neue Scene
+     */
+    public void StarteAuktion(TMP_Dropdown drop)
+    {
+        Config.AUKTION_SPIEL.setSelected(Config.AUKTION_SPIEL.getAuktion(drop.value));
+        Logging.add(Logging.Type.Normal, "StartupServer", "StarteAuktion", "Auktion starts: " + Config.AUKTION_SPIEL.getSelected().getTitel());
+
+        //SceneManager.LoadSceneAsync("Auktion");
+        Broadcast("#StarteSpiel Auktion");
+        SceneManager.LoadScene("Auktion");
     }
     #endregion
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
@@ -48,11 +49,27 @@ public class WerBietetMehrServer : MonoBehaviour
         PlayerConnected = new bool[Config.SERVER_MAX_CONNECTIONS];
         InitAnzeigen();
         InitWerBietetMehr();
+
+        StartCoroutine(TestConnectionToClients());
     }
 
+    IEnumerator TestConnectionToClients()
+    {
+        while (true)
+        {
+            foreach (Player p in Config.PLAYERLIST)
+            {
+                yield return new WaitForSeconds(15);
+                if (!p.isConnected)
+                    continue;
+                SendMessage("#TestConnection", p);
+            }
+        }
+    }
     void Update()
     {
         // Timer
+        /*  TODO: testweise mit Coroutines
         if (zieltimer != null && zieltimer != DateTime.MinValue)
         {
             if (DateTime.Now.Second != timersecond)
@@ -74,7 +91,7 @@ public class WerBietetMehrServer : MonoBehaviour
                     Moeoep.Play();
                 }
             }
-        }
+        }*/
 
         #region Server
         if (!Config.SERVER_STARTED)
@@ -146,6 +163,32 @@ public class WerBietetMehrServer : MonoBehaviour
         Config.SERVER_TCP.Server.Close();
     }
 
+    IEnumerator RunTimer(int seconds)
+    {
+        Timer.SetActive(true);
+
+        while (seconds >= 0)
+        {
+            Timer.GetComponent<TMP_Text>().text = "" + seconds;
+
+            if (seconds == 0)
+            {
+                Debug.Log(seconds);
+                Beeep.Play();
+            }
+            // Moep Sound bei sekunden
+            if (seconds == 1 || seconds == 2 || seconds == 3 || seconds == 10 || seconds == 30 || seconds == 60) // 10-0
+            {
+                Debug.Log(seconds);
+                Moeoep.Play();
+            }
+            seconds--;
+            yield return new WaitForSecondsRealtime(1);
+        }
+        Timer.SetActive(false);
+        yield break;
+    }
+
     #region Server Stuff
     #region Verbindungen
     /**
@@ -212,6 +255,8 @@ public class WerBietetMehrServer : MonoBehaviour
         catch (Exception e)
         {
             Logging.add(new Logging(Logging.Type.Error, "Server", "SendMessage", "Nachricht an Client: " + sc.id + " (" + sc.name + ") konnte nicht gesendet werden." + e));
+            // Verbindung zum Client wird getrennt
+            ClientClosed(sc);
         }
     }
     /**
@@ -257,7 +302,7 @@ public class WerBietetMehrServer : MonoBehaviour
     public void Commands(Player player, string data, string cmd)
     {
         // Zeigt alle einkommenden Nachrichten an
-        Debug.Log(player.name + " " + player.id + " -> " + cmd + "   ---   " + data);
+        //Debug.Log(player.name + " " + player.id + " -> " + cmd + "   ---   " + data);
         // Sucht nach Command
         switch (cmd)
         {
@@ -268,6 +313,8 @@ public class WerBietetMehrServer : MonoBehaviour
             case "#ClientClosed":
                 ClientClosed(player);
                 UpdateSpielerBroadcast();
+                break;
+            case "#TestConnection":
                 break;
             case "#ClientFocusChange":
                 ClientFocusChange(player, data);
@@ -407,7 +454,11 @@ public class WerBietetMehrServer : MonoBehaviour
     private void SpielerBuzzered(Player p)
     {
         if (!buzzerIsOn)
+        {
+            Debug.Log(p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
             return;
+        }
+        Debug.LogWarning("B: " + p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
         buzzerIsOn = false;
         Broadcast("#AudioBuzzerPressed " + p.id);
         BuzzerSound.Play();
@@ -421,6 +472,7 @@ public class WerBietetMehrServer : MonoBehaviour
         for (int i = 0; i < Config.SERVER_MAX_CONNECTIONS; i++)
             SpielerAnzeige[i, 1].SetActive(false);
         buzzerIsOn = BuzzerAnzeige.activeInHierarchy;
+        Debug.LogWarning("Buzzer freigegeben.");
         Broadcast("#BuzzerFreigeben");
     }
     #endregion
@@ -653,9 +705,12 @@ public class WerBietetMehrServer : MonoBehaviour
         int sekunden = Int32.Parse(TimerSekunden.text);
         Broadcast("#WBMTimerStarten " + (sekunden));
 
-        zieltimer = DateTime.Now.AddSeconds(sekunden);
-        Timer.SetActive(true);
-        Timer.GetComponent<TMP_Text>().text = "" + getDiffInSeconds(zieltimer);
+        StopCoroutine(RunTimer(0));
+        StartCoroutine(RunTimer(sekunden));
+
+        //zieltimer = DateTime.Now.AddSeconds(sekunden);
+        //Timer.SetActive(true);
+        //Timer.GetComponent<TMP_Text>().text = "" + getDiffInSeconds(zieltimer);
     }
     public void KreuzeAusgrauen(GameObject go)
     {

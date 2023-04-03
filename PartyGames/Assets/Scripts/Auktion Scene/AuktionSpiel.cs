@@ -5,45 +5,54 @@ using UnityEngine;
 
 public class AuktionSpiel
 {
-    private List<Mosaik> mosaike;
-    private Mosaik selected;
-    private Sprite beispiel;
+    private List<Auktion> elemente;
+    private Auktion selected;
 
     public AuktionSpiel()
     {
-        mosaike = new List<Mosaik>();
-        beispiel = Resources.Load<Sprite>("Spiele/Mosaik/Beispiel");
+        elemente = new List<Auktion>();
 
-        for (int i = 0; i < 5; i++)
+        foreach (string sfile in Directory.GetFiles(Config.MedienPath + "/Spiele/Auktion"))
         {
-            mosaike.Add(new Mosaik(i));
+            // Ignoriert #Vorlage.txt
+            if (sfile.EndsWith("#Vorlage.txt"))
+                continue;
+            // Ignoriert Unity Meta Dateien
+            if (sfile.EndsWith(".meta"))
+                continue;
+            // Ignoriert gespielte Spiele
+            string tmp = sfile.Split('/')[sfile.Split('/').Length - 1];
+            tmp = tmp.Split('\\')[tmp.Split('\\').Length - 1];
+            if (tmp.StartsWith("#"))
+                continue;
+
+            // Lädt alle Flaggen und speichert diese ab
+            elemente.Add(new Auktion(sfile));
         }
     }
 
-    public List<Mosaik> getMosaike() { return mosaike; }
-    public int getIndex(Mosaik mosaik) { return mosaike.IndexOf(mosaik); }
-    public int getIndex(string titel) { foreach (Mosaik mosaik in mosaike) if (mosaik.getTitel().ToLower().Equals(titel.ToLower())) return mosaike.IndexOf(mosaik); return -1; }
-    public Mosaik getMosaik(int index) { return mosaike[index]; }
-    public Mosaik getMosaik(string titel)
+    public List<Auktion> getAuktionen() { return elemente; }
+    public int getIndex(Auktion auktion) { return elemente.IndexOf(auktion); }
+    public Auktion getAuktion(int index) { return elemente[index]; }
+    public Auktion getAuktion(string titel)
     {
-        foreach (Mosaik mosaik in mosaike)
+        foreach (Auktion element in elemente)
         {
-            if (mosaik.getTitel().ToLower().Equals(titel.ToLower()))
-                return mosaik;
+            if (element.getTitel().ToLower().Equals(titel.ToLower()))
+                return element;
         }
         return null;
     }
-    public void setSelected(Mosaik mosaik) { selected = mosaik; }
-    public Mosaik getSelected() { return selected; }
-    public Sprite getBeispiel() { return beispiel; }
-
+    public void setSelected(Auktion element) { selected = element; }
+    public Auktion getSelected() { return selected; }
     public List<string> getListenAsStringList()
     {
         List<string> list = new List<string>();
-        foreach (Mosaik mosaik in mosaike)
+        foreach (Auktion element in elemente)
         {
-            list.Add(mosaik.getTitel());
+            list.Add(element.getTitel());
         }
         return list;
     }
+
 }

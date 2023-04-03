@@ -15,22 +15,6 @@ public class Flagge
     private double flaeche; // in km²
     private int einwohner; // in einer
 
-    public Flagge(string path)
-    {
-        string[] split = path.Split('\\');
-
-        this.path = path;
-        string temp = path.Split('\\')[path.Split('\\').Length - 1];
-        this.name = path.Split('/')[path.Split('/').Length - 1].Replace("_Flagge", "").Replace(".png", "").Replace("_Inhalt", "").Replace(".txt", "");
-        this.bild = Resources.Load<Sprite>(path.Replace("Resources/", ""));
-
-        string[] inhalt = LadeDateien.listInhalt("Assets/Resources/" + path.Replace("_Flagge", "_Inhalt.txt"));
-        this.farben = inhalt[0].Replace("Farben: ", "").Replace(", ", "#").Split('#');
-        this.hauptstadt = inhalt[1].Replace("Hauptstadt: ", "");
-        this.flaeche = Convert.ToDouble(inhalt[2].Substring(0, inhalt[2].Length - 4).Replace("Fläche: ", "").Replace(".", ""));
-        this.einwohner = Int32.Parse(inhalt[3].Replace("Einwohnerzahl: ", "").Replace(".", ""));
-    }
-
     public Flagge(Sprite sprite, bool loadInhalt)
     {
         this.path = "";

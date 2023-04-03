@@ -75,6 +75,22 @@ public class ListenServer : MonoBehaviour
     {
         PlayerConnected = new bool[Config.SERVER_MAX_CONNECTIONS];
         InitAnzeigen();
+
+        StartCoroutine(TestConnectionToClients());
+    }
+
+    IEnumerator TestConnectionToClients()
+    {
+        while (true)
+        {
+            foreach (Player p in Config.PLAYERLIST)
+            {
+                yield return new WaitForSeconds(15);
+                if (!p.isConnected)
+                    continue;
+                SendMessage("#TestConnection", p);
+            }
+        }
     }
 
     void Update()
@@ -215,6 +231,8 @@ public class ListenServer : MonoBehaviour
         catch (Exception e)
         {
             Logging.add(new Logging(Logging.Type.Error, "Server", "SendMessage", "Nachricht an Client: " + sc.id + " (" + sc.name + ") konnte nicht gesendet werden." + e));
+            // Verbindung zum Client wird getrennt
+            ClientClosed(sc);
         }
     }
     /**
@@ -260,7 +278,7 @@ public class ListenServer : MonoBehaviour
     public void Commands(Player player, string data, string cmd)
     {
         // Zeigt alle einkommenden Nachrichten an
-        Debug.Log(player.name + " " + player.id + " -> " + cmd + "   ---   " + data);
+        //Debug.Log(player.name + " " + player.id + " -> " + cmd + "   ---   " + data);
         // Sucht nach Command
         switch (cmd)
         {
@@ -271,6 +289,8 @@ public class ListenServer : MonoBehaviour
             case "#ClientClosed":
                 ClientClosed(player);
                 UpdateSpielerBroadcast();
+                break;
+            case "#TestConnection":
                 break;
             case "#JoinListen":
                 JoinTeam("Zuschauer", player.id);
@@ -441,6 +461,13 @@ public class ListenServer : MonoBehaviour
             }
         }
         TeamZuschauerGrid.SetActive(true);
+
+        // joint alle Spieler in Zuschauer
+        for (int i = 0; i < Config.PLAYERLIST.Length; i++)
+        {
+            if (Config.PLAYERLIST[i].name.Length > 1)
+                JoinTeam("Zuschauer", Config.PLAYERLIST[i].id);
+        }
 
         GameObject.Find("LobbyTeamWahl/SpielerAnzeige Server/Team Zuschauer/Spacer").transform.GetChild(0).gameObject.SetActive(false);
 
@@ -1164,7 +1191,7 @@ public class ListenServer : MonoBehaviour
 
         LobbyTeamWahl.SetActive(false);
         InGameAnzeige.SetActive(true);
-
+        listewirdaufgeloest = false;
         GameObject.Find("Einstellungen/HerzenAnzeigen").GetComponent<Toggle>().isOn = false;
 
         // TeamsAnzeigen BuzzerPress & Ausgetabt ausblenden
@@ -1276,14 +1303,17 @@ public class ListenServer : MonoBehaviour
         AuswahlTitel.SetActive(true);
         for (int i = 0; i < 30; i++)
         {
-            Element element = Config.LISTEN_SPIEL.getSelected().getAuswahlElemente()[i];
-            msg += "[" + (i + 1) + "]" + element.getItem() + "[" + (i + 1) + "]";
-            AuswahlElemente[i].SetActive(true);
-            AuswahlElemente[i].GetComponentInChildren<TMP_Text>().text = element.getItem();
-            AuswahlElemente[i].transform.GetChild(2).GetComponentInChildren<TMP_Text>().text = "" + (i + 1);
+            if (i < Config.LISTEN_SPIEL.getSelected().getAuswahlElemente().Count)
+            {
+                Element element = Config.LISTEN_SPIEL.getSelected().getAuswahlElemente()[i];
+                msg += "[" + (i + 1) + "]" + element.getItem() + "[" + (i + 1) + "]";
+                AuswahlElemente[i].SetActive(true);
+                AuswahlElemente[i].GetComponentInChildren<TMP_Text>().text = element.getItem();
+                AuswahlElemente[i].transform.GetChild(2).GetComponentInChildren<TMP_Text>().text = "" + (i + 1);
+            }
         }
 
-        Broadcast("#ListenAuswahl " + msg);
+        Broadcast("#ListenAuswahl "+ Config.LISTEN_SPIEL.getSelected().getAuswahlElemente().Count + "<#!#>" + msg);
     }
     /**
      * Löst die bereits gewählten Elemente mit details auf
@@ -1329,9 +1359,37 @@ public class ListenServer : MonoBehaviour
         ListenElementIdsAktualisieren();
 
         if (listewirdaufgeloest)
-            Broadcast("#ListenElementEinfuegen [INDEX]" + loesIndex + "[INDEX][ELEMENT]" + loesElement.getItem() + " - " + loesElement.getDisplay() + "[ELEMENT]");
+            Broadcast("#ListenElementEinfuegen [INDEX]" + loesIndex + "[INDEX][ELEMENT]" + loesElement.getItem() + " - " + loesElement.getDisplay() + "[ELEMENT][AUSWAHLINDEX]"+ auswahlIndex+"[AUSWAHLINDEX]");
         else
-            Broadcast("#ListenElementEinfuegen [INDEX]" + loesIndex + "[INDEX][ELEMENT]" + loesElement.getItem() + "[ELEMENT]");
+            Broadcast("#ListenElementEinfuegen [INDEX]" + loesIndex + "[INDEX][ELEMENT]" + loesElement.getItem() + "[ELEMENT][AUSWAHLINDEX]"+ auswahlIndex + "[AUSWAHLINDEX]");
+    }
+    /**
+     * Gibt bei einem Eingefügen Element die Sortdisplay an
+     */
+    public void ListenShowSortDisplay(GameObject element)
+    {
+        if (!Config.isServer)
+            return;
+
+        string ele = element.transform.GetChild(1).GetComponentInChildren<TMP_Text>().text;
+        Element e = null;
+        int index = 0;
+        for (int i = 0; i < Config.LISTEN_SPIEL.getSelected().getAlleElemente().Count; i++)
+        {
+            if (Config.LISTEN_SPIEL.getSelected().getAlleElemente()[i].getItem() == ele)
+            {
+                e = Config.LISTEN_SPIEL.getSelected().getAlleElemente()[i];
+                index = i;
+                break;
+            }
+        }
+        if (e == null)
+            return;
+
+        element.transform.GetChild(0).gameObject.SetActive(true);
+        element.transform.GetChild(1).GetComponentInChildren<TMP_Text>().text = e.getItem() + " - " + e.getDisplay();
+
+        Broadcast("#ListenElementShowDisplay "+index+"[!#!]"+ e.getItem() + " - " + e.getDisplay());
     }
     /**
      * ID der Listen werden aktualisiert
@@ -1783,7 +1841,8 @@ public class ListenServer : MonoBehaviour
         {
             for (int i = 0; i < 4; i++)
             {
-                TeamRotSpielGrid[i].transform.GetChild(5).GetChild(spielerherzenzahl[index]).GetChild(0).GetChild(0).gameObject.SetActive(false);
+                if (i < teamRotIds.Count)
+                    TeamRotSpielGrid[i].transform.GetChild(5).GetChild(spielerherzenzahl[index]).GetChild(0).GetChild(0).gameObject.SetActive(false);
                 /*if (spielername == TeamRotSpielGrid[i].transform.GetChild(4).GetChild(1).GetComponent<TMP_Text>().text)
                 {
                     TeamRotSpielGrid[i].transform.GetChild(5).GetChild(spielerherzenzahl[index]).GetChild(0).GetChild(0).gameObject.SetActive(false);
@@ -1795,7 +1854,8 @@ public class ListenServer : MonoBehaviour
         {
             for (int i = 0; i < 4; i++)
             {
-                TeamBlauSpielGrid[i].transform.GetChild(5).GetChild(spielerherzenzahl[index]).GetChild(0).GetChild(0).gameObject.SetActive(false);
+                if (i < teamBlauIds.Count)
+                    TeamBlauSpielGrid[i].transform.GetChild(5).GetChild(spielerherzenzahl[index]).GetChild(0).GetChild(0).gameObject.SetActive(false);
                 /*if (spielername == TeamBlauSpielGrid[i].transform.GetChild(4).GetChild(1).GetComponent<TMP_Text>().text)
                 {
                     TeamBlauSpielGrid[i].transform.GetChild(5).GetChild(spielerherzenzahl[index]).GetChild(0).GetChild(0).gameObject.SetActive(false);
@@ -1807,7 +1867,8 @@ public class ListenServer : MonoBehaviour
         {
             for (int i = 0; i < 2; i++)
             {
-                TeamGruenSpielGrid[i].transform.GetChild(5).GetChild(spielerherzenzahl[index]).GetChild(0).GetChild(0).gameObject.SetActive(false);
+                if (i < teamGruenIds.Count)
+                    TeamGruenSpielGrid[i].transform.GetChild(5).GetChild(spielerherzenzahl[index]).GetChild(0).GetChild(0).gameObject.SetActive(false);
                 /*if (spielername == TeamGruenSpielGrid[i].transform.GetChild(4).GetChild(1).GetComponent<TMP_Text>().text)
                 {
                     TeamGruenSpielGrid[i].transform.GetChild(5).GetChild(spielerherzenzahl[index]).GetChild(0).GetChild(0).gameObject.SetActive(false);
@@ -1819,7 +1880,8 @@ public class ListenServer : MonoBehaviour
         {
             for (int i = 0; i < 2; i++)
             {
-                TeamLilaSpielGrid[i].transform.GetChild(5).GetChild(spielerherzenzahl[index]).GetChild(0).GetChild(0).gameObject.SetActive(false);
+                if (i < teamLilaIds.Count)
+                    TeamLilaSpielGrid[i].transform.GetChild(5).GetChild(spielerherzenzahl[index]).GetChild(0).GetChild(0).gameObject.SetActive(false);
                 /*if (spielername == TeamLilaSpielGrid[i].transform.GetChild(4).GetChild(1).GetComponent<TMP_Text>().text)
                 {
                     TeamLilaSpielGrid[i].transform.GetChild(5).GetChild(spielerherzenzahl[index]).GetChild(0).GetChild(0).gameObject.SetActive(false);
@@ -2025,6 +2087,7 @@ public class ListenServer : MonoBehaviour
         Broadcast("#AudioFalscheAntwort");
         FalscheAntwortSound.Play();
     }
+    #endregion
     /**
      * Ändert die ausgewählte Liste
      */
@@ -2039,24 +2102,31 @@ public class ListenServer : MonoBehaviour
 
         LobbyTeamWahl.SetActive(true);
         InGameAnzeige.SetActive(false);
-
+        // Anzeigen Leeren
         Titel.SetActive(false);
         SortierungOben.SetActive(false);
         SortierungUnten.SetActive(false);
         for (int i = 0; i < GridElemente.Length; i++)
         {
             GridElemente[i].transform.GetChild(0).gameObject.SetActive(false);
+            GridElemente[i].transform.GetChild(1).GetComponent<TMP_Text>().text = "";
+            GridElemente[i].transform.GetChild(2).GetComponentInChildren<TMP_Text>().text = "";
             GridElemente[i].SetActive(false);
         }
         AuswahlTitel.SetActive(false);
         for (int i = 0; i < AuswahlElemente.Length; i++)
         {
+            AuswahlElemente[i].transform.GetChild(0).gameObject.SetActive(false);
+            AuswahlElemente[i].transform.GetChild(1).GetComponent<TMP_Text>().text = "";
+            AuswahlElemente[i].transform.GetChild(2).GetComponentInChildren<TMP_Text>().text = "";
             AuswahlElemente[i].SetActive(false);
         }
         for (int i = 2; i < LoesungGrid.Length; i++)
         {
             LoesungGrid[i].transform.GetChild(0).gameObject.SetActive(false);
+            LoesungGrid[i].transform.GetChild(1).GetComponent<TMP_Text>().text = "";
+            LoesungGrid[i].transform.GetChild(2).GetComponentInChildren<TMP_Text>().text = "";
+            LoesungGrid[i].SetActive(false);
         }
     }
-    #endregion
 }

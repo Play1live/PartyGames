@@ -37,11 +37,22 @@ public class WerBietetMehrClient : MonoBehaviour
         if (!Config.CLIENT_STARTED)
             return;
         SendToServer("#JoinWerBietetMehr");
+
+        StartCoroutine(TestConnectionToServer());
+    }
+    IEnumerator TestConnectionToServer()
+    {
+        while (Config.CLIENT_STARTED)
+        {
+            SendToServer("#TestConnection");
+            yield return new WaitForSeconds(10);
+        }
     }
 
     void Update()
     {
         // Timer
+        /* TODO: testweise mit Coroutines
         if (zieltimer != null && zieltimer != DateTime.MinValue)
         {
             if (DateTime.Now.Second != timersecond)
@@ -62,7 +73,7 @@ public class WerBietetMehrClient : MonoBehaviour
                     Moeoep.Play();
                 }
             }
-        }
+        }*/
 
         // Leertaste kann Buzzern
         if (Input.GetKeyDown(KeyCode.Space))
@@ -92,6 +103,32 @@ public class WerBietetMehrClient : MonoBehaviour
             }
         }
         #endregion
+    }
+
+    IEnumerator RunTimer(int seconds)
+    {
+        Timer.SetActive(true);
+
+        while (seconds >= 0)
+        {
+            Timer.GetComponent<TMP_Text>().text = "" + seconds;
+
+            if (seconds == 0)
+            {
+                Debug.Log(seconds);
+                Beeep.Play();
+            }
+            // Moep Sound bei sekunden
+            if (seconds == 1 || seconds == 2 || seconds == 3 || seconds == 10 || seconds == 30 || seconds == 60) // 10-0
+            {
+                Debug.Log(seconds);
+                Moeoep.Play();
+            }
+            seconds--;
+            yield return new WaitForSecondsRealtime(1);
+        }
+        Timer.SetActive(false);
+        yield break;
     }
 
     private void OnApplicationFocus(bool focus)
@@ -130,10 +167,20 @@ public class WerBietetMehrClient : MonoBehaviour
         if (!Config.CLIENT_STARTED)
             return;
 
-        NetworkStream stream = Config.CLIENT_TCP.GetStream();
-        StreamWriter writer = new StreamWriter(stream);
-        writer.WriteLine(data);
-        writer.Flush();
+        try
+        {
+            NetworkStream stream = Config.CLIENT_TCP.GetStream();
+            StreamWriter writer = new StreamWriter(stream);
+            writer.WriteLine(data);
+            writer.Flush();
+        }
+        catch (Exception e)
+        {
+            Logging.add(Logging.Type.Error, "Client", "SendToServer", "Nachricht an Server konnte nicht gesendet werden." + e);
+            Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server wurde verloren.";
+            CloseSocket();
+            SceneManager.LoadSceneAsync("StartUp");
+        }
     }
     /**
      * Einkommende Nachrichten die vom Sever
@@ -155,7 +202,7 @@ public class WerBietetMehrClient : MonoBehaviour
      */
     public void Commands(string data, string cmd)
     {
-        Debug.Log("Eingehend: " + cmd + " -> " + data);
+        //Debug.Log("Eingehend: " + cmd + " -> " + data);
         switch (cmd)
         {
             default:
@@ -493,9 +540,12 @@ public class WerBietetMehrClient : MonoBehaviour
     public void TimerStarten(string data)
     {
         int sekunden = Int32.Parse(data);
-        zieltimer = DateTime.Now.AddSeconds(sekunden);
-        Timer.SetActive(true);
-        Timer.GetComponent<TMP_Text>().text = "" + getDiffInSeconds(zieltimer);
+
+        StopCoroutine(RunTimer(0));
+        StartCoroutine(RunTimer(sekunden));
+        //zieltimer = DateTime.Now.AddSeconds(sekunden);
+        //Timer.SetActive(true);
+        //Timer.GetComponent<TMP_Text>().text = "" + getDiffInSeconds(zieltimer);
     }
     private void KreuzeAusgrauen(string data)
     {

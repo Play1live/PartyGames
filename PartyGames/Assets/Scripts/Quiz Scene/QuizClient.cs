@@ -28,6 +28,16 @@ public class QuizClient : MonoBehaviour
         if (!Config.CLIENT_STARTED)
             return;
         SendToServer("#JoinQuiz");
+
+        StartCoroutine(TestConnectionToServer());
+    }
+    IEnumerator TestConnectionToServer()
+    {
+        while (Config.CLIENT_STARTED)
+        {
+            SendToServer("#TestConnection");
+            yield return new WaitForSeconds(10);
+        }
     }
 
     void Update()
@@ -98,10 +108,20 @@ public class QuizClient : MonoBehaviour
         if (!Config.CLIENT_STARTED)
             return;
 
-        NetworkStream stream = Config.CLIENT_TCP.GetStream();
-        StreamWriter writer = new StreamWriter(stream);
-        writer.WriteLine(data);
-        writer.Flush();
+        try
+        {
+            NetworkStream stream = Config.CLIENT_TCP.GetStream();
+            StreamWriter writer = new StreamWriter(stream);
+            writer.WriteLine(data);
+            writer.Flush();
+        }
+        catch (Exception e)
+        {
+            Logging.add(Logging.Type.Error, "Client", "SendToServer", "Nachricht an Server konnte nicht gesendet werden." + e);
+            Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server wurde verloren.";
+            CloseSocket();
+            SceneManager.LoadSceneAsync("StartUp");
+        }
     }
     /**
      * Einkommende Nachrichten die vom Sever
@@ -123,7 +143,7 @@ public class QuizClient : MonoBehaviour
      */
     public void Commands(string data, string cmd)
     {
-        Debug.Log("Eingehend: " + cmd + " -> " + data);
+        //Debug.Log("Eingehend: " + cmd + " -> " + data);
         switch (cmd)
         {
             default:
@@ -468,6 +488,7 @@ public class QuizClient : MonoBehaviour
             {
                 SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].transform.GetChild(1).GetComponent<TMP_Text>().text = "";
                 SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].transform.GetChild(3).gameObject.SetActive(false);
+                SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].GetComponent<Image>().sprite = p.icon;
             }
         }
 

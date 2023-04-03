@@ -53,9 +53,9 @@ public class Listen
                 // ListenElement
                 else if (s.StartsWith("- "))
                 {
-                    if (alleElemente.Count > 30)
+                    if (alleElemente.Count >= 30)
                     {
-                        return;
+                        break;
                     }
                     string tmp = s.Substring(2);
                     string[] split = tmp.Replace(" # ", "|").Split('|');

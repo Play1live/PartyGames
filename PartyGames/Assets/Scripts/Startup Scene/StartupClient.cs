@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -53,6 +54,8 @@ public class StartupClient : MonoBehaviour
                 SceneManager.LoadSceneAsync("Startup");
                 return;
             }
+            // Verbindung erfolgreich
+            Config.HAUPTMENUE_FEHLERMELDUNG = "";
         }
         else
         {
@@ -61,6 +64,18 @@ public class StartupClient : MonoBehaviour
             SendToServer("#GetSpielerUpdate");
         }
         #endregion
+
+        StartCoroutine(TestConnectionToServer());
+    }
+    
+    IEnumerator TestConnectionToServer()
+    {
+        while (Config.CLIENT_STARTED)
+        {
+            SendToServer("#TestConnection");
+            Config.PingTime = DateTime.Now;
+            yield return new WaitForSeconds(10);
+        }
     }
 
     void Update()
@@ -117,10 +132,20 @@ public class StartupClient : MonoBehaviour
         if (!Config.CLIENT_STARTED)
             return;
 
-        NetworkStream stream = Config.CLIENT_TCP.GetStream();
-        StreamWriter writer = new StreamWriter(stream);
-        writer.WriteLine(data);
-        writer.Flush();
+        try
+        {
+            NetworkStream stream = Config.CLIENT_TCP.GetStream();
+            StreamWriter writer = new StreamWriter(stream);
+            writer.WriteLine(data);
+            writer.Flush();
+        }
+        catch (Exception e)
+        {
+            Logging.add(Logging.Type.Error, "Client", "SendToServer", "Nachricht an Server konnte nicht gesendet werden." + e);
+            Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server wurde verloren.";
+            CloseSocket();
+            SceneManager.LoadSceneAsync("StartUp");
+        }
     }
     /**
      * Eingehende Nachrichten vom Server
@@ -142,7 +167,7 @@ public class StartupClient : MonoBehaviour
      */
     public void Commands(string data, string cmd)
     {
-        Debug.Log("Eingehend: " + cmd + " -> " + data);
+        //Debug.Log("Eingehend: " + cmd + " -> " + data);
         switch (cmd)
         {
             default:
@@ -152,7 +177,16 @@ public class StartupClient : MonoBehaviour
             #region Universal Commands
             case "#ServerClosed":
                 CloseSocket();
+                Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung wurde Serverseitig beendet.";
                 SceneManager.LoadSceneAsync("StartUp");
+                break;
+            case "#ConnectionEstablished": // TODO: testweise Ping Berechnung
+                DateTime timenow = DateTime.Now;
+                DateTime timebefore = Config.PingTime;
+                int diffmillis = (timenow.Millisecond-timebefore.Millisecond) + (timenow.Second - timebefore.Second)*1000 + (timenow.Minute - timebefore.Minute)*1000*60 + (timenow.Hour - timebefore.Hour)*1000*60*60 + (timenow.Day - timebefore.Day)*1000*60*60*24;
+                // Ping ist diffmillis / 2 (hin und rückweg)
+                int ping = diffmillis / 2;
+                SendToServer("#PlayerPing " + ping);
                 break;
             #endregion
 
@@ -208,12 +242,20 @@ public class StartupClient : MonoBehaviour
             Logging.add(Logging.Type.Error, "StartupClient", "SetID", "ID konnte nicht geladen werden.", e);
             return;
         }
+        // IDs festlegen
+        for (int i = 0; i < Config.PLAYERLIST.Length; i++)
+        {
+            Config.PLAYERLIST[i].id = (i + 1);
+        }
+        Config.PLAYER_ID = idparse;
+
+        /*
         Config.PLAYER_ID = idparse;
         idparse--;
         for (int i = 0; i < Config.PLAYERLIST.Length; i++)
         {
             Config.PLAYERLIST[i].id = (idparse + i) % Config.PLAYERLIST.Length + 1;
-        }
+        }*/
         SendToServer("#ClientSetName [NAME]" + Config.PLAYER_NAME + "[NAME][VERSION]" + Config.APPLICATION_VERSION + "[VERSION]");
 
         Hauptmenue.SetActive(false);
@@ -226,7 +268,8 @@ public class StartupClient : MonoBehaviour
     {
         Config.PLAYER_NAME = data;
 
-        ChangeIcon();
+        //ChangeIcon();
+        SendToServer("#SpielerIconChange 0"); // Für namentliches Icon
     }
     /**
      * Beendet beitrittsversuche, wenn der Server eine andere Version hat
@@ -352,6 +395,9 @@ public class StartupClient : MonoBehaviour
             case "WerBietetMehr":
                 SceneManager.LoadScene(data);
                 break;
+            case "Auktion":
+                SceneManager.LoadScene(data);
+                break;
         }
     }
 
@@ -435,4 +481,5 @@ public class StartupClient : MonoBehaviour
 
     #endregion
     #endregion
+        
 }

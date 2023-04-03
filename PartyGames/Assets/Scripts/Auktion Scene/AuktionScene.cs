@@ -47,9 +47,6 @@ public class AuktionScene : MonoBehaviour
 
 
         StartCoroutine(IntroAnimation());
-
-        Debug.LogWarning(imageUrl);
-        StartCoroutine(GetTexture());
     }
 
     IEnumerator IntroAnimation()
@@ -63,25 +60,24 @@ public class AuktionScene : MonoBehaviour
         IntroGo.SetActive(false);
     }
 
-    IEnumerator GetTexture()
+
+    // testzwecke
+    private IEnumerator GetTexture()
     {
-        UnityWebRequest www = UnityWebRequestTexture.GetTexture(imageUrl);
+        UnityWebRequest www = UnityWebRequestTexture.GetTexture("");
         yield return www.SendWebRequest();
 
-        if (www.result != UnityWebRequest.Result.Success)
+        if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
         {
-            Debug.Log(www.error);
+            Debug.LogError("Error while downloading image: " + www.error);
         }
         else
         {
-            Texture2D myTexture = ((DownloadHandlerTexture)www.downloadHandler).texture;
-            Sprite sprite = Sprite.Create(myTexture, new Rect(0, 0, myTexture.width, myTexture.height), new Vector2(0.5f, 0.5f));
-            imageObject.GetComponent<Image>().sprite = sprite;
+            Texture2D texture = ((DownloadHandlerTexture)www.downloadHandler).texture;
+            Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero);
+            
         }
     }
-
-    public string imageUrl = "https://www.google.de"; // URL des Bildes hier einfügen
-    public GameObject imageObject;
 
     private void OnApplicationQuit()
     {

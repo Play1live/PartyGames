@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using TMPro;
 using Unity.RemoteConfig;
 using UnityEngine;
@@ -14,26 +16,37 @@ public class StartupScene : MonoBehaviour
  
     void Start()
     {
-        if (!Config.CLIENT_STARTED && !Config.SERVER_STARTED)
+        // Speichert Version in TXT Datei
+        if (!File.Exists(Application.dataPath.Replace("\\PartyGames_Data", "").Replace("/PartyGames_Data", "") + @"/Version.txt"))
         {
-            Config.log = new List<Logging>();
-            LoadConfigs.FetchRemoteConfig();
-            MedienUtil.CreateMediaDirectory();
-            SetupSpiele.LoadGameFiles();
-            Client.SetActive(false);
-            Server.SetActive(false);
+            using (FileStream fs = File.Create(Application.dataPath.Replace("\\PartyGames_Data", "").Replace("/PartyGames_Data", "") + @"/Version.txt"))
+            {
+                byte[] info = new UTF8Encoding(true).GetBytes(Config.APPLICATION_VERSION);
+                // Add some information to the file.
+                fs.Write(info, 0, info.Length);
+            }
         }
-
 
         Application.targetFrameRate = 60;
 #if UNITY_EDITOR
         Config.isServer = true;
-        Debug.Log("DataPath: "+Config.MedienPath);
+        Debug.Log("DataPath: " + Config.MedienPath);
         Application.targetFrameRate = 120;
 #endif
         /*Testzwecke*/// TODO
-        //Config.isServer = !Config.isServer;
+                       //Config.isServer = !Config.isServer;
+
         //Config.isServer = false;
+
+        if (!Config.CLIENT_STARTED && !Config.SERVER_STARTED)
+        {
+            Config.log = new List<Logging>();
+            LoadConfigs.FetchRemoteConfig();    // Lädt Config
+            MedienUtil.CreateMediaDirectory();
+            StartCoroutine(LoadGameFilesAsync());
+            Client.SetActive(false);
+            Server.SetActive(false);
+        }
 
         // Init Playerlist
         if (Config.PLAYERLIST == null)
@@ -43,6 +56,8 @@ public class StartupScene : MonoBehaviour
             Config.PLAYER_ICONS = new List<Sprite>();
             foreach (Sprite sprite in Resources.LoadAll<Sprite>("Images/ProfileIcons/"))
             {
+                if (sprite.name.Equals("empty"))
+                    continue;
                 Config.PLAYER_ICONS.Add(sprite);
             }
             Hauptmenue.SetActive(true); 
@@ -66,6 +81,11 @@ public class StartupScene : MonoBehaviour
                 GameObject.Find("Version_LBL").gameObject.GetComponent<TMP_Text>().text = "Version: " + Config.APPLICATION_VERSION;
             }
         }
+    }
+    IEnumerator LoadGameFilesAsync()
+    {
+        SetupSpiele.LoadGameFiles();
+        yield return null;
     }
     private void OnEnable()
     {
@@ -146,5 +166,4 @@ public class StartupScene : MonoBehaviour
             Server.SetActive(true);
         }
     }
-
 }

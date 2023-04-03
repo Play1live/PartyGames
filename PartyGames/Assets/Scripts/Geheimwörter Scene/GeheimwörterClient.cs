@@ -30,6 +30,16 @@ public class GeheimwörterClient : MonoBehaviour
         if (!Config.CLIENT_STARTED)
             return;
         SendToServer("#JoinGeheimwörter");
+
+        StartCoroutine(TestConnectionToServer());
+    }
+    IEnumerator TestConnectionToServer()
+    {
+        while (Config.CLIENT_STARTED)
+        {
+            SendToServer("#TestConnection");
+            yield return new WaitForSeconds(10);
+        }
     }
 
     void Update()
@@ -100,10 +110,20 @@ public class GeheimwörterClient : MonoBehaviour
         if (!Config.CLIENT_STARTED)
             return;
 
-        NetworkStream stream = Config.CLIENT_TCP.GetStream();
-        StreamWriter writer = new StreamWriter(stream);
-        writer.WriteLine(data);
-        writer.Flush();
+        try
+        {
+            NetworkStream stream = Config.CLIENT_TCP.GetStream();
+            StreamWriter writer = new StreamWriter(stream);
+            writer.WriteLine(data);
+            writer.Flush();
+        }
+        catch (Exception e)
+        {
+            Logging.add(Logging.Type.Error, "Client", "SendToServer", "Nachricht an Server konnte nicht gesendet werden." + e);
+            Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server wurde verloren.";
+            CloseSocket();
+            SceneManager.LoadSceneAsync("StartUp");
+        }
     }
     /**
      * Einkommende Nachrichten die vom Sever
@@ -125,7 +145,7 @@ public class GeheimwörterClient : MonoBehaviour
      */
     public void Commands(string data, string cmd)
     {
-        Debug.Log("Eingehend: " + cmd + " -> " + data);
+        //Debug.Log("Eingehend: " + cmd + " -> " + data);
         switch (cmd)
         {
             default:

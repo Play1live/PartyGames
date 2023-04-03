@@ -68,6 +68,16 @@ public class ListenClient : MonoBehaviour
         if (!Config.CLIENT_STARTED)
             return;
         SendToServer("#JoinListen");
+
+        StartCoroutine(TestConnectionToServer());
+    }
+    IEnumerator TestConnectionToServer()
+    {
+        while (Config.CLIENT_STARTED)
+        {
+            SendToServer("#TestConnection");
+            yield return new WaitForSeconds(10);
+        }
     }
 
     void Update()
@@ -123,10 +133,20 @@ public class ListenClient : MonoBehaviour
         if (!Config.CLIENT_STARTED)
             return;
 
-        NetworkStream stream = Config.CLIENT_TCP.GetStream();
-        StreamWriter writer = new StreamWriter(stream);
-        writer.WriteLine(data);
-        writer.Flush();
+        try
+        {
+            NetworkStream stream = Config.CLIENT_TCP.GetStream();
+            StreamWriter writer = new StreamWriter(stream);
+            writer.WriteLine(data);
+            writer.Flush();
+        }
+        catch (Exception e)
+        {
+            Logging.add(Logging.Type.Error, "Client", "SendToServer", "Nachricht an Server konnte nicht gesendet werden." + e);
+            Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server wurde verloren.";
+            CloseSocket();
+            SceneManager.LoadSceneAsync("StartUp");
+        }
     }
     /**
      * Einkommende Nachrichten die vom Sever
@@ -148,7 +168,7 @@ public class ListenClient : MonoBehaviour
      */
     public void Commands(string data, string cmd)
     {
-        Debug.Log("Eingehend: " + cmd + " -> " + data);
+        //Debug.Log("Eingehend: " + cmd + " -> " + data);
         switch (cmd)
         {
             default:
@@ -190,6 +210,9 @@ public class ListenClient : MonoBehaviour
             case "#ListenElementEinfuegen":
                 ListenElementEinfuegen(data);
                 break;
+            case "#ListenElementShowDisplay":
+                ListenShowSortDisplay(data);
+                break;
             #endregion
 
             case "#HerzenEinblenden":
@@ -212,8 +235,7 @@ public class ListenClient : MonoBehaviour
                 SpielerIstDran(data);
                 break;
             case "#ZurueckZurTeamWahl":
-                LobbyTeamWahl.SetActive(true);
-                InGameAnzeige.SetActive(false);
+                ZurueckZurTeamWahl();
                 break;
 
         }
@@ -871,12 +893,16 @@ public class ListenClient : MonoBehaviour
     {
         ListenAnzeigen.SetActive(true);
         AuswahlTitel.SetActive(true);
+        int zahl = Int32.Parse(data.Replace("<#!#>", "|").Split('|')[0]);
         for (int i = 0; i < 30; i++)
         {
-            string element = data.Replace("["+(i+1)+"]","|").Split('|')[1];
-            AuswahlElemente[i].SetActive(true);
-            AuswahlElemente[i].GetComponentInChildren<TMP_Text>().text = element;
-            AuswahlElemente[i].transform.GetChild(2).GetComponentInChildren<TMP_Text>().text = "" + (i + 1);
+            if (i < zahl)
+            {
+                string element = data.Replace("[" + (i + 1) + "]", "|").Split('|')[1];
+                AuswahlElemente[i].SetActive(true);
+                AuswahlElemente[i].GetComponentInChildren<TMP_Text>().text = element;
+                AuswahlElemente[i].transform.GetChild(2).GetComponentInChildren<TMP_Text>().text = "" + (i + 1);
+            }
         }
     }
     /**
@@ -901,10 +927,24 @@ public class ListenClient : MonoBehaviour
     {
         int index = Int32.Parse(data.Replace("[INDEX]", "|").Split('|')[1]);
         string element = data.Replace("[ELEMENT]", "|").Split('|')[1];
+        int auswahlindex = Int32.Parse(data.Replace("[AUSWAHLINDEX]", "|").Split('|')[1]);
 
         GridElemente[index].SetActive(true); // Für alle Anzeigen
         GridElemente[index].GetComponentInChildren<TMP_Text>().text = element;
+
+		AuswahlElemente[auswahlindex].GetComponentInChildren<TMP_Text>().text = "";
         ListenElementIdsAktualisieren();
+    }
+    /**
+     * Gibt bei einem Eingefügen Element die Sortdisplay an
+     */
+    private void ListenShowSortDisplay(string data)
+    {
+        int elementindex = Int32.Parse(data.Replace("[!#!]", "|").Split('|')[0]);
+        string display = data.Replace("[!#!]", "|").Split('|')[1];
+
+        GridElemente[elementindex].transform.GetChild(0).gameObject.SetActive(true);
+        GridElemente[elementindex].transform.GetChild(1).GetComponentInChildren<TMP_Text>().text = display;
     }
     /**
      * Aktualisiert die Ids der Elemente
@@ -1396,6 +1436,31 @@ public class ListenClient : MonoBehaviour
                 TeamLilaSpielGrid[i].transform.GetChild(1).gameObject.SetActive(true);
             }
             return;
+        }
+    }
+
+    private void ZurueckZurTeamWahl()
+    {
+        LobbyTeamWahl.SetActive(true);
+        InGameAnzeige.SetActive(false);
+        // Anzeigen Leeren
+        Titel.SetActive(false);
+        SortierungOben.SetActive(false);
+        SortierungUnten.SetActive(false);
+        for (int i = 0; i < GridElemente.Length; i++)
+        {
+            GridElemente[i].transform.GetChild(0).gameObject.SetActive(false);
+            GridElemente[i].transform.GetChild(1).GetComponent<TMP_Text>().text = "";
+            GridElemente[i].transform.GetChild(2).GetComponentInChildren<TMP_Text>().text = "";
+            GridElemente[i].SetActive(false);
+        }
+        AuswahlTitel.SetActive(false);
+        for (int i = 0; i < AuswahlElemente.Length; i++)
+        {
+            AuswahlElemente[i].transform.GetChild(0).gameObject.SetActive(false);
+            AuswahlElemente[i].transform.GetChild(1).GetComponent<TMP_Text>().text = "";
+            AuswahlElemente[i].transform.GetChild(2).GetComponentInChildren<TMP_Text>().text = "";
+            AuswahlElemente[i].SetActive(false);
         }
     }
 }

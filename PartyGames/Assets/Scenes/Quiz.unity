@@ -7383,7 +7383,7 @@ RectTransform:
   - {fileID: 1634236492}
   - {fileID: 912912281}
   m_Father: {fileID: 1191329315}
-  m_RootOrder: 1
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -9021,7 +9021,7 @@ RectTransform:
   - {fileID: 1085765043}
   - {fileID: 2017423080}
   m_Father: {fileID: 1191329315}
-  m_RootOrder: 3
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -10568,7 +10568,7 @@ RectTransform:
   m_Children:
   - {fileID: 454534928}
   m_Father: {fileID: 775932883}
-  m_RootOrder: 3
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -12351,7 +12351,7 @@ RectTransform:
   m_Children:
   - {fileID: 741321375}
   m_Father: {fileID: 775932883}
-  m_RootOrder: 5
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -14074,7 +14074,7 @@ RectTransform:
   - {fileID: 1573864587}
   - {fileID: 18433895}
   m_Father: {fileID: 1191329315}
-  m_RootOrder: 5
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -14266,18 +14266,6 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 310990668}
-        m_TargetAssemblyTypeName: QuizServer, Assembly-CSharp
-        m_MethodName: setMinGrenze
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 569193957}
-          m_ObjectArgumentAssemblyTypeName: TMPro.TMP_InputField, Unity.TextMeshPro
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -19529,13 +19517,13 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1392249876}
-  - {fileID: 1538994011}
-  - {fileID: 70306754}
   - {fileID: 428735403}
   - {fileID: 1785929301}
+  - {fileID: 70306754}
   - {fileID: 470925497}
+  - {fileID: 1538994011}
   - {fileID: 1368067726}
+  - {fileID: 1392249876}
   - {fileID: 273099493}
   m_Father: {fileID: 35288342}
   m_RootOrder: 11
@@ -24138,18 +24126,6 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 310990668}
-        m_TargetAssemblyTypeName: QuizServer, Assembly-CSharp
-        m_MethodName: setMinGrenze
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 903704506}
-          m_ObjectArgumentAssemblyTypeName: TMPro.TMP_InputField, Unity.TextMeshPro
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -28831,7 +28807,7 @@ RectTransform:
   - {fileID: 1928899445}
   - {fileID: 829081010}
   m_Father: {fileID: 1191329315}
-  m_RootOrder: 0
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -30161,18 +30137,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 310990668}
-        m_TargetAssemblyTypeName: QuizServer, Assembly-CSharp
-        m_MethodName: setMaxGrenze
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 1159265333}
-          m_ObjectArgumentAssemblyTypeName: TMPro.TMP_InputField, Unity.TextMeshPro
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
   m_OnSubmit:
     m_PersistentCalls:
       m_Calls: []
@@ -31187,13 +31151,13 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1111166867}
-  - {fileID: 313153288}
-  - {fileID: 1419776914}
   - {fileID: 374869655}
   - {fileID: 1768637427}
+  - {fileID: 1419776914}
   - {fileID: 563840056}
+  - {fileID: 313153288}
   - {fileID: 1781339859}
+  - {fileID: 1111166867}
   - {fileID: 861238988}
   m_Father: {fileID: 294682665}
   m_RootOrder: 7
@@ -36911,7 +36875,7 @@ RectTransform:
   m_Children:
   - {fileID: 1015205796}
   m_Father: {fileID: 775932883}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -37277,7 +37241,7 @@ RectTransform:
   m_Children:
   - {fileID: 2062727764}
   m_Father: {fileID: 775932883}
-  m_RootOrder: 0
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -40639,7 +40603,7 @@ RectTransform:
   m_Children:
   - {fileID: 1703050777}
   m_Father: {fileID: 775932883}
-  m_RootOrder: 1
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -46474,7 +46438,7 @@ RectTransform:
   - {fileID: 422583638}
   - {fileID: 1633398981}
   m_Father: {fileID: 1191329315}
-  m_RootOrder: 4
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -46827,7 +46791,7 @@ RectTransform:
   - {fileID: 1647013979}
   - {fileID: 1076607406}
   m_Father: {fileID: 1191329315}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -47001,7 +46965,7 @@ RectTransform:
   m_Children:
   - {fileID: 731469962}
   m_Father: {fileID: 775932883}
-  m_RootOrder: 4
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -48182,18 +48146,6 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 310990668}
-        m_TargetAssemblyTypeName: QuizServer, Assembly-CSharp
-        m_MethodName: setZielGrenze
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 1853407191}
-          m_ObjectArgumentAssemblyTypeName: TMPro.TMP_InputField, Unity.TextMeshPro
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 

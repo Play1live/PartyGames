@@ -11,22 +11,16 @@ using UnityEngine.UI;
 
 public class AuktionServer : MonoBehaviour
 {
-    GameObject[] Bild;
-
-    TMP_Text BildTitel;
-    GameObject[] BildVorschau;
-    GameObject[] bildListe;
-    List<int> coverlist;
-    int bildIndex;
-
-    bool buzzerIsOn = false;
-    GameObject BuzzerAnzeige;
     GameObject AustabbenAnzeigen;
-
+    bool initReady = false;
     GameObject[,] SpielerAnzeige;
     bool[] PlayerConnected;
-    int PunkteProRichtige = 4;
-    int PunkteProFalsche = 1;
+
+    Image BildAnzeige;
+    //Server
+    GameObject[,] AuktionsElemente;
+    TMP_InputField SummeAllerPreise;
+    
 
     [SerializeField] AudioSource BuzzerSound;
     [SerializeField] AudioSource RichtigeAntwortSound;
@@ -34,9 +28,59 @@ public class AuktionServer : MonoBehaviour
 
     void OnEnable()
     {
+        initReady = false;
         PlayerConnected = new bool[Config.SERVER_MAX_CONNECTIONS];
-        InitAnzeigen();
-        InitMosaik();
+        InitAnzeigen(); // Crasht wenn spieler mit in der Lobby sind
+        //InitAuktion();
+        StartCoroutine(LoadAllAuktionImages());
+        //StartCoroutine(TestConnectionToClients()); // Braucht der Server eig nicht, nur Client
+    }
+
+    IEnumerator LoadAllAuktionImages()
+    {
+        if (Config.AUKTION_SPIEL.getSelected() == null)
+            yield break;
+        //yield return new WaitForSeconds(2);
+
+        foreach (AuktionElement Elemente in Config.AUKTION_SPIEL.getSelected().getElemente())
+        {
+            for (int i = 0; i < Elemente.getBilderURL().Length; i++)
+            {
+                string url = Elemente.getBilderURL()[i];
+                UnityWebRequest www = UnityWebRequestTexture.GetTexture(url);
+                yield return www.SendWebRequest();
+
+                if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
+                {
+                    Debug.LogError("Auktion: Bild konnte nicht geladen werden: " + Elemente.getName() + " -> " + url + " << " + www.error);
+                }
+                else
+                {
+                    Texture2D texture = ((DownloadHandlerTexture)www.downloadHandler).texture;
+                    Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero);
+                    Elemente.getBilder()[i] = sprite;
+                }
+                yield return null;
+            }
+        }
+
+        // Anzeigen
+        yield return null;
+        InitAuktion();
+    }
+
+    IEnumerator TestConnectionToClients()
+    {
+        while (true)
+        {
+            foreach (Player p in Config.PLAYERLIST)
+            {
+                yield return new WaitForSeconds(15);
+                if (!p.isConnected)
+                    continue;
+                SendMessage("#TestConnection", p);
+            }
+        }
     }
 
     void Update()
@@ -44,7 +88,7 @@ public class AuktionServer : MonoBehaviour
         #region Server
         if (!Config.SERVER_STARTED)
         {
-            SceneManager.LoadScene("Startup");
+            SceneManager.LoadSceneAsync("Startup");
             return;
         }
 
@@ -177,6 +221,8 @@ public class AuktionServer : MonoBehaviour
         catch (Exception e)
         {
             Logging.add(new Logging(Logging.Type.Error, "Server", "SendMessage", "Nachricht an Client: " + sc.id + " (" + sc.name + ") konnte nicht gesendet werden." + e));
+            // Verbindung zum Client wird getrennt
+            ClientClosed(sc);
         }
     }
     /**
@@ -222,7 +268,7 @@ public class AuktionServer : MonoBehaviour
     public void Commands(Player player, string data, string cmd)
     {
         // Zeigt alle einkommenden Nachrichten an
-        Debug.Log(player.name + " " + player.id + " -> " + cmd + "   ---   " + data);
+        //Debug.Log(player.name + " " + player.id + " -> " + cmd + "   ---   " + data);
         // Sucht nach Command
         switch (cmd)
         {
@@ -234,16 +280,22 @@ public class AuktionServer : MonoBehaviour
                 ClientClosed(player);
                 UpdateSpielerBroadcast();
                 break;
+            case "#TestConnection":
+                break;
             case "#ClientFocusChange":
                 ClientFocusChange(player, data);
                 break;
 
-            case "#JoinMosaik":
+            case "#JoinAuktion":
                 PlayerConnected[player.id - 1] = true;
+                SendImageURLs(player);
                 UpdateSpielerBroadcast();
                 break;
-            case "#SpielerBuzzered":
-                SpielerBuzzered(player);
+            case "#ImageDownloadError":
+                Debug.LogError("ImageDownloadError: (" + player.id + ") " + player.name + " -> " + data);
+                break;
+            case "#ImageDownloadedSuccessful":
+                Debug.LogError("ImageDownloadedSuccessful: (" + player.id + ") " + player.name);
                 break;
         }
     }
@@ -280,6 +332,8 @@ public class AuktionServer : MonoBehaviour
      */
     private void UpdateSpielerBroadcast()
     {
+        if (!initReady)
+            return;
         Broadcast(UpdateSpieler(), Config.PLAYERLIST);
     }
     /**
@@ -287,44 +341,71 @@ public class AuktionServer : MonoBehaviour
      */
     private string UpdateSpieler()
     {
-        string msg = "#UpdateSpieler [ID]0[ID][PUNKTE]" + Config.SERVER_PLAYER_POINTS + "[PUNKTE]";
+        string msg = "";
         for (int i = 0; i < Config.PLAYERLIST.Length; i++)
         {
+            
             Player p = Config.PLAYERLIST[i];
-            msg += "[TRENNER][ID]" + p.id + "[ID][PUNKTE]" + p.points + "[PUNKTE]";
+            string buyeditems = "";
+            for (int j = 0; j < Config.AUKTION_SPIEL.getSelected().getElemente().Count; j++)
+            {
+                if (Config.AUKTION_SPIEL.getSelected().getElemente()[j].getWurdeverkauft())
+                {
+                    if (Config.AUKTION_SPIEL.getSelected().getElemente()[j].getKaueferId() == p.id)
+                    {
+                        buyeditems += "," + j;
+                    }
+                }
+            }
+            if (buyeditems.Length > 1)
+                buyeditems = buyeditems.Substring(1);
+
+            msg += "[TRENNER][ID]" + p.id + "[ID][PUNKTE]" + p.points + "[PUNKTE][KONTO]"+ SpielerAnzeige[p.id - 1, 7].GetComponent<TMP_InputField>().text + "[KONTO][GUV]"+ SpielerAnzeige[p.id - 1, 8].GetComponent<TMP_InputField>().text + "[GUV][ITEMS]" + buyeditems + "[ITEMS]";
             if (p.isConnected && PlayerConnected[i])
             {
                 SpielerAnzeige[i, 0].SetActive(true);
                 SpielerAnzeige[i, 2].GetComponent<Image>().sprite = p.icon;
                 SpielerAnzeige[i, 4].GetComponent<TMP_Text>().text = p.name;
                 SpielerAnzeige[i, 5].GetComponent<TMP_Text>().text = p.points+"";
+
+                
+                for (int j = 0; j < 10; j++)
+                {
+                    SpielerAnzeige[i, 6].transform.GetChild(j).gameObject.SetActive(false);
+                }
+                if (buyeditems.Length == 1)
+                {
+                    SpielerAnzeige[i, 6].transform.GetChild(Int32.Parse(buyeditems)).gameObject.SetActive(true);
+                }
+                else if (buyeditems.Length > 1)
+                {
+                    string[] items = buyeditems.Split(',');
+                    for (int j = 0; j < items.Length; j++)
+                    {
+                        SpielerAnzeige[i, 6].transform.GetChild(Int32.Parse(items[j])).gameObject.SetActive(true);
+                    }
+                }
             }
             else
                 SpielerAnzeige[i, 0].SetActive(false);
 
         }
-        return msg;
+        if (msg.StartsWith("[TRENNER]"))
+            msg = msg.Substring("[TRENNER]".Length);
+        return "#UpdateSpieler " +msg;
     }
     /**
      * Initialisiert die Anzeigen zu beginn
      */
     private void InitAnzeigen()
     {
-        // Buzzer Deaktivieren
-        GameObject.Find("Einstellungen/BuzzerAktivierenToggle").GetComponent<Toggle>().isOn = false;
-        BuzzerAnzeige = GameObject.Find("Einstellungen/BuzzerIstAktiviert");
-        BuzzerAnzeige.SetActive(false);
-        buzzerIsOn = false;
+        GameObject.Find("Auktion/Server/KontoGuthaben").GetComponent<TMP_InputField>().text = "0";
         // Austabben wird gezeigt
         GameObject.Find("Einstellungen/AusgetabtSpielernZeigenToggle").GetComponent<Toggle>().isOn = false;
         AustabbenAnzeigen = GameObject.Find("Einstellungen/AusgetabtWirdSpielernGezeigen");
         AustabbenAnzeigen.SetActive(false);
-        // Punkte Pro Richtige Antwort
-        GameObject.Find("Einstellungen/PunkteProRichtigeAntwort").GetComponent<TMP_InputField>().text = ""+PunkteProRichtige;
-        // Punkte Pro Falsche Antwort
-        GameObject.Find("Einstellungen/PunkteProFalscheAntwort").GetComponent<TMP_InputField>().text = ""+PunkteProFalsche;
         // Spieler Anzeige
-        SpielerAnzeige = new GameObject[Config.SERVER_MAX_CONNECTIONS, 6]; // Anzahl benötigter Elemente
+        SpielerAnzeige = new GameObject[Config.SERVER_MAX_CONNECTIONS, 9]; // Anzahl benötigter Elemente
         for (int i = 0; i < Config.SERVER_MAX_CONNECTIONS; i++)
         {
             PlayerConnected[i] = false;
@@ -335,72 +416,197 @@ public class AuktionServer : MonoBehaviour
             SpielerAnzeige[i, 4] = GameObject.Find("SpielerAnzeige/Player (" + (i + 1) + ")/Infobar/Name"); // Spieler Name
             SpielerAnzeige[i, 5] = GameObject.Find("SpielerAnzeige/Player (" + (i + 1) + ")/Infobar/Punkte"); // Spieler Punkte
 
+            SpielerAnzeige[i, 6] = GameObject.Find("SpielerAnzeige/Player (" + (i + 1) + ")/Elemente");
+            SpielerAnzeige[i, 7] = GameObject.Find("SpielerAnzeige/Player (" + (i + 1) + ")/Konto");
+            SpielerAnzeige[i, 7].GetComponent<TMP_InputField>().text = "0";
+            SpielerAnzeige[i, 8] = GameObject.Find("SpielerAnzeige/Player (" + (i + 1) + ")/GUV");
+            SpielerAnzeige[i, 8].GetComponent<TMP_InputField>().text = "0";
+
+
             SpielerAnzeige[i, 0].SetActive(false); // Spieler Anzeige
             SpielerAnzeige[i, 1].SetActive(false); // BuzzerPressed Umrandung
             SpielerAnzeige[i, 3].SetActive(false); // Ausgetabt Einblendung
         }
+
+        //Auktion
+        BildAnzeige = GameObject.Find("Auktion/Anzeige/Bild").GetComponent<Image>();
+        BildAnzeige.gameObject.SetActive(false);
+        //Server
+        SummeAllerPreise = GameObject.Find("Auktion/Server/SummePreise").GetComponent<TMP_InputField>();
+        AuktionsElemente = new GameObject[10, 11];
+        for (int i = 0; i < 10; i++)
+        {
+            // Element An Sich falls weniger enthalten sind
+            AuktionsElemente[i, 0] = GameObject.Find("Auktion/Server/Vorschau/Element (" + (i+1) + ")");
+            // Name
+            AuktionsElemente[i, 1] = GameObject.Find("Auktion/Server/Vorschau/Element (" + (i + 1) + ")/Name");
+            // Preis
+            AuktionsElemente[i, 2] = GameObject.Find("Auktion/Server/Vorschau/Element (" + (i + 1) + ")/Preis");
+            // URL
+            AuktionsElemente[i, 3] = GameObject.Find("Auktion/Server/Vorschau/Element (" + (i + 1) + ")/URL");
+            // Verkaufspreis
+            AuktionsElemente[i, 4] = GameObject.Find("Auktion/Server/Vorschau/Element (" + (i + 1) + ")/Verkaufspreis");
+            // Käufer
+            AuktionsElemente[i, 5] = GameObject.Find("Auktion/Server/Vorschau/Element (" + (i + 1) + ")/Käufer");
+            // Bild (1)
+            AuktionsElemente[i, 6] = GameObject.Find("Auktion/Server/Vorschau/Element (" + (i + 1) + ")/Bild (1)");
+            // Bild (2)
+            AuktionsElemente[i, 7] = GameObject.Find("Auktion/Server/Vorschau/Element (" + (i + 1) + ")/Bild (2)");
+            // Bild (3)
+            AuktionsElemente[i, 8] = GameObject.Find("Auktion/Server/Vorschau/Element (" + (i + 1) + ")/Bild (3)");
+            // Bild (4)
+            AuktionsElemente[i, 9] = GameObject.Find("Auktion/Server/Vorschau/Element (" + (i + 1) + ")/Bild (4)");
+            // Bild (5)
+            AuktionsElemente[i, 10] = GameObject.Find("Auktion/Server/Vorschau/Element (" + (i + 1) + ")/Bild (5)");
+
+            AuktionsElemente[i, 0].SetActive(false);
+        }
+
+        TMP_Dropdown drop = GameObject.Find("Einstellungen/ChangeAuktion").GetComponent<TMP_Dropdown>();
+        drop.ClearOptions();
+        List<string> gamelist = new List<string>();
+        foreach (Auktion liste in Config.AUKTION_SPIEL.getAuktionen())
+        {
+            gamelist.Add(liste.getTitel());
+        }
+        drop.AddOptions(gamelist);
+        drop.value = Config.AUKTION_SPIEL.getIndex(Config.AUKTION_SPIEL.getSelected());
+    }
+    /**
+    * Initialisiert die Anzeigen der Auktion
+    */
+    private void InitAuktion()
+    {
+        //Auktion
+        BildAnzeige.gameObject.SetActive(false);
+        //Server
+        for (int i = 0; i < Config.AUKTION_SPIEL.getSelected().getElemente().Count; i++)
+        {
+            // Element An Sich falls weniger enthalten sind
+            AuktionsElemente[i, 0].SetActive(true);
+            // Name
+            AuktionsElemente[i, 1].GetComponent<TMP_Text>().text = Config.AUKTION_SPIEL.getSelected().getElemente()[i].getName();
+            // Preis
+            AuktionsElemente[i, 2].GetComponent<TMP_InputField>().text = Config.AUKTION_SPIEL.getSelected().getElemente()[i].getPreis() + "";
+            // URL
+            AuktionsElemente[i, 3].GetComponent<TMP_InputField>().text = Config.AUKTION_SPIEL.getSelected().getElemente()[i].getURL();
+            // Verkaufspreis
+            AuktionsElemente[i, 4].GetComponent<TMP_InputField>().text = "";
+            Config.AUKTION_SPIEL.getSelected().getElemente()[i].setVerkaufspreis(0);
+            // Käufer
+            List<string> spieler = new List<string>();
+            spieler.Add("zurücknehmen");
+            foreach (Player p in Config.PLAYERLIST)
+            {
+                if (p.isConnected)
+                    spieler.Add(p.id + " - " + p.name);
+            }
+            AuktionsElemente[i, 5].GetComponent<TMP_Dropdown>().ClearOptions();
+            AuktionsElemente[i, 5].GetComponent<TMP_Dropdown>().AddOptions(spieler);
+            // Bild (1)
+            AuktionsElemente[i, 6].GetComponent<Image>().sprite = Config.AUKTION_SPIEL.getSelected().getElemente()[i].getBilder()[0];
+            // Bild (2)
+            AuktionsElemente[i, 7].GetComponent<Image>().sprite = Config.AUKTION_SPIEL.getSelected().getElemente()[i].getBilder()[1];
+            // Bild (3)
+            AuktionsElemente[i, 8].GetComponent<Image>().sprite = Config.AUKTION_SPIEL.getSelected().getElemente()[i].getBilder()[2];
+            // Bild (4)
+            AuktionsElemente[i, 9].GetComponent<Image>().sprite = Config.AUKTION_SPIEL.getSelected().getElemente()[i].getBilder()[3];
+            // Bild (5)
+            AuktionsElemente[i, 10].GetComponent<Image>().sprite = Config.AUKTION_SPIEL.getSelected().getElemente()[i].getBilder()[4];
+        }
+        for (int i = 0; i < Config.SERVER_MAX_CONNECTIONS; i++)
+        {
+            for (int j = 0; j < 10; j++)
+            {
+                SpielerAnzeige[i, 6].transform.GetChild(j).gameObject.SetActive(false);
+            }
+            
+            for (int j = 0; j < Config.AUKTION_SPIEL.getSelected().getElemente().Count; j++)
+            {
+                SpielerAnzeige[i, 6].transform.GetChild(j).GetComponent<Image>().sprite = Config.AUKTION_SPIEL.getSelected().getElemente()[j].getBilder()[0];
+            }
+        }
+
+        initReady = true;
+        UpdateKonten();
+    }
+    private void UpdateKonten()
+    {
+        float preissumme = 0;
+        foreach (AuktionElement element in Config.AUKTION_SPIEL.getSelected().getElemente())
+        {
+            preissumme += element.getPreis();
+        }
+        SummeAllerPreise.text = preissumme + "";
+
+        foreach (Player p in Config.PLAYERLIST)
+        {
+            if (!p.isConnected)
+                continue;
+            float konto = float.Parse(GameObject.Find("Auktion/Server/KontoGuthaben").GetComponent<TMP_InputField>().text);
+            float guv = 0;
+            foreach (AuktionElement element in Config.AUKTION_SPIEL.getSelected().getElemente())
+            {
+                if (!element.getWurdeverkauft())
+                    continue;
+                if (element.getKaueferId() == p.id)
+                {
+                    guv += element.getPreis() - element.getVerkaufspreis();
+                    konto -= element.getVerkaufspreis();
+                }
+            }
+            // Konto
+            SpielerAnzeige[Player.getPosInLists(p.id), 7].GetComponent<TMP_InputField>().text = konto + " €";
+            // GUV
+            SpielerAnzeige[Player.getPosInLists(p.id), 8].GetComponent<TMP_InputField>().text = guv+" €";
+
+        }
+        UpdateSpielerBroadcast();
     }
     /**
      * Wechselt das Mosaik Game
      */
-    public void ChangeMosaik(TMP_Dropdown drop)
+    public void ChangeAuktion(TMP_Dropdown drop)
     {
-        Config.MOSAIK_SPIEL.setSelected(Config.MOSAIK_SPIEL.getMosaik(drop.value));
-        bildIndex = 0;
+        // TODO: not working
+        /*Broadcast("#HideImage");
+        Config.AUKTION_SPIEL.setSelected(Config.AUKTION_SPIEL.getAuktion(drop.value));
 
-        Bild[0].transform.parent.gameObject.GetComponent<Image>().sprite = Config.MOSAIK_SPIEL.getBeispiel();
-        Bild[0].transform.parent.gameObject.SetActive(false);
-        BildTitel = GameObject.Find("MosaikAnzeige/Server/Titel").GetComponent<TMP_Text>();
-        BildTitel.text = Config.MOSAIK_SPIEL.getBeispiel().name;
-        
-        bildIndex = 0;
-       
-        BildVorschau[0].GetComponent<Image>().sprite = Config.MOSAIK_SPIEL.getBeispiel();
-        bildListe[0].SetActive(true);
-        bildListe[0].GetComponent<Image>().sprite = Config.MOSAIK_SPIEL.getBeispiel();
-        for (int i = 1; i < bildListe.Length; i++)
+        for (int i = 0; i < AuktionsElemente.GetLength(0); i++)
         {
-            bildListe[i].SetActive(false);
+            AuktionsElemente[i, 0].SetActive(false);
         }
-        for (int i = 0; i < Config.MOSAIK_SPIEL.getSelected().getSprites().Count; i++)
+
+        InitAuktion();
+        StartCoroutine(LoadAllAuktionImages());
+
+        foreach (Player p in Config.PLAYERLIST)
         {
-            bildListe[i + 1].GetComponent<Image>().sprite = Config.MOSAIK_SPIEL.getSelected().getSprites()[i];
-            bildListe[i + 1].SetActive(true);
-        }
+            if (p.isConnected)
+                SendImageURLs(p);
+        }*/
     }
 
-    #region Buzzer
-    /**
-     * Aktiviert/Deaktiviert den Buzzer für alle Spieler
-     */
-    public void BuzzerAktivierenToggle(Toggle toggle)
+   
+
+    private void SendImageURLs(Player p)
     {
-        buzzerIsOn = toggle.isOn;
-        BuzzerAnzeige.SetActive(toggle.isOn);
+        string msg = "[ANZ]" + Config.AUKTION_SPIEL.getSelected().getElemente().Count + "[ANZ]";
+        for (int j = 0; j < Config.AUKTION_SPIEL.getSelected().getElemente().Count; j++)
+        {
+            string temp = "";
+            AuktionElement Elemente = Config.AUKTION_SPIEL.getSelected().getElemente()[j];
+            for (int i = 0; i < Elemente.getBilderURL().Length; i++)
+            {
+                temp += "<#>" + Elemente.getBilderURL()[i];
+            }
+            if (temp.Length > 3)
+                temp = temp.Substring(3);
+            msg += "[" + j + "]" + temp + "[" + j + "]";
+        }
+        Debug.LogError("#AuktionDownloadImages "+ p.name);
+        SendMessage("#AuktionDownloadImages "+msg, p);
     }
-    /**
-     * Spielt Sound ab, sperrt den Buzzer und zeigt den Spieler an
-     */
-    private void SpielerBuzzered(Player p)
-    {
-        if (!buzzerIsOn)
-            return;
-        buzzerIsOn = false;
-        Broadcast("#AudioBuzzerPressed " + p.id);
-        BuzzerSound.Play();
-        SpielerAnzeige[p.id - 1, 1].SetActive(true);
-    }
-    /**
-     * Gibt den Buzzer für alle Spieler frei
-     */
-    public void SpielerBuzzerFreigeben()
-    {
-        for (int i = 0; i < Config.SERVER_MAX_CONNECTIONS; i++)
-            SpielerAnzeige[i, 1].SetActive(false);
-        buzzerIsOn = BuzzerAnzeige.activeInHierarchy;
-        Broadcast("#BuzzerFreigeben");
-    }
-    #endregion
     #region Spieler Ausgetabt Anzeige
     /**
      * Austaben wird allen/keinen Spielern angezeigt
@@ -423,49 +629,6 @@ public class AuktionServer : MonoBehaviour
     }
     #endregion
     #region Punkte
-    /**
-     * Punkte Pro Richtige Antworten Anzeigen
-     */
-    public void ChangePunkteProRichtigeAntwort(TMP_InputField input)
-    {
-        PunkteProRichtige = Int32.Parse(input.text);
-    }
-    /**
-     * Punkte Pro Falsche Antworten Anzeigen
-     */
-    public void ChangePunkteProFalscheAntwort(TMP_InputField input)
-    {
-        PunkteProFalsche = Int32.Parse(input.text);
-    }
-
-    /**
-     * Vergibt an den Spieler Punkte für eine richtige Antwort
-     */
-    public void PunkteRichtigeAntwort(GameObject player)
-    {
-        Broadcast("#AudioRichtigeAntwort");
-        RichtigeAntwortSound.Play();
-        int pId = Int32.Parse(player.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
-        int pIndex = Player.getPosInLists(pId);
-        Config.PLAYERLIST[pIndex].points += PunkteProRichtige;
-        UpdateSpielerBroadcast();
-    }
-    /**
-     * Vergibt an alle anderen Spieler Punkte bei einer falschen Antwort
-     */
-    public void PunkteFalscheAntwort(GameObject player)
-    {
-        Broadcast("#AudioFalscheAntwort");
-        FalscheAntwortSound.Play();
-        int pId = Int32.Parse(player.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
-        foreach (Player p in Config.PLAYERLIST)
-        {
-            if (pId != p.id && p.isConnected)
-                p.points += PunkteProFalsche;
-        }
-        Config.SERVER_PLAYER_POINTS += PunkteProFalsche;
-        UpdateSpielerBroadcast();
-    }
     /**
      * Ändert die Punkte des Spielers (+-1)
      */
@@ -506,7 +669,6 @@ public class AuktionServer : MonoBehaviour
     {
         int pId = Int32.Parse(button.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
         SpielerAnzeige[(pId - 1), 1].SetActive(true);
-        buzzerIsOn = false;
         Broadcast("#SpielerIstDran " + pId);
     }
     /**
@@ -520,190 +682,103 @@ public class AuktionServer : MonoBehaviour
         for (int i = 0; i < Config.SERVER_MAX_CONNECTIONS; i++)
             if (SpielerAnzeige[i, 1].activeInHierarchy)
                 return;
-        buzzerIsOn = BuzzerAnzeige.activeInHierarchy; // Buzzer wird erst aktiviert wenn keiner mehr dran ist
+
         Broadcast("#SpielerIstNichtDran " + pId);
     }
     #endregion
 
-    #region Mosaik Anzeige
-    /**
-     * Initialisiert die Anzeigen des Quizzes
-     */
-    private void InitMosaik()
+    #region Auktion Anzeige
+    public void ShowCustomImage(TMP_InputField input)
     {
-        BildTitel = GameObject.Find("MosaikAnzeige/Server/Titel").GetComponent<TMP_Text>();
-        BildTitel.text = Config.MOSAIK_SPIEL.getBeispiel().name;
-        // ImageAnzeige
-        Bild = new GameObject[49];
-        BildVorschau = new GameObject[49];
-        coverlist = new List<int>();
-        for (int i = 0; i < 49; i++)
-        {
-            Bild[i] = GameObject.Find("MosaikAnzeige/Image/Cover (" + i + ")");
-            Bild[i].GetComponent<Animator>().enabled = false;
-            Bild[i].GetComponent<RectTransform>().sizeDelta = new Vector2(100, 100);
-            Bild[i].GetComponent<RectTransform>().eulerAngles = new Vector3(0, 0, 0);
-            Bild[i].GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
-            BildVorschau[i] = GameObject.Find("MosaikAnzeige/Server/Vorschau/Cover (" + i + ")");
-            coverlist.Add(i);
-        }
-        Bild[0].transform.parent.gameObject.GetComponent<Image>().sprite = Config.MOSAIK_SPIEL.getBeispiel();
-        Bild[0].transform.parent.gameObject.SetActive(false);
-        BildVorschau[0].transform.parent.gameObject.GetComponent<Image>().sprite = Config.MOSAIK_SPIEL.getBeispiel();
-
-        bildIndex = 0;
-        bildListe = new GameObject[21];
-        for (int i = 0; i < 21; i++)
-        {
-            bildListe[i] = GameObject.Find("MosaikAnzeige/Server/ImageVorschau/Image (" + i + ")");
-            bildListe[i].SetActive(false);
-        }
-
-        BildVorschau[0].GetComponent<Image>().sprite = Config.MOSAIK_SPIEL.getBeispiel();
-        bildListe[0].SetActive(true);
-        bildListe[0].GetComponent<Image>().sprite = Config.MOSAIK_SPIEL.getBeispiel();
-        for (int i = 0; i < Config.MOSAIK_SPIEL.getSelected().getSprites().Count; i++)
-        {
-            bildListe[i+1].GetComponent<Image>().sprite = Config.MOSAIK_SPIEL.getSelected().getSprites()[i];
-            bildListe[i+1].SetActive(true);
-        }
-
-        List<string> games = new List<string>();
-        foreach (Mosaik m in Config.MOSAIK_SPIEL.getMosaike())
-        {
-            games.Add(m.getTitel());
-        }
-        GameObject.Find("Einstellungen/ChangeMosaik").GetComponent<TMP_Dropdown>().ClearOptions();
-        GameObject.Find("Einstellungen/ChangeMosaik").GetComponent<TMP_Dropdown>().AddOptions(games);
-        GameObject.Find("Einstellungen/ChangeMosaik").GetComponent<TMP_Dropdown>().value = Config.MOSAIK_SPIEL.getIndex(Config.MOSAIK_SPIEL.getSelected());
-
-    }
-    /**
-     * Blendet das Nächste/Vorherige Element in der Vorschau ein
-     */
-    public void MosaikNächstesElement(int vor)
-    {
-        if ((bildIndex + vor) < 0 || (bildIndex + vor) > Config.MOSAIK_SPIEL.getSelected().getSprites().Count)
-        {
+        if (input.text.Length == 0)
             return;
-        }
-        bildIndex += vor;
+        Broadcast("#ShowCustomImage "+input.text);
+        StartCoroutine(LoadImageIntoScene(input.text));
+    }
+    public void HideImage()
+    {
+        Broadcast("#HideImage");
+        BildAnzeige.gameObject.SetActive(false);
+    }
+    IEnumerator LoadImageIntoScene(string url)
+    {
+        UnityWebRequest www = UnityWebRequestTexture.GetTexture(url);
+        yield return www.SendWebRequest();
 
-        if (bildIndex == 0)
+        if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
         {
-            BildVorschau[0].transform.parent.gameObject.GetComponent<Image>().sprite = Config.MOSAIK_SPIEL.getBeispiel();
-            BildTitel.text = Config.MOSAIK_SPIEL.getBeispiel().name;
+            Debug.LogError("Auktion: Bild konnte nicht geladen werden: " + url + " << " + www.error);
         }
         else
         {
-            BildVorschau[0].transform.parent.gameObject.GetComponent<Image>().sprite = Config.MOSAIK_SPIEL.getSelected().getSprites()[bildIndex-1];
-            BildTitel.text = Config.MOSAIK_SPIEL.getSelected().getSprites()[bildIndex-1].name;
+            Texture2D texture = ((DownloadHandlerTexture)www.downloadHandler).texture;
+            Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero);
+            BildAnzeige.sprite = sprite;
+            BildAnzeige.gameObject.SetActive(true);
         }
-
-        // Blendet Cover ein
-        for (int i = 0; i < 49; i++)
-        {
-            BildVorschau[i].GetComponent<RectTransform>().sizeDelta = new Vector2(70, 70);
-            BildVorschau[i].GetComponent<RectTransform>().eulerAngles = new Vector3(0, 0, 0);
-            BildVorschau[i].GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
-            BildVorschau[i].SetActive(true);
-        }
+        yield return null;
     }
-    /**
-     * Zeigt allen das ausgewählte Element
-     */
-    public void MosaikEinblendenAusblenden(bool einblenden)
-    {
-        Broadcast("#MosaikEinblendenAusblenden [BOOL]" + einblenden + "[BOOL][BILD]" + bildIndex + "[BILD][GAME]"+Config.MOSAIK_SPIEL.getIndex(Config.MOSAIK_SPIEL.getSelected())+"[GAME]");
 
-        if (einblenden == true)
+    public void SpielerKontoFestlegen(TMP_InputField input)
+    {
+        if (input.text.Length == 0)
+            return;
+        UpdateKonten();
+        Broadcast("#SpielerKonto "+ input.text);
+    }
+    public void ChangePreis(TMP_InputField input)
+    {
+        if (input.text.Length == 0)
+            return;
+        int item = Int32.Parse(input.transform.parent.name.Replace("Element (", "").Replace(")", "")) - 1;
+        Config.AUKTION_SPIEL.getSelected().getElemente()[item].setPreis(float.Parse(input.text));
+
+        UpdateKonten();
+    }
+    public void SetVerkaufspreis(TMP_InputField input)
+    {
+        if (input.text.Length == 0)
+            return;
+        int item = Int32.Parse(input.transform.parent.name.Replace("Element (", "").Replace(")", "")) - 1;
+        Config.AUKTION_SPIEL.getSelected().getElemente()[item].setVerkaufspreis(float.Parse(input.text));
+
+        UpdateKonten();
+    }
+    public void ShowItemImage(GameObject go)
+    {
+        int item = Int32.Parse(go.transform.parent.name.Replace("Element (", "").Replace(")", "")) -1;
+        int bild = Int32.Parse(go.name.Replace("Bild (", "").Replace(")", "")) - 1;
+        BildAnzeige.sprite = Config.AUKTION_SPIEL.getSelected().getElemente()[item].getBilder()[bild];
+        BildAnzeige.gameObject.SetActive(true);
+        Broadcast("#ShowItemImage " + item + "|" + bild);
+    }
+    public void SellItemToPlayer(TMP_Dropdown drop)
+    {
+        int item = Int32.Parse(drop.transform.parent.name.Replace("Element (", "").Replace(")", "")) - 1;
+        //Broadcast("#SellItemToPlayer " + drop.value + "|" + item);
+        // Verkauf wird zurückgenommen
+        if (drop.value == 0)
         {
-            coverlist = new List<int>();
-            //BildVorschau[0].transform.parent.gameObject.GetComponent<Image>().sprite = Config.MOSAIK_SPIEL.getSelected().getSprites()[bildIndex];
-            //BildTitel.text = Config.MOSAIK_SPIEL.getSelected().getSprites()[bildIndex].name;
-            if (bildIndex == 0)
-            {
-                Bild[0].transform.parent.gameObject.GetComponent<Image>().sprite = Config.MOSAIK_SPIEL.getBeispiel();
-                Bild[0].transform.parent.gameObject.SetActive(true);
-            }
-            else
-            {
-                Bild[0].transform.parent.gameObject.GetComponent<Image>().sprite = Config.MOSAIK_SPIEL.getSelected().getSprites()[bildIndex-1];
-                Bild[0].transform.parent.gameObject.SetActive(true);
-            }
-            // Blendet Cover ein
-            for (int i = 0; i < 49; i++)
-            {
-                coverlist.Add(i);
-                Bild[i].GetComponent<RectTransform>().sizeDelta = new Vector2(100, 100);
-                Bild[i].GetComponent<RectTransform>().eulerAngles = new Vector3(0, 0, 0);
-                Bild[i].GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
-                Bild[i].GetComponent<Animator>().enabled = false;
-                Bild[i].SetActive(true);
-            }
-            // Blendet Cover ein
-            for (int i = 0; i < 49; i++)
-            {
-                BildVorschau[i].SetActive(true);
-            }
+            Config.AUKTION_SPIEL.getSelected().getElemente()[item].setWurdeverkauft(false);
+            Config.AUKTION_SPIEL.getSelected().getElemente()[item].setKaueferId(0);
         }
+        // Item wird verkauft
         else
         {
-            Bild[0].transform.parent.gameObject.SetActive(false);
+            int id = drop.value;
+            Config.AUKTION_SPIEL.getSelected().getElemente()[item].setWurdeverkauft(true);
+            Config.AUKTION_SPIEL.getSelected().getElemente()[item].setKaueferId(id);
         }
+
+        UpdateKonten();
     }
-    /**
-     * Löst zufällige Cover auf
-     */
-    public void MosaikZufälligesAuflösen()
+    public void ShowAllKonten(Toggle toggle)
     {
-        if (coverlist.Count == 0)
-            return;
-        int random = coverlist[UnityEngine.Random.Range(0, coverlist.Count)];
-        coverlist.Remove(random);
-
-        Broadcast("#MosaikCoverAuflösen " + random);
-
-        Bild[random].SetActive(false);
-        Bild[random].GetComponent<Animator>().enabled = false;
-        Bild[random].GetComponent<Animator>().enabled = true;
-        Bild[random].SetActive(true);
-        BildVorschau[random].SetActive(false);
+        Broadcast("#ShowAllKonten " + toggle.isOn);
     }
-    /**
-     * Löst bestimmtes Cover auf
-     */
-    public void MosaikBestimmtesAuflösen(Button go)
+    public void ShowAllGUV(Toggle toggle)
     {
-        int index = Int32.Parse(go.gameObject.name.Replace("Cover (", "").Replace(")", ""));
-        Broadcast("#MosaikCoverAuflösen " + index);
-
-        Bild[index].SetActive(false);
-        Bild[index].GetComponent<Animator>().enabled = false;
-        Bild[index].GetComponent<Animator>().enabled = true;
-        Bild[index].SetActive(true);
-        go.gameObject.SetActive(false);
-        coverlist.Remove(index);
-    }
-    /**
-     * Löst alle Cover auf
-     */
-    public void MosaikAllesAuflösen()
-    {
-        if (coverlist.Count == 0)
-            return;
-        Broadcast("#MosaikAllesAuflösen");
-
-        while (coverlist.Count > 0)
-        {
-            Bild[coverlist[0]].SetActive(false);
-            Bild[coverlist[0]].GetComponent<Animator>().enabled = false;
-            Bild[coverlist[0]].GetComponent<Animator>().enabled = true;
-            Bild[coverlist[0]].SetActive(true);
-            BildVorschau[coverlist[0]].SetActive(false);
-            coverlist.RemoveAt(0);
-        }
+        Broadcast("#ShowAllGUV " + toggle.isOn);
     }
     #endregion
-
 }

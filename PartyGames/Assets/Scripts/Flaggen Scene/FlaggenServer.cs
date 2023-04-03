@@ -42,6 +42,22 @@ public class FlaggenServer : MonoBehaviour
         PlayerConnected = new bool[Config.SERVER_MAX_CONNECTIONS];
         InitAnzeigen();
         InitFlaggen();
+
+        StartCoroutine(TestConnectionToClients());
+    }
+
+    IEnumerator TestConnectionToClients()
+    {
+        while (true)
+        {
+            foreach (Player p in Config.PLAYERLIST)
+            {
+                yield return new WaitForSeconds(15);
+                if (!p.isConnected)
+                    continue;
+                SendMessage("#TestConnection", p);
+            }
+        }
     }
 
     void Update()
@@ -182,6 +198,8 @@ public class FlaggenServer : MonoBehaviour
         catch (Exception e)
         {
             Logging.add(new Logging(Logging.Type.Error, "Server", "SendMessage", "Nachricht an Client: " + sc.id + " (" + sc.name + ") konnte nicht gesendet werden." + e));
+            // Verbindung zum Client wird getrennt
+            ClientClosed(sc);
         }
     }
     /**
@@ -227,7 +245,7 @@ public class FlaggenServer : MonoBehaviour
     public void Commands(Player player, string data, string cmd)
     {
         // Zeigt alle einkommenden Nachrichten an
-        Debug.Log(player.name + " " + player.id + " -> " + cmd + "   ---   " + data);
+        //Debug.Log(player.name + " " + player.id + " -> " + cmd + "   ---   " + data);
         // Sucht nach Command
         switch (cmd)
         {
@@ -238,6 +256,8 @@ public class FlaggenServer : MonoBehaviour
             case "#ClientClosed":
                 ClientClosed(player);
                 UpdateSpielerBroadcast();
+                break;
+            case "#TestConnection":
                 break;
             case "#ClientFocusChange":
                 ClientFocusChange(player, data);
@@ -387,7 +407,11 @@ public class FlaggenServer : MonoBehaviour
     private void SpielerBuzzered(Player p)
     {
         if (!buzzerIsOn)
+        {
+            Debug.Log(p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
             return;
+        }
+        Debug.LogWarning("B: " + p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
         buzzerIsOn = false;
         Broadcast("#AudioBuzzerPressed " + p.id);
         BuzzerSound.Play();
@@ -401,6 +425,7 @@ public class FlaggenServer : MonoBehaviour
         for (int i = 0; i < Config.SERVER_MAX_CONNECTIONS; i++)
             SpielerAnzeige[i, 1].SetActive(false);
         buzzerIsOn = BuzzerAnzeige.activeInHierarchy;
+        Debug.LogWarning("Buzzer freigegeben.");
         Broadcast("#BuzzerFreigeben");
     }
     #endregion
@@ -569,7 +594,7 @@ public class FlaggenServer : MonoBehaviour
      */
     private void InitFlaggen()
     {
-        FlaggenName.GetComponent<TMP_Text>().text = "Flaggen Name";
+        FlaggenName.GetComponent<TMP_Text>().text = "#Fragezeichen";
         FlaggenVorschauAnzeige.GetComponent<Image>().sprite = Config.FLAGGEN_SPIEL.getFragezeichenFlagge();
         InhaltVorschau.GetComponent<TMP_Text>().text = "Farben: \nHauptstadt: \nFläche: \nEinwohnerzahl:";
         List<string> namen = new List<string>();
@@ -648,7 +673,7 @@ public class FlaggenServer : MonoBehaviour
     {
         FlaggenOutline.SetActive(true);
         FlaggenImage.SetActive(true);
-        if (FlaggenAuswahl.GetComponent<TMP_Dropdown>().value == 1)
+        if (FlaggenAuswahl.GetComponent<TMP_Dropdown>().value == 1 || FlaggenName.GetComponent<TMP_Text>().text.Equals("#Fragezeichen"))
         {
             // Fragezeichen Flagge zeigen
             Broadcast("#FlaggenSpielAnzeige #Fragezeichen");
