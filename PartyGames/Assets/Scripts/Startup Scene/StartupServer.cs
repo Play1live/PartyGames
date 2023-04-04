@@ -969,27 +969,27 @@ public class StartupServer : MonoBehaviour
     {
         if (!ServerControlGameSelection.activeInHierarchy)
             return;
-        TMP_Dropdown QuizDropdown = GameObject.Find("GameSelection/Quiz/QuizAuswahl").GetComponent<TMP_Dropdown>();
+        TMP_Dropdown QuizDropdown = GameObject.Find("Quiz/QuizAuswahl").GetComponent<TMP_Dropdown>();
         QuizDropdown.ClearOptions();
         QuizDropdown.AddOptions(Config.QUIZ_SPIEL.getQuizzeAsStringList());
 
-        TMP_Dropdown ListenDropdown = GameObject.Find("GameSelection/Listen/ListenAuswahl").GetComponent<TMP_Dropdown>();
+        TMP_Dropdown ListenDropdown = GameObject.Find("Listen/ListenAuswahl").GetComponent<TMP_Dropdown>();
         ListenDropdown.ClearOptions();
         ListenDropdown.AddOptions(Config.LISTEN_SPIEL.getListenAsStringList());
 
-        TMP_Dropdown MosaikDropdown = GameObject.Find("GameSelection/Mosaik/Auswahl").GetComponent<TMP_Dropdown>();
+        TMP_Dropdown MosaikDropdown = GameObject.Find("Mosaik/Auswahl").GetComponent<TMP_Dropdown>();
         MosaikDropdown.ClearOptions();
         MosaikDropdown.AddOptions(Config.MOSAIK_SPIEL.getListenAsStringList());
 
-        TMP_Dropdown GeheimwoerterDropdown = GameObject.Find("GameSelection/Geheimwörter/Auswahl").GetComponent<TMP_Dropdown>();
+        TMP_Dropdown GeheimwoerterDropdown = GameObject.Find("Geheimwörter/Auswahl").GetComponent<TMP_Dropdown>();
         GeheimwoerterDropdown.ClearOptions();
         GeheimwoerterDropdown.AddOptions(Config.GEHEIMWOERTER_SPIEL.getListenAsStringList());
 
-        TMP_Dropdown WerBietetMehrDropdown = GameObject.Find("GameSelection/WerBietetMehr/Auswahl").GetComponent<TMP_Dropdown>();
+        TMP_Dropdown WerBietetMehrDropdown = GameObject.Find("WerBietetMehr/Auswahl").GetComponent<TMP_Dropdown>();
         WerBietetMehrDropdown.ClearOptions();
         WerBietetMehrDropdown.AddOptions(Config.WERBIETETMEHR_SPIEL.getQuizzeAsStringList());
 
-        TMP_Dropdown AuktionDropdown = GameObject.Find("GameSelection/Auktion/Auswahl").GetComponent<TMP_Dropdown>();
+        TMP_Dropdown AuktionDropdown = GameObject.Find("Auktion/Auswahl").GetComponent<TMP_Dropdown>();
         AuktionDropdown.ClearOptions();
         AuktionDropdown.AddOptions(Config.AUKTION_SPIEL.getListenAsStringList());
     }
