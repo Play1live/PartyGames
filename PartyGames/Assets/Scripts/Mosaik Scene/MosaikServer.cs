@@ -37,22 +37,6 @@ public class MosaikServer : MonoBehaviour
         PlayerConnected = new bool[Config.SERVER_MAX_CONNECTIONS];
         InitAnzeigen();
         InitMosaik();
-
-        StartCoroutine(TestConnectionToClients());
-    }
-
-    IEnumerator TestConnectionToClients()
-    {
-        while (true)
-        {
-            foreach (Player p in Config.PLAYERLIST)
-            {
-                yield return new WaitForSeconds(15);
-                if (!p.isConnected)
-                    continue;
-                SendMessage("#TestConnection", p);
-            }
-        }
     }
 
     void Update()
@@ -574,7 +558,6 @@ public class MosaikServer : MonoBehaviour
         }
         Bild[0].transform.parent.gameObject.GetComponent<Image>().sprite = Config.MOSAIK_SPIEL.getBeispiel();
         Bild[0].transform.parent.gameObject.SetActive(false);
-        BildVorschau[0].transform.parent.gameObject.GetComponent<Image>().sprite = Config.MOSAIK_SPIEL.getBeispiel();
 
         bildIndex = 0;
         bildListe = new GameObject[21];

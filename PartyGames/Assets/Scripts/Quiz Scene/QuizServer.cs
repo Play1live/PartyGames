@@ -38,22 +38,6 @@ public class QuizServer : MonoBehaviour
         PlayerConnected = new bool[Config.SERVER_MAX_CONNECTIONS];
         InitAnzeigen();
         InitQuiz();
-
-        StartCoroutine(TestConnectionToClients());
-    }
-
-    IEnumerator TestConnectionToClients()
-    {
-        while (true)
-        {
-            foreach (Player p in Config.PLAYERLIST)
-            {
-                yield return new WaitForSeconds(15);
-                if (!p.isConnected)
-                    continue;
-                SendMessage("#TestConnection", p);
-            }
-        }
     }
 
     void Update()

@@ -969,6 +969,7 @@ public class StartupServer : MonoBehaviour
     {
         if (!ServerControlGameSelection.activeInHierarchy)
             return;
+
         TMP_Dropdown QuizDropdown = GameObject.Find("Quiz/QuizAuswahl").GetComponent<TMP_Dropdown>();
         QuizDropdown.ClearOptions();
         QuizDropdown.AddOptions(Config.QUIZ_SPIEL.getQuizzeAsStringList());

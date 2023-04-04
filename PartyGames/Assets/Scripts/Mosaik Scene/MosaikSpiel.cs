@@ -42,7 +42,8 @@ public class MosaikSpiel
         List<string> list = new List<string>();
         foreach (Mosaik mosaik in mosaike)
         {
-            list.Add(mosaik.getTitel());
+            if (mosaik.getSprites().Count > 0)
+                list.Add(mosaik.getTitel());
         }
         return list;
     }

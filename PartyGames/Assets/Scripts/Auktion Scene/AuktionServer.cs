@@ -33,7 +33,6 @@ public class AuktionServer : MonoBehaviour
         InitAnzeigen(); // Crasht wenn spieler mit in der Lobby sind
         //InitAuktion();
         StartCoroutine(LoadAllAuktionImages());
-        //StartCoroutine(TestConnectionToClients()); // Braucht der Server eig nicht, nur Client
     }
 
     IEnumerator LoadAllAuktionImages()
@@ -68,21 +67,6 @@ public class AuktionServer : MonoBehaviour
         yield return null;
         InitAuktion();
     }
-
-    IEnumerator TestConnectionToClients()
-    {
-        while (true)
-        {
-            foreach (Player p in Config.PLAYERLIST)
-            {
-                yield return new WaitForSeconds(15);
-                if (!p.isConnected)
-                    continue;
-                SendMessage("#TestConnection", p);
-            }
-        }
-    }
-
     void Update()
     {
         #region Server
