@@ -26,7 +26,7 @@ MonoBehaviour:
     \"https://github.com/Play1live/PartyGames/releases/latest/download/PartyGames.zip\"\r\n   
     }\r\n  },\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"015bb440-f110-46cd-b907-a22b8dc3d69d\"\r\n   
     },\r\n    \"rs\": {\r\n      \"key\": \"Program_Download_Version\",\r\n     
-    \"type\": \"string\",\r\n      \"value\": \"1.6c\"\r\n    }\r\n  }\r\n]"
+    \"type\": \"string\",\r\n      \"value\": \"1.8c\"\r\n    }\r\n  }\r\n]"
   _rsLastCachedKeyList: "[\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"615bee1d-8105-4d16-bdf5-153a0c9fc742\"\r\n   
     },\r\n    \"rs\": {\r\n      \"key\": \"Server_Connection_IP\",\r\n      \"type\":
     \"string\",\r\n      \"value\": \"playgamesip.ddns.net\"\r\n    }\r\n  },\r\n 
@@ -41,7 +41,7 @@ MonoBehaviour:
     \"https://github.com/Play1live/PartyGames/releases/latest/download/PartyGames.zip\"\r\n   
     }\r\n  },\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"015bb440-f110-46cd-b907-a22b8dc3d69d\"\r\n   
     },\r\n    \"rs\": {\r\n      \"key\": \"Program_Download_Version\",\r\n     
-    \"type\": \"string\",\r\n      \"value\": \"1.6c\"\r\n    }\r\n  }\r\n]"
+    \"type\": \"string\",\r\n      \"value\": \"1.8c\"\r\n    }\r\n  }\r\n]"
   _environments: "[\r\n  {\r\n    \"projectId\": \"760eff2f-db4d-47b7-8854-a3f5a42b7f80\",\r\n   
     \"name\": \"production\",\r\n    \"id\": \"90d90299-0bff-4ddf-b505-8ca560908f14\",\r\n   
     \"isDefault\": true,\r\n    \"createdAt\": \"2023-02-26T17:23:41Z\",\r\n    \"updatedAt\":
