@@ -32,9 +32,10 @@ public class StartupScene : MonoBehaviour
         Config.isServer = true;
         Debug.Log("DataPath: " + Config.MedienPath);
         Application.targetFrameRate = 120;
+        Config.PLAYER_NAME = "Henryk";
 #endif
         /*Testzwecke*/// TODO
-                       //Config.isServer = !Config.isServer;
+                      //Config.isServer = !Config.isServer;
 
         //Config.isServer = false;
 
@@ -81,6 +82,12 @@ public class StartupScene : MonoBehaviour
                 GameObject.Find("Version_LBL").gameObject.GetComponent<TMP_Text>().text = "Version: " + Config.APPLICATION_VERSION;
             }
         }
+
+        // Autostart für Server
+#if UNITY_EDITOR
+        if (Config.isServer)
+            StartConnection();
+#endif
     }
     IEnumerator LoadGameFilesAsync()
     {
