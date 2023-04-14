@@ -35,9 +35,9 @@ public class StartupScene : MonoBehaviour
         Config.PLAYER_NAME = "Henryk";
 #endif
         /*Testzwecke*/// TODO
-                      //Config.isServer = !Config.isServer;
+                     // Config.isServer = !Config.isServer;
 
-        //Config.isServer = false;
+        //Config.isServer = true;
 
         if (!Config.CLIENT_STARTED && !Config.SERVER_STARTED)
         {
@@ -85,7 +85,7 @@ public class StartupScene : MonoBehaviour
 
         // Autostart für Server
 #if UNITY_EDITOR
-        if (Config.isServer)
+        if (Config.isServer && !Config.SERVER_STARTED)
             StartConnection();
 #endif
     }

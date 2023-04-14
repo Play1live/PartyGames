@@ -20,6 +20,7 @@ public class LoadConfigs
         Config.SERVER_CONNECTION_IP = ConfigManager.appConfig.GetString("Server_Connection_IP");
         Config.SERVER_CONNECTION_PORT = ConfigManager.appConfig.GetInt("Server_Connection_Port");
         Config.FULLSCREEN = ConfigManager.appConfig.GetBool("Program_Fullscreen");
+        Debug.Log("Fullscreen: "+ Config.FULLSCREEN);
 
         Logging.add(Logging.Type.Normal, "LoadConfigs", "FetchRemoteConfig", "Fetching Config completed...");
         
@@ -29,10 +30,6 @@ public class LoadConfigs
 
     private static void MoveToPrimaryDisplay()
     {
-        // Bewegt Bild nicht, wenn kein Vollbild
-        if (Config.FULLSCREEN == false)
-            return;
-
         List<DisplayInfo> displays = new List<DisplayInfo>();
         Screen.GetDisplayLayout(displays);
         if (displays?.Count > 1) // don't bother running if only one display exists...

@@ -11,6 +11,7 @@ public class Player
     public TcpClient tcp;
     public string name;
     public Sprite icon;
+    public int crowns;
     public int points;
 
     public Player(int id)
@@ -20,6 +21,7 @@ public class Player
         this.isDisconnected = false;
         this.tcp = null;
         this.name = "";
+        this.crowns = 0;
         this.points = 0;
         this.icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
     }

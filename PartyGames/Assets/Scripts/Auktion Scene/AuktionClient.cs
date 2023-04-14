@@ -290,6 +290,10 @@ public class AuktionClient : MonoBehaviour
             SpielerAnzeige[i, 4] = GameObject.Find("SpielerAnzeige/Player (" + (i + 1) + ")/Infobar/Name"); // Spieler Name
             SpielerAnzeige[i, 5] = GameObject.Find("SpielerAnzeige/Player (" + (i + 1) + ")/Infobar/Punkte"); // Spieler Punkte
 
+            GameObject servercontrol = GameObject.Find("SpielerAnzeige/Player (" + (i + 1) + ")/ServerControl");
+            if (servercontrol != null)
+                servercontrol.SetActive(false);
+
             SpielerAnzeige[i, 6] = GameObject.Find("SpielerAnzeige/Player (" + (i + 1) + ")/Elemente");
             for (int j = 0; j < 10; j++)
             {
@@ -399,6 +403,14 @@ public class AuktionClient : MonoBehaviour
     }
     private void SpielerKonto(string data)
     {
+        if (!data.EndsWith("€"))
+        {
+            if (!data.EndsWith(" "))
+                data = data + " ";
+            data = data + "€";
+        }
+
+
         for (int i = 0; i < Config.PLAYERLIST.Length; i++)
         {
             SpielerAnzeige[i, 7].GetComponent<TMP_InputField>().text = data;

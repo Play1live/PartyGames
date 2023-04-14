@@ -527,7 +527,15 @@ public class AuktionServer : MonoBehaviour
         {
             if (!p.isConnected)
                 continue;
-            float konto = float.Parse(GameObject.Find("Auktion/Server/KontoGuthaben").GetComponent<TMP_InputField>().text);
+            float konto = 0;
+            try
+            {
+                konto = float.Parse(GameObject.Find("Auktion/Server/KontoGuthaben").GetComponent<TMP_InputField>().text);
+            }
+            catch (Exception e)
+            {
+                return;
+            }
             float guv = 0;
             foreach (AuktionElement element in Config.AUKTION_SPIEL.getSelected().getElemente())
             {

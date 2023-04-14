@@ -20,8 +20,10 @@ public class Config
     public static TcpListener SERVER_TCP;
     public static bool SERVER_STARTED;
     public static bool SERVER_ALL_CONNECTED;
+
     public static Sprite SERVER_ICON = Resources.Load<Sprite>("Images/ProfileIcons/empty");
     public static int SERVER_PLAYER_POINTS = 0;
+    public static int SERVER_CROWNS = 0;
 
     // Client Infos
     public static TcpClient CLIENT_TCP;

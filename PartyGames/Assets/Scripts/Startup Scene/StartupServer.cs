@@ -57,7 +57,7 @@ public class StartupServer : MonoBehaviour
                 return;
             }
             // Wenn Server "Henryk" bild legen
-            if (Config.PLAYER_NAME.ToLower().Equals("henryk") || Config.PLAYER_NAME.ToLower().Equals("play1live") || Config.PLAYER_NAME.ToLower().Equals("play"))
+            if (Config.PLAYER_NAME.ToLower().Equals("henryk"))
             {
                 Config.SERVER_ICON = FindIconByName("Henryk");
                 UpdateSpieler();
@@ -67,18 +67,8 @@ public class StartupServer : MonoBehaviour
             Config.HAUPTMENUE_FEHLERMELDUNG = "";
             SperreGameSelection();
 
-           // StartCoroutine(TestConnectionToClients());
         }
         #endregion
-
-        // Potenziell Fehleranfällig, wenn Dateien nicht korrekt sind
-        try
-        {
-            //SetupSpiele.LoadGameFiles();
-        } catch (Exception e)
-        {
-            Logging.add(Logging.Type.Error, "StartupServer", "Start", "Es kam zu einem Fehler beim Laden der Spieldateien!\n", e);
-        }
 
         Hauptmenue.SetActive(false);
         Lobby.SetActive(true);
@@ -88,25 +78,12 @@ public class StartupServer : MonoBehaviour
         if (ServerControlGameSelection.activeInHierarchy && ServerControlGameSelection.transform.GetChild(1).gameObject.activeInHierarchy)
             DisplayGameFiles();
         UpdateSpieler();
-    }
-
-    IEnumerator TestConnectionToClients()
-    {
-        while (true)
-        {
-            foreach (Player p in Config.PLAYERLIST)
-            {
-                yield return new WaitForSeconds(15);
-                if (!p.isConnected)
-                    continue;
-                SendMessage("#TestConnection", p);
-            }
-        }
     }
 
     private void OnEnable()
     {
-        //EventSystem.SetActive(true);
+        InitPlayerLobby();
+
         Hauptmenue.SetActive(false);
         Lobby.SetActive(true);
         ServerControl.SetActive(true);
@@ -115,6 +92,7 @@ public class StartupServer : MonoBehaviour
         if (ServerControlGameSelection.activeInHierarchy && ServerControlGameSelection.transform.GetChild(1).gameObject.activeInHierarchy)
             DisplayGameFiles();
         UpdateSpieler();
+        UpdateCrowns();
     }
 
     void Update()
@@ -152,12 +130,11 @@ public class StartupServer : MonoBehaviour
             }*/
             #endregion
             #region Sucht nach neuen Nachrichten
-            /*else*/ if (spieler.isConnected == true)
+            /*else*/ if (spieler.isConnected == true && spieler.tcp != null)
             {
                 NetworkStream stream = spieler.tcp.GetStream();
                 if (stream.DataAvailable)
                 {
-                    //StreamReader reader = new StreamReader(stream, true);
                     StreamReader reader = new StreamReader(stream);
                     string data = reader.ReadLine();
 
@@ -285,7 +262,9 @@ public class StartupServer : MonoBehaviour
         }
         // Spieler sind voll
         if (freierS == null)
+        {
             return;
+        }
 
         TcpListener listener = (TcpListener)ar.AsyncState;
         freierS.isConnected = true;
@@ -307,6 +286,8 @@ public class StartupServer : MonoBehaviour
 
         // Sendet neuem Spieler zugehörige ID
         SendMessage("#SetID " + freierS.id, freierS);
+        // Legt Default PingImage fest
+        SpielerAnzeigeLobby[freierS.id].transform.GetChild(3).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Ping/Ping 0");
         Logging.add(Logging.Type.Normal, "Server", "AcceptTcpClient", "Spieler: " + freierS.id + " ist jetzt verbunden. IP:" + freierS.tcp.Client.RemoteEndPoint);
     }
     #endregion
@@ -396,6 +377,11 @@ public class StartupServer : MonoBehaviour
             case "#ChangePlayerName":
                 ChangePlayerName(player, data);
                 break;
+            case "#PlayerPing":
+                Debug.Log("PlayerPing: "+ player.name +" -> "+data);
+                PlayerPing(player, data);
+                UpdatePing();
+                break;
 
             // Minigames
             case "#StartTickTackToe":
@@ -469,6 +455,30 @@ public class StartupServer : MonoBehaviour
         }*/
     }
     /**
+     * Init Lobby Anzeigen
+     */
+    private void InitPlayerLobby()
+    {
+        // Für Server Host
+        SpielerAnzeigeLobby[0].transform.GetChild(4).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Top4");
+        SpielerAnzeigeLobby[0].transform.GetChild(4).gameObject.SetActive(false);
+        SpielerAnzeigeLobby[0].transform.GetChild(5).GetComponent<TMP_Text>().text = "";
+
+        // Blendet Leere Spieler aus
+        for (int i = 0; i < Config.PLAYERLIST.Length; i++)
+        {
+            if (Config.PLAYERLIST[i].name == "")
+                SpielerAnzeigeLobby[i + 1].SetActive(false);
+            else
+                SpielerAnzeigeLobby[i + 1].SetActive(true);
+
+            // Blendet Top3 Stuff aus
+            SpielerAnzeigeLobby[i + 1].transform.GetChild(4).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Top4");
+            SpielerAnzeigeLobby[i + 1].transform.GetChild(4).gameObject.SetActive(false);
+            SpielerAnzeigeLobby[i + 1].transform.GetChild(5).GetComponent<TMP_Text>().text = "";
+        }
+    }
+    /**
      * Sendet die aktualisierten Spielerinfos an alle Spieler
      */
     private void UpdateSpielerBroadcast()
@@ -525,6 +535,151 @@ public class StartupServer : MonoBehaviour
         }
         Debug.Log(msg);
         return msg;
+    }
+
+    private void UpdatePing()
+    {
+        string msg = "#UpdatePing [0]" + SpielerAnzeigeLobby[0].transform.GetChild(3).GetComponent<Image>().sprite.name + "[0]";
+        foreach (Player player in Config.PLAYERLIST)
+        {
+            msg += "[" + player.id + "]" + SpielerAnzeigeLobby[player.id].transform.GetChild(3).GetComponent<Image>().sprite.name + "[" + player.id + "]";
+        }
+        Broadcast(msg);
+    }
+    private void UpdateCrowns()
+    {
+        int top1 = -1;
+        int top2 = -1;
+        int top3 = -1;
+        #region Kronen Zahlen festlegen
+        // Clients
+        for (int i = 0; i < Config.PLAYERLIST.Length; i++)
+        {
+            Player p = Config.PLAYERLIST[i];
+            if (p.crowns > top1)
+            {
+                top3 = top2;
+                top2 = top1;
+                top1 = p.crowns;
+            }
+            else if (p.crowns > top2)
+            {
+                top3 = top2;
+                top2 = p.crowns;
+            }
+            else if (p.crowns > top3)
+            {
+                top3 = p.crowns;
+            }
+
+            if (top2 == top1)
+            {
+                top2 = top3;
+                top3 = -1;
+            }
+            if (top3 == top2)
+            {
+                top3 = -1;
+            }
+        }
+        // Server
+        if (Config.SERVER_CROWNS > top1)
+        {
+            top3 = top2;
+            top2 = top1;
+            top1 = Config.SERVER_CROWNS;
+        }
+        else if (Config.SERVER_CROWNS > top2)
+        {
+            top3 = top2;
+            top2 = Config.SERVER_CROWNS;
+        }
+        else if (Config.SERVER_CROWNS > top3)
+        {
+            top3 = Config.SERVER_CROWNS;
+        }
+        if (top2 == top1)
+        {
+            top2 = top3;
+            top3 = -1;
+        }
+        if (top3 == top2)
+        {
+            top3 = -1;
+        }
+        #endregion
+
+
+        // Keine Anzeigen wenn noch keiner Punkte hat
+        if (top1 == 0)
+        {
+            SpielerAnzeigeLobby[0].transform.GetChild(5).GetComponent<TMP_Text>().text = "";
+            for (int i = 0; i < Config.PLAYERLIST.Length; i++)
+                SpielerAnzeigeLobby[i+1].transform.GetChild(5).GetComponent<TMP_Text>().text = "";
+
+            for (int i = 0; i < (Config.PLAYERLIST.Length + 1); i++)
+                SpielerAnzeigeLobby[i].transform.GetChild(4).gameObject.SetActive(false);
+            return;
+        }
+        if (top2 == 0)
+            top2 = -1;
+        if (top3 == 0)
+            top3 = -1;
+
+        #region Anzeigen Aktualisieren
+        // Clients
+        for (int i = 0; i < Config.PLAYERLIST.Length; i++)
+        {
+            SpielerAnzeigeLobby[i+1].transform.GetChild(5).GetComponent<TMP_Text>().text = "" + Config.PLAYERLIST[i].crowns;
+
+            if (Config.PLAYERLIST[i].crowns == top1)
+                SpielerAnzeigeLobby[i + 1].transform.GetChild(4).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Top1");
+            else if (Config.PLAYERLIST[i].crowns == top2)
+                SpielerAnzeigeLobby[i + 1].transform.GetChild(4).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Top2");
+            else if (Config.PLAYERLIST[i].crowns == top3)
+                SpielerAnzeigeLobby[i + 1].transform.GetChild(4).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Top3");
+            else
+                SpielerAnzeigeLobby[i + 1].transform.GetChild(4).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Top4");
+        }
+        // Server
+        SpielerAnzeigeLobby[0].transform.GetChild(5).GetComponent<TMP_Text>().text = "" + Config.SERVER_CROWNS;
+
+        if (Config.SERVER_CROWNS == top1)
+            SpielerAnzeigeLobby[0].transform.GetChild(4).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Top1");
+        else if (Config.SERVER_CROWNS == top2)
+            SpielerAnzeigeLobby[0].transform.GetChild(4).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Top2");
+        else if (Config.SERVER_CROWNS == top3)
+            SpielerAnzeigeLobby[0].transform.GetChild(4).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Top3");
+        else
+            SpielerAnzeigeLobby[0].transform.GetChild(4).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Top4");
+
+
+        // Clients
+        for (int i = 0; i < (Config.PLAYERLIST.Length + 1); i++)
+        {
+            if (i > 0)
+                SpielerAnzeigeLobby[i].transform.GetChild(4).gameObject.SetActive(true);
+            else
+                SpielerAnzeigeLobby[i].transform.GetChild(4).gameObject.SetActive(false);
+        }
+        // Server
+        if (Config.SERVER_CROWNS > 0)
+            SpielerAnzeigeLobby[0].transform.GetChild(4).gameObject.SetActive(true);
+        else
+        {
+            SpielerAnzeigeLobby[0].transform.GetChild(5).GetComponent<TMP_Text>().text = "";
+            SpielerAnzeigeLobby[0].transform.GetChild(4).gameObject.SetActive(false);
+        }
+
+
+        #endregion
+
+        string msg = "#UpdateCrowns [0]" + Config.SERVER_CROWNS + "[0]";
+        foreach (Player player in Config.PLAYERLIST)
+        {
+            msg += "[" + player.id + "]" + player.crowns + "[" + player.id + "]";
+        }
+        Broadcast(msg);
     }
 
     #region Spieler Namen Ändern
@@ -780,7 +935,8 @@ public class StartupServer : MonoBehaviour
                 IconFestlegen(p, neuesIcon);
                 return;
             }
-            else if (p.name.ToLower().Contains("munk"))
+            else if (p.name.ToLower().Contains("munk") || 
+                p.name.ToLower().Contains("munck"))
             {
                 neuesIcon = FindIconByName("Munk");
                 IconFestlegen(p, neuesIcon);
@@ -867,6 +1023,29 @@ public class StartupServer : MonoBehaviour
         UpdateSpielerBroadcast();
     }
     #endregion
+    /**
+     * Ping anzeige der Spieler
+     */
+    public void PlayerPing(Player p, string data)
+    {
+        int ping = Int32.Parse(data);
+        if (ping <= 10)
+        {
+            SpielerAnzeigeLobby[p.id].transform.GetChild(3).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Ping/Ping 3");
+        }
+        else if (ping > 10 && ping <= 25)
+        {
+            SpielerAnzeigeLobby[p.id].transform.GetChild(3).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Ping/Ping 2");
+        }
+        else if (ping > 25 && ping <= 100)
+        {
+            SpielerAnzeigeLobby[p.id].transform.GetChild(3).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Ping/Ping 1");
+        }
+        else if (ping > 100)
+        {
+            SpielerAnzeigeLobby[p.id].transform.GetChild(3).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Ping/Ping 0");
+        }
+    }
     #region MiniSpielauswahl
     /**
      * Wechselt das angezeigt Minigame in der Lobby für die Spieler
@@ -1071,6 +1250,63 @@ public class StartupServer : MonoBehaviour
         //SceneManager.LoadSceneAsync("Auktion");
         Broadcast("#StarteSpiel Auktion");
         SceneManager.LoadScene("Auktion");
+    }
+    #endregion
+    #region Crowns
+    public void CrownsAdd(GameObject button)
+    {
+        int pos = Int32.Parse(button.transform.parent.parent.name.Replace("Player (","").Replace(")","")) -1;
+
+        // Server
+        if (pos == -1)
+        {
+            if (button.name.Equals("+1"))
+                Config.SERVER_CROWNS++;
+            else if (button.name.Equals("-1"))
+                Config.SERVER_CROWNS--;
+
+            if (Config.SERVER_CROWNS < 0)
+                Config.SERVER_CROWNS = 0;
+        }
+        // Clients
+        else
+        {
+            if (button.name.Equals("+1"))
+                Config.PLAYERLIST[pos].crowns++;
+            else if (button.name.Equals("-1"))
+                Config.PLAYERLIST[pos].crowns--;
+
+            if (Config.PLAYERLIST[pos].crowns < 0)
+                Config.PLAYERLIST[pos].crowns = 0;
+        }
+        UpdateCrowns();
+    }
+    public void CrownsAddX(TMP_InputField input)
+    {
+        int punkte = 0;
+        try
+        {
+            punkte = int.Parse(input.text);
+            input.text = "";
+        }
+        catch (Exception e)
+        {
+            return;
+        }
+        int pos = Int32.Parse(input.transform.parent.parent.name.Replace("Player (", "").Replace(")", "")) - 1;
+
+        // Server
+        if (pos == -1)
+        {
+            Config.SERVER_CROWNS += punkte;
+        }
+        // Clients
+        else
+        {
+            Config.PLAYERLIST[pos].crowns += punkte;
+        }
+
+        UpdateCrowns();
     }
     #endregion
 }

@@ -17819,7 +17819,7 @@ MonoBehaviour:
   DeactivateForServer:
   - {fileID: 785900280}
   DeactivateForClient: []
-  imageUrl: https://raw.githubusercontent.com/Play1live/PartyGames/main/PartyGames/Assets/Resources/Spiele/Flaggen/%23Fragezeichen.png?token=GHSAT0AAAAAAB7JI6S3C6B5XXOWVYQJ74CEZAKCP5Q
+  imageUrl: https://images.t-online.de/2021/05/85574550v3/240x100:1440x1080/fit-in/1800x0/quiz-erkennen-sie-diese-15-tiere.jpg
   imageObject: {fileID: 1917913525}
 --- !u!1001 &1743757487
 PrefabInstance:
@@ -19797,7 +19797,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.8584906, g: 0.8584906, b: 0.8584906, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -19839,7 +19839,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -1519, y: 69}
+  m_AnchoredPosition: {x: 0, y: 20}
   m_SizeDelta: {x: 983.1746, y: 451.7237}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1926087493

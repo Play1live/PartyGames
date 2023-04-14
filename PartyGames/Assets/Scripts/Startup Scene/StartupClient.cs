@@ -18,11 +18,14 @@ public class StartupClient : MonoBehaviour
     [SerializeField] GameObject[] MiniGames;
     private string ticktacktoe = "";
     private string ticktacktoeRes = "W0WL0LD0D";
+    private bool PingWarteAufAntwort = false;
 
     [SerializeField] GameObject UmbenennenFeld;
 
     void OnEnable()
     {
+        InitPlayerLobby();
+
         MiniGames[0].SetActive(true);
         #region Client Verbindungsaufbau zum Server
         if (!Config.CLIENT_STARTED)
@@ -66,15 +69,37 @@ public class StartupClient : MonoBehaviour
         #endregion
 
         StartCoroutine(TestConnectionToServer());
+        StartCoroutine(TestIfStartConnectionError());
     }
     
+    IEnumerator TestIfStartConnectionError()
+    {
+        yield return new WaitForSeconds(10);
+        for (int i = 0; i < Config.PLAYERLIST.Length; i++)
+        {
+            if (SpielerAnzeigeLobby[i + 1].transform.GetChild(2).GetComponent<TMP_Text>().text == Config.PLAYER_NAME)
+            {
+                yield break;
+            }
+        }
+        CloseSocket();
+        Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server war fehlerhaft. Bitte versuche es erneut.";
+        SceneManager.LoadSceneAsync("StartUp");
+    }
+
     IEnumerator TestConnectionToServer()
     {
         while (Config.CLIENT_STARTED)
         {
+            while (PingWarteAufAntwort)
+            {
+                yield return new WaitForSeconds(1);
+            }
+            PingWarteAufAntwort = true;
             SendToServer("#TestConnection");
             Config.PingTime = DateTime.Now;
-            yield return new WaitForSeconds(10);
+            // TODO: 5 sekunden warten bis antwort kam
+            yield return new WaitForSeconds(5);
         }
     }
 
@@ -180,13 +205,14 @@ public class StartupClient : MonoBehaviour
                 Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung wurde Serverseitig beendet.";
                 SceneManager.LoadSceneAsync("StartUp");
                 break;
-            case "#ConnectionEstablished": // TODO: testweise Ping Berechnung
+            case "#ConnectionEstablished":
                 DateTime timenow = DateTime.Now;
                 DateTime timebefore = Config.PingTime;
                 int diffmillis = (timenow.Millisecond-timebefore.Millisecond) + (timenow.Second - timebefore.Second)*1000 + (timenow.Minute - timebefore.Minute)*1000*60 + (timenow.Hour - timebefore.Hour)*1000*60*60 + (timenow.Day - timebefore.Day)*1000*60*60*24;
                 // Ping ist diffmillis / 2 (hin und rückweg)
                 int ping = diffmillis / 2;
                 SendToServer("#PlayerPing " + ping);
+                PingWarteAufAntwort = false;
                 break;
             #endregion
 
@@ -201,6 +227,12 @@ public class StartupClient : MonoBehaviour
                 break;
             case "#UpdateSpieler":
                 UpdateSpieler(data);
+                break;
+            case "#UpdateCrowns":
+                UpdateCrowns(data);
+                break;
+            case "#UpdatePing":
+                UpdatePing(data);
                 break;
             case "#AllowNameChange":
                 AllowNameChange(data);
@@ -306,6 +338,32 @@ public class StartupClient : MonoBehaviour
         SendToServer("#SpielerIconChange");
     }
     /**
+     * Init Lobby Anzeigen
+     */
+    private void InitPlayerLobby()
+    {
+        // Für Server Host
+        SpielerAnzeigeLobby[0].transform.GetChild(4).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Top4");
+        SpielerAnzeigeLobby[0].transform.GetChild(4).gameObject.SetActive(false);
+        SpielerAnzeigeLobby[0].transform.GetChild(5).GetComponent<TMP_Text>().text = "";
+        SpielerAnzeigeLobby[0].transform.GetChild(6).gameObject.SetActive(false);
+
+        // Blendet Leere Spieler aus
+        for (int i = 0; i < Config.PLAYERLIST.Length; i++)
+        {
+            if (Config.PLAYERLIST[i].name == "")
+                SpielerAnzeigeLobby[i + 1].SetActive(false);
+            else
+                SpielerAnzeigeLobby[i + 1].SetActive(true);
+
+            // Blendet Top3 Stuff aus
+            SpielerAnzeigeLobby[i + 1].transform.GetChild(4).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Top4");
+            SpielerAnzeigeLobby[i + 1].transform.GetChild(4).gameObject.SetActive(false);
+            SpielerAnzeigeLobby[i + 1].transform.GetChild(5).GetComponent<TMP_Text>().text = "";
+            SpielerAnzeigeLobby[i + 1].transform.GetChild(6).gameObject.SetActive(false);
+        }
+    }
+    /**
      * Updated die Spieler
      * #UpdateSpieler
      */
@@ -361,6 +419,135 @@ public class StartupClient : MonoBehaviour
             if (Lobby.activeInHierarchy)
                 GameObject.Find("Lobby/Title_LBL/Spieleranzahl").GetComponent<TMP_Text>().text = spieleranzahl + "/" + (Config.PLAYERLIST.Length + 1);
         }
+    }
+
+    private void UpdatePing(string data)
+    {
+        SpielerAnzeigeLobby[0].transform.GetChild(3).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Ping/" + data.Replace("[0]", "|").Split('|')[1]);
+        foreach (Player p in Config.PLAYERLIST)
+        {
+            SpielerAnzeigeLobby[p.id].transform.GetChild(3).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Ping/" + data.Replace("[" + p.id + "]", "|").Split('|')[1]);
+        }
+    }
+
+    private void UpdateCrowns(string data)
+    {
+        #region Speichert Zahlen
+        // Server
+        Config.SERVER_CROWNS = Int32.Parse(data.Replace("[0]","|").Split('|')[1]);
+        foreach (Player p in Config.PLAYERLIST)
+        {
+            p.crowns = Int32.Parse(data.Replace("[" + p.id + "]", "|").Split('|')[1]);
+        }
+        #endregion
+
+
+        int top1 = -1;
+        int top2 = -1;
+        int top3 = -1;
+        #region Kronen Zahlen festlegen
+        // Clients
+        for (int i = 0; i < Config.PLAYERLIST.Length; i++)
+        {
+            Player p = Config.PLAYERLIST[i];
+            if (p.crowns > top1)
+            {
+                top3 = top2;
+                top2 = top1;
+                top1 = p.crowns;
+            }
+            else if (p.crowns > top2)
+            {
+                top3 = top2;
+                top2 = p.crowns;
+            }
+            else if (p.crowns > top3)
+            {
+                top3 = p.crowns;
+            }
+        }
+        // Server
+        if (Config.SERVER_CROWNS > top1)
+        {
+            top3 = top2;
+            top2 = top1;
+            top1 = Config.SERVER_CROWNS;
+        }
+        else if (Config.SERVER_CROWNS > top2)
+        {
+            top3 = top2;
+            top2 = Config.SERVER_CROWNS;
+        }
+        else if (Config.SERVER_CROWNS > top3)
+        {
+            top3 = Config.SERVER_CROWNS;
+        }
+        #endregion
+
+
+        // Keine Anzeigen wenn noch keiner Punkte hat
+        if (top1 == 0)
+        {
+            SpielerAnzeigeLobby[0].transform.GetChild(5).GetComponent<TMP_Text>().text = "";
+            for (int i = 0; i < Config.PLAYERLIST.Length; i++)
+                SpielerAnzeigeLobby[i + 1].transform.GetChild(5).GetComponent<TMP_Text>().text = "";
+
+            for (int i = 0; i < (Config.PLAYERLIST.Length + 1); i++)
+                SpielerAnzeigeLobby[i].transform.GetChild(4).gameObject.SetActive(false);
+            return;
+        }
+        if (top2 == 0)
+            top2 = -1;
+        if (top3 == 0)
+            top3 = -1;
+
+        #region Anzeigen Aktualisieren
+        // Clients
+        for (int i = 0; i < Config.PLAYERLIST.Length; i++)
+        {
+            SpielerAnzeigeLobby[i + 1].transform.GetChild(5).GetComponent<TMP_Text>().text = "" + Config.PLAYERLIST[i].crowns;
+
+            if (Config.PLAYERLIST[i].crowns == top1)
+                SpielerAnzeigeLobby[i + 1].transform.GetChild(4).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Top1");
+            else if (Config.PLAYERLIST[i].crowns == top2)
+                SpielerAnzeigeLobby[i + 1].transform.GetChild(4).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Top2");
+            else if (Config.PLAYERLIST[i].crowns == top3)
+                SpielerAnzeigeLobby[i + 1].transform.GetChild(4).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Top3");
+            else
+                SpielerAnzeigeLobby[i + 1].transform.GetChild(4).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Top4");
+        }
+        // Server
+        SpielerAnzeigeLobby[0].transform.GetChild(5).GetComponent<TMP_Text>().text = "" + Config.SERVER_CROWNS;
+
+        if (Config.SERVER_CROWNS == top1)
+            SpielerAnzeigeLobby[0].transform.GetChild(4).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Top1");
+        else if (Config.SERVER_CROWNS == top2)
+            SpielerAnzeigeLobby[0].transform.GetChild(4).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Top2");
+        else if (Config.SERVER_CROWNS == top3)
+            SpielerAnzeigeLobby[0].transform.GetChild(4).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Top3");
+        else
+            SpielerAnzeigeLobby[0].transform.GetChild(4).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Top4");
+
+
+        // Clients
+        for (int i = 0; i < (Config.PLAYERLIST.Length + 1); i++)
+        {
+            if (i > 0)
+                SpielerAnzeigeLobby[i].transform.GetChild(4).gameObject.SetActive(true);
+            else
+                SpielerAnzeigeLobby[i].transform.GetChild(4).gameObject.SetActive(false);
+        }
+        // Server
+        if (Config.SERVER_CROWNS > 0)
+            SpielerAnzeigeLobby[0].transform.GetChild(4).gameObject.SetActive(true);
+        else
+        {
+            SpielerAnzeigeLobby[0].transform.GetChild(5).GetComponent<TMP_Text>().text = "";
+            SpielerAnzeigeLobby[0].transform.GetChild(4).gameObject.SetActive(false);
+        }
+
+
+        #endregion
     }
 
     /**

@@ -20,7 +20,9 @@ public class FlaggenServer : MonoBehaviour
     GameObject InhaltVorschau;
     GameObject FlaggenAuswahl;
     GameObject KategorieAuswahl;
-    
+
+    GameObject[] SearchBar;
+
     bool buzzerIsOn = false;
 
     GameObject BuzzerAnzeige;
@@ -374,6 +376,14 @@ public class FlaggenServer : MonoBehaviour
             SpielerAnzeige[i, 3].SetActive(false); // Ausgetabt Einblendung
             SpielerAnzeige[i, 6].SetActive(true); // Spieler Antwort
         }
+
+        //SearchBar
+        SearchBar = new GameObject[21];
+        for (int i = 0; i < 21; i++)
+        {
+            SearchBar[i] = GameObject.Find("SearchBar/Land (" + (i) + ")");
+            SearchBar[i].SetActive(false);
+        }
     }
 
     #region Buzzer
@@ -657,7 +667,7 @@ public class FlaggenServer : MonoBehaviour
     {
         FlaggenOutline.SetActive(true);
         FlaggenImage.SetActive(true);
-        if (FlaggenAuswahl.GetComponent<TMP_Dropdown>().value == 1 || FlaggenName.GetComponent<TMP_Text>().text.Equals("#Fragezeichen"))
+        if (KategorieAuswahl.GetComponent<TMP_Dropdown>().value == 1 || FlaggenName.GetComponent<TMP_Text>().text.Equals("#Fragezeichen"))
         {
             // Fragezeichen Flagge zeigen
             Broadcast("#FlaggenSpielAnzeige #Fragezeichen");
@@ -735,5 +745,47 @@ public class FlaggenServer : MonoBehaviour
         Antwort.SetActive(true);
     }
     #endregion
-    
+
+    #region SearchBar
+    public void OnSearch(TMP_InputField input)
+    {
+        if (input.text.Length == 0)
+        {
+            for (int i = 0; i < 21; i++)
+            {
+                SearchBar[i].SetActive(false);
+            }
+            return;
+        }
+        
+        int bar = 0;
+        foreach (Flagge flagge in Config.FLAGGEN_SPIEL.getFlaggen())
+        {
+            if (bar == 21)
+                break;
+
+            if (flagge.getName().ToLower().StartsWith(input.text.ToLower()))
+            {
+                SearchBar[bar].SetActive(true);
+                SearchBar[bar].transform.GetChild(0).GetComponent<TMP_Text>().text = flagge.getName();
+                bar++;
+            }
+        }
+
+        // Blendet restliches aus
+        for (int i = bar; i < 21; i++)
+        {
+            SearchBar[i].SetActive(false);
+        }
+
+    }
+    public void SelectSearchItem(Button btn)
+    {
+        Flagge flag = Config.FLAGGEN_SPIEL.getFlagge(btn.transform.parent.transform.GetChild(0).GetComponent<TMP_Text>().text);
+        if (flag == null)
+            return;
+        FlaggenVorschau(flag);
+    }
+    #endregion
+
 }

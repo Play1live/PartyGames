@@ -567,7 +567,7 @@ public class MosaikServer : MonoBehaviour
             bildListe[i].SetActive(false);
         }
 
-        BildVorschau[0].GetComponent<Image>().sprite = Config.MOSAIK_SPIEL.getBeispiel();
+        BildVorschau[0].transform.parent.gameObject.GetComponent<Image>().sprite = Config.MOSAIK_SPIEL.getBeispiel();
         bildListe[0].SetActive(true);
         bildListe[0].GetComponent<Image>().sprite = Config.MOSAIK_SPIEL.getBeispiel();
         for (int i = 0; i < Config.MOSAIK_SPIEL.getSelected().getSprites().Count; i++)

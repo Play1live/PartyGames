@@ -49,7 +49,7 @@ public class MosaikScene : MonoBehaviour
         StartCoroutine(IntroAnimation());
 
         //Debug.LogWarning(imageUrl);
-        //StartCoroutine(GetTexture());
+        StartCoroutine(GetTexture());
     }
 
     IEnumerator IntroAnimation()
@@ -75,8 +75,11 @@ public class MosaikScene : MonoBehaviour
         else
         {
             Texture2D myTexture = ((DownloadHandlerTexture)www.downloadHandler).texture;
+            Debug.LogError(myTexture.width+ " "+ myTexture.height);
             Sprite sprite = Sprite.Create(myTexture, new Rect(0, 0, myTexture.width, myTexture.height), new Vector2(0.5f, 0.5f));
             imageObject.GetComponent<Image>().sprite = sprite;
+
+
         }
     }
 
