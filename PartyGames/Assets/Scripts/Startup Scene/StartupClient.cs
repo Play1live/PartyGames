@@ -95,6 +95,7 @@ public class StartupClient : MonoBehaviour
             {
                 yield return new WaitForSeconds(1);
             }
+            // WaitForChangedResult???
             PingWarteAufAntwort = true;
             SendToServer("#TestConnection");
             Config.PingTime = DateTime.Now;

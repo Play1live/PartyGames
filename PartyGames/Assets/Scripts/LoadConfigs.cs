@@ -28,6 +28,9 @@ public class LoadConfigs
         MoveToPrimaryDisplay(); // Schiebt das Programm auf den Primären Monitor
     }
 
+    /**
+     * Bewegt das Spiel auf den 1. Bildschirm & legt Vollbild fest
+     */
     private static void MoveToPrimaryDisplay()
     {
         List<DisplayInfo> displays = new List<DisplayInfo>();

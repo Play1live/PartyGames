@@ -36,7 +36,6 @@ public class StartupScene : MonoBehaviour
 #endif
         /*Testzwecke*/// TODO
                      // Config.isServer = !Config.isServer;
-
         //Config.isServer = true;
 
         if (!Config.CLIENT_STARTED && !Config.SERVER_STARTED)
@@ -85,9 +84,25 @@ public class StartupScene : MonoBehaviour
 
         // Autostart für Server
 #if UNITY_EDITOR
-        if (Config.isServer && !Config.SERVER_STARTED)
-            StartConnection();
+        StartCoroutine(AutostartServer());
 #endif
+    }
+    IEnumerator AutostartServer()
+    {
+        if (Config.isServer && !Config.SERVER_STARTED)
+        {
+           // yield return new WaitForSeconds(2);
+            // Updatet die IP-Adresse nachdem die RemoteConfig geladen wurde
+            yield return new WaitUntil(() => Config.SERVER_CONNECTION_IP != "localhost");
+            bool updatedSuccessful = new UpdateIpAddress().UpdateNoIP_DNS();
+
+            yield return new WaitForSeconds(1);
+
+            // Startet den Server, wenn IP Update erfolgreich war
+            if (updatedSuccessful)
+                StartConnection();
+        }
+        yield return null;
     }
     IEnumerator LoadGameFilesAsync()
     {

@@ -8,7 +8,7 @@ public class MedienUtil
     public static void CreateMediaDirectory()
     {
         // Erstellt die Spiele Ordner
-        string[] spielOrdner = { "Quiz", "Listen", "Geheimwörter", "WerBietetMehr", "Auktion" };
+        string[] spielOrdner = { "Quiz", "Listen", "Geheimwörter", "WerBietetMehr", "Auktion", "Mosaik" };
         foreach (string game in spielOrdner)
         {
             if (!Directory.Exists(Config.MedienPath + @"/Spiele/" + game))
@@ -76,6 +76,19 @@ public class MedienUtil
             using (FileStream fs = File.Create(auktiovorlage))
             {
                 byte[] info = new UTF8Encoding(true).GetBytes(""); // TODO
+                // Add some information to the file.
+                fs.Write(info, 0, info.Length);
+            }
+        }
+        #endregion
+
+        #region Mosaik
+        string mosaikvorlage = Config.MedienPath + @"/Spiele/Mosaik/#Vorlage.txt";
+        if (!File.Exists(mosaikvorlage))
+        {
+            using (FileStream fs = File.Create(mosaikvorlage))
+            {
+                byte[] info = new UTF8Encoding(true).GetBytes("- Name [!#!] URL\n- Name [!#!] URL\n- Name [!#!] URL");
                 // Add some information to the file.
                 fs.Write(info, 0, info.Length);
             }

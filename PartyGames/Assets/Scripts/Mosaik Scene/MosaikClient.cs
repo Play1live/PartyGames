@@ -5,16 +5,19 @@ using System.IO;
 using System.Net.Sockets;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class MosaikClient : MonoBehaviour
 {
+    Vector2 BildRect;
     GameObject[] Bild;
     List<int> coverlist;
-    int bildIndex;
 
-    GameObject SpielerAntwortEingabe;
+    List<string> geladeneURls;
+    List<Sprite> geladeneBilder;
+
     GameObject[,] SpielerAnzeige;
     bool pressingbuzzer = false;
 
@@ -199,6 +202,9 @@ public class MosaikClient : MonoBehaviour
             case "#MosaikAllesAuflösen":
                 MosaikAllesAuflösen();
                 break;
+            case "#DownloadCustom":
+                DownloadCustom(data);
+                break;
         }
     }
 
@@ -322,19 +328,21 @@ public class MosaikClient : MonoBehaviour
      */
     private void InitAnzeigen()
     {
+        geladeneURls = new List<string>();
+        geladeneBilder = new List<Sprite>();
         // ImageAnzeige
         Bild = new GameObject[49];
         coverlist = new List<int>();
         for (int i = 0; i < 49; i++)
         {
-            Bild[i] = GameObject.Find("MosaikAnzeige/Image/Cover (" + i + ")");
+            Bild[i] = GameObject.Find("MosaikAnzeige/BildImage/Cover (" + i + ")");
             Bild[i].GetComponent<Animator>().enabled = false;
             Bild[i].GetComponent<RectTransform>().sizeDelta = new Vector2(100, 100);
             Bild[i].GetComponent<RectTransform>().eulerAngles = new Vector3(0, 0, 0);
             Bild[i].GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
             coverlist.Add(i);
         }
-        Bild[0].transform.parent.gameObject.GetComponent<Image>().sprite = Config.MOSAIK_SPIEL.getBeispiel();
+        BildRect = new Vector2(Bild[0].transform.parent.GetComponent<RectTransform>().rect.width, Bild[0].transform.parent.GetComponent<RectTransform>().rect.height);
         Bild[0].transform.parent.gameObject.SetActive(false);
 
         // Spieler Anzeige
@@ -360,23 +368,80 @@ public class MosaikClient : MonoBehaviour
      */
     private void MosaikEinblendenAusblenden(string data)
     {
-        bool einblenden = Boolean.Parse(data.Replace("[BOOL]", "|").Split('|')[1]);
-        int index = Int32.Parse(data.Replace("[BILD]", "|").Split('|')[1]);
-        int gameIndex = Int32.Parse(data.Replace("[GAME]", "|").Split('|')[1]);
-        Config.MOSAIK_SPIEL.setSelected(Config.MOSAIK_SPIEL.getMosaik(gameIndex));
+        bool einblenden = Boolean.Parse(data.Replace("[!#!]", "|").Split('|')[0]);
+        string url = data.Replace("[!#!]", "|").Split('|')[1];
 
-        if (einblenden == true)
+        // Ausblenden
+        if (einblenden == false)
         {
-            if (index == 0)
+            Bild[0].transform.parent.gameObject.SetActive(einblenden);
+        }
+        // Einblenden
+        else
+        {
+            // Beispiel Bild
+            if (url.Equals("Beispiel"))
             {
                 Bild[0].transform.parent.gameObject.GetComponent<Image>().sprite = Config.MOSAIK_SPIEL.getBeispiel();
-                Bild[0].transform.parent.gameObject.SetActive(true);
+                Bild[0].transform.parent.gameObject.SetActive(einblenden);
+                SendToServer("#SpielerHatBildGeladen success");
             }
+            // Unbekanntes Bild
             else
             {
-                Bild[0].transform.parent.gameObject.GetComponent<Image>().sprite = Config.MOSAIK_SPIEL.getSelected().getSprites()[index-1];
-                Bild[0].transform.parent.gameObject.SetActive(true);
+                // Schauen ob Bild bereits vorhanden
+                if (geladeneURls.Contains(url))
+                {
+                    Bild[0].transform.parent.gameObject.GetComponent<Image>().sprite = geladeneBilder[geladeneURls.IndexOf(url)];
+                    Bild[0].transform.parent.gameObject.SetActive(einblenden);
+                    SendToServer("#SpielerHatBildGeladen success");
+                }
+                // Sonst Bild herunterladen
+                else
+                {
+                    StartCoroutine(LoadImageFromWeb(url));
+                }
             }
+            // TEIL 2: Zeigt Bild in der Szene an und behält die Seitenverhältnisse bei
+            #region Teil 2
+            Bild[0].transform.parent.GetComponent<RectTransform>().sizeDelta = BildRect;
+            Texture2D myTexture = Bild[0].transform.parent.gameObject.GetComponent<Image>().sprite.texture;
+            Sprite sprite = Sprite.Create(myTexture, new Rect(0, 0, myTexture.width, myTexture.height), new Vector2(0.5f, 0.5f), 100);
+            GameObject imageObject = Bild[0].transform.parent.gameObject;
+            imageObject.GetComponent<Image>().sprite = sprite;
+
+            // Skalierung des Bildes, um das Seitenverhältnis beizubehalten und um sicherzustellen, dass das Bild nicht größer als das Image ist
+            float imageWidth = imageObject.GetComponent<RectTransform>().rect.width;
+            float imageHeight = imageObject.GetComponent<RectTransform>().rect.height;
+            float textureWidth = myTexture.width;
+            float textureHeight = myTexture.height;
+            float widthRatio = imageWidth / textureWidth;
+            float heightRatio = imageHeight / textureHeight;
+            float ratio = Mathf.Min(widthRatio, heightRatio);
+            float newWidth = textureWidth * ratio;
+            float newHeight = textureHeight * ratio;
+
+            // Anpassung der Größe des Image-GameObjects und des Sprite-Components
+            RectTransform imageRectTransform = imageObject.GetComponent<RectTransform>();
+            imageRectTransform.sizeDelta = new Vector2(newWidth, newHeight);
+            imageObject.GetComponent<Image>().sprite = sprite;
+            #endregion
+            // TEIL 3: Passt die Überlagerten Images an die größe an
+            #region Teil 3
+            float cellWidth = newWidth / 7;
+            float cellHeight = newHeight / 7;
+            imageObject.GetComponent<GridLayoutGroup>().cellSize = new Vector2(cellWidth, cellHeight);
+            #endregion
+            // TEIL 4: Überlagerten Images muster geben
+            #region Teil 4
+            string[] himmelrichtungen = new string[] { "E", "N", "NE", "NW", "S", "SE", "SW", "W" };
+            for (int i = 0; i < 49; i++)
+            {
+                int random = UnityEngine.Random.Range(0, himmelrichtungen.Length);
+                imageObject.transform.GetChild(i).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Arrow " + himmelrichtungen[random]);
+            }
+            #endregion
+
 
             // Blendet Cover ein
             for (int i = 0; i < 49; i++)
@@ -388,10 +453,31 @@ public class MosaikClient : MonoBehaviour
                 Bild[i].SetActive(true);
             }
         }
+    }
+    IEnumerator LoadImageFromWeb(string imageUrl)
+    {
+        Debug.Log("Loading Image: " + imageUrl);
+        // TEIL 1: Download des Bildes
+        UnityWebRequest www = UnityWebRequestTexture.GetTexture(imageUrl);
+        yield return www.SendWebRequest();
+
+        if (www.result != UnityWebRequest.Result.Success)
+        {
+            Debug.Log(www.error);
+            SendToServer("#SpielerHatBildGeladen error");
+        }
         else
         {
-            Bild[0].transform.parent.gameObject.SetActive(false);
+            Texture2D myTexture = ((DownloadHandlerTexture)www.downloadHandler).texture;
+            Sprite sprite = Sprite.Create(myTexture, new Rect(0, 0, myTexture.width, myTexture.height), new Vector2(0.5f, 0.5f), 100);
+            geladeneURls.Add(imageUrl);
+            geladeneBilder.Add(sprite);
+            SendToServer("#SpielerHatBildGeladen success");
+
+            Bild[0].transform.parent.gameObject.GetComponent<Image>().sprite = geladeneBilder[geladeneURls.IndexOf(imageUrl)];
+            Bild[0].transform.parent.gameObject.SetActive(true);
         }
+        yield return null;
     }
     /**
      * Löst bestimmtes Cover auf
@@ -417,5 +503,83 @@ public class MosaikClient : MonoBehaviour
             Bild[i].GetComponent<Animator>().enabled = true;
             Bild[i].SetActive(true);
         }
+    }
+
+    public void DownloadCustom(string data)
+    {
+        StartCoroutine(LoadImageFromWebIntoScene(data));
+    }
+    IEnumerator LoadImageFromWebIntoScene(string imageUrl)
+    {
+        // Blendet Cover ein
+        for (int i = 0; i < 49; i++)
+        {
+            Bild[i].GetComponent<RectTransform>().sizeDelta = new Vector2(100, 100);
+            Bild[i].GetComponent<RectTransform>().eulerAngles = new Vector3(0, 0, 0);
+            Bild[i].GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
+            Bild[i].GetComponent<Animator>().enabled = false;
+            Bild[i].SetActive(true);
+        }
+        Debug.Log("Loading Image: " + imageUrl);
+        // TEIL 1: Download des Bildes
+        UnityWebRequest www = UnityWebRequestTexture.GetTexture(imageUrl);
+        yield return www.SendWebRequest();
+
+        if (www.result != UnityWebRequest.Result.Success)
+        {
+            Debug.Log(www.error);
+            SendToServer("#SpielerHatBildGeladen error");
+        }
+        else
+        {
+            Texture2D myTexture2 = ((DownloadHandlerTexture)www.downloadHandler).texture;
+            Sprite sprite2 = Sprite.Create(myTexture2, new Rect(0, 0, myTexture2.width, myTexture2.height), new Vector2(0.5f, 0.5f), 100);
+
+            SendToServer("#SpielerHatBildGeladen success");
+
+            Bild[0].transform.parent.gameObject.GetComponent<Image>().sprite = sprite2;
+        }
+        yield return null;
+        // TEIL 2: Zeigt Bild in der Szene an und behält die Seitenverhältnisse bei
+        #region Teil 2
+        Bild[0].transform.parent.GetComponent<RectTransform>().sizeDelta = BildRect;
+        Texture2D myTexture = Bild[0].transform.parent.gameObject.GetComponent<Image>().sprite.texture;
+        Sprite sprite = Sprite.Create(myTexture, new Rect(0, 0, myTexture.width, myTexture.height), new Vector2(0.5f, 0.5f), 100);
+        GameObject imageObject = Bild[0].transform.parent.gameObject;
+        imageObject.GetComponent<Image>().sprite = sprite;
+
+        // Skalierung des Bildes, um das Seitenverhältnis beizubehalten und um sicherzustellen, dass das Bild nicht größer als das Image ist
+        float imageWidth = imageObject.GetComponent<RectTransform>().rect.width;
+        float imageHeight = imageObject.GetComponent<RectTransform>().rect.height;
+        float textureWidth = myTexture.width;
+        float textureHeight = myTexture.height;
+        float widthRatio = imageWidth / textureWidth;
+        float heightRatio = imageHeight / textureHeight;
+        float ratio = Mathf.Min(widthRatio, heightRatio);
+        float newWidth = textureWidth * ratio;
+        float newHeight = textureHeight * ratio;
+
+        // Anpassung der Größe des Image-GameObjects und des Sprite-Components
+        RectTransform imageRectTransform = imageObject.GetComponent<RectTransform>();
+        imageRectTransform.sizeDelta = new Vector2(newWidth, newHeight);
+        imageObject.GetComponent<Image>().sprite = sprite;
+        #endregion
+        // TEIL 3: Passt die Überlagerten Images an die größe an
+        #region Teil 3
+        float cellWidth = newWidth / 7;
+        float cellHeight = newHeight / 7;
+        imageObject.GetComponent<GridLayoutGroup>().cellSize = new Vector2(cellWidth, cellHeight);
+        #endregion
+        // TEIL 4: Überlagerten Images muster geben
+        #region Teil 4
+        string[] himmelrichtungen = new string[] { "E", "N", "NE", "NW", "S", "SE", "SW", "W" };
+        for (int i = 0; i < 49; i++)
+        {
+            int random = UnityEngine.Random.Range(0, himmelrichtungen.Length);
+            imageObject.transform.GetChild(i).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Arrow " + himmelrichtungen[random]);
+        }
+        #endregion
+        Bild[0].transform.parent.gameObject.SetActive(true);
+        yield return null;
     }
 }

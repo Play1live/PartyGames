@@ -49,7 +49,7 @@ public class MosaikScene : MonoBehaviour
         StartCoroutine(IntroAnimation());
 
         //Debug.LogWarning(imageUrl);
-        StartCoroutine(GetTexture());
+        //StartCoroutine(GetTexture());
     }
 
     IEnumerator IntroAnimation()

@@ -14,7 +14,7 @@ public class Config
 
     // Server Infos
     public static bool isServer = false;
-    public static string SERVER_CONNECTION_IP = "192.168.1.217";
+    public static string SERVER_CONNECTION_IP = "localhost";
     public static int SERVER_CONNECTION_PORT = 11001;
     public static int SERVER_MAX_CONNECTIONS = 8;
     public static TcpListener SERVER_TCP;

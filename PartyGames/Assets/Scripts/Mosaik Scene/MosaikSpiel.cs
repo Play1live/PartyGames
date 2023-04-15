@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class MosaikSpiel
 {
+    public static string path = "/Spiele/Mosaik";
     private List<Mosaik> mosaike;
     private Mosaik selected;
     private Sprite beispiel;
@@ -14,9 +15,22 @@ public class MosaikSpiel
         mosaike = new List<Mosaik>();
         beispiel = Resources.Load<Sprite>("Spiele/Mosaik/Beispiel");
 
-        for (int i = 0; i < 5; i++)
+        foreach (string sfile in Directory.GetFiles(Config.MedienPath + path))
         {
-            mosaike.Add(new Mosaik(i));
+            // Ignoriert #Vorlage.txt
+            if (sfile.EndsWith("#Vorlage.txt"))
+                continue;
+            // Ignoriert Unity Meta Dateien
+            if (sfile.EndsWith(".meta"))
+                continue;
+            // Ignoriert gespielte Spiele
+            string tmp = sfile.Split('/')[sfile.Split('/').Length - 1];
+            tmp = tmp.Split('\\')[tmp.Split('\\').Length - 1];
+            if (tmp.StartsWith("#"))
+                continue;
+
+            // Lädt alle Flaggen und speichert diese ab
+            mosaike.Add(new Mosaik(sfile));
         }
     }
 
