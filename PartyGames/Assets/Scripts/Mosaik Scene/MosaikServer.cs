@@ -16,6 +16,7 @@ public class MosaikServer : MonoBehaviour
     TMP_Text BildTitel;
     GameObject[] BildVorschau;
     GameObject[] bildListe;
+    GameObject bildListeText;
     List<int> coverlist;
     int bildIndex;
 
@@ -541,14 +542,14 @@ public class MosaikServer : MonoBehaviour
     private void InitMosaik()
     {
         BildTitel = GameObject.Find("MosaikAnzeige/Server/Titel").GetComponent<TMP_Text>();
-        BildTitel.text = Config.MOSAIK_SPIEL.getBeispiel().name;
+        BildTitel.text = "(0/"+Config.MOSAIK_SPIEL.getSelected().getSprites().Count + ") " + Config.MOSAIK_SPIEL.getBeispiel().name;
         // ImageAnzeige
         Bild = new GameObject[49];
         BildVorschau = new GameObject[49];
         coverlist = new List<int>();
         for (int i = 0; i < 49; i++)
         {
-            Bild[i] = GameObject.Find("MosaikAnzeige/Image/Cover (" + i + ")");
+            Bild[i] = GameObject.Find("MosaikAnzeige/BildImage/Cover (" + i + ")");
             Bild[i].GetComponent<Animator>().enabled = false;
             Bild[i].GetComponent<RectTransform>().sizeDelta = new Vector2(100, 100);
             Bild[i].GetComponent<RectTransform>().eulerAngles = new Vector3(0, 0, 0);
@@ -560,6 +561,13 @@ public class MosaikServer : MonoBehaviour
         Bild[0].transform.parent.gameObject.SetActive(false);
 
         bildIndex = 0;
+        bildListeText = GameObject.Find("Server/TextVorschau");
+        bildListeText.GetComponent<TMP_Text>().text = "- Beispiel";
+        for (int i = 0; i < Config.MOSAIK_SPIEL.getSelected().getNames().Count; i++)
+        {
+            bildListeText.GetComponent<TMP_Text>().text += "\n- " + Config.MOSAIK_SPIEL.getSelected().getNames()[i];
+        }
+        /*
         bildListe = new GameObject[21];
         for (int i = 0; i < 21; i++)
         {
@@ -574,7 +582,7 @@ public class MosaikServer : MonoBehaviour
         {
             bildListe[i+1].GetComponent<Image>().sprite = Config.MOSAIK_SPIEL.getSelected().getSprites()[i];
             bildListe[i+1].SetActive(true);
-        }
+        }*/
 
         List<string> games = new List<string>();
         foreach (Mosaik m in Config.MOSAIK_SPIEL.getMosaike())
@@ -591,7 +599,7 @@ public class MosaikServer : MonoBehaviour
      */
     public void MosaikNächstesElement(int vor)
     {
-        if ((bildIndex + vor) < 0 || (bildIndex + vor) > Config.MOSAIK_SPIEL.getSelected().getSprites().Count)
+        if ((bildIndex + vor) < 0 || (bildIndex + vor) > Config.MOSAIK_SPIEL.getSelected().getURLs().Count)
         {
             return;
         }
@@ -600,12 +608,23 @@ public class MosaikServer : MonoBehaviour
         if (bildIndex == 0)
         {
             BildVorschau[0].transform.parent.gameObject.GetComponent<Image>().sprite = Config.MOSAIK_SPIEL.getBeispiel();
-            BildTitel.text = Config.MOSAIK_SPIEL.getBeispiel().name;
+            BildTitel.text = "("+Bild+"/"+ Config.MOSAIK_SPIEL.getSelected().getURLs().Count+") "+ Config.MOSAIK_SPIEL.getBeispiel().name;
         }
         else
         {
-            BildVorschau[0].transform.parent.gameObject.GetComponent<Image>().sprite = Config.MOSAIK_SPIEL.getSelected().getSprites()[bildIndex-1];
-            BildTitel.text = Config.MOSAIK_SPIEL.getSelected().getSprites()[bildIndex-1].name;
+            BildTitel.text = "(" + Bild + "/" + Config.MOSAIK_SPIEL.getSelected().getURLs().Count + ") " + Config.MOSAIK_SPIEL.getSelected().getSprites()[bildIndex - 1].name;
+
+            // Schauen ob das Bild bereits geladen wurde
+            if (Config.MOSAIK_SPIEL.getSelected().getIstGeladen()[bildIndex - 1])
+            {
+                BildVorschau[0].transform.parent.gameObject.GetComponent<Image>().sprite = Config.MOSAIK_SPIEL.getSelected().getSprites()[bildIndex - 1];
+            }
+            // Bild Herunterladen
+            else
+            {
+                StartCoroutine(LoadImageFromWeb(Config.MOSAIK_SPIEL.getSelected().getURLs()[bildIndex - 1]));
+            }
+
         }
 
         // Blendet Cover ein
@@ -617,11 +636,111 @@ public class MosaikServer : MonoBehaviour
             BildVorschau[i].SetActive(true);
         }
     }
+    // TODO:  TEIL 5: Lösung dafür finden das ich im Overlay sehe wenn alle fertig geladen sind
+
+    IEnumerator LoadImageFromWeb(string imageUrl)
+    {
+        // TEIL 1: Download des Bildes
+        UnityWebRequest www = UnityWebRequestTexture.GetTexture(imageUrl);
+        yield return www.SendWebRequest();
+
+        if (www.result != UnityWebRequest.Result.Success)
+        {
+            Debug.Log(www.error);
+            // TODO: Handling, nachricht an server, der erneut befehl geben kann/ oder custom bild einblenden
+        }
+        else
+        {
+            // TEIL 2: Zeigt Bild in der Szene an und behält die Seitenverhältnisse bei
+            #region Teil 2
+            Texture2D myTexture = ((DownloadHandlerTexture)www.downloadHandler).texture;
+            Debug.LogError(myTexture.width + " " + myTexture.height);
+            Sprite sprite = Sprite.Create(myTexture, new Rect(0, 0, myTexture.width, myTexture.height), new Vector2(0.5f, 0.5f), 100);
+            GameObject imageObject = BildVorschau[0].transform.parent.gameObject;
+            imageObject.GetComponent<Image>().sprite = sprite;
+
+            // Skalierung des Bildes, um das Seitenverhältnis beizubehalten und um sicherzustellen, dass das Bild nicht größer als das Image ist
+            float imageWidth = imageObject.GetComponent<RectTransform>().rect.width;
+            float imageHeight = imageObject.GetComponent<RectTransform>().rect.height;
+            float textureWidth = myTexture.width;
+            float textureHeight = myTexture.height;
+            float widthRatio = imageWidth / textureWidth;
+            float heightRatio = imageHeight / textureHeight;
+            float ratio = Mathf.Min(widthRatio, heightRatio);
+            float newWidth = textureWidth * ratio;
+            float newHeight = textureHeight * ratio;
+
+            // Anpassung der Größe des Image-GameObjects und des Sprite-Components
+            RectTransform imageRectTransform = imageObject.GetComponent<RectTransform>();
+            imageRectTransform.sizeDelta = new Vector2(newWidth, newHeight);
+            imageObject.GetComponent<Image>().sprite = sprite;
+            #endregion
+            // TEIL 3: Passt die Überlagerten Images an die größe an
+            #region Teil 3
+            float cellWidth = newWidth / 7;
+            float cellHeight = newHeight / 7;
+            imageObject.GetComponent<GridLayoutGroup>().cellSize = new Vector2(cellWidth, cellHeight);
+            #endregion
+            // TEIL 4: Überlagerten Images muster geben
+            #region Teil 4
+            string[] himmelrichtungen = new string[] { "E", "N", "NE", "NW", "S", "SE", "SW", "W" };
+            for (int i = 0; i < 49; i++)
+            {
+                int random = UnityEngine.Random.Range(0, himmelrichtungen.Length);
+                imageObject.transform.GetChild(i).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Arrow " + himmelrichtungen[random]);
+            }
+            #endregion
+        }
+        yield return null;
+    }
     /**
      * Zeigt allen das ausgewählte Element
      */
     public void MosaikEinblendenAusblenden(bool einblenden)
     {
+        // TODO: erst wenn für Server bild bereits geladen wurde
+
+        if (bildIndex == 0)
+            Broadcast("#MosaikEinblendenAusblenden " + einblenden + "[!#!]Beispiel");
+        else
+            Broadcast("#MosaikEinblendenAusblenden " + einblenden + "[!#!]" + Config.MOSAIK_SPIEL.getSelected().getURLs()[bildIndex - 1]);
+
+        if (einblenden == true)
+        {
+            coverlist = new List<int>();
+            if (bildIndex == 0)
+            {
+                Bild[0].transform.parent.gameObject.GetComponent<Image>().sprite = Config.MOSAIK_SPIEL.getBeispiel();
+                Bild[0].transform.parent.gameObject.SetActive(true);
+            }
+            else
+            {
+                Bild[0].transform.parent.gameObject.GetComponent<Image>().sprite = Config.MOSAIK_SPIEL.getSelected().getSprites()[bildIndex - 1];
+                Bild[0].transform.parent.gameObject.SetActive(true);
+            }
+            // Blendet Cover ein
+            for (int i = 0; i < 49; i++)
+            {
+                coverlist.Add(i);
+                Bild[i].GetComponent<RectTransform>().sizeDelta = new Vector2(100, 100);
+                Bild[i].GetComponent<RectTransform>().eulerAngles = new Vector3(0, 0, 0);
+                Bild[i].GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
+                Bild[i].GetComponent<Animator>().enabled = false;
+                Bild[i].SetActive(true);
+            }
+            // Blendet Cover ein
+            for (int i = 0; i < 49; i++)
+            {
+                BildVorschau[i].SetActive(true);
+            }
+        }
+        else
+        {
+            Bild[0].transform.parent.gameObject.SetActive(false);
+        }
+
+
+        /*
         Broadcast("#MosaikEinblendenAusblenden [BOOL]" + einblenden + "[BOOL][BILD]" + bildIndex + "[BILD][GAME]"+Config.MOSAIK_SPIEL.getIndex(Config.MOSAIK_SPIEL.getSelected())+"[GAME]");
 
         if (einblenden == true)
@@ -658,7 +777,7 @@ public class MosaikServer : MonoBehaviour
         else
         {
             Bild[0].transform.parent.gameObject.SetActive(false);
-        }
+        }*/
     }
     /**
      * Löst zufällige Cover auf
@@ -713,5 +832,10 @@ public class MosaikServer : MonoBehaviour
         }
     }
     #endregion
+
+    private void LoadImageIntoPreview()
+    {
+
+    }
 
 }

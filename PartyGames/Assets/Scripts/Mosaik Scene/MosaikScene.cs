@@ -65,21 +65,58 @@ public class MosaikScene : MonoBehaviour
 
     IEnumerator GetTexture()
     {
+        // TEIL 1: Download des Bildes
         UnityWebRequest www = UnityWebRequestTexture.GetTexture(imageUrl);
         yield return www.SendWebRequest();
 
         if (www.result != UnityWebRequest.Result.Success)
         {
             Debug.Log(www.error);
+            // Handling, nachricht an server, der erneut befehl geben kann/ oder custom bild einblenden
         }
         else
         {
+            // TEIL 2: Zeigt Bild in der Szene an und behält die Seitenverhältnisse bei
+            #region Teil 2
             Texture2D myTexture = ((DownloadHandlerTexture)www.downloadHandler).texture;
             Debug.LogError(myTexture.width+ " "+ myTexture.height);
-            Sprite sprite = Sprite.Create(myTexture, new Rect(0, 0, myTexture.width, myTexture.height), new Vector2(0.5f, 0.5f));
+            Sprite sprite = Sprite.Create(myTexture, new Rect(0, 0, myTexture.width, myTexture.height), new Vector2(0.5f, 0.5f), 100);
             imageObject.GetComponent<Image>().sprite = sprite;
 
+            // Skalierung des Bildes, um das Seitenverhältnis beizubehalten und um sicherzustellen, dass das Bild nicht größer als das Image ist
+            float imageWidth = imageObject.GetComponent<RectTransform>().rect.width;
+            float imageHeight = imageObject.GetComponent<RectTransform>().rect.height;
+            float textureWidth = myTexture.width;
+            float textureHeight = myTexture.height;
+            float widthRatio = imageWidth / textureWidth;
+            float heightRatio = imageHeight / textureHeight;
+            float ratio = Mathf.Min(widthRatio, heightRatio);
+            float newWidth = textureWidth * ratio;
+            float newHeight = textureHeight * ratio;
 
+            // Anpassung der Größe des Image-GameObjects und des Sprite-Components
+            RectTransform imageRectTransform = imageObject.GetComponent<RectTransform>();
+            imageRectTransform.sizeDelta = new Vector2(newWidth, newHeight);
+            imageObject.GetComponent<Image>().sprite = sprite;
+            #endregion
+            // TEIL 3: Passt die Überlagerten Images an die größe an
+            #region Teil 3
+            float cellWidth = newWidth / 7;
+            float cellHeight = newHeight / 7;
+            imageObject.GetComponent<GridLayoutGroup>().cellSize = new Vector2(cellWidth, cellHeight);
+            #endregion
+            // TEIL 4: Überlagerten Images muster geben
+            #region Teil 4
+            string[] himmelrichtungen = new string[] { "E", "N", "NE", "NW", "S", "SE", "SW", "W" };
+            for (int i = 0; i < 49; i++)
+            {
+                int random = Random.Range(0, himmelrichtungen.Length);
+                imageObject.transform.GetChild(i).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Arrow "+ himmelrichtungen[random]);
+            }
+            #endregion
+            // TEIL 5: Lösung dafür finden das ich im Overlay sehe wenn alle fertig geladen sind
+
+            // TEIL 6: Fake Loadingbar für Spieler anzeigen (nur wenn lust)
         }
     }
 
