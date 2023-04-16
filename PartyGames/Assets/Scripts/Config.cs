@@ -45,6 +45,7 @@ public class Config
     public static GeheimwörterSpiel GEHEIMWOERTER_SPIEL;
     public static WerBietetMehrSpiel WERBIETETMEHR_SPIEL;
     public static AuktionSpiel AUKTION_SPIEL;
+    public static SloxikonSpiel SLOXIKON_SPIEL;
 
     // Scenenspezifisches
     // Hauptmenue

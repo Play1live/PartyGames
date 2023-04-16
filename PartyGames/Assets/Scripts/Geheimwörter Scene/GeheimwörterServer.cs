@@ -168,7 +168,7 @@ public class GeheimwörterServer : MonoBehaviour
     /**
      * Sendet eine Nachricht an den übergebenen Spieler
      */
-    private void SendMessage(string data, Player sc)
+    private void SendMSG(string data, Player sc)
     {
         try
         {
@@ -191,7 +191,7 @@ public class GeheimwörterServer : MonoBehaviour
         foreach (Player sc in spieler)
         {
             if (sc.isConnected)
-                SendMessage(data, sc);
+                SendMSG(data, sc);
         }
     }
     /**
@@ -202,7 +202,7 @@ public class GeheimwörterServer : MonoBehaviour
         foreach (Player sc in Config.PLAYERLIST)
         {
             if (sc.isConnected)
-                SendMessage(data, sc);
+                SendMSG(data, sc);
         }
     }
     /**

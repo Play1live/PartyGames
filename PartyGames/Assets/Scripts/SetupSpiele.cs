@@ -14,6 +14,7 @@ public class SetupSpiele
         reloadGeheimwoerter();
         reloadWerBietetMehr();
         reloadAuktion();
+        reloadSloxikon();
         Logging.add(Logging.Type.Normal, "SetupSpiele", "LoadGameFiles", "Games are ready!");
     }
 
@@ -44,5 +45,9 @@ public class SetupSpiele
     public static void reloadAuktion()
     {
         Config.AUKTION_SPIEL = new AuktionSpiel();
+    }
+    public static void reloadSloxikon()
+    {
+        Config.SLOXIKON_SPIEL = new SloxikonSpiel();
     }
 }

@@ -5,6 +5,7 @@ using System.Text;
 using TMPro;
 using Unity.RemoteConfig;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class StartupScene : MonoBehaviour
 {
@@ -155,6 +156,11 @@ public class StartupScene : MonoBehaviour
     {
         if (input.text.Length > Config.MAX_PLAYER_NAME_LENGTH)
             input.text = input.text.Substring(0, Config.MAX_PLAYER_NAME_LENGTH);
+
+        if (input.text.Length < 4)
+            GameObject.Find("ConnectToServer_BTN").GetComponent<Button>().interactable = false;
+        else
+            GameObject.Find("ConnectToServer_BTN").GetComponent<Button>().interactable = true;
     }
 
     /**

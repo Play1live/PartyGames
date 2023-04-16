@@ -8,32 +8,21 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class FlaggenServer : MonoBehaviour
+public class SloxikonServer : MonoBehaviour
 {
-    GameObject FlaggenOutline;
-    GameObject FlaggenImage;
-    GameObject Antwort;
-
-    GameObject FlaggenEinstellungen;
-    GameObject FlaggenName;
-    GameObject FlaggenVorschauAnzeige;
-    GameObject InhaltVorschau;
-    GameObject FlaggenAuswahl;
-    GameObject KategorieAuswahl;
-
-    GameObject[] SearchBar;
-
-    bool buzzerIsOn = false;
-
     GameObject BuzzerAnzeige;
+    bool buzzerIsOn = false;
+    int aktuellesThema = 0;
     GameObject AustabbenAnzeigen;
     GameObject TextEingabeAnzeige;
     GameObject TextAntwortenAnzeige;
-
     GameObject[,] SpielerAnzeige;
     bool[] PlayerConnected;
-    int PunkteProRichtige = 4;
+    int PunkteProRichtige = 3;
     int PunkteProFalsche = 1;
+
+    GameObject Thema;
+    GameObject[] Antworten;
 
     [SerializeField] AudioSource BuzzerSound;
     [SerializeField] AudioSource RichtigeAntwortSound;
@@ -43,7 +32,7 @@ public class FlaggenServer : MonoBehaviour
     {
         PlayerConnected = new bool[Config.SERVER_MAX_CONNECTIONS];
         InitAnzeigen();
-        InitFlaggen();
+        InitSloxikon();
     }
 
     void Update()
@@ -249,7 +238,7 @@ public class FlaggenServer : MonoBehaviour
                 ClientFocusChange(player, data);
                 break;
 
-            case "#JoinFlaggen":
+            case "#JoinQuiz":
                 PlayerConnected[player.id - 1] = true;
                 UpdateSpielerBroadcast();
                 break;
@@ -302,12 +291,14 @@ public class FlaggenServer : MonoBehaviour
     private string UpdateSpieler()
     {
         string msg = "#UpdateSpieler [ID]0[ID][PUNKTE]" + Config.SERVER_PLAYER_POINTS + "[PUNKTE]";
+        int connectedplayer = 0;
         for (int i = 0; i < Config.PLAYERLIST.Length; i++)
         {
             Player p = Config.PLAYERLIST[i];
             msg += "[TRENNER][ID]" + p.id + "[ID][PUNKTE]" + p.points + "[PUNKTE]";
             if (p.isConnected && PlayerConnected[i])
             {
+                connectedplayer++;
                 SpielerAnzeige[i, 0].SetActive(true);
                 SpielerAnzeige[i, 2].GetComponent<Image>().sprite = p.icon;
                 SpielerAnzeige[i, 4].GetComponent<TMP_Text>().text = p.name;
@@ -324,20 +315,7 @@ public class FlaggenServer : MonoBehaviour
      */
     private void InitAnzeigen()
     {
-        // Anzeigen für alle
-        FlaggenOutline = GameObject.Find("FlaggenAnzeigen/FlaggenImageOutline");
-        FlaggenOutline.SetActive(false);
-        FlaggenImage = GameObject.Find("FlaggenAnzeigen/FlaggenImage");
-        FlaggenImage.SetActive(false);
-        Antwort = GameObject.Find("FlaggenAnzeigen/Antwort");
-        Antwort.SetActive(false);
-        // Server Anzeigen
-        FlaggenEinstellungen = GameObject.Find("FlaggenAnzeigen/EinstellungenLinks");
-        FlaggenName = GameObject.Find("FlaggenAnzeigen/EinstellungenLinks/FlaggenName");
-        FlaggenVorschauAnzeige = GameObject.Find("FlaggenAnzeigen/EinstellungenLinks/FlaggenVorschau");
-        InhaltVorschau = GameObject.Find("FlaggenAnzeigen/EinstellungenLinks/InhaltVorschau");
-        FlaggenAuswahl = GameObject.Find("FlaggenAnzeigen/EinstellungenLinks/FlaggenAuswahl");
-        KategorieAuswahl = GameObject.Find("FlaggenAnzeigen/EinstellungenLinks/KategorieAuswahl");
+        GameObject.Find("ServerSide/FrageAnzeigenToggle").GetComponent<Toggle>().isOn = false;
         // Buzzer Deaktivieren
         GameObject.Find("ServerSide/BuzzerAktivierenToggle").GetComponent<Toggle>().isOn = false;
         BuzzerAnzeige = GameObject.Find("ServerSide/BuzzerIstAktiviert");
@@ -376,16 +354,82 @@ public class FlaggenServer : MonoBehaviour
             SpielerAnzeige[i, 3].SetActive(false); // Ausgetabt Einblendung
             SpielerAnzeige[i, 6].SetActive(true); // Spieler Antwort
         }
-
-        //SearchBar
-        SearchBar = new GameObject[21];
-        for (int i = 0; i < 21; i++)
-        {
-            SearchBar[i] = GameObject.Find("SearchBar/Land (" + (i) + ")");
-            SearchBar[i].SetActive(false);
-        }
+        // Change Quiz
+        GameObject ChangeQuiz = GameObject.Find("ServerSide/ChangeQuiz");
+        ChangeQuiz.GetComponent<TMP_Dropdown>().ClearOptions();
+        List<string> quizzes = new List<string>();
+        foreach (Quiz quiz in Config.QUIZ_SPIEL.getQuizze())
+            quizzes.Add(quiz.getTitel());
+        ChangeQuiz.GetComponent<TMP_Dropdown>().AddOptions(quizzes);
+        ChangeQuiz.GetComponent<TMP_Dropdown>().value = Config.QUIZ_SPIEL.getIndex(Config.QUIZ_SPIEL.getSelected());
     }
 
+    #region Quiz Fragen Anzeige
+    /**
+     * Initialisiert die Anzeigen des Quizzes
+     */
+    private void InitSloxikon()
+    {
+        aktuellesThema = 0;
+        GameObject.Find("Server/Titel").GetComponent<TMP_Text>().text = Config.SLOXIKON_SPIEL.getSelected().getTitel();
+        GameObject.Find("Server/ThemenVorschau").GetComponent<TMP_Text>().text = Config.SLOXIKON_SPIEL.getSelected().getThemenListe();
+
+    }
+    /**
+     * Ändert das ausgewählte Quiz
+     */
+    public void ChangeQuiz(TMP_Dropdown drop)
+    {
+        // Wählt neues Quiz aus
+        Config.QUIZ_SPIEL.setSelected(Config.QUIZ_SPIEL.getQuizByIndex(drop.value));
+        Logging.add(Logging.Type.Normal, "QuizServer", "ChangeQuiz", "Quiz starts: " + Config.QUIZ_SPIEL.getSelected().getTitel());
+        // Aktualisiert die Anzeigen
+        aktuellesThema = 0;
+        GameObject.Find("QuizAnzeigen/Titel").GetComponent<TMP_Text>().text = Config.QUIZ_SPIEL.getSelected().getTitel();
+        GameObject.Find("QuizAnzeigen/FragenIndex2").GetComponentInChildren<TMP_Text>().text = "";
+        GameObject.Find("QuizAnzeigen/FragenIndex1").GetComponentInChildren<TMP_Text>().text = "";
+        GameObject.Find("Frage").GetComponentInChildren<TMP_Text>().text = "";
+        if (Config.QUIZ_SPIEL.getSelected().getFragenCount() > 0)
+        {
+            LoadQuestionIntoScene(0);
+        }
+    }
+    /**
+     * Navigiert durch die Fragen, zeigt/versteckt diese
+     */
+    public void NavigateThroughQuestions(string type)
+    {
+        switch (type)
+        {
+            default:
+                Debug.LogError("NavigateThroughQuestions: unbekannter Typ");
+                Logging.add(Logging.Type.Error, "QuizServer", "NavigateThroughQuestions", "unbekannter Typ -> " + type);
+                break;
+            case "previous":
+                if (aktuellesThema <= 0)
+                    return;
+                aktuellesThema--;
+                LoadQuestionIntoScene(aktuellesThema);
+                break;
+            case "next":
+                if (aktuellesThema >= (Config.QUIZ_SPIEL.getSelected().getFragenCount() - 1))
+                    return;
+                aktuellesThema++;
+                LoadQuestionIntoScene(aktuellesThema);
+                break;
+        }
+    }
+    /**
+     * Lädt die Frage nach Index, für die Server Vorschau
+     */
+    private void LoadQuestionIntoScene(int index)
+    {
+        GameObject.Find("QuizAnzeigen/FragenVorschau").GetComponent<TMP_Text>().text = "Frage:\n"+Config.QUIZ_SPIEL.getSelected().getFrage(index).getFrage();
+        GameObject.Find("QuizAnzeigen/AntwortVorschau").GetComponent<TMP_Text>().text = "Antwort:\n"+ Config.QUIZ_SPIEL.getSelected().getFrage(index).getAntwort();
+        GameObject.Find("QuizAnzeigen/InfoVorschau").GetComponent<TMP_Text>().text = "Info:\n"+Config.QUIZ_SPIEL.getSelected().getFrage(index).getInfo();
+        GameObject.Find("QuizAnzeigen/FragenIndex2").GetComponentInChildren<TMP_Text>().text = (aktuellesThema+1)+"/" + Config.QUIZ_SPIEL.getSelected().getFragenCount();
+    }
+    #endregion
     #region Buzzer
     /**
      * Aktiviert/Deaktiviert den Buzzer für alle Spieler
@@ -405,7 +449,7 @@ public class FlaggenServer : MonoBehaviour
             Debug.Log(p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
             return;
         }
-        Debug.LogWarning("B: " + p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
+        Debug.LogWarning("B: "+p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
         buzzerIsOn = false;
         Broadcast("#AudioBuzzerPressed " + p.id);
         BuzzerSound.Play();
@@ -451,7 +495,7 @@ public class FlaggenServer : MonoBehaviour
     public void TexteingabeAnzeigenToggle(Toggle toggle)
     {
         TextEingabeAnzeige.SetActive(toggle.isOn);
-        Broadcast("#TexteingabeAnzeigen " + toggle.isOn);
+        Broadcast("#TexteingabeAnzeigen "+ toggle.isOn);
     }
     /**
     * Aktualisiert die Antwort die der Spieler eingibt
@@ -476,7 +520,7 @@ public class FlaggenServer : MonoBehaviour
         {
             msg = msg + "[ID" + (i + 1) + "]" + SpielerAnzeige[i, 6].GetComponentInChildren<TMP_InputField>().text + "[ID" + (i + 1) + "]";
         }
-        Broadcast("#TextantwortenAnzeigen [BOOL]" + toggle.isOn + "[BOOL][TEXT]" + msg);
+        Broadcast("#TextantwortenAnzeigen [BOOL]"+toggle.isOn+"[BOOL][TEXT]"+ msg);
     }
     #endregion
     #region Punkte
@@ -494,7 +538,7 @@ public class FlaggenServer : MonoBehaviour
     {
         PunkteProFalsche = Int32.Parse(input.text);
     }
-
+    
     /**
      * Vergibt an den Spieler Punkte für eine richtige Antwort
      */
@@ -562,9 +606,11 @@ public class FlaggenServer : MonoBehaviour
     public void SpielerIstDran(GameObject button)
     {
         int pId = Int32.Parse(button.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
+        for (int i = 0; i < Config.SERVER_MAX_CONNECTIONS; i++)
+            SpielerAnzeige[(pId - 1), 1].SetActive(false);
         SpielerAnzeige[(pId - 1), 1].SetActive(true);
         buzzerIsOn = false;
-        Broadcast("#SpielerIstDran " + pId);
+        Broadcast("#SpielerIstDran "+pId);
     }
     /**
      * Versteckt den Icon Rand beim Spieler
@@ -579,212 +625,6 @@ public class FlaggenServer : MonoBehaviour
                 return;
         buzzerIsOn = BuzzerAnzeige.activeInHierarchy; // Buzzer wird erst aktiviert wenn keiner mehr dran ist
         Broadcast("#SpielerIstNichtDran " + pId);
-    }
-    #endregion
-
-    #region Flaggen Anzeige
-    /**
-     * Initialisiert die Anzeigen des Quizzes
-     */
-    private void InitFlaggen()
-    {
-        FlaggenName.GetComponent<TMP_Text>().text = "#Fragezeichen";
-        FlaggenVorschauAnzeige.GetComponent<Image>().sprite = Config.FLAGGEN_SPIEL.getFragezeichenFlagge();
-        InhaltVorschau.GetComponent<TMP_Text>().text = "Farben: \nHauptstadt: \nFläche: \nEinwohnerzahl:";
-        List<string> namen = new List<string>();
-        foreach (Flagge flagge in Config.FLAGGEN_SPIEL.getFlaggen())
-        {
-            namen.Add(flagge.getName());
-        }
-        FlaggenAuswahl.GetComponent<TMP_Dropdown>().ClearOptions();
-        FlaggenAuswahl.GetComponent<TMP_Dropdown>().AddOptions(namen);
-    }
-    /**
-     * Wählt eine zufällige Flagge aus.
-     */
-    public void FlaggenZufaelligeFlaggeVorschau()
-    {
-        Flagge flagge = Config.FLAGGEN_SPIEL.getRandomFlagge();
-        FlaggenVorschau(flagge);
-    }
-    /**
-     * Wählt eine bestimmte Landesflagge aus.
-     */
-    public void FlaggenBestimmteFlaggeVorschau(TMP_Dropdown drop)
-    {
-        Flagge flagge = Config.FLAGGEN_SPIEL.getFlagge(drop.value);
-        FlaggenVorschau(flagge);
-    }
-    /**
-    * Wählt eine zufällige Kategorie aus.
-    */
-    public void FlaggenZufaelligeKategorie(TMP_Dropdown drop)
-    {
-        drop.value = UnityEngine.Random.Range(0, drop.options.Count);
-    }
-    /**
-     * Zeigt Flagge in Vorschau an.
-     */
-    private void FlaggenVorschau(Flagge flagge)
-    {
-        FlaggenName.GetComponent<TMP_Text>().text = flagge.getName();
-        FlaggenVorschauAnzeige.GetComponent<Image>().sprite = flagge.getBild();
-        string farben = "";
-        foreach (string f in flagge.getFarben())
-        {
-            farben += ", " + f;
-        }
-        farben = farben.Substring(2);
-        string einwohner = "";
-        char[] carray = flagge.getEinwohner().ToString().ToCharArray();
-        int temp = 0;
-        for (int i = carray.Length - 1; i >= 0; i--)
-        {
-            if (temp % 3 == 0)
-                einwohner = "." + einwohner;
-            einwohner = carray[i] + einwohner;
-            temp++;
-        }
-        einwohner = einwohner.Substring(0, einwohner.Length - 1);
-        string flaeche = "";
-        char[] carray2 = flagge.getFlaeche().ToString().ToCharArray();
-        int temp2 = 0;
-        for (int i = carray2.Length - 1; i >= 0; i--)
-        {
-            if (temp2 % 3 == 0)
-                flaeche = "." + flaeche;
-            flaeche = carray2[i] + flaeche;
-            temp2++;
-        }
-        flaeche = flaeche.Substring(0, flaeche.Length - 1);
-        InhaltVorschau.GetComponent<TMP_Text>().text = "Farben: " + farben + "\nHauptstadt: " + flagge.getHauptstadt() + "\nFläche: " + flaeche + " km²\nEinwohnerzahl: " + einwohner;
-        FlaggenAuswahl.GetComponent<TMP_Dropdown>().value = Config.FLAGGEN_SPIEL.getIndex(flagge);
-    }
-    /**
-     * Wählt Flagge aus und zeigt diese den Spielern an.
-     */
-    public void FlaggenFlaggeAuswaehlen()
-    {
-        FlaggenOutline.SetActive(true);
-        FlaggenImage.SetActive(true);
-        if (KategorieAuswahl.GetComponent<TMP_Dropdown>().value == 1 || FlaggenName.GetComponent<TMP_Text>().text.Equals("#Fragezeichen"))
-        {
-            // Fragezeichen Flagge zeigen
-            Broadcast("#FlaggenSpielAnzeige #Fragezeichen");
-            FlaggenImage.GetComponent<Image>().sprite = Config.FLAGGEN_SPIEL.getFragezeichenFlagge();
-        }
-        else
-        {
-            Broadcast("#FlaggenSpielAnzeige " + Config.FLAGGEN_SPIEL.getFlagge(FlaggenName.GetComponent<TMP_Text>().text).getName());
-            FlaggenImage.GetComponent<Image>().sprite = Config.FLAGGEN_SPIEL.getFlagge(FlaggenName.GetComponent<TMP_Text>().text).getBild();
-        }
-        Antwort.SetActive(false); // Antwort ausblenden
-    }
-    /**
-     * Zeigt den Spielern die gegebene Antwort an.
-     */
-    public void FlaggenShowAntwort()
-    {
-        string antwort = "";
-        Flagge flagge = Config.FLAGGEN_SPIEL.getFlagge(FlaggenAuswahl.GetComponent<TMP_Dropdown>().value);
-        if (KategorieAuswahl.GetComponent<TMP_Dropdown>().value == 0) // Namen
-        {
-            antwort = flagge.getName();
-        }
-        else if (KategorieAuswahl.GetComponent<TMP_Dropdown>().value == 1) // Farben
-        {
-            string farben = "";
-            for (int i = 0; i < flagge.getFarben().Length; i++)
-            {
-                farben += ", " + flagge.getFarben()[i];
-            }
-            farben = farben.Substring(2);
-            antwort = farben;
-        }
-        else if (KategorieAuswahl.GetComponent<TMP_Dropdown>().value == 2) // Hauptstadt
-        {
-            antwort = flagge.getHauptstadt();
-        }
-        else if (KategorieAuswahl.GetComponent<TMP_Dropdown>().value == 3) // Fläche
-        {
-            string flaeche = "";
-            char[] carray = flagge.getFlaeche().ToString().ToCharArray();
-            int temp = 0;
-            for (int i = carray.Length - 1; i >= 0; i--)
-            {
-                if (temp % 3 == 0)
-                    flaeche = "." + flaeche;
-                flaeche = carray[i] + flaeche;
-                temp++;
-            }
-            flaeche = flaeche.Substring(0, flaeche.Length - 1);
-            antwort = flaeche + " km²";
-        }
-        else if (KategorieAuswahl.GetComponent<TMP_Dropdown>().value == 4) // Einwohnerzahl
-        {
-            string einwohner = "";
-            char[] carray = flagge.getEinwohner().ToString().ToCharArray();
-            int temp = 0;
-            for (int i = carray.Length - 1; i >= 0; i--)
-            {
-                if (temp % 3 == 0)
-                    einwohner = "." + einwohner;
-                einwohner = carray[i] + einwohner;
-                temp++;
-            }
-            einwohner = einwohner.Substring(0, einwohner.Length - 1);
-            antwort = einwohner + " Einwohner";
-        }
-        else
-        {
-            Logging.add(Logging.Type.Error, "Server", "FlaggenShowAntwort", "Unbekannte Kategorie.", new Exception());
-        }
-
-        Broadcast("#FlaggenSpielShowAntwort " + antwort);
-        Antwort.GetComponent<TMP_Text>().text = antwort;
-        Antwort.SetActive(true);
-    }
-    #endregion
-
-    #region SearchBar
-    public void OnSearch(TMP_InputField input)
-    {
-        if (input.text.Length == 0)
-        {
-            for (int i = 0; i < 21; i++)
-            {
-                SearchBar[i].SetActive(false);
-            }
-            return;
-        }
-        
-        int bar = 0;
-        foreach (Flagge flagge in Config.FLAGGEN_SPIEL.getFlaggen())
-        {
-            if (bar == 21)
-                break;
-
-            if (flagge.getName().ToLower().StartsWith(input.text.ToLower()))
-            {
-                SearchBar[bar].SetActive(true);
-                SearchBar[bar].transform.GetChild(0).GetComponent<TMP_Text>().text = flagge.getName();
-                bar++;
-            }
-        }
-
-        // Blendet restliches aus
-        for (int i = bar; i < 21; i++)
-        {
-            SearchBar[i].SetActive(false);
-        }
-
-    }
-    public void SelectSearchItem(Button btn)
-    {
-        Flagge flag = Config.FLAGGEN_SPIEL.getFlagge(btn.transform.parent.transform.GetChild(0).GetComponent<TMP_Text>().text);
-        if (flag == null)
-            return;
-        FlaggenVorschau(flag);
     }
     #endregion
 

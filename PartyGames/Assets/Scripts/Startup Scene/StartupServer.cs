@@ -27,7 +27,7 @@ public class StartupServer : MonoBehaviour
     {
         if (Config.SERVER_STARTED)
             SperreGameSelection();
-
+        
         #region Startet Server
         if (!Config.SERVER_STARTED)
         {
@@ -93,6 +93,7 @@ public class StartupServer : MonoBehaviour
             DisplayGameFiles();
         UpdateSpieler();
         UpdateCrowns();
+
     }
 
     void Update()
@@ -111,27 +112,23 @@ public class StartupServer : MonoBehaviour
             }
         }
 
-
+        
         foreach (Player spieler in Config.PLAYERLIST)
         {
             if (spieler.isConnected == false)
                 continue;
 
-            
-            #region Prüft ob Clients noch verbunden sind
-            /*if (!isConnected(spieler.tcp) && spieler.isConnected == true)
-            {
-                Debug.LogWarning(spieler.id);
-                spieler.tcp.Close();
-                spieler.isConnected = false;
-                spieler.isDisconnected = true;
-                Logging.add(new Logging(Logging.Type.Normal, "Server", "Update", "Spieler ist nicht mehr Verbunden. ID: " + spieler.id));
-                continue;
-            }*/
-            #endregion
             #region Sucht nach neuen Nachrichten
-            /*else*/ if (spieler.isConnected == true && spieler.tcp != null)
+            if (spieler.isConnected == true && spieler.tcp != null)
             {
+                // TCP Verbindung zum Client verloren
+                if (spieler.tcp.Connected == false) // TODO: testen
+                {
+                    Debug.LogError("TCP Verbindung zum Client "+ spieler.name +" wurde verloren.");
+                    ClientClosed(spieler);
+                    UpdateSpielerBroadcast();
+                    continue;
+                }
                 NetworkStream stream = spieler.tcp.GetStream();
                 if (stream.DataAvailable)
                 {
@@ -143,17 +140,6 @@ public class StartupServer : MonoBehaviour
                 }
                 try
                 {
-                    /*
-                    NetworkStream stream = spieler.tcp.GetStream();
-                    if (stream.DataAvailable)
-                    {
-                        //StreamReader reader = new StreamReader(stream, true);
-                        StreamReader reader = new StreamReader(stream);
-                        string data = reader.ReadLine();
-
-                        if (data != null)
-                            OnIncommingData(spieler, data);
-                    }*/
                 }
                 catch (Exception e)
                 {
@@ -192,52 +178,6 @@ public class StartupServer : MonoBehaviour
     }
 
     #region Verbindungen
-    // Prüft ob ein Client noch mit dem Server verbunden ist
-    private bool isConnected(TcpClient c)
-    {
-        /*try
-        {
-            if (c != null && c.Client != null && c.Client.Connected)
-            {
-                if (c.Client.Poll(0, SelectMode.SelectRead))
-                {
-                    return !(c.Client.Receive(new byte[1], SocketFlags.Peek) == 0);
-                }
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        catch
-        {
-            return false;
-        }*/
-        if (c != null && c.Client != null && c.Client.Connected)
-        {
-            if ((c.Client.Poll(0, SelectMode.SelectWrite)) && (!c.Client.Poll(0, SelectMode.SelectError)))
-            {
-                byte[] buffer = new byte[1];
-                if (c.Client.Receive(buffer, SocketFlags.Peek) == 0)
-                {
-                    return false;
-                }
-                else
-                {
-                    return true;
-                }
-            }
-            else
-            {
-                return false;
-            }
-        }
-        else
-        {
-            return false;
-        }
-    }
     // Startet das empfangen von Nachrichten von Clients
     private void startListening()
     {
@@ -285,16 +225,16 @@ public class StartupServer : MonoBehaviour
         startListening();
 
         // Sendet neuem Spieler zugehörige ID
-        SendMessage("#SetID " + freierS.id, freierS);
+        SendMSG("#SetID " + freierS.id, freierS);
         // Legt Default PingImage fest
         SpielerAnzeigeLobby[freierS.id].transform.GetChild(3).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Ping/Ping 0");
         Logging.add(Logging.Type.Normal, "Server", "AcceptTcpClient", "Spieler: " + freierS.id + " ist jetzt verbunden. IP:" + freierS.tcp.Client.RemoteEndPoint);
     }
+    
     #endregion
-
     #region Kommunikation
     // Sendet eine Nachricht an den angegebenen Spieler.
-    private void SendMessage(string data, Player sc)
+    private void SendMSG(string data, Player sc)
     {
         try
         {
@@ -304,7 +244,7 @@ public class StartupServer : MonoBehaviour
         }
         catch (Exception e)
         {
-            Logging.add(Logging.Type.Error, "Server", "SendMessage", "Nachricht an Client: " + sc.id + " (" + sc.name + ") konnte nicht gesendet werden." + e);
+            Logging.add(Logging.Type.Error, "Server", "SendMSG", "Nachricht an Client: " + sc.id + " (" + sc.name + ") konnte nicht gesendet werden." + e);
             // Verbindung zum Client wird getrennt
             //ClientClosed(sc);
         }
@@ -315,7 +255,7 @@ public class StartupServer : MonoBehaviour
         foreach (Player sc in spieler)
         {
             if (sc.isConnected)
-                SendMessage(data, sc);
+                SendMSG(data, sc);
         }
     }
     // Sendet eine Nachticht an alle verbundenen Spieler.
@@ -324,8 +264,16 @@ public class StartupServer : MonoBehaviour
         foreach (Player sc in Config.PLAYERLIST)
         {
             if (sc.isConnected)
-                SendMessage(data, sc);
+                SendMSG(data, sc);
         }
+    }
+    private void ClientClosed(Player player)
+    {
+        player.icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
+        player.name = "";
+        player.points = 0;
+        player.isConnected = false;
+        player.isDisconnected = true;
     }
     //Einkommende Nachrichten die von Spielern an den Server gesendet werden.
     private void OnIncommingData(Player spieler, string data)
@@ -359,7 +307,7 @@ public class StartupServer : MonoBehaviour
                 UpdateSpielerBroadcast();
                 break;
             case "#TestConnection":
-                SendMessage("#ConnectionEstablished", player);
+                SendMSG("#ConnectionEstablished", player);
                 break;
             case "#ClientFocusChange":
                 //Debug.Log("FocusChange (" + player.id + ") " + player.name + ": InGame: " + data);
@@ -430,30 +378,7 @@ public class StartupServer : MonoBehaviour
         DisplayGameFiles();
     }
 
-    /**
-     * Spieler beendet das Spiel
-     */
-    private void ClientClosed(Player player)
-    {
-        player.icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
-        player.name = "";
-        player.points = 0;
-        player.isConnected = false;
-        player.isDisconnected = true;
-
-        /*for (int i = 0; i < Config.PLAYERLIST.Length; i++)
-        {
-            if (Config.PLAYERLIST[i].id == player.id)
-            {
-                Config.PLAYERLIST[i].icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
-                Config.PLAYERLIST[i].name = "";
-                Config.PLAYERLIST[i].points = 0;
-                Config.PLAYERLIST[i].isConnected = false;
-                Config.PLAYERLIST[i].isDisconnected = true;
-                break;
-            }
-        }*/
-    }
+    
     /**
      * Init Lobby Anzeigen
      */
@@ -706,7 +631,8 @@ public class StartupServer : MonoBehaviour
         if (version != Config.APPLICATION_VERSION)
         {
             Logging.add(Logging.Type.Warning, "Server", "ClientSetName", "Spieler ID: " + player.id + " versucht mit einer falschen Version beizutreten.Spieler Version: " + version + " | Server Version: " + Config.APPLICATION_VERSION);
-            SendMessage("#WrongVersion " + Application.version, player);
+            SendMSG("#WrongVersion " + Application.version, player);
+            ClientClosed(player);
             return;
         }
         // Legt Spielernamen fest
@@ -716,7 +642,7 @@ public class StartupServer : MonoBehaviour
         if (!SpielernameIstBelegt(name))
         {
             player.name = name;
-            SendMessage("#SpielerChangeName " + name, player);
+            SendMSG("#SpielerChangeName " + name, player);
             UpdateSpielerBroadcast();
             return;
         }
@@ -730,7 +656,7 @@ public class StartupServer : MonoBehaviour
                 break;
         }
         player.name = name;
-        SendMessage("#SpielerChangeName " + name, player);
+        SendMSG("#SpielerChangeName " + name, player);
         // Sendet Update an alle Spieler & Updatet Spieler Anzeigen#SpielerChangeName
         UpdateSpielerBroadcast();
     }   
@@ -851,7 +777,7 @@ public class StartupServer : MonoBehaviour
         if (dropdown.options[dropdown.value].text == "")
             return;
         int playerid = Int32.Parse(dropdown.options[dropdown.value].text.Split('|')[0]);
-        SendMessage("#ServerClosed", Config.PLAYERLIST[playerid - 1]);
+        SendMSG("#ServerClosed", Config.PLAYERLIST[playerid - 1]);
         Config.PLAYERLIST[playerid - 1].name = "";
         Config.PLAYERLIST[playerid - 1].isConnected = false;
         Config.PLAYERLIST[playerid - 1].isDisconnected = true;
@@ -1091,7 +1017,7 @@ public class StartupServer : MonoBehaviour
             else
                 msg = msg + "[" + i + "][" + i + "]";
         }
-        SendMessage("#TickTackToeZug " + msg, player);
+        SendMSG("#TickTackToeZug " + msg, player);
     }
     /**
      * Lässt den Server einen Zug machen & prüft ob das Spiel beendet ist
@@ -1104,7 +1030,7 @@ public class StartupServer : MonoBehaviour
         // CheckForWin
         if (TickTackToe.CheckForEnd(freieFelder, belegteFelder))
         {
-            SendMessage("#TickTackToeZugEnde |" + TickTackToe.getResult(belegteFelder) + "| " + data, player);
+            SendMSG("#TickTackToeZugEnde |" + TickTackToe.getResult(belegteFelder) + "| " + data, player);
             return;
         }
         // Ziehen
@@ -1112,9 +1038,9 @@ public class StartupServer : MonoBehaviour
         freieFelder = TickTackToe.GetFreieFelder(belegteFelder);
         //Check for End
         if (TickTackToe.CheckForEnd(freieFelder, belegteFelder))
-            SendMessage("#TickTackToeZugEnde |" + TickTackToe.getResult(belegteFelder) + "|" + TickTackToe.PrintBelegteFelder(belegteFelder), player);
+            SendMSG("#TickTackToeZugEnde |" + TickTackToe.getResult(belegteFelder) + "|" + TickTackToe.PrintBelegteFelder(belegteFelder), player);
         else
-            SendMessage("#TickTackToeZug " + TickTackToe.PrintBelegteFelder(belegteFelder), player);
+            SendMSG("#TickTackToeZug " + TickTackToe.PrintBelegteFelder(belegteFelder), player);
     }
     #endregion
     #endregion
@@ -1139,7 +1065,63 @@ public class StartupServer : MonoBehaviour
             Logging.add(Logging.Type.Warning, "StartupServer", "WechselGameSelectionFie", "Unbekannte Auswahl: WechselGameSelControlFie -> " + s);
         }
     }
+    #region Crowns
+    public void CrownsAdd(GameObject button)
+    {
+        int pos = Int32.Parse(button.transform.parent.parent.name.Replace("Player (", "").Replace(")", "")) - 1;
 
+        // Server
+        if (pos == -1)
+        {
+            if (button.name.Equals("+1"))
+                Config.SERVER_CROWNS++;
+            else if (button.name.Equals("-1"))
+                Config.SERVER_CROWNS--;
+
+            if (Config.SERVER_CROWNS < 0)
+                Config.SERVER_CROWNS = 0;
+        }
+        // Clients
+        else
+        {
+            if (button.name.Equals("+1"))
+                Config.PLAYERLIST[pos].crowns++;
+            else if (button.name.Equals("-1"))
+                Config.PLAYERLIST[pos].crowns--;
+
+            if (Config.PLAYERLIST[pos].crowns < 0)
+                Config.PLAYERLIST[pos].crowns = 0;
+        }
+        UpdateCrowns();
+    }
+    public void CrownsAddX(TMP_InputField input)
+    {
+        int punkte = 0;
+        try
+        {
+            punkte = int.Parse(input.text);
+            input.text = "";
+        }
+        catch (Exception e)
+        {
+            return;
+        }
+        int pos = Int32.Parse(input.transform.parent.parent.name.Replace("Player (", "").Replace(")", "")) - 1;
+
+        // Server
+        if (pos == -1)
+        {
+            Config.SERVER_CROWNS += punkte;
+        }
+        // Clients
+        else
+        {
+            Config.PLAYERLIST[pos].crowns += punkte;
+        }
+
+        UpdateCrowns();
+    }
+    #endregion
 
     /**
      * Die geladenen Spiele in der GameÜbersicht an
@@ -1172,6 +1154,10 @@ public class StartupServer : MonoBehaviour
         TMP_Dropdown AuktionDropdown = GameObject.Find("Auktion/Auswahl").GetComponent<TMP_Dropdown>();
         AuktionDropdown.ClearOptions();
         AuktionDropdown.AddOptions(Config.AUKTION_SPIEL.getListenAsStringList());
+
+        TMP_Dropdown SloxikonDropdown = GameObject.Find("Sloxikon/Auswahl").GetComponent<TMP_Dropdown>();
+        SloxikonDropdown.ClearOptions();
+        SloxikonDropdown.AddOptions(Config.SLOXIKON_SPIEL.getGamesAsStringList());
     }
     #region Starte Spiele
     /**
@@ -1251,62 +1237,18 @@ public class StartupServer : MonoBehaviour
         Broadcast("#StarteSpiel Auktion");
         SceneManager.LoadScene("Auktion");
     }
-    #endregion
-    #region Crowns
-    public void CrownsAdd(GameObject button)
+    /**
+     * Starte das Sloxikon Spiel -> Alle Spieler laden in die neue Scene
+     */
+    public void StarteSloxikon(TMP_Dropdown drop)
     {
-        int pos = Int32.Parse(button.transform.parent.parent.name.Replace("Player (","").Replace(")","")) -1;
+        Config.SLOXIKON_SPIEL.setSelected(Config.SLOXIKON_SPIEL.getQuizByIndex(drop.value));
+        Logging.add(Logging.Type.Normal, "StartupServer", "StarteSloxikon", "Sloxikon starts: " + Config.SLOXIKON_SPIEL.getSelected().getTitel());
 
-        // Server
-        if (pos == -1)
-        {
-            if (button.name.Equals("+1"))
-                Config.SERVER_CROWNS++;
-            else if (button.name.Equals("-1"))
-                Config.SERVER_CROWNS--;
-
-            if (Config.SERVER_CROWNS < 0)
-                Config.SERVER_CROWNS = 0;
-        }
-        // Clients
-        else
-        {
-            if (button.name.Equals("+1"))
-                Config.PLAYERLIST[pos].crowns++;
-            else if (button.name.Equals("-1"))
-                Config.PLAYERLIST[pos].crowns--;
-
-            if (Config.PLAYERLIST[pos].crowns < 0)
-                Config.PLAYERLIST[pos].crowns = 0;
-        }
-        UpdateCrowns();
-    }
-    public void CrownsAddX(TMP_InputField input)
-    {
-        int punkte = 0;
-        try
-        {
-            punkte = int.Parse(input.text);
-            input.text = "";
-        }
-        catch (Exception e)
-        {
-            return;
-        }
-        int pos = Int32.Parse(input.transform.parent.parent.name.Replace("Player (", "").Replace(")", "")) - 1;
-
-        // Server
-        if (pos == -1)
-        {
-            Config.SERVER_CROWNS += punkte;
-        }
-        // Clients
-        else
-        {
-            Config.PLAYERLIST[pos].crowns += punkte;
-        }
-
-        UpdateCrowns();
+        //SceneManager.LoadSceneAsync("Auktion");
+        Broadcast("#StarteSpiel Sloxikon");
+        SceneManager.LoadScene("Sloxikon");
     }
     #endregion
+
 }

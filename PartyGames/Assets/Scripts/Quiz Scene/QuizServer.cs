@@ -26,7 +26,7 @@ public class QuizServer : MonoBehaviour
     TMP_InputField[] SchaetzfragenSpielerInput;
     [SerializeField] GameObject SchaetzfragenAnimationController;
     bool[] PlayerConnected;
-    int PunkteProRichtige = 4;
+    int PunkteProRichtige = 3;
     int PunkteProFalsche = 1;
 
     [SerializeField] AudioSource BuzzerSound;
@@ -167,7 +167,7 @@ public class QuizServer : MonoBehaviour
     /**
      * Sendet eine Nachricht an den übergebenen Spieler
      */
-    private void SendMessage(string data, Player sc)
+    private void SendMSG(string data, Player sc)
     {
         try
         {
@@ -190,7 +190,7 @@ public class QuizServer : MonoBehaviour
         foreach (Player sc in spieler)
         {
             if (sc.isConnected)
-                SendMessage(data, sc);
+                SendMSG(data, sc);
         }
     }
     /**
@@ -201,7 +201,7 @@ public class QuizServer : MonoBehaviour
         foreach (Player sc in Config.PLAYERLIST)
         {
             if (sc.isConnected)
-                SendMessage(data, sc);
+                SendMSG(data, sc);
         }
     }
     /**

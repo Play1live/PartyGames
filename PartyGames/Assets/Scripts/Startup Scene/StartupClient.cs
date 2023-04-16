@@ -91,15 +91,10 @@ public class StartupClient : MonoBehaviour
     {
         while (Config.CLIENT_STARTED)
         {
-            while (PingWarteAufAntwort)
-            {
-                yield return new WaitForSeconds(1);
-            }
-            // WaitForChangedResult???
+            yield return new WaitUntil(() => PingWarteAufAntwort == false);
             PingWarteAufAntwort = true;
             SendToServer("#TestConnection");
             Config.PingTime = DateTime.Now;
-            // TODO: 5 sekunden warten bis antwort kam
             yield return new WaitForSeconds(5);
         }
     }
@@ -301,7 +296,6 @@ public class StartupClient : MonoBehaviour
     {
         Config.PLAYER_NAME = data;
 
-        //ChangeIcon();
         SendToServer("#SpielerIconChange 0"); // Für namentliches Icon
     }
     /**

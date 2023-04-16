@@ -204,7 +204,7 @@ public class ListenServer : MonoBehaviour
     /**
      * Sendet eine Nachricht an den übergebenen Spieler
      */
-    private void SendMessage(string data, Player sc)
+    private void SendMSG(string data, Player sc)
     {
         try
         {
@@ -227,7 +227,7 @@ public class ListenServer : MonoBehaviour
         foreach (Player sc in spieler)
         {
             if (sc.isConnected)
-                SendMessage(data, sc);
+                SendMSG(data, sc);
         }
     }
     /**
@@ -238,7 +238,7 @@ public class ListenServer : MonoBehaviour
         foreach (Player sc in Config.PLAYERLIST)
         {
             if (sc.isConnected)
-                SendMessage(data, sc);
+                SendMSG(data, sc);
         }
     }
     /**

@@ -18,7 +18,10 @@ public class UpdateIpAddress
         Debug.Log("Aktuelle IP: " + ipaddress + "  DNS-IP: " + domainip[0].ToString());
         // Wenn die DNS-IP gleich der aktuellen des Servers ist, dann muss kein IP Update durchgeführt werden
         if (ipaddress == domainip[0].ToString())
+        {
+            Debug.Log("DNS-IP ist aktuell.");
             return true;
+        }
 
         // Noch keine Kontodaten vorhanden
         if (!File.Exists(Application.persistentDataPath + @"/No-IP Settings.txt"))
