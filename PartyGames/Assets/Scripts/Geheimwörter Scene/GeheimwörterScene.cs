@@ -45,13 +45,15 @@ public class GeheimwörterScene : MonoBehaviour
                 go.SetActive(false);
         }
 
-
         StartCoroutine(IntroAnimation());
-
     }
 
+    /// <summary>
+    /// Spielt die Introanimation ab
+    /// </summary>
     IEnumerator IntroAnimation()
     {
+        Logging.log(Logging.LogType.Debug, "GeheimwörterScene", "IntroAnimation", "Spielt die Introanimation ab");
         IntroSound.Play();
         IntroGo.SetActive(true);
 
@@ -60,11 +62,4 @@ public class GeheimwörterScene : MonoBehaviour
 
         IntroGo.SetActive(false);
     }
-
-    private void OnApplicationQuit()
-    {
-        //Logging.add(Logging.Type.Normal, "StartupScene", "OnApplicationQuit", "Programm wird beendet");
-        //MedienUtil.WriteLogsInDirectory();
-    }
-
 }

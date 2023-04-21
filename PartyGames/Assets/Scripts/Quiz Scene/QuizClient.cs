@@ -31,14 +31,6 @@ public class QuizClient : MonoBehaviour
 
         StartCoroutine(TestConnectionToServer());
     }
-    IEnumerator TestConnectionToServer()
-    {
-        while (Config.CLIENT_STARTED)
-        {
-            SendToServer("#TestConnection");
-            yield return new WaitForSeconds(10);
-        }
-    }
 
     void Update()
     {
@@ -55,7 +47,6 @@ public class QuizClient : MonoBehaviour
         {
             pressingbuzzer = false;
         }
-
 
         #region Prüft auf Nachrichten vom Server
         if (Config.CLIENT_STARTED)
@@ -79,15 +70,27 @@ public class QuizClient : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        Logging.add(Logging.Type.Normal, "Client", "OnApplicationQuit", "Client wird geschlossen.");
+        Logging.log(Logging.LogType.Normal, "QuizClient", "OnApplicationQuit", "Client wird geschlossen.");
         SendToServer("#ClientClosed");
         CloseSocket();
     }
 
+    /// <summary>
+    /// Testet die Verbindung zum Server
+    /// </summary>
+    IEnumerator TestConnectionToServer()
+    {
+        Logging.log(Logging.LogType.Debug, "QuizClient", "TestConnectionToServer", "Testet die Verbindumg zum Server.");
+        while (Config.CLIENT_STARTED)
+        {
+            SendToServer("#TestConnection");
+            yield return new WaitForSeconds(10);
+        }
+    }
     #region Verbindungen
-    /**
-     * Trennt die Verbindung zum Server
-     */
+    /// <summary>
+    /// Trennt die Verbindung zum Server
+    /// </summary>
     private void CloseSocket()
     {
         if (!Config.CLIENT_STARTED)
@@ -95,15 +98,14 @@ public class QuizClient : MonoBehaviour
 
         Config.CLIENT_TCP.Close();
         Config.CLIENT_STARTED = false;
-
-        Logging.add(Logging.Type.Normal, "Client", "CloseSocket", "Verbindung zum Server wurde getrennt. Client wird in das Hauptmenü geladen.");
     }
     #endregion
     #region Kommunikation
-    /**
-     * Sendet eine Nachricht an den Server.
-     */
-    public void SendToServer(string data)
+    /// <summary>
+    /// Sendet eine Nachricht an den Server.
+    /// </summary>
+    /// <param name="data">Nachricht</param>
+    private void SendToServer(string data)
     {
         if (!Config.CLIENT_STARTED)
             return;
@@ -117,15 +119,16 @@ public class QuizClient : MonoBehaviour
         }
         catch (Exception e)
         {
-            Logging.add(Logging.Type.Error, "Client", "SendToServer", "Nachricht an Server konnte nicht gesendet werden." + e);
+            Logging.log(Logging.LogType.Warning, "QuizClient", "SendToServer", "Nachricht an Server konnte nicht gesendet werden.",e);
             Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server wurde verloren.";
             CloseSocket();
             SceneManager.LoadSceneAsync("StartUp");
         }
     }
-    /**
-     * Einkommende Nachrichten die vom Sever
-     */
+    /// <summary>
+    /// Einkommende Nachrichten die vom Sever
+    /// </summary>
+    /// <param name="data">Nachricht</param>
     private void OnIncomingData(string data)
     {
         string cmd;
@@ -138,27 +141,32 @@ public class QuizClient : MonoBehaviour
         Commands(data, cmd);
     }
     #endregion
-    /**
-     * Eingehende Commands vom Server
-     */
-    public void Commands(string data, string cmd)
+    /// <summary>
+    /// Eingehende Commands vom Server
+    /// </summary>
+    /// <param name="data">Befehlsargumente</param>
+    /// <param name="cmd">Befehl</param>
+    private void Commands(string data, string cmd)
     {
-        //Debug.Log("Eingehend: " + cmd + " -> " + data);
+        Logging.log(Logging.LogType.Debug, "QuizClient", "Commands", "Eingehende Nachricht: " + cmd + " -> " + data);
         switch (cmd)
         {
             default:
-                Logging.add(Logging.Type.Warning, "QuizClient", "Commands", "Unkown Command -> " + cmd + " - " + data);
+                Logging.log(Logging.LogType.Warning, "QuizClient", "Commands", "Unkown Command: " + cmd + " -> " + data);
                 break;
 
             #region Universal Commands
             case "#ServerClosed":
+                Logging.log(Logging.LogType.Normal, "QuizClient", "Commands", "Verbindumg zum Server wurde beendet. Lade ins Hauptmenü.");
                 CloseSocket();
                 SceneManager.LoadSceneAsync("Startup");
                 break;
             case "#UpdateRemoteConfig":
+                Logging.log(Logging.LogType.Normal, "QuizClient", "Commands", "RemoteConfig wird neugeladen");
                 LoadConfigs.FetchRemoteConfig();
                 break;
             case "#ZurueckInsHauptmenue":
+                Logging.log(Logging.LogType.Normal, "QuizClient", "Commands", "Spiel wird beendet. Lade ins Hauptmenü");
                 SceneManager.LoadSceneAsync("Startup");
                 break;
             #endregion
@@ -211,12 +219,12 @@ public class QuizClient : MonoBehaviour
                 break;
         } 
     }
-
-    /**
-     * Initialisiert die Anzeigen der Scene
-     */
+    /// <summary>
+    /// Initialisiert die Anzeigen der Scene
+    /// </summary>
     private void InitAnzeigen()
     {
+        Logging.log(Logging.LogType.Debug, "QuizClient", "InitAnzeigen", "Anzeigen werden initialisiert.");
         // Fragen Anzeige
         Frage = GameObject.Find("Frage");
         Frage.SetActive(false);
@@ -239,9 +247,7 @@ public class QuizClient : MonoBehaviour
             {
                 GameObject.Find("SpielerAnzeige/Player (" + (i + 1) + ")/ServerControl").SetActive(false); // Server Control für Spieler ausblenden
             }
-            catch (Exception e)
-            {
-            }
+            catch {}
             SpielerAnzeige[i, 0].SetActive(false);
             SpielerAnzeige[i, 1].SetActive(false);
             SpielerAnzeige[i, 3].SetActive(false);
@@ -283,21 +289,20 @@ public class QuizClient : MonoBehaviour
         SchaetzfragenAnzeige[19].SetActive(false);
         SchaetzfragenAnzeige[0].SetActive(false);
     }
-    /**
-     * Aktualisiert die Spieler Anzeigen
-     */
+    /// <summary>
+    /// Aktualisiert die Spieler Anzeigen
+    /// </summary>
+    /// <param name="data">#UpdateSpieler ...</param>
     private void UpdateSpieler(string data)
     {
+        Logging.log(Logging.LogType.Debug, "QuizClient", "UpdateSpieler", data);
         string[] player = data.Replace("[TRENNER]", "|").Split('|');
         foreach (string sp in player)
         {
             int pId = Int32.Parse(sp.Replace("[ID]", "|").Split('|')[1]);
-
             // Display ServerInfos
             if (pId == 0)
-            {
-                
-            }
+            {}
             // Display Client Infos
             else
             {
@@ -322,63 +327,68 @@ public class QuizClient : MonoBehaviour
             }
         }
     }
-    /**
-     * Sendet eine Buzzer Anfrage an den Server
-     */
+    /// <summary>
+    /// Sendet eine Buzzer Anfrage an den Server
+    /// </summary>
     public void SpielerBuzzered()
     {
         SendToServer("#SpielerBuzzered");
     }
-    /**
-     * Gibt den Buzzer frei
-     */
+    /// <summary>
+    /// Gibt den Buzzer frei
+    /// </summary>
     private void BuzzerFreigeben()
     {
+        Logging.log(Logging.LogType.Debug, "QuizClient", "BuzzerFreigeben", "Buzzer wurde freigegeben");
         for (int i = 0; i < Config.SERVER_MAX_CONNECTIONS; i++)
             SpielerAnzeige[i, 1].SetActive(false);
     }
-    /**
-     * Spielt Sound des Buzzers ab und zeigt welcher Spieler diesen gedrückt hat
-     */
+    /// <summary>
+    /// Spielt Sound des Buzzers ab und zeigt welcher Spieler diesen gedrückt hat
+    /// </summary>
+    /// <param name="data">Spielerid</param>
     private void AudioBuzzerPressed(string data)
     {
         BuzzerSound.Play();
         int pId = Int32.Parse(data);
         SpielerAnzeige[Player.getPosInLists(pId), 1].SetActive(true);
     }
-    /**
-     * Zeigt an, welcher Spieler dran ist
-     */
+    /// <summary>
+    /// Zeigt an, welcher Spieler dran ist
+    /// </summary>
+    /// <param name="data">Spielerid</param>
     private void SpielerIstDran(string data)
     {
         int pId = Int32.Parse(data);
         SpielerAnzeige[Player.getPosInLists(pId), 1].SetActive(true);
     }
-    /**
-     * Deaktiviert die Spieler ist dran anzeige
-     */
+    /// <summary>
+    /// Deaktiviert die Spieler ist dran anzeige
+    /// </summary>
+    /// <param name="data">Spielerid</param>
     private void SpielerIstNichtDran(string data)
     {
         int pId = Int32.Parse(data);
         SpielerAnzeige[Player.getPosInLists(pId), 1].SetActive(false);
     }
-    /**
-     * Spielt den Sound für eine richtige Antwort ab
-     */
+    /// <summary>
+    /// Spielt den Sound für eine richtige Antwort ab
+    /// </summary>
     private void AudioRichtigeAntwort()
     {
         RichtigeAntwortSound.Play();
     }
-    /**
-     * Spielt den Sound für eine falsche Antwort ab
-     */
+    /// <summary>
+    /// Spielt den Sound für eine falsche Antwort ab
+    /// </summary>
     private void AudioFalscheAntwort()
     {
         FalscheAntwortSound.Play();
     }
-    /**
-     * Zeigt an, ob ein Spieler austabt
-     */
+    /// <summary>
+    /// Zeigt an, ob ein Spieler austabt
+    /// </summary>
+    /// <param name="data">Spielerid</param>
     private void SpielerAusgetabt(string data)
     {
         // AustabenAnzeigen wird deaktiviert
@@ -399,9 +409,10 @@ public class QuizClient : MonoBehaviour
             SpielerAnzeige[pos, 3].SetActive(type);
         }
     }
-    /**
-     * Zeigt die gestellte Frage an
-     */
+    /// <summary>
+    /// Zeigt die gestellte Frage an
+    /// </summary>
+    /// <param name="data">Frage & bool</param>
     private void FragenAnzeige(string data)
     {
         bool anzeigen = Boolean.Parse(data.Replace("[BOOL]", "|").Split('|')[1]);
@@ -416,9 +427,10 @@ public class QuizClient : MonoBehaviour
             Frage.GetComponentInChildren<TMP_Text>().text = "";
         }
     }
-    /**
-     * Zeigt das Texteingabefeld an
-     */
+    /// <summary>
+    /// Zeigt das Texteingabefeld an
+    /// </summary>
+    /// <param name="data">bool</param>
     private void TexteingabeAnzeigen(string data)
     {
         bool anzeigen = Boolean.Parse(data);
@@ -429,9 +441,10 @@ public class QuizClient : MonoBehaviour
         else
             SpielerAntwortEingabe.SetActive(false);
     }
-    /**
-     * Zeigt die Textantworten aller Spieler an
-     */
+    /// <summary>
+    /// Zeigt die Textantworten aller Spieler an
+    /// </summary>
+    /// <param name="data">Textantworten der SPieler</param>
     private void TextantwortenAnzeigen(string data)
     {
         bool anzeigen = Boolean.Parse(data.Replace("[BOOL]", "|").Split('|')[1]);
@@ -450,20 +463,28 @@ public class QuizClient : MonoBehaviour
             SpielerAnzeige[Player.getPosInLists(i), 6].GetComponentInChildren<TMP_InputField>().text = text.Replace("[ID"+i+"]","|").Split('|')[1];
         }
     }
-    /**
-     * Sendet die Antworteingabe an den Server
-     */
+    /// <summary>
+    /// Sendet die Antworteingabe an den Server
+    /// </summary>
+    /// <param name="input">Texteingabefeld</param>
     public void SpielerAntwortEingabeInput(TMP_InputField input)
     {
         SendToServer("#SpielerAntwortEingabe "+input.text);
     }
-
     #region SchaetzAnimation
-    public void AnimationZiel(string data)
+    /// <summary>
+    /// Zeigt das Ziel der Schätzfrage an
+    /// </summary>
+    /// <param name="data"></param>
+    private void AnimationZiel(string data)
     {
         SchaetzfragenAnzeige[2].SetActive(bool.Parse(data));
     }
-    public void AnimationAnzeigen(string data)
+    /// <summary>
+    /// Zeigt die Schätzfragenanimation an
+    /// </summary>
+    /// <param name="data"></param>
+    private void AnimationAnzeigen(string data)
     {
         SchaetzfragenAnzeige[0].SetActive(true);
         SchaetzfragenAnimationController.SetActive(false);
@@ -491,7 +512,6 @@ public class QuizClient : MonoBehaviour
                 SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].GetComponent<Image>().sprite = p.icon;
             }
         }
-
 
         // SpielerData berechnen
         string data_text = "";
@@ -525,16 +545,20 @@ public class QuizClient : MonoBehaviour
             }
         }
     }
-
-    public void AnimationStarten()
+    /// <summary>
+    /// Startet die Schätzfragenanimation
+    /// </summary>
+    private void AnimationStarten()
     {
         SchaetzfragenAnimationController.SetActive(true);
     }
-    public void AnimationBeenden()
+    /// <summary>
+    /// Beendet die Schätzfragenanimation
+    /// </summary>
+    private void AnimationBeenden()
     {
         SchaetzfragenAnimationController.SetActive(false);
         SchaetzfragenAnzeige[0].SetActive(false);
     }
     #endregion
-
 }

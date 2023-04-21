@@ -27,7 +27,6 @@ public class AnimationController : MonoBehaviour
     bool[] ismoving;
     bool[] israising;
 
-    float Schritte = 600000;
     float Schrittweite;
 
     DateTime MaxTime;
@@ -37,7 +36,7 @@ public class AnimationController : MonoBehaviour
     {
         MaxTime = DateTime.Now.AddSeconds(10);
         StartTime = DateTime.Now;
-        Debug.Log(StartTime + " "+ MaxTime);
+        Logging.log(Logging.LogType.Debug, "AnimationController", "OnEnable", StartTime + " " + MaxTime);
 
         Player = new GameObject[8];
         Player[0] = Player1;
@@ -163,13 +162,6 @@ public class AnimationController : MonoBehaviour
         if (!minOneisMoving && !minOnerising)
             Controller.SetActive(false);
     }
-
-    void OnDisable()
-    {
-        
-    }
-
-
     private void setSPIELER_DISPLAY(int index, string display)
     {
         Player[index].transform.GetChild(1).GetComponent<TMP_Text>().text = display + getEINHEIT(index);
@@ -251,7 +243,6 @@ public class AnimationController : MonoBehaviour
             endpos = getMAX_POSITION(index);
         return endpos;
     }
-
     private string getEINHEIT(int index)
     {
         return Player[index].transform.GetChild(2).GetComponent<TMP_Text>().text.Replace("[EINHEIT]", "|").Split('|')[1];

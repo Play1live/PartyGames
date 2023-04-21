@@ -1,115 +1,94 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Logging
 {
-    public enum Type
+    /// <summary>
+    /// Ist der Typ der auszugebenen Nachrichten
+    /// </summary>
+    public enum LogType
     {
+        Debug = 0,
         Normal = 1,
         Warning = 2,
         Error = 3,
         Fatal = 4
     };
-
-    public Type type { get; set; }
-    public DateTime time { get; set; }
-    public string klasse { get; set; }
-    public string methode { get; set; }
-    public string msg { get; set; }
-    public Exception exception { get; set; }
-
-    public Logging(Type type, string klasse, string methode, string msg)
+    /// <summary>
+    /// Erstellt eine Log-Nachricht
+    /// </summary>
+    /// <param name="type">Wichtigkeits Grad der Ausgabe</param>
+    /// <param name="klasse">Betroffene Klasse</param>
+    /// <param name="methode">Betroffene Methode</param>
+    /// <param name="msg">Auszugebene Nachricht</param>
+    public static void log(LogType type, string klasse, string methode, string msg)
     {
-        this.type = type;
-        this.time = DateTime.Now;
-        this.klasse = klasse;
-        this.methode = methode;
-        this.msg = msg;
-        this.exception = null;
+        generate(type, klasse, methode, msg);
     }
-
-    public Logging(Type type, string klasse, string methode, string msg, Exception exception)
+    /// <summary>
+    /// Erstellt eine Log-Nachricht
+    /// </summary>
+    /// <param name="type">Wichtigkeits Grad der Ausgabe</param>
+    /// <param name="klasse">Betroffene Klasse</param>
+    /// <param name="methode">Betroffene Methode</param>
+    /// <param name="msg">Auszugebene Nachricht</param>
+    /// <param name="e">Exception</param>
+    public static void log(LogType type, string klasse, string methode, string msg, Exception e)
     {
-        this.type = type;
-        this.time = DateTime.Now;
-        this.klasse = klasse;
-        this.msg = msg;
-        this.exception = exception;
+        generate(type, klasse, methode, msg + " >> Exception:\n" + e);
     }
-
-    public static string getType(List<Logging> log, Type type, bool withExceptions)
+    /// <summary>
+    /// Erstellt eine Log-Nachricht
+    /// </summary>
+    /// <param name="type">Wichtigkeits Grad der Ausgabe</param>
+    /// <param name="msg">Auszugebene Nachricht</param>
+    public static void log(LogType type, string msg)
     {
-        string list = "";
-        foreach (Logging l in log)
-        {
-            if (type <= l.type)
-            {
-                list += "[" + l.time + "] " + l.type + " " + l.klasse + ": " + l.methode + ": " + l.msg;
-
-                if (withExceptions)
-                    list += " <<" + l.exception.Message + ">>";
-                list += "\n";
-            }
-        }
-        return list;
+        generate(type, "", "", msg);
     }
-
-    public string tostring()
+    /// <summary>
+    /// Erstellt die auszugebene Nachricht mit Zeitstempel
+    /// </summary>
+    /// <param name="type">Wichtigkeits Grad der Ausgabe</param>
+    /// <param name="klasse">Betroffene Klasse</param>
+    /// <param name="methode">Betroffene Methode</param>
+    /// <param name="msg">Auszugebene Nachricht mit evtl. Exception</param>
+    private static void generate(LogType type, string klasse, string methode, string msg)
     {
-        string s = "[" + this.time + "] " + this.type + " " + this.klasse + ": " + this.methode + ": " + this.msg;
-        if (this.exception != null)
-            s += " <<" + this.exception.Message + ">>";
-        return s;
+        print(type, "[" + klasse + " - " + methode + "] " + msg); 
     }
-
-    public static void add(Type type, string klasse, string methode, string msg, Exception e)
+    /// <summary>
+    /// Gibt die Lognachricht aus
+    /// </summary>
+    /// <param name="type">Wichtigkeits Grad der Ausgabe</param>
+    /// <param name="message">Auszugebene Nachricht</param>
+    private static void print(LogType type, string message)
     {
-        add(new Logging(type, klasse, methode, msg, e));
-    }
-    public static void add(Type type, string klasse, string methode, string msg)
-    {
-        add(new Logging(type, klasse, methode, msg));
-    }
+#if UNITY_EDITOR
+        if (type == LogType.Debug && Config.DEBUG_MODE)
+            Debug.Log("DEBUG " + message);
+        else if (type == LogType.Normal)
+            Debug.Log(message);
+        else if (type == LogType.Warning)
+            Debug.LogWarning(message);
+        else if (type == LogType.Error)
+            Debug.LogError(message);
+        else if (type == LogType.Fatal)
+            Debug.LogError(message);
+#else
+        message = DateTime.Now + " " + message;
+        if (type == LogType.Debug || Config.DEBUG_MODE)
+            Debug.Log("DEBUG >> " + message);
+        else if (type == LogType.Normal)
+            Debug.Log("NORMAL >> " + message);
+        else if (type == LogType.Warning)
+            Debug.LogWarning("WARNING >> " + message);
+        else if (type == LogType.Error)
+            Debug.LogError("ERROR >> " + message);
+        else if (type == LogType.Fatal)
+            Debug.LogError("FATAL >> " + message);
+#endif
 
-    public static void add(Logging log)
-    {
-        Config.log.Add(log);
-
-        if (log.type == Type.Normal)
-        {
-            if (log.exception == null)
-            {
-                Debug.Log(log.klasse + ": " + log.methode + ": " + log.msg);
-            }
-            else
-            {
-                Debug.Log(log.klasse + ": " + log.methode + ": " + log.msg + " <<" + log.exception.Message + ">>");
-            }
-        }
-        else if (log.type == Type.Warning)
-        {
-            if (log.exception == null)
-            {
-                Debug.LogWarning(log.klasse + ": " + log.methode + ": " + log.msg);
-            }
-            else
-            {
-                Debug.LogWarning(log.klasse + ": " + log.methode + ": " + log.msg + " <<" + log.exception.Message + ">>");
-            }
-        }
-        else if (log.type == Type.Error || log.type == Type.Fatal)
-        {
-            if (log.exception == null)
-            {
-                Debug.LogError(log.klasse + ": " + log.methode + ": " + log.msg);
-            }
-            else
-            {
-                Debug.LogError(log.klasse + ": " + log.methode + ": " + log.msg + " <<" + log.exception.Message + ">>");
-            }
-        }
     }
-
 }
 

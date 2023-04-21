@@ -9,6 +9,7 @@ public class Quiz
 
     public Quiz(string path)
     {
+        Logging.log(Logging.LogType.Debug, "QuizSpiel", "QuizSpiel", "Spiel wird geladen: " + path);
         if (path == "Freestyle")
         {
             titel = "Freestyle";

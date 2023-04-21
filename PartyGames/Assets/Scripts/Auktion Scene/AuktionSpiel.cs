@@ -10,6 +10,7 @@ public class AuktionSpiel
 
     public AuktionSpiel()
     {
+        Logging.log(Logging.LogType.Debug, "AuktionSpiel", "AuktionSpiel", "Lade Spieldateien");
         elemente = new List<Auktion>();
 
         foreach (string sfile in Directory.GetFiles(Config.MedienPath + "/Spiele/Auktion"))
@@ -45,7 +46,7 @@ public class AuktionSpiel
     }
     public void setSelected(Auktion element) { selected = element; }
     public Auktion getSelected() { return selected; }
-    public List<string> getListenAsStringList()
+    public List<string> getGamesAsStringList()
     {
         List<string> list = new List<string>();
         foreach (Auktion element in elemente)
@@ -54,5 +55,4 @@ public class AuktionSpiel
         }
         return list;
     }
-
 }

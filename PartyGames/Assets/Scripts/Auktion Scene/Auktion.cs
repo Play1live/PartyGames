@@ -1,9 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
-using UnityEngine.UI;
 
 public class Auktion
 {
@@ -13,6 +10,7 @@ public class Auktion
 
     public Auktion(string path)
     {
+        Logging.log(Logging.LogType.Debug, "Auktion", "Auktion", "Lade Spieldatei: " + path);
         this.path = path;
         string temp = path.Split('\\')[path.Split('\\').Length - 1];
         this.titel = temp.Split('/')[temp.Split('/').Length - 1].Replace(".txt", "");
@@ -42,26 +40,8 @@ public class Auktion
             }
             catch (Exception e)
             {
-                Debug.LogError("Fehler beim Laden von Auktion: " + titel + " ->  " + s);
+                Logging.log(Logging.LogType.Warning, "Auktion", "Auktion", "Spieldatei konnte nicht geladen werden", e);
             }
-        }
-    }
-
-
-    private void LoadImages(Sprite destination, string url)
-    {
-        UnityWebRequest www = UnityWebRequestTexture.GetTexture(url);
-        www.SendWebRequest();
-
-        if (www.result != UnityWebRequest.Result.Success)
-        {
-            Debug.LogError("Auktion loading Image: " + www.error);
-        }
-        else
-        {
-            Texture2D myTexture = ((DownloadHandlerTexture)www.downloadHandler).texture;
-            Sprite sprite = Sprite.Create(myTexture, new Rect(0, 0, myTexture.width, myTexture.height), new Vector2(0.5f, 0.5f));
-            destination = sprite;
         }
     }
 

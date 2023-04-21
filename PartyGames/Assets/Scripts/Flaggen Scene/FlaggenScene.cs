@@ -45,6 +45,9 @@ public class FlaggenScene : MonoBehaviour
         StartCoroutine(IntroAnimation());
     }
 
+    /// <summary>
+    /// Spielt Introanimation ab
+    /// </summary>
     IEnumerator IntroAnimation()
     {
         IntroSound.Play();
@@ -55,11 +58,4 @@ public class FlaggenScene : MonoBehaviour
 
         IntroGO.SetActive(false);
     }
-
-    private void OnApplicationQuit()
-    {
-        //Logging.add(Logging.Type.Normal, "StartupScene", "OnApplicationQuit", "Programm wird beendet");
-        //MedienUtil.WriteLogsInDirectory();
-    }
-
 }

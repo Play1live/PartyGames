@@ -46,8 +46,12 @@ public class ListenScene : MonoBehaviour
         StartCoroutine(IntroAnimation());
     }
 
+    /// <summary>
+    /// Spiele die Introanimation ab
+    /// </summary>
     IEnumerator IntroAnimation()
     {
+        Logging.log(Logging.LogType.Debug, "ListenScene", "IntroAnimation", "Spiele die Introanimation ab");
         IntroSound.Play();
         IntroGO.SetActive(true);
 
@@ -55,16 +59,5 @@ public class ListenScene : MonoBehaviour
         yield return new WaitForSeconds(10);
 
         IntroGO.SetActive(false);
-    }
-
-    void Update()
-    {
-        
-    }
-
-    private void OnApplicationQuit()
-    {
-        //Logging.add(Logging.Type.Normal, "StartupScene", "OnApplicationQuit", "Programm wird beendet");
-        //MedienUtil.WriteLogsInDirectory();
     }
 }

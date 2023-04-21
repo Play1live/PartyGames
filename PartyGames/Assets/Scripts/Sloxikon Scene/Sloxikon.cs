@@ -10,6 +10,7 @@ public class Sloxikon
 
     public Sloxikon(string path)
     {
+        Logging.log(Logging.LogType.Debug, "Sloxikon", "Sloxikon", "Lade Datei: " + path);
         this.path = path;
         string temp = path.Split('\\')[path.Split('\\').Length - 1];
         this.titel = temp.Split('/')[temp.Split('/').Length - 1].Replace(".txt", "");
@@ -25,7 +26,7 @@ public class Sloxikon
             }
             else
             {
-                Debug.LogError("Datei Fehler: Sloxikon: "+ titel);
+                Logging.log(Logging.LogType.Warning, "Sloxikon", "Sloxikon", "Datei Fehler: Sloxikon: " + titel);
                 return;
             }
         }

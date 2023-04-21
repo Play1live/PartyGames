@@ -45,10 +45,13 @@ public class AuktionScene : MonoBehaviour
                 go.SetActive(false);
         }
 
-
         StartCoroutine(IntroAnimation());
     }
 
+    /// <summary>
+    /// Starte die Introanimation
+    /// </summary>
+    /// <returns></returns>
     IEnumerator IntroAnimation()
     {
         IntroSound.Play();
@@ -59,30 +62,4 @@ public class AuktionScene : MonoBehaviour
 
         IntroGo.SetActive(false);
     }
-
-
-    // testzwecke
-    private IEnumerator GetTexture()
-    {
-        UnityWebRequest www = UnityWebRequestTexture.GetTexture("");
-        yield return www.SendWebRequest();
-
-        if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
-        {
-            Debug.LogError("Error while downloading image: " + www.error);
-        }
-        else
-        {
-            Texture2D texture = ((DownloadHandlerTexture)www.downloadHandler).texture;
-            Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero);
-            
-        }
-    }
-
-    private void OnApplicationQuit()
-    {
-        //Logging.add(Logging.Type.Normal, "StartupScene", "OnApplicationQuit", "Programm wird beendet");
-        //MedienUtil.WriteLogsInDirectory();
-    }
-
 }

@@ -48,12 +48,15 @@ public class MosaikScene : MonoBehaviour
 
         StartCoroutine(IntroAnimation());
 
-        //Debug.LogWarning(imageUrl);
         //StartCoroutine(GetTexture());
     }
 
+    /// <summary>
+    /// Spielt die IntroAnimation an
+    /// </summary>
     IEnumerator IntroAnimation()
     {
+        Logging.log(Logging.LogType.Debug, "MosaikScene", "IntroAnimation", "Spielt Introanimation ab");
         IntroSound.Play();
         IntroGo.SetActive(true);
 
@@ -62,7 +65,9 @@ public class MosaikScene : MonoBehaviour
 
         IntroGo.SetActive(false);
     }
-
+    /// <summary>
+    /// Lädt ein Image und blendet es im Objekt ein
+    /// </summary>
     IEnumerator GetTexture()
     {
         // TEIL 1: Download des Bildes
@@ -114,19 +119,9 @@ public class MosaikScene : MonoBehaviour
                 imageObject.transform.GetChild(i).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Arrow "+ himmelrichtungen[random]);
             }
             #endregion
-            // TEIL 5: Lösung dafür finden das ich im Overlay sehe wenn alle fertig geladen sind
-
-            // TEIL 6: Fake Loadingbar für Spieler anzeigen (nur wenn lust)
         }
     }
 
     public string imageUrl = "https://forum.unity.com/styles/UnitySkin/xenforo/avatars/avatar_m.png"; // URL des Bildes hier einfügen
     public GameObject imageObject;
-
-    private void OnApplicationQuit()
-    {
-        //Logging.add(Logging.Type.Normal, "StartupScene", "OnApplicationQuit", "Programm wird beendet");
-        //MedienUtil.WriteLogsInDirectory();
-    }
-
 }

@@ -46,6 +46,9 @@ public class SloxikonScene : MonoBehaviour
         StartCoroutine(IntroAnimation());
     }
 
+    /// <summary>
+    /// Spielt die Introanimation ab
+    /// </summary>
     IEnumerator IntroAnimation()
     {
         IntroSound.Play();
@@ -55,16 +58,5 @@ public class SloxikonScene : MonoBehaviour
         yield return new WaitForSeconds(10);
 
         IntroGO.SetActive(false);
-    }
-
-    void Update()
-    {
-        
-    }
-
-    private void OnApplicationQuit()
-    {
-        //Logging.add(Logging.Type.Normal, "StartupScene", "OnApplicationQuit", "Programm wird beendet");
-        //MedienUtil.WriteLogsInDirectory();
     }
 }

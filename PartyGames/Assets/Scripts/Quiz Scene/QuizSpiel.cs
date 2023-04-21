@@ -10,6 +10,7 @@ public class QuizSpiel
 
     public QuizSpiel()
     {
+        Logging.log(Logging.LogType.Debug, "QuizSpiel", "QuizSpiel", "Spiele werden geladen.");
         quizze = new List<Quiz>();
         quizze.Add(new Quiz("Freestyle"));
 
@@ -35,7 +36,7 @@ public class QuizSpiel
     public List<Quiz> getQuizze() { return quizze; }
     public Quiz getSelected() { return selectedQuiz; }
     public void setSelected(Quiz quiz) { selectedQuiz = quiz; }
-    public List<string> getQuizzeAsStringList()
+    public List<string> getGamesAsStringList()
     {
         List<string> quizzes = new List<string>();
         foreach (Quiz quiz in getQuizze())

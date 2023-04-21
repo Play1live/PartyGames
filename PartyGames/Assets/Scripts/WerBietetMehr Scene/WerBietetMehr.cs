@@ -9,6 +9,7 @@ public class WerBietetMehr
 
     public WerBietetMehr(string path)
     {
+        Logging.log(Logging.LogType.Debug, "WerBietetMehr", "WerBietetMehr", "Spiel wird geladen: " + path);
         this.path = path;
         string temp = path.Split('\\')[path.Split('\\').Length - 1];
         this.titel = temp.Split('/')[temp.Split('/').Length - 1].Replace(".txt", "");
@@ -24,6 +25,10 @@ public class WerBietetMehr
             else if (zeile.StartsWith("-"))
             {
                 elemente.Add(zeile.Replace("-", ""));
+            }
+            else
+            {
+                Logging.log(Logging.LogType.Warning, "WerBietetMehr", "WerBietetMehr", titel + " unbekannte Eingabe: " + zeile);
             }
         }
     }

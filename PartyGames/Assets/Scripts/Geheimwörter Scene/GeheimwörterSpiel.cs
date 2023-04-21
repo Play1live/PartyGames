@@ -10,6 +10,7 @@ public class GeheimwörterSpiel
 
     public GeheimwörterSpiel()
     {
+        Logging.log(Logging.LogType.Debug, "GeheimwörterSpiel", "GeheimwörterSpiel", "Spieldateien werden geladen.");
         geheimwoerter = new List<Geheimwörter>();
 
         foreach (string sfile in Directory.GetFiles(Config.MedienPath + "/Spiele/Geheimwörter"))
@@ -40,7 +41,7 @@ public class GeheimwörterSpiel
     public Geheimwörter getSelected() { return selected; }
     public void setSelected(Geheimwörter geheimwoerter) { selected = geheimwoerter; }
 
-    public List<string> getListenAsStringList()
+    public List<string> getGamesAsStringList()
     {
         List<string> s = new List<string>();
         foreach (Geheimwörter ge in geheimwoerter)

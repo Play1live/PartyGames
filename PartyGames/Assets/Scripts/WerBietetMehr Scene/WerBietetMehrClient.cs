@@ -17,8 +17,6 @@ public class WerBietetMehrClient : MonoBehaviour
     GameObject Kreuz1;
     GameObject Kreuz2;
     GameObject Kreuz3;
-    DateTime zieltimer;
-    int timersecond = 0;
 
     GameObject SpielerAntwortEingabe;
     GameObject[,] SpielerAnzeige;
@@ -36,45 +34,13 @@ public class WerBietetMehrClient : MonoBehaviour
 
         if (!Config.CLIENT_STARTED)
             return;
-        SendToServer("#JoinWerBietetMehr");
 
+        SendToServer("#JoinWerBietetMehr");
         StartCoroutine(TestConnectionToServer());
     }
-    IEnumerator TestConnectionToServer()
-    {
-        while (Config.CLIENT_STARTED)
-        {
-            SendToServer("#TestConnection");
-            yield return new WaitForSeconds(10);
-        }
-    }
-
+    
     void Update()
     {
-        // Timer
-        /* TODO: testweise mit Coroutines
-        if (zieltimer != null && zieltimer != DateTime.MinValue)
-        {
-            if (DateTime.Now.Second != timersecond)
-            {
-                timersecond = DateTime.Now.Second;
-                int diff = getDiffInSeconds(zieltimer);
-                Timer.GetComponent<TMP_Text>().text = "" + diff;
-                if (diff == 0)
-                {
-                    Beeep.Play();
-                    Timer.SetActive(false);
-                    zieltimer = DateTime.MinValue;
-                    return;
-                }
-                // Moep Sound bei sekunden
-                if (diff == 1 || diff == 2 || diff == 3 || diff == 10 || diff == 30 || diff == 60) // 10-0
-                {
-                    Moeoep.Play();
-                }
-            }
-        }*/
-
         // Leertaste kann Buzzern
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -88,7 +54,6 @@ public class WerBietetMehrClient : MonoBehaviour
         {
             pressingbuzzer = false;
         }
-
 
         #region Prüft auf Nachrichten vom Server
         if (Config.CLIENT_STARTED)
@@ -105,8 +70,38 @@ public class WerBietetMehrClient : MonoBehaviour
         #endregion
     }
 
+    private void OnApplicationFocus(bool focus)
+    {
+        SendToServer("#ClientFocusChange " + focus);
+    }
+
+    private void OnApplicationQuit()
+    {
+        Logging.log(Logging.LogType.Normal, "Client", "OnApplicationQuit", "Client wird geschlossen.");
+        SendToServer("#ClientClosed");
+        CloseSocket();
+    }
+
+    /// <summary>
+    /// Testet die Verbindung zum Server alle 10 Sekunden. 
+    /// Beendet den Server, sobald die Verbindung getrennt wurde.
+    /// </summary>
+    IEnumerator TestConnectionToServer()
+    {
+        Logging.log(Logging.LogType.Debug, "WerBietetMehrClient", "TestConnectionToServer", "Testet ab sofort die Verbindumg zum Server.");
+        while (Config.CLIENT_STARTED)
+        {
+            SendToServer("#TestConnection");
+            yield return new WaitForSeconds(10);
+        }
+    }
+    /// <summary>
+    /// Lässt den Timer ablaufen
+    /// </summary>
+    /// <param name="seconds">Dauer des Timers</param>
     IEnumerator RunTimer(int seconds)
     {
+        Logging.log(Logging.LogType.Debug, "WerBietetMehrClient", "RunTimer", "Timer wird gestartet: " + seconds);
         Timer.SetActive(true);
 
         while (seconds >= 0)
@@ -130,23 +125,10 @@ public class WerBietetMehrClient : MonoBehaviour
         Timer.SetActive(false);
         yield break;
     }
-
-    private void OnApplicationFocus(bool focus)
-    {
-        SendToServer("#ClientFocusChange " + focus);
-    }
-
-    private void OnApplicationQuit()
-    {
-        Logging.add(Logging.Type.Normal, "Client", "OnApplicationQuit", "Client wird geschlossen.");
-        SendToServer("#ClientClosed");
-        CloseSocket();
-    }
-
     #region Verbindungen
-    /**
-     * Trennt die Verbindung zum Server
-     */
+    /// <summary>
+    /// Trennt die Verbindung zum Server
+    /// </summary>
     private void CloseSocket()
     {
         if (!Config.CLIENT_STARTED)
@@ -155,15 +137,17 @@ public class WerBietetMehrClient : MonoBehaviour
         Config.CLIENT_TCP.Close();
         Config.CLIENT_STARTED = false;
 
-        Logging.add(Logging.Type.Normal, "Client", "CloseSocket", "Verbindung zum Server wurde getrennt. Client wird in das Hauptmenü geladen.");
+        Logging.log(Logging.LogType.Normal, "WerBietetMehrClient", "CloseSocket", "Verbindung zum Server wurde getrennt. Client wird in das Hauptmenü geladen.");
     }
     #endregion
     #region Kommunikation
-    /**
-     * Sendet eine Nachricht an den Server.
-     */
-    public void SendToServer(string data)
+    /// <summary>
+    /// Sendet eine Nachricht an den Server.
+    /// </summary>
+    /// <param name="data">Nachricht</param>
+    private void SendToServer(string data)
     {
+        Logging.log(Logging.LogType.Debug, "WerBietetMehrClient", "SendToServer", "Nachricht: " + data);
         if (!Config.CLIENT_STARTED)
             return;
 
@@ -176,15 +160,16 @@ public class WerBietetMehrClient : MonoBehaviour
         }
         catch (Exception e)
         {
-            Logging.add(Logging.Type.Error, "Client", "SendToServer", "Nachricht an Server konnte nicht gesendet werden." + e);
+            Logging.log(Logging.LogType.Warning, "Client", "SendToServer", "Nachricht an Server konnte nicht gesendet werden.", e);
             Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server wurde verloren.";
             CloseSocket();
             SceneManager.LoadSceneAsync("StartUp");
         }
     }
-    /**
-     * Einkommende Nachrichten die vom Sever
-     */
+    /// <summary>
+    /// Einkommende Nachrichten die vom Sever
+    /// </summary>
+    /// <param name="data">Eingehende Daten</param>
     private void OnIncomingData(string data)
     {
         string cmd;
@@ -197,27 +182,32 @@ public class WerBietetMehrClient : MonoBehaviour
         Commands(data, cmd);
     }
     #endregion
-    /**
-     * Eingehende Commands vom Server
-     */
-    public void Commands(string data, string cmd)
+    /// <summary>
+    /// Eingehende Commands vom Server
+    /// </summary>
+    /// <param name="data">Befehlsargumente</param>
+    /// <param name="cmd">Befehl</param>
+    private void Commands(string data, string cmd)
     {
-        //Debug.Log("Eingehend: " + cmd + " -> " + data);
+        Logging.log(Logging.LogType.Debug, "WerBietetMehrClient", "Commands", "Eingehende Nachricht vom Server: " + cmd + " -> " + data);
         switch (cmd)
         {
             default:
-                Logging.add(Logging.Type.Warning, "WerBietetMehrClient", "Commands", "Unkown Command -> " + cmd + " - " + data);
+                Logging.log(Logging.LogType.Warning, "WerBietetMehrClient", "Commands", "Unkown Command: " + cmd + " -> " + data);
                 break;
 
             #region Universal Commands
             case "#ServerClosed":
+                Logging.log(Logging.LogType.Normal, "WerBietetMehrClient", "Commands", "Verbindung zum Server wurde getrennt.");
                 CloseSocket();
                 SceneManager.LoadSceneAsync("Startup");
                 break;
             case "#UpdateRemoteConfig":
+                Logging.log(Logging.LogType.Normal, "WerBietetMehrClient", "Commands", "RemoteConfig wird neugeladen.");
                 LoadConfigs.FetchRemoteConfig();
                 break;
             case "#ZurueckInsHauptmenue":
+                Logging.log(Logging.LogType.Normal, "WerBietetMehrClient", "Commands", "Spiel wird beendet. Lade ins Hauptmenü.");
                 SceneManager.LoadSceneAsync("Startup");
                 break;
             #endregion
@@ -283,11 +273,12 @@ public class WerBietetMehrClient : MonoBehaviour
         } 
     }
 
-    /**
-     * Initialisiert die Anzeigen der Scene
-     */
+    /// <summary>
+    /// Initialisiert die Anzeigen der Scene
+    /// </summary>
     private void InitAnzeigen()
     {
+        Logging.log(Logging.LogType.Debug, "WerBietetMehrClient", "InitAnzeigen", "Initialisiert Anzeigen");
         // Spieler Texteingabe
         SpielerAntwortEingabe = GameObject.Find("Canvas/SpielerAntwortEingabe");
         SpielerAntwortEingabe.SetActive(false);
@@ -310,7 +301,6 @@ public class WerBietetMehrClient : MonoBehaviour
             SpielerAnzeige[i, 6].SetActive(false); // Spieler Antwort
         }
 
-        zieltimer = DateTime.MinValue;
         Titel = GameObject.Find("WerBietetMehr/Outline/Titel");
         Titel.GetComponent<TMP_Text>().text = "";
         Timer = GameObject.Find("WerBietetMehr/Outline/Timer");
@@ -332,14 +322,15 @@ public class WerBietetMehrClient : MonoBehaviour
         Kreuz2.SetActive(false);
         Kreuz3 = GameObject.Find("WerBietetMehr/Outline/Kreuze/Kreuz 3");
         Kreuz3.SetActive(false);
-
     }
     #region
-    /**
-     * Aktualisiert die Spieler Anzeigen
-     */
+    /// <summary>
+    /// Aktualisiert die Spieler Anzeigen
+    /// </summary>
+    /// <param name="data">#UpdateSpieler <...></param>
     private void UpdateSpieler(string data)
     {
+        Logging.log(Logging.LogType.Debug, "WerBietetMehrClient", "UpdateSpieler", "Aktualisiert Spieleranzeigen: " + data);
         string[] player = data.Replace("[TRENNER]", "|").Split('|');
         foreach (string sp in player)
         {
@@ -348,7 +339,6 @@ public class WerBietetMehrClient : MonoBehaviour
             // Display ServerInfos
             if (pId == 0)
             {
-                
             }
             // Display Client Infos
             else
@@ -374,65 +364,76 @@ public class WerBietetMehrClient : MonoBehaviour
             }
         }
     }
-    /**
-     * Sendet eine Buzzer Anfrage an den Server
-     */
-    public void SpielerBuzzered()
+    /// <summary>
+    /// Sendet eine Buzzer Anfrage an den Server
+    /// </summary>
+    private void SpielerBuzzered()
     {
         SendToServer("#SpielerBuzzered");
     }
-    /**
-     * Gibt den Buzzer frei
-     */
+    /// <summary>
+    /// Gibt den Buzzer frei
+    /// </summary>
     private void BuzzerFreigeben()
     {
+        Logging.log(Logging.LogType.Debug, "WerBietetMehrClient", "BuzzerFreigeben", "Gibt den Buzzer frei.");
         for (int i = 0; i < Config.SERVER_MAX_CONNECTIONS; i++)
             SpielerAnzeige[i, 1].SetActive(false);
     }
-    /**
-     * Spielt Sound des Buzzers ab und zeigt welcher Spieler diesen gedrückt hat
-     */
+    /// <summary>
+    /// Spielt Sound des Buzzers ab und zeigt welcher Spieler diesen gedrückt hat
+    /// </summary>
+    /// <param name="data">Spieler</param>
     private void AudioBuzzerPressed(string data)
     {
+        Logging.log(Logging.LogType.Debug, "WerBietetMehrClient", "AudioBuzzerPressed", "Spieler bekommt Buzzer: " + data);
         BuzzerSound.Play();
         int pId = Int32.Parse(data);
         SpielerAnzeige[Player.getPosInLists(pId), 1].SetActive(true);
     }
-    /**
-     * Zeigt an, welcher Spieler dran ist
-     */
+    /// <summary>
+    /// Zeigt an, welcher Spieler dran ist. Blendet den roten Kreis eines Spielers ein
+    /// </summary>
+    /// <param name="data">Spielers</param>
     private void SpielerIstDran(string data)
     {
+        Logging.log(Logging.LogType.Debug, "WerBietetMehrClient", "SpielerIstDran", "Blendet roten Kreis ein: " + data);
         int pId = Int32.Parse(data);
         SpielerAnzeige[Player.getPosInLists(pId), 1].SetActive(true);
     }
-    /**
-     * Deaktiviert die Spieler ist dran anzeige
-     */
+    /// <summary>
+    /// Deaktiviert die Spieler ist nicht dran anzeige. Blendet den roten Kreis eines Spielers aus
+    /// </summary>
+    /// <param name="data"> Spielers</param>
     private void SpielerIstNichtDran(string data)
     {
+        Logging.log(Logging.LogType.Debug, "WerBietetMehrClient", "SpielerIstNichtDran", "Blendet roten Kreis aus: " + data);
         int pId = Int32.Parse(data);
         SpielerAnzeige[Player.getPosInLists(pId), 1].SetActive(false);
     }
-    /**
-     * Spielt den Sound für eine richtige Antwort ab
-     */
+    /// <summary>
+    /// Spielt den Sound für eine richtige Antwort ab
+    /// </summary>
     private void AudioRichtigeAntwort()
     {
+        Logging.log(Logging.LogType.Debug, "WerBietetMehrClient", "AudioRichtigeAntwort", "Spielt den Sound für eine richtige Antwort ab");
         RichtigeAntwortSound.Play();
     }
-    /**
-     * Spielt den Sound für eine falsche Antwort ab
-     */
+    /// <summary>
+    /// Spielt den Sound für eine falsche Antwort ab
+    /// </summary>
     private void AudioFalscheAntwort()
     {
+        Logging.log(Logging.LogType.Debug, "WerBietetMehrClient", "AudioFalscheAntwort", "Spielt den Sound für eine falsche Antwort ab");
         FalscheAntwortSound.Play();
     }
-    /**
-     * Zeigt an, ob ein Spieler austabt
-     */
+    /// <summary>
+    /// Zeigt an, ob ein Spieler austabt
+    /// </summary>
+    /// <param name="data">Aus-/Eingetabbte Spieler</param>
     private void SpielerAusgetabt(string data)
     {
+        Logging.log(Logging.LogType.Debug, "WerBietetMehrClient", "SpielerAusgetabt", "Zeigt an ob ein Spieler ein-/austabbt: " + data);
         // AustabenAnzeigen wird deaktiviert
         if (data == "0")
         {
@@ -451,11 +452,13 @@ public class WerBietetMehrClient : MonoBehaviour
             SpielerAnzeige[pos, 3].SetActive(type);
         }
     }
-    /**
-     * Zeigt das Texteingabefeld an
-     */
+    /// <summary>
+    /// Zeigt das Texteingabefeld an
+    /// </summary>
+    /// <param name="data">bool</param>
     private void TexteingabeAnzeigen(string data)
     {
+        Logging.log(Logging.LogType.Debug, "WerBietetMehrClient", "TexteingabeAnzeigen", "Blendet das Texteingabefeld ein/aus: " + data);
         bool anzeigen = Boolean.Parse(data);
         if (anzeigen) {
             SpielerAntwortEingabe.SetActive(true);
@@ -464,11 +467,13 @@ public class WerBietetMehrClient : MonoBehaviour
         else
             SpielerAntwortEingabe.SetActive(false);
     }
-    /**
-     * Zeigt die Textantworten aller Spieler an
-     */
+    /// <summary>
+    /// Zeigt die Textantworten aller Spieler an
+    /// </summary>
+    /// <param name="data">Blendet die Textantworten der Spieler ein</param>
     private void TextantwortenAnzeigen(string data)
     {
+        Logging.log(Logging.LogType.Debug, "WerBietetMehrClient", "TextantwortenAnzeigen", "Textantworten aller Spieler werden angezeigt: " + data);
         bool anzeigen = Boolean.Parse(data.Replace("[BOOL]", "|").Split('|')[1]);
         if (!anzeigen)
         {
@@ -485,27 +490,22 @@ public class WerBietetMehrClient : MonoBehaviour
             SpielerAnzeige[Player.getPosInLists(i), 6].GetComponentInChildren<TMP_InputField>().text = text.Replace("[ID"+i+"]","|").Split('|')[1];
         }
     }
-    /**
-     * Sendet die Antworteingabe an den Server
-     */
+    /// <summary>
+    /// Sendet die Antworteingabe an den Server
+    /// </summary>
+    /// <param name="input">Texteingabefeld</param>
     public void SpielerAntwortEingabeInput(TMP_InputField input)
     {
         SendToServer("#SpielerAntwortEingabe "+input.text);
     }
 #endregion
-    private int getDiffInSeconds(DateTime time)
-    {
-        if (DateTime.Compare(DateTime.Now, time) > 0)
-        {
-            return 0;
-        }
-        int sekunden = time.Second - DateTime.Now.Second;
-        sekunden += (time.Minute - DateTime.Now.Minute) * 60;
-        sekunden += (time.Hour - DateTime.Now.Hour) * 60 * 60;
-        return sekunden;
-    }
+    /// <summary>
+    /// Blendet alle Kreuze ein/aus
+    /// </summary>
+    /// <param name="data">bool</param>
     private void WMBKreuzeEinblenden(string data)
     {
+        Logging.log(Logging.LogType.Debug, "WerBietetMehrClient", "WMBKreuzeEinblenden", "Blendet alle Kreuze ein/aus: " + data);
         bool toggle = bool.Parse(data);
         Kreuz1.SetActive(toggle);
         Kreuz1.transform.GetChild(0).gameObject.SetActive(toggle);
@@ -514,8 +514,14 @@ public class WerBietetMehrClient : MonoBehaviour
         Kreuz3.SetActive(toggle);
         Kreuz3.transform.GetChild(0).gameObject.SetActive(toggle);
     }
-    public void WBMAnzahl(string data)
+    /// <summary>
+    /// Zeigt an, wie viele Elemente vorhanden sind. 
+    /// Blendet aber Texte aus.
+    /// </summary>
+    /// <param name="data">Liste der Elemente</param>
+    private void WBMAnzahl(string data)
     {
+        Logging.log(Logging.LogType.Debug, "WerBietetMehrClient", "WBMAnzahl", data);
         string[] elemente = data.Replace("<>", "|").Split('|');
         for (int i = 0; i < elemente.Length; i++)
         {
@@ -526,29 +532,46 @@ public class WerBietetMehrClient : MonoBehaviour
             Elemente[i].SetActive(true);
         }
     }
-    public void AnsagenElementeEinblenden(string data)
+    /// <summary>
+    /// Blendet ein, wie viele Elemente aufgezählt werden müssen
+    /// </summary>
+    /// <param name="data">Anzahl der aufzuzählenden Elemente</param>
+    private void AnsagenElementeEinblenden(string data)
     {
+        Logging.log(Logging.LogType.Debug, "WerBietetMehrClient", "AnsagenElementeEinblenden", "Blendet ein, wie viele Elemente auszuzählen sind. " + data);
         Anzahl.SetActive(true);
         Anzahl.transform.GetChild(0).gameObject.GetComponent<TMP_Text>().text = "0";
         Anzahl.transform.GetChild(1).gameObject.GetComponent<TMP_Text>().text = "von " + data;
     }
-    public void TitelEinblenden(string data)
+    /// <summary>
+    /// Blendet den Titel des Games für alle ein
+    /// </summary>
+    /// <param name="data">Titel</param>
+    private void TitelEinblenden(string data)
     {
+        Logging.log(Logging.LogType.Debug, "WerBietetMehrClient", "TitelEinblenden", "Titel wird eingeblendet: " + data);
         Titel.GetComponent<TMP_Text>().text = data;
         Titel.SetActive(true);
     }
-    public void TimerStarten(string data)
+    /// <summary>
+    /// Startet den Timer mit Anzeige
+    /// </summary>
+    /// <param name="data">Sekunden</param>
+    private void TimerStarten(string data)
     {
+        Logging.log(Logging.LogType.Debug, "WerBietetMehrClient", "TimerStarten", "Starte den Timer mit " + data + " Sekunden.");
         int sekunden = Int32.Parse(data);
 
         StopCoroutine(RunTimer(0));
         StartCoroutine(RunTimer(sekunden));
-        //zieltimer = DateTime.Now.AddSeconds(sekunden);
-        //Timer.SetActive(true);
-        //Timer.GetComponent<TMP_Text>().text = "" + getDiffInSeconds(zieltimer);
     }
+    /// <summary>
+    /// Zeigt/versteckt Kreuze bei Fehlern
+    /// </summary>
+    /// <param name="data">Kreuz <1-3> ein-/ausblenden</param>
     private void KreuzeAusgrauen(string data)
     {
+        Logging.log(Logging.LogType.Debug, "WerBietetMehrClient", "KreuzeAusgrauen", data);
         if (data == "1")
         {
             Kreuz1.transform.GetChild(0).gameObject.SetActive(false);
@@ -573,14 +596,26 @@ public class WerBietetMehrClient : MonoBehaviour
         {
             Kreuz3.transform.GetChild(0).gameObject.SetActive(true);
         }
+        else
+        {
+            Logging.log(Logging.LogType.Warning, "WerBietetMehrClient", "KreuzeAusgrauen", "Kreuz nicht gefunden. " + data);
+        }
     }
+    /// <summary>
+    /// Ändert die Punktanzahl manuell
+    /// </summary>
+    /// <param name="data">Punkteingabe</param>
     private void AnzahlManuellAendern(string data)
     {
+        Logging.log(Logging.LogType.Debug, "WerBietetMehrClient", "AnzahlManuellAendern", "Ändert die Anzahl der aufgezählten Elemente. Anzahl: " + data);
         Anzahl.transform.GetChild(0).gameObject.GetComponent<TMP_Text>().text = data;
     }
+    /// <summary>
+    /// Blendet alte Anzeigen aus und wechselt das ausgewählte Spiel
+    /// </summary>
     private void ChangeListe()
     {
-        zieltimer = DateTime.MinValue;
+        Logging.log(Logging.LogType.Debug, "WerBietetMehrClient", "ChangeListe", "Wechselt die Liste und blendet alle Anzeigen aus.");
         Titel.GetComponent<TMP_Text>().text = "";
         Timer.SetActive(false);
         Anzahl.SetActive(false);
@@ -597,8 +632,13 @@ public class WerBietetMehrClient : MonoBehaviour
         Kreuz2.SetActive(false);
         Kreuz3.SetActive(false);
     }
-    public void ElementAuflösen(string data)
+    /// <summary>
+    /// Löst ein Element der Liste auf
+    /// </summary>
+    /// <param name="data">Element Daten</param>
+    private void ElementAuflösen(string data)
     {
+        Logging.log(Logging.LogType.Debug, "WerBietetMehrClient", "ElementAuflösen", "Element wird aufgelöst. Element: " + data);
         bool aufloesen = bool.Parse(data.Replace("[BOOL]", "|").Split('|')[1]);
         string anz = data.Replace("[ANZ]", "|").Split('|')[1];
         int index = Int32.Parse(data.Replace("[INDEX]", "|").Split('|')[1])-1;

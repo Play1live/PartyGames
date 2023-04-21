@@ -12,6 +12,7 @@ public class MosaikSpiel
 
     public MosaikSpiel()
     {
+        Logging.log(Logging.LogType.Debug, "MosaikSpiel", "MosaikSpiel", "Lade Spiele.");
         mosaike = new List<Mosaik>();
         beispiel = Resources.Load<Sprite>("Spiele/Mosaik/Beispiel");
 
@@ -51,7 +52,7 @@ public class MosaikSpiel
     public Mosaik getSelected() { return selected; }
     public Sprite getBeispiel() { return beispiel; }
 
-    public List<string> getListenAsStringList()
+    public List<string> getGamesAsStringList()
     {
         List<string> list = new List<string>();
         foreach (Mosaik mosaik in mosaike)

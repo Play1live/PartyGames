@@ -10,6 +10,7 @@ public class Geheimwörter
 
     public Geheimwörter(string path)
     {
+        Logging.log(Logging.LogType.Debug, "Geheimwörter", "Geheimwörter", "Lade Datei: " + path);
         this.path = path;
         string temp = path.Split('\\')[path.Split('\\').Length - 1];
         this.dateiname = temp.Split('/')[temp.Split('/').Length - 1].Replace(".txt", "");

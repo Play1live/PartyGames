@@ -45,36 +45,20 @@ public class QuizServer : MonoBehaviour
         #region Server
         if (!Config.SERVER_STARTED)
         {
-            SceneManager.LoadScene("Startup");
+            SceneManager.LoadSceneAsync("Startup");
             return;
         }
 
         foreach (Player spieler in Config.PLAYERLIST)
         {
-
             if (spieler.isConnected == false)
                 continue;
-
-
-            #region Prüft ob Clients noch verbunden sind
-            /*if (!isConnected(spieler.tcp) && spieler.isConnected == true)
-            {
-                Debug.LogWarning(spieler.id);
-                spieler.tcp.Close();
-                spieler.isConnected = false;
-                spieler.isDisconnected = true;
-                Logging.add(new Logging(Logging.Type.Normal, "Server", "Update", "Spieler ist nicht mehr Verbunden. ID: " + spieler.id));
-                continue;
-            }*/
-            #endregion
             #region Sucht nach neuen Nachrichten
-            /*else*/
             if (spieler.isConnected == true)
             {
                 NetworkStream stream = spieler.tcp.GetStream();
                 if (stream.DataAvailable)
                 {
-                    //StreamReader reader = new StreamReader(stream, true);
                     StreamReader reader = new StreamReader(stream);
                     string data = reader.ReadLine();
 
@@ -91,7 +75,7 @@ public class QuizServer : MonoBehaviour
                 {
                     if (Config.PLAYERLIST[i].isDisconnected == true)
                     {
-                        Logging.add(Logging.Type.Normal, "QuizServer", "Update", "Spieler hat die Verbindung getrennt. ID: " + Config.PLAYERLIST[i].id);
+                        Logging.log(Logging.LogType.Normal, "QuizServer", "Update", "Spieler hat die Verbindung getrennt. ID: " + Config.PLAYERLIST[i].id);
                         Broadcast(Config.PLAYERLIST[i].name + " has disconnected", Config.PLAYERLIST);
                         Config.PLAYERLIST[i].isConnected = false;
                         Config.PLAYERLIST[i].isDisconnected = false;
@@ -108,65 +92,17 @@ public class QuizServer : MonoBehaviour
     private void OnApplicationQuit()
     {
         Broadcast("#ServerClosed", Config.PLAYERLIST);
-        Logging.add(new Logging(Logging.Type.Normal, "Server", "OnApplicationQuit", "Server wird geschlossen"));
+        Logging.log(Logging.LogType.Normal, "QuizServer", "OnApplicationQuit", "Server wird geschlossen.");
         Config.SERVER_TCP.Server.Close();
     }
 
-    #region Server Stuff
-    #region Verbindungen
-    /**
-     * Prüft ob eine Verbindung zum gegebenen Client noch besteht
-     */
-    private bool isConnected(TcpClient c)
-    {
-        /*try
-        {
-            if (c != null && c.Client != null && c.Client.Connected)
-            {
-                if (c.Client.Poll(0, SelectMode.SelectRead))
-                {
-                    return !(c.Client.Receive(new byte[1], SocketFlags.Peek) == 0);
-                }
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        catch
-        {
-            return false;
-        }*/
-        if (c != null && c.Client != null && c.Client.Connected)
-        {
-            if ((c.Client.Poll(0, SelectMode.SelectWrite)) && (!c.Client.Poll(0, SelectMode.SelectError)))
-            {
-                byte[] buffer = new byte[1];
-                if (c.Client.Receive(buffer, SocketFlags.Peek) == 0)
-                {
-                    return false;
-                }
-                else
-                {
-                    return true;
-                }
-            }
-            else
-            {
-                return false;
-            }
-        }
-        else
-        {
-            return false;
-        }
-    }
-    #endregion
+    #region Server Stuff  
     #region Kommunikation
-    /**
-     * Sendet eine Nachricht an den übergebenen Spieler
-     */
+    /// <summary>
+    /// Sendet eine Nachricht an den übergebenen Spieler
+    /// </summary>
+    /// <param name="data">Nachricht</param>
+    /// <param name="sc">Spieler</param>
     private void SendMSG(string data, Player sc)
     {
         try
@@ -177,14 +113,16 @@ public class QuizServer : MonoBehaviour
         }
         catch (Exception e)
         {
-            Logging.add(new Logging(Logging.Type.Error, "Server", "SendMessage", "Nachricht an Client: " + sc.id + " (" + sc.name + ") konnte nicht gesendet werden." + e));
+            Logging.log(Logging.LogType.Warning, "QuizServer", "SendMSG", "Nachricht an Client: " + sc.id + " (" + sc.name + ") konnte nicht gesendet werden.", e);
             // Verbindung zum Client wird getrennt
             ClientClosed(sc);
         }
     }
-    /**
-     * Sendet eine Nachricht an alle verbundenen Spieler
-     */
+    /// <summary>
+    /// Sendet eine Nachricht an alle Spieler der liste
+    /// </summary>
+    /// <param name="data">Nachricht</param>
+    /// <param name="spieler">Spielerliste</param>
     private void Broadcast(string data, Player[] spieler)
     {
         foreach (Player sc in spieler)
@@ -193,9 +131,10 @@ public class QuizServer : MonoBehaviour
                 SendMSG(data, sc);
         }
     }
-    /**
-     * Sendet eine Nachricht an alle verbundenen Spieler
-     */
+    /// <summary>
+    /// Sendet eine Nachricht an alle verbundenen Spieler
+    /// </summary>
+    /// <param name="data">Nachricht</param>
     private void Broadcast(string data)
     {
         foreach (Player sc in Config.PLAYERLIST)
@@ -204,9 +143,11 @@ public class QuizServer : MonoBehaviour
                 SendMSG(data, sc);
         }
     }
-    /**
-     * Einkommende Nachrichten die von Spielern an den Server gesendet werden.
-     */
+    /// <summary>
+    /// Einkommende Nachrichten die von Spielern an den Server gesendet werden
+    /// </summary>
+    /// <param name="spieler">Spieler</param>
+    /// <param name="data">Nachricht</param>
     private void OnIncommingData(Player spieler, string data)
     {
         string cmd;
@@ -219,18 +160,21 @@ public class QuizServer : MonoBehaviour
         Commands(spieler, data, cmd);
     }
     #endregion
-    /**
-     * Einkommende Befehle von Spielern
-     */
-    public void Commands(Player player, string data, string cmd)
+    /// <summary>
+    /// Einkommende Befehle von Spielern
+    /// </summary>
+    /// <param name="player">Spieler</param>
+    /// <param name="data">Befehlsargumente</param>
+    /// <param name="cmd">Befehl</param>
+    private void Commands(Player player, string data, string cmd)
     {
         // Zeigt alle einkommenden Nachrichten an
-        //Debug.Log(player.name + " " + player.id + " -> " + cmd + "   ---   " + data);
+        Logging.log(Logging.LogType.Debug, "QuizServer", "Commands", "Eingehende Nachricht: " + player.name + " " + player.id + " -> " + cmd + "   ---   " + data);
         // Sucht nach Command
         switch (cmd)
         {
             default:
-                Logging.add(Logging.Type.Warning, "QuizServer", "Commands", "Unkown Command -> " + cmd + " - " + data);
+                Logging.log(Logging.LogType.Warning, "QuizServer", "Commands", "Unkown Command: " + cmd + " -> " + data);
                 break;
 
             case "#ClientClosed":
@@ -256,17 +200,19 @@ public class QuizServer : MonoBehaviour
         }
     }
     #endregion
-    /**
-     * Fordert alle Clients auf die RemoteConfig neuzuladen
-     */
+    /// <summary>
+    /// Fordert alle Clients auf die RemoteConfig neuzuladen
+    /// </summary>
     public void UpdateRemoteConfig()
     {
+        Logging.log(Logging.LogType.Debug, "QuizServer", "UpdateRemoteConfig", "RemoteConfig wird aktualisiert.");
         Broadcast("#UpdateRemoteConfig");
         LoadConfigs.FetchRemoteConfig();
     }
-    /**
-     * Spieler beendet das Spiel
-     */
+    /// <summary>
+    /// Spieler beendet das Spiel
+    /// </summary>
+    /// <param name="player">Spieler</param>
     private void ClientClosed(Player player)
     {
         player.icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
@@ -275,24 +221,26 @@ public class QuizServer : MonoBehaviour
         player.isConnected = false;
         player.isDisconnected = true;
     }
-    /**
-     *  Spiel Verlassen & Zurück in die Lobby laden
-     */
+    /// <summary>
+    /// Spiel Verlassen & Zurück in die Lobby laden
+    /// </summary>
     public void SpielVerlassenButton()
     {
+        Logging.log(Logging.LogType.Debug, "QuizServer", "SpielVerlassenButton", "Spiel wird beendet. Lädt ins Hauptmenü.");
         SceneManager.LoadScene("Startup");
         Broadcast("#ZurueckInsHauptmenue");
     }
-    /**
-     * Sendet aktualisierte Spielerinfos an alle Spieler
-     */
+    /// <summary>
+    /// Sendet aktualisierte Spielerinfos an alle Spieler
+    /// </summary>
     private void UpdateSpielerBroadcast()
     {
         Broadcast(UpdateSpieler(), Config.PLAYERLIST);
     }
-    /**
-     * Aktualisiert die Spieler Anzeige Informationen & gibt diese als Text zurück
-     */
+    /// <summary>
+    /// Aktualisiert die Spieler Anzeige Informationen & gibt diese als Text zurück
+    /// </summary>
+    /// <returns>#UpdateSpieler ...</returns>
     private string UpdateSpieler()
     {
         string msg = "#UpdateSpieler [ID]0[ID][PUNKTE]" + Config.SERVER_PLAYER_POINTS + "[PUNKTE]";
@@ -311,17 +259,18 @@ public class QuizServer : MonoBehaviour
             }
             else
                 SpielerAnzeige[i, 0].SetActive(false);
-
         }
         // Server 
         FalscheAntworten.GetComponent<TMP_Text>().text = "Falsche Antworten: "+Config.SERVER_PLAYER_POINTS;
+        Logging.log(Logging.LogType.Debug, "QuizServer", "UpdateSpieler", msg);
         return msg;
     }
-    /**
-     * Initialisiert die Anzeigen zu beginn
-     */
+    /// <summary>
+    /// Initialisiert die Anzeigen zu beginn
+    /// </summary>
     private void InitAnzeigen()
     {
+        Logging.log(Logging.LogType.Debug, "QuizServer", "InitAnzeigen", "Anzeigen werden initialisiert.");
         SchaetzfragenAnimationController.SetActive(false);
 
         // Fragen Anzeige
@@ -384,9 +333,6 @@ public class QuizServer : MonoBehaviour
         ChangeQuiz.GetComponent<TMP_Dropdown>().AddOptions(quizzes);
         ChangeQuiz.GetComponent<TMP_Dropdown>().value = Config.QUIZ_SPIEL.getIndex(Config.QUIZ_SPIEL.getSelected());
 
-        // Schätzfragen
-        //if (GameObject.Find("SchaetzfragenAnimation") != null)
-            //GameObject.Find("SchaetzfragenAnimation").SetActive(false);
         SchaetzfragenAnzeige = new GameObject[20];
         SchaetzfragenAnzeige[0] = GameObject.Find("SchaetzfragenAnimation/Grid");
         SchaetzfragenAnzeige[1] = GameObject.Find("SchaetzfragenAnimation/Grid/MinGrenze");
@@ -432,20 +378,19 @@ public class QuizServer : MonoBehaviour
             }
         }
 
-
         SchaetzfragenSpielerInput = new TMP_InputField[Config.PLAYERLIST.Length];
         for (int i = 0; i < Config.PLAYERLIST.Length; i++)
         {
             SchaetzfragenSpielerInput[i] = GameObject.Find("SchaetzfragenAnimation/Spieler/Spieler ("+(i+1)+")/Input").GetComponent<TMP_InputField>();
         }
     }
-
     #region Quiz Fragen Anzeige
-    /**
-     * Initialisiert die Anzeigen des Quizzes
-     */
+    /// <summary>
+    /// Initialisiert die Anzeigen des Quizzes
+    /// </summary>
     private void InitQuiz()
     {
+        Logging.log(Logging.LogType.Debug, "QuizServer", "InitQuiz", "Quizelemente werden aktualisiert.");
         aktuelleFrage = 0;
         GameObject.Find("QuizAnzeigen/Titel").GetComponent<TMP_Text>().text = Config.QUIZ_SPIEL.getSelected().getTitel();
         GameObject.Find("QuizAnzeigen/FragenIndex2").GetComponentInChildren<TMP_Text>().text = "";
@@ -455,14 +400,16 @@ public class QuizServer : MonoBehaviour
             LoadQuestionIntoScene(0);
         }
     }
-    /**
-     * Ändert das ausgewählte Quiz
-     */
+    /// <summary>
+    /// Ändert das ausgewählte Quiz
+    /// </summary>
+    /// <param name="drop">Quizauswahl</param>
     public void ChangeQuiz(TMP_Dropdown drop)
     {
+        Logging.log(Logging.LogType.Debug, "QuizServer", "ChangeQuiz", "Spiel wird gewechselt: " + drop.options[drop.value]);
         // Wählt neues Quiz aus
         Config.QUIZ_SPIEL.setSelected(Config.QUIZ_SPIEL.getQuizByIndex(drop.value));
-        Logging.add(Logging.Type.Normal, "QuizServer", "ChangeQuiz", "Quiz starts: " + Config.QUIZ_SPIEL.getSelected().getTitel());
+        Logging.log(Logging.LogType.Normal, "QuizServer", "ChangeQuiz", "Quiz starts: " + Config.QUIZ_SPIEL.getSelected().getTitel());
         // Aktualisiert die Anzeigen
         aktuelleFrage = 0;
         GameObject.Find("QuizAnzeigen/Titel").GetComponent<TMP_Text>().text = Config.QUIZ_SPIEL.getSelected().getTitel();
@@ -474,16 +421,16 @@ public class QuizServer : MonoBehaviour
             LoadQuestionIntoScene(0);
         }
     }
-    /**
-     * Navigiert durch die Fragen, zeigt/versteckt diese
-     */
+    /// <summary>
+    /// Navigiert durch die Fragen, zeigt/versteckt diese
+    /// </summary>
+    /// <param name="type">Navigationsargument</param>
     public void NavigateThroughQuestions(string type)
     {
         switch (type)
         {
             default:
-                Debug.LogError("NavigateThroughQuestions: unbekannter Typ");
-                Logging.add(Logging.Type.Error, "QuizServer", "NavigateThroughQuestions", "unbekannter Typ -> " + type);
+                Logging.log(Logging.LogType.Error, "QuizServer", "NavigateThroughQuestions", "Unbekannter Typ: " + type);
                 break;
             case "previous":
                 if (aktuelleFrage <= 0)
@@ -509,11 +456,13 @@ public class QuizServer : MonoBehaviour
                 break;
         }
     }
-    /**
-     * Lädt die Frage nach Index, für die Server Vorschau
-     */
+    /// <summary>
+    /// Lädt die Frage nach Index, für die Server Vorschau
+    /// </summary>
+    /// <param name="index">Lädt eine Frage des aktuellen Quiz in die Scene</param>
     private void LoadQuestionIntoScene(int index)
     {
+        Logging.log(Logging.LogType.Debug, "QuizServer", "LoadQuestionIntoScene", "Lädt die Frage: " + Config.QUIZ_SPIEL.getSelected().getFrage(index).getFrage() + " in die Scene.");
         GameObject.Find("QuizAnzeigen/FragenVorschau").GetComponent<TMP_Text>().text = "Frage:\n"+Config.QUIZ_SPIEL.getSelected().getFrage(index).getFrage();
         GameObject.Find("QuizAnzeigen/AntwortVorschau").GetComponent<TMP_Text>().text = "Antwort:\n"+ Config.QUIZ_SPIEL.getSelected().getFrage(index).getAntwort();
         GameObject.Find("QuizAnzeigen/InfoVorschau").GetComponent<TMP_Text>().text = "Info:\n"+Config.QUIZ_SPIEL.getSelected().getFrage(index).getInfo();
@@ -521,57 +470,65 @@ public class QuizServer : MonoBehaviour
     }
     #endregion
     #region Buzzer
-    /**
-     * Aktiviert/Deaktiviert den Buzzer für alle Spieler
-     */
+    /// <summary>
+    /// Aktiviert/Deaktiviert den Buzzer für alle Spieler
+    /// </summary>
+    /// <param name="toggle">Toggle</param>
     public void BuzzerAktivierenToggle(Toggle toggle)
     {
+        Logging.log(Logging.LogType.Debug, "WerBietetMehrServer", "BuzzerAktivierenToggle", "Buzzer wird aktiviert: " + toggle.isOn);
         buzzerIsOn = toggle.isOn;
         BuzzerAnzeige.SetActive(toggle.isOn);
     }
-    /**
-     * Spielt Sound ab, sperrt den Buzzer und zeigt den Spieler an
-     */
+    /// <summary>
+    /// Spielt Sound ab, sperrt den Buzzer und zeigt den Spieler an
+    /// </summary>
+    /// <param name="p">Spieler</param>
     private void SpielerBuzzered(Player p)
     {
         if (!buzzerIsOn)
         {
-            Debug.Log(p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
+            Logging.log(Logging.LogType.Normal, "WerBietetMehrServer", "SpielerBuzzered", p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
             return;
         }
-        Debug.LogWarning("B: "+p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
+        Logging.log(Logging.LogType.Warning, "WerBietetMehrServer", "SpielerBuzzered", "B: " + p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
         buzzerIsOn = false;
         Broadcast("#AudioBuzzerPressed " + p.id);
         BuzzerSound.Play();
         SpielerAnzeige[p.id - 1, 1].SetActive(true);
     }
-    /**
-     * Gibt den Buzzer für alle Spieler frei
-     */
+    /// <summary>
+    /// Gibt den Buzzer für alle Spieler frei
+    /// </summary>
     public void SpielerBuzzerFreigeben()
     {
         for (int i = 0; i < Config.SERVER_MAX_CONNECTIONS; i++)
             SpielerAnzeige[i, 1].SetActive(false);
         buzzerIsOn = BuzzerAnzeige.activeInHierarchy;
-        Debug.LogWarning("Buzzer freigegeben.");
+        Logging.log(Logging.LogType.Warning, "WerBietetMehrServer", "SpielerBuzzerFreigeben", "Buzzer freigegeben");
         Broadcast("#BuzzerFreigeben");
     }
     #endregion
     #region Spieler Ausgetabt Anzeige
-    /**
-     * Austaben wird allen/keinen Spielern angezeigt
-     */
+    /// <summary>
+    /// Austaben wird allen/keinen Spielern angezeigt
+    /// </summary>
+    /// <param name="toggle">Toggle</param>
     public void AustabenAllenZeigenToggle(Toggle toggle)
     {
+        Logging.log(Logging.LogType.Debug, "WerBietetMehrServer", "AustabenAllenZeigenToggle", "Angeige: " + toggle.isOn);
         AustabbenAnzeigen.SetActive(toggle.isOn);
         if (toggle.isOn == false)
             Broadcast("#SpielerAusgetabt 0");
     }
-    /**
-     * Spieler Tabt aus, wird ggf allen gezeigt
-     */
+    /// <summary>
+    /// Spieler Tabt aus, wird ggf allen gezeigt
+    /// </summary>
+    /// <param name="player">Spieler</param>
+    /// <param name="data">Ein-/Ausgetabt</param>
     private void ClientFocusChange(Player player, string data)
     {
+        Logging.log(Logging.LogType.Debug, "WerBietetMehrServer", "ClientFocusChange", "Spieler " + player.name + " ist ausgetabt: " + data);
         bool ausgetabt = !Boolean.Parse(data);
         SpielerAnzeige[(player.id - 1), 3].SetActive(ausgetabt); // Ausgetabt Einblednung
         if (AustabbenAnzeigen.activeInHierarchy)
@@ -579,17 +536,19 @@ public class QuizServer : MonoBehaviour
     }
     #endregion
     #region Frage
-    /**
-     * Zeigt/Versteckt die Frage für alle Spieler
-     */
+    /// <summary>
+    /// Zeigt/Versteckt die Frage für alle Spieler
+    /// </summary>
+    /// <param name="toggle">Toggle</param>
     public void FrageAnzeigenToggle(Toggle toggle)
     {
         FragenAnzeige.SetActive(toggle.isOn);
         Broadcast("#FragenAnzeige [BOOL]"+toggle.isOn+"[BOOL][FRAGE]"+Frage.GetComponentInChildren<TMP_Text>().text);
     }
-    /**
-     * Blendet die selbst eingegebene Frage ein
-     */
+    /// <summary>
+    /// Blendet die selbst eingegebene Frage ein
+    /// </summary>
+    /// <param name="input">Texteingabefeld</param>
     public void EigeneFrageEinblenden(TMP_InputField input)
     {
         Frage.GetComponentInChildren<TMP_Text>().text = input.text;
@@ -599,18 +558,21 @@ public class QuizServer : MonoBehaviour
     }
     #endregion
     #region Textantworten der Spieler
-    /**
-     * Blendet die Texteingabe für die Spieler ein
-     */
+    /// <summary>
+    /// Blendet die Texteingabe für die Spieler ein
+    /// </summary>
+    /// <param name="toggle">Toggle</param>
     public void TexteingabeAnzeigenToggle(Toggle toggle)
     {
         TextEingabeAnzeige.SetActive(toggle.isOn);
         Broadcast("#TexteingabeAnzeigen "+ toggle.isOn);
     }
-    /**
-    * Aktualisiert die Antwort die der Spieler eingibt
-    */
-    public void SpielerAntwortEingabe(Player p, string data)
+    /// <summary>
+    /// Aktualisiert die Antwort die der Spieler eingibt
+    /// </summary>
+    /// <param name="p">Spieler</param>
+    /// <param name="data">Texteingabe</param>
+    private void SpielerAntwortEingabe(Player p, string data)
     {
         SpielerAnzeige[p.id - 1, 6].GetComponentInChildren<TMP_InputField>().text = data;
 
@@ -624,8 +586,6 @@ public class QuizServer : MonoBehaviour
         int zahlende = -1;
         for (int i = 0; i < data.Length; i++)
         {
-
-            //Debug.LogError(zahlstart +"   "+ zahlstart +"   "+ data);
             // Buchstabe an Index i ist nicht in Liste enthalten
             if (Array.IndexOf(moeglicheEingaben, data[i]) > -1)
             {
@@ -637,11 +597,8 @@ public class QuizServer : MonoBehaviour
             // Wenn Zahl Vorbei ist, abbrechen
             if (zahlende != i && zahlende > -1)
                 break;
-            //Debug.LogWarning("Länge: " + (zahlende - zahlstart + 1));
             try
             {
-                //double antwort = float.Parse(data.Substring(zahlstart, zahlende - zahlstart + 1));
-                //Debug.LogWarning(antwort);
                 string antwort = data.Substring(zahlstart, zahlende - zahlstart + 1).Replace(".", "");
                 // maximiert komma trennung
                 if (antwort.Contains(","))
@@ -652,14 +609,13 @@ public class QuizServer : MonoBehaviour
 
                 SchaetzfragenSpielerInput[Player.getPosInLists(p.id)].text = antwort+"";
             }
-            catch (Exception e) { }
-
+            catch {}
         }
     }
-
-    /**
-     * Blendet die Textantworten der Spieler ein
-     */
+    /// <summary>
+    /// Blendet die Textantworten der Spieler ein
+    /// </summary>
+    /// <param name="toggle">Toggle</param>
     public void TextantwortenAnzeigeToggle(Toggle toggle)
     {
         TextAntwortenAnzeige.SetActive(toggle.isOn);
@@ -677,24 +633,26 @@ public class QuizServer : MonoBehaviour
     }
     #endregion
     #region Punkte
-    /**
-     * Punkte Pro Richtige Antworten Anzeigen
-     */
+    /// <summary>
+    /// Punkte Pro Richtige Antworten Anzeigen
+    /// </summary>
+    /// <param name="input">Punkteingabe</param>
     public void ChangePunkteProRichtigeAntwort(TMP_InputField input)
     {
         PunkteProRichtige = Int32.Parse(input.text);
     }
-    /**
-     * Punkte Pro Falsche Antworten Anzeigen
-     */
+    /// <summary>
+    /// Punkte Pro Falsche Antworten Anzeigen
+    /// </summary>
+    /// <param name="input">Punkteingabe</param>
     public void ChangePunkteProFalscheAntwort(TMP_InputField input)
     {
         PunkteProFalsche = Int32.Parse(input.text);
     }
-    
-    /**
-     * Vergibt an den Spieler Punkte für eine richtige Antwort
-     */
+    /// <summary>
+    /// Vergibt an den Spieler Punkte für eine richtige Antwort
+    /// </summary>
+    /// <param name="player">Spieler</param>
     public void PunkteRichtigeAntwort(GameObject player)
     {
         Broadcast("#AudioRichtigeAntwort");
@@ -704,9 +662,10 @@ public class QuizServer : MonoBehaviour
         Config.PLAYERLIST[pIndex].points += PunkteProRichtige;
         UpdateSpielerBroadcast();
     }
-    /**
-     * Vergibt an alle anderen Spieler Punkte bei einer falschen Antwort
-     */
+    /// <summary>
+    /// Vergibt an alle anderen Spieler Punkte bei einer falschen Antwort
+    /// </summary>
+    /// <param name="player">Spieler</param>
     public void PunkteFalscheAntwort(GameObject player)
     {
         Broadcast("#AudioFalscheAntwort");
@@ -720,9 +679,10 @@ public class QuizServer : MonoBehaviour
         Config.SERVER_PLAYER_POINTS += PunkteProFalsche;
         UpdateSpielerBroadcast();
     }
-    /**
-     * Ändert die Punkte des Spielers (+-1)
-     */
+    /// <summary>
+    /// Ändert die Punkte des Spielers (+-1)
+    /// </summary>
+    /// <param name="button">Spieler</param>
     public void PunkteManuellAendern(GameObject button)
     {
         int pId = Int32.Parse(button.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
@@ -738,9 +698,10 @@ public class QuizServer : MonoBehaviour
         }
         UpdateSpielerBroadcast();
     }
-    /**
-     * Ändert die Punkte des Spielers, variable Punkte
-     */
+    /// <summary>
+    /// Ändert die Punkte des Spielers, variable Punkte
+    /// </summary>
+    /// <param name="input">Punkteingabe</param>
     public void PunkteManuellAendern(TMP_InputField input)
     {
         int pId = Int32.Parse(input.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
@@ -753,9 +714,10 @@ public class QuizServer : MonoBehaviour
     }
     #endregion
     #region Spieler ist (Nicht-)Dran
-    /**
-     * Aktiviert den Icon Rand beim Spieler
-     */
+    /// <summary>
+    /// Aktiviert den Icon Rand beim Spieler
+    /// </summary>
+    /// <param name="button">Spieler</param>
     public void SpielerIstDran(GameObject button)
     {
         int pId = Int32.Parse(button.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
@@ -765,9 +727,10 @@ public class QuizServer : MonoBehaviour
         buzzerIsOn = false;
         Broadcast("#SpielerIstDran "+pId);
     }
-    /**
-     * Versteckt den Icon Rand beim Spieler
-     */
+    /// <summary>
+    /// Versteckt den Icon Rand beim Spieler
+    /// </summary>
+    /// <param name="button">Spieler</param>
     public void SpielerIstNichtDran(GameObject button)
     {
         int pId = Int32.Parse(button.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
@@ -780,13 +743,19 @@ public class QuizServer : MonoBehaviour
         Broadcast("#SpielerIstNichtDran " + pId);
     }
     #endregion
-
     #region Schätzfragen Animation
+    /// <summary>
+    /// Zeigt das Ziel der Schätzfragenanimation an
+    /// </summary>
+    /// <param name="toggle">Toggle</param>
     public void toggleZielAnzeige(Toggle toggle)
     {
         SchaetzfragenAnzeige[2].SetActive(toggle.isOn);
         Broadcast("#AnimationZiel "+ toggle.isOn);
     }
+    /// <summary>
+    /// Aktualisiert die Grenzen der Schätzfragenanimation
+    /// </summary>
     public void updateGrenzen()
     {
         SchaetzfragenAnzeige[1].GetComponentInChildren<TMP_Text>().text = GameObject.Find("SchaetzfragenAnimation/MinGrenzeFestlegen").GetComponent<TMP_InputField>().text + GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text;
@@ -794,6 +763,9 @@ public class QuizServer : MonoBehaviour
         SchaetzfragenAnzeige[3].GetComponentInChildren<TMP_Text>().text = GameObject.Find("SchaetzfragenAnimation/MaxGrenzeFestlegen").GetComponent<TMP_InputField>().text + GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text;
         SchaetzfragenAnzeige[2].SetActive(GameObject.Find("SchaetzfragenAnimation/ZielAnzeigen").GetComponent<Toggle>().isOn);
     }
+    /// <summary>
+    /// Zeigt den Startzustand der Animation
+    /// </summary>
     public void zeigeAnimationAn()
     {
         SchaetzfragenAnzeige[0].SetActive(true);
@@ -851,7 +823,9 @@ public class QuizServer : MonoBehaviour
                 SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].transform.GetChild(3).gameObject.SetActive(true);
         }
     }
-   
+    /// <summary>
+    /// Berechnet Daten für die Schätzfragenanimation
+    /// </summary>
     public void BerechneSchritteProEinheit()
     {
         if (GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text == "")
@@ -905,12 +879,17 @@ public class QuizServer : MonoBehaviour
         }
         Broadcast("#AnimationInfo " + data_text.Replace("[SPIELER_WERT]", "|").Split('|')[0] + broadcastmsg);
     }
-
+    /// <summary>
+    /// Startet die Schätzfragenanimation
+    /// </summary>
     public void AnimationStarten()
     {
         Broadcast("#AnimationStart");
         SchaetzfragenAnimationController.SetActive(true);
     }
+    /// <summary>
+    /// Beendet die Schätzfragenanimation
+    /// </summary>
     public void AnimationBeenden()
     {
         Broadcast("#AnimationBeenden");

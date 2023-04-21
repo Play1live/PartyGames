@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class TickTackToe
 {
+    /// <summary>
+    /// Erstellt eine Liste von freien Felder, mithilfe eines strings mit Daten zu allen Feldern
+    /// </summary>
+    /// <param name="inhalt">Daten zu allen Feldern</param>
+    /// <returns>Liste der freien Felder</returns>
     public static List<int> GetFreieFelder(string inhalt)
     {
         List<int> freieFelder = new List<int>();
@@ -15,7 +20,11 @@ public class TickTackToe
         }
         return freieFelder;
     }
-
+    /// <summary>
+    /// Erstellt eine Liste von freien Felder, mithilfe einer Liste von belegten Feldern
+    /// </summary>
+    /// <param name="belegteFelder"></param>
+    /// <returns>Liste der freien Felder</returns>
     public static List<int> GetFreieFelder(List<string> belegteFelder)
     {
         List<int> freieFelder = new List<int>();
@@ -26,7 +35,11 @@ public class TickTackToe
         }
         return freieFelder;
     }
-
+    /// <summary>
+    /// Extrahiert belegte Felder aus einem string
+    /// </summary>
+    /// <param name="inhalt">Text aller Felder</param>
+    /// <returns>Liste der belegten Felder</returns>
     public static List<string> GetBelegteFelder(string inhalt)
     {
         List<string> belegteFelder = new List<string>();
@@ -37,7 +50,11 @@ public class TickTackToe
         }
         return belegteFelder;
     }
-
+    /// <summary>
+    /// Fügt alle belegten Felder zusammen
+    /// </summary>
+    /// <param name="belegteFelder">Liste aller belegten Felder</param>
+    /// <returns>gibt die belegten Felder als string zurück</returns>
     public static string PrintBelegteFelder(List<string> belegteFelder)
     {
         string felderText = "";
@@ -47,7 +64,11 @@ public class TickTackToe
         }
         return felderText;
     }
-
+    /// <summary>
+    /// Berechnet wie viele Züge der Server getätigt hat
+    /// </summary>
+    /// <param name="belegteFelder">Liste der belegten Felder</param>
+    /// <returns>Gibt zurück wie viel Züge der Server bereits gemacht hat</returns>
     public static int getServerZuege(List<string> belegteFelder)
     {
         int server = 0;
@@ -56,7 +77,12 @@ public class TickTackToe
                 server++;
         return server;
     }
-
+    /// <summary>
+    /// Testet ob das Spiel vorbei ist
+    /// </summary>
+    /// <param name="freieFelder">Liste der freien Felder</param>
+    /// <param name="belegteFelder">Liste der belegten Felder</param>
+    /// <returns>Gibt zurück ob das Spiel vorbei ist</returns>
     public static bool CheckForEnd(List<int> freieFelder, List<string> belegteFelder)
     {
         if (freieFelder.Count >= 7)
@@ -87,8 +113,11 @@ public class TickTackToe
 
         return isend;
     }
-
-    // Win w, Lose l, draw d
+    /// <summary>
+    /// Sobald das Spiel vorbei ist, wird berechnet wer gewonnen hat.
+    /// </summary>
+    /// <param name="belegteFelder">Bekommt alle belegte Felder</param>
+    /// <returns>Win: w Lose: l Draw: d</returns>
     public static string getResult(List<string> belegteFelder)
     {
         // Check for playerwin
@@ -143,7 +172,12 @@ public class TickTackToe
 
         return "D";
     }
-
+    /// <summary>
+    /// Durchsucht alle Felder und teilt diese in Freie und belegte Felder ein
+    /// </summary>
+    /// <param name="freieFelder">Füllt diese Liste neu</param>
+    /// <param name="belegteFelder">Füllt diese Liste neu</param>
+    /// <returns>Gibt ein gezogenes Feld zurück</returns>
     public static List<string> ServerZiehen(List<int> freieFelder, List<string> belegteFelder)
     {
         List<int> moeglicheFelder = new List<int>();
@@ -726,7 +760,12 @@ public class TickTackToe
         }
         return Ziehen(moeglicheFelder, belegteFelder);
     }
-
+    /// <summary>
+    /// Wählt ein zufälliges Feld aus
+    /// </summary>
+    /// <param name="moeglicheFelder">Mögliche Felder</param>
+    /// <param name="belegteFelder">Bereits belegte Felder</param>
+    /// <returns></returns>
     private static List<string> Ziehen(List<int> moeglicheFelder, List<string> belegteFelder)
     {
         int serverzug = moeglicheFelder[UnityEngine.Random.Range(0, moeglicheFelder.Count)];

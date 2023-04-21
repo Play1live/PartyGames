@@ -6,7 +6,7 @@ public class SetupSpiele
 {
     public static void LoadGameFiles()
     {
-        Logging.add(Logging.Type.Normal, "SetupSpiele", "LoadGameFiles", "Loading Games...");
+        Logging.log(Logging.LogType.Normal, "SetupSpiele", "LoadGameFiles", "Loading Games...");
         reloadQuiz();
         reloadFlaggen();
         reloadListen();
@@ -15,7 +15,7 @@ public class SetupSpiele
         reloadWerBietetMehr();
         reloadAuktion();
         reloadSloxikon();
-        Logging.add(Logging.Type.Normal, "SetupSpiele", "LoadGameFiles", "Games are ready!");
+        Logging.log(Logging.LogType.Normal, "SetupSpiele", "LoadGameFiles", "Games are ready!");
     }
 
     public static void reloadQuiz()

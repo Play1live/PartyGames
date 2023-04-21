@@ -1,10 +1,8 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -28,47 +26,8 @@ public class StartupServer : MonoBehaviour
         if (Config.SERVER_STARTED)
             SperreGameSelection();
         
-        #region Startet Server
         if (!Config.SERVER_STARTED)
-        {
-            try
-            {
-                Config.SERVER_TCP = new TcpListener(IPAddress.Any, Config.SERVER_CONNECTION_PORT);
-                Config.SERVER_TCP.Start();
-                startListening();
-                Config.SERVER_STARTED = true;
-                Logging.add(Logging.Type.Normal, "StartupServer", "Start", "Server gestartet. Port: " + Config.SERVER_CONNECTION_PORT);
-                Config.HAUPTMENUE_FEHLERMELDUNG = "Server wurde gestartet.";
-            }
-            catch (Exception e)
-            {
-                Logging.add(Logging.Type.Fatal, "StartupServer", "Start", "Server kann nicht gestartet werden", e);
-                Config.HAUPTMENUE_FEHLERMELDUNG = "Server kann nicht gestartet werden.";
-                Config.SERVER_STARTED = false;
-                try
-                {
-                    Config.SERVER_TCP.Server.Close();
-                }
-                catch (Exception e1)
-                {
-                    Logging.add(Logging.Type.Fatal, "StartupServer", "Start", "Socket kann nicht geschlossen werden.", e1);
-                }
-                SceneManager.LoadScene("Startup");
-                return;
-            }
-            // Wenn Server "Henryk" bild legen
-            if (Config.PLAYER_NAME.ToLower().Equals("henryk"))
-            {
-                Config.SERVER_ICON = FindIconByName("Henryk");
-                UpdateSpieler();
-            }
-
-            // Verbindung erfolgreich
-            Config.HAUPTMENUE_FEHLERMELDUNG = "";
-            SperreGameSelection();
-
-        }
-        #endregion
+            StarteServer();
 
         Hauptmenue.SetActive(false);
         Lobby.SetActive(true);
@@ -80,7 +39,7 @@ public class StartupServer : MonoBehaviour
         UpdateSpieler();
     }
 
-    private void OnEnable()
+    void OnEnable()
     {
         InitPlayerLobby();
 
@@ -93,7 +52,6 @@ public class StartupServer : MonoBehaviour
             DisplayGameFiles();
         UpdateSpieler();
         UpdateCrowns();
-
     }
 
     void Update()
@@ -121,14 +79,17 @@ public class StartupServer : MonoBehaviour
             #region Sucht nach neuen Nachrichten
             if (spieler.isConnected == true && spieler.tcp != null)
             {
-                // TCP Verbindung zum Client verloren
-                if (spieler.tcp.Connected == false) // TODO: testen
+                // Spieler Verbindung ist weg
+                if (!spieler.tcp.Connected)
                 {
-                    Debug.LogError("TCP Verbindung zum Client "+ spieler.name +" wurde verloren.");
-                    ClientClosed(spieler);
-                    UpdateSpielerBroadcast();
+                    Logging.log(Logging.LogType.Normal, "StartupServer", "Update", "Spieler hat die Verbindung verloren. " + spieler.name);
+                    spieler.isConnected = false;
+                    spieler.isDisconnected = false;
+                    Config.SERVER_ALL_CONNECTED = false;
+                    spieler.name = "";
                     continue;
                 }
+
                 NetworkStream stream = spieler.tcp.GetStream();
                 if (stream.DataAvailable)
                 {
@@ -138,52 +99,90 @@ public class StartupServer : MonoBehaviour
                     if (data != null)
                         OnIncommingData(spieler, data);
                 }
-                try
-                {
-                }
-                catch (Exception e)
-                {
-                    Logging.add(Logging.Type.Error, "StartupServer", "Update", "TODO: Nachricht kann nicht empfangen werden, Spieler wird gekickt: ", e);
-                    ClientClosed(spieler);
-                }
-            }
-            #endregion
-
-            #region Spieler Disconnected Message
-            for (int i = 0; i < Config.PLAYERLIST.Length; i++)
-            {
-                if (Config.PLAYERLIST[i].isConnected == false)
-                {
-                    if (Config.PLAYERLIST[i].isDisconnected == true)
-                    {
-                        Logging.add(Logging.Type.Normal, "StartupServer", "Update", "Spieler hat die Verbindung getrennt. ID: " + Config.PLAYERLIST[i].id);
-                        Broadcast(Config.PLAYERLIST[i].name + " has disconnected", Config.PLAYERLIST);
-                        Config.PLAYERLIST[i].isConnected = false;
-                        Config.PLAYERLIST[i].isDisconnected = false;
-                        Config.SERVER_ALL_CONNECTED = false;
-                        Config.PLAYERLIST[i].name = "";
-                    }
-                }
             }
             #endregion
         }
+        #region Spieler Disconnected Message
+        for (int i = 0; i < Config.PLAYERLIST.Length; i++)
+        {
+            if (Config.PLAYERLIST[i].isConnected == false)
+            {
+                if (Config.PLAYERLIST[i].isDisconnected == true)
+                {
+                    Logging.log(Logging.LogType.Normal, "StartupServer", "Update", "Spieler hat die Verbindung getrennt. ID: " + Config.PLAYERLIST[i].id);
+                    Broadcast(Config.PLAYERLIST[i].name + " has disconnected", Config.PLAYERLIST);
+                    Config.PLAYERLIST[i].isConnected = false;
+                    Config.PLAYERLIST[i].isDisconnected = false;
+                    Config.SERVER_ALL_CONNECTED = false;
+                    Config.PLAYERLIST[i].name = "";
+                }
+            }
+        }
+        #endregion
         #endregion
     }
 
-    private void OnApplicationQuit()
+    void OnApplicationQuit()
     {
         Broadcast("#ServerClosed", Config.PLAYERLIST);
-        Logging.add(Logging.Type.Normal, "StartupServer", "OnApplicationQuit", "Server wird geschlossen");
-        Config.SERVER_TCP.Server.Close();
+        Logging.log(Logging.LogType.Normal, "StartupServer", "OnApplicationQuit", "Server wird geschlossen.");
+        //Config.SERVER_TCP.Server.Close();
+        Config.SERVER_TCP.Stop();
     }
 
     #region Verbindungen
-    // Startet das empfangen von Nachrichten von Clients
+    /// <summary>
+    /// Startet den Server
+    /// </summary>
+    private void StarteServer()
+    {
+        Logging.log(Logging.LogType.Normal, "StartupServer", "Start", "Server wird gestartet...");
+        try
+        {
+            Config.SERVER_TCP = new TcpListener(IPAddress.Any, Config.SERVER_CONNECTION_PORT);
+            Config.SERVER_TCP.Start();
+            startListening();
+            Config.SERVER_STARTED = true;
+            Logging.log(Logging.LogType.Normal, "StartupServer", "Start", "Server gestartet. Port: " + Config.SERVER_CONNECTION_PORT);
+            Config.HAUPTMENUE_FEHLERMELDUNG = "Server wurde gestartet.";
+        }
+        catch (Exception e)
+        {
+            Logging.log(Logging.LogType.Warning, "StartupServer", "Start", "Server kann nicht gestartet werden", e);
+            Config.HAUPTMENUE_FEHLERMELDUNG = "Server kann nicht gestartet werden.\n" + e;
+            Config.SERVER_STARTED = false;
+            try
+            {
+                Config.SERVER_TCP.Server.Close();
+            }
+            catch (Exception e1)
+            {
+                Logging.log(Logging.LogType.Error, "StartupServer", "Start", "Socket kann nicht geschlossen werden.", e1);
+            }
+            SceneManager.LoadSceneAsync("Startup");
+            return;
+        }
+        // Wenn Server "Henryk" bild legen
+        if (Config.PLAYER_NAME.ToLower().Equals("henryk"))
+        {
+            Config.SERVER_ICON = FindIconByName("Henryk");
+        }
+
+        // Verbindung erfolgreich
+        Config.HAUPTMENUE_FEHLERMELDUNG = "";
+        SperreGameSelection();
+    }
+    /// <summary>
+    /// Startet das empfangen von Nachrichten von Clients
+    /// </summary>
     private void startListening()
     {
         Config.SERVER_TCP.BeginAcceptTcpClient(AcceptTcpClient, Config.SERVER_TCP);
     }
-    // Fügt Client der Empfangsliste hinzu
+    /// <summary>
+    /// Fügt Client der Empfangsliste hinzu (Config.PLAYLIST)
+    /// </summary>
+    /// <param name="ar"></param>
     private void AcceptTcpClient(IAsyncResult ar)
     {
         // Spieler sind voll
@@ -203,13 +202,14 @@ public class StartupServer : MonoBehaviour
         // Spieler sind voll
         if (freierS == null)
         {
+            SendMSG("#ServerVoll", freierS);
             return;
         }
 
         TcpListener listener = (TcpListener)ar.AsyncState;
         freierS.isConnected = true;
         freierS.tcp = listener.EndAcceptTcpClient(ar);
-
+        Logging.log(Logging.LogType.Debug, "StartupServer", "AcceptTcpClient", "Ein neuer Spieler verbindet sich: "+ freierS.id);
         // Prüft ob der Server voll ist
         bool tempAllConnected = true;
         for (int i = 0; i < Config.PLAYERLIST.Length; i++)
@@ -221,19 +221,22 @@ public class StartupServer : MonoBehaviour
             }
         }
         Config.SERVER_ALL_CONNECTED = tempAllConnected;
-
+        Debug.Log("Server full: "+ Config.SERVER_ALL_CONNECTED);
+        Logging.log(Logging.LogType.Debug, "StartupServer", "AcceptTcpClient", "Server ist voll: " + Config.SERVER_ALL_CONNECTED);
         startListening();
 
         // Sendet neuem Spieler zugehörige ID
         SendMSG("#SetID " + freierS.id, freierS);
-        // Legt Default PingImage fest
-        SpielerAnzeigeLobby[freierS.id].transform.GetChild(3).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Ping/Ping 0");
-        Logging.add(Logging.Type.Normal, "Server", "AcceptTcpClient", "Spieler: " + freierS.id + " ist jetzt verbunden. IP:" + freierS.tcp.Client.RemoteEndPoint);
+        Logging.log(Logging.LogType.Normal, "Server", "AcceptTcpClient", "Spieler: " + freierS.id + " ist jetzt verbunden. IP:" + freierS.tcp.Client.RemoteEndPoint);
     }
-    
+
     #endregion
     #region Kommunikation
-    // Sendet eine Nachricht an den angegebenen Spieler.
+    /// <summary>
+    /// Sendet eine Nachricht an den angegebenen Spieler.
+    /// </summary>
+    /// <param name="data">Nachricht</param>
+    /// <param name="sc">Spieler</param>
     private void SendMSG(string data, Player sc)
     {
         try
@@ -244,12 +247,16 @@ public class StartupServer : MonoBehaviour
         }
         catch (Exception e)
         {
-            Logging.add(Logging.Type.Error, "Server", "SendMSG", "Nachricht an Client: " + sc.id + " (" + sc.name + ") konnte nicht gesendet werden." + e);
+            Logging.log(Logging.LogType.Warning, "Server", "SendMSG", "Nachricht an Client: " + sc.id + " (" + sc.name + ") konnte nicht gesendet werden." + e);
             // Verbindung zum Client wird getrennt
             //ClientClosed(sc);
         }
     }
-    // Sendet eine Nachticht an alle verbundenen Spieler.
+    /// <summary>
+    /// Sendet eine Nachticht an alle übergebenen Spieler
+    /// </summary>
+    /// <param name="data">Nachricht</param>
+    /// <param name="spieler">Spielerliste</param>
     private void Broadcast(string data, Player[] spieler)
     {
         foreach (Player sc in spieler)
@@ -258,7 +265,10 @@ public class StartupServer : MonoBehaviour
                 SendMSG(data, sc);
         }
     }
-    // Sendet eine Nachticht an alle verbundenen Spieler.
+    /// <summary>
+    /// Sendet eine Nachticht an alle verbundenen Spieler. (Config.PLAYLIST)
+    /// </summary>
+    /// <param name="data">Nachricht</param>
     private void Broadcast(string data)
     {
         foreach (Player sc in Config.PLAYERLIST)
@@ -267,15 +277,25 @@ public class StartupServer : MonoBehaviour
                 SendMSG(data, sc);
         }
     }
+    /// <summary>
+    /// Löscht Daten des Spielers von dem die Verbindung getrennt wurde
+    /// </summary>
+    /// <param name="player">Spieler</param>
     private void ClientClosed(Player player)
     {
         player.icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
         player.name = "";
         player.points = 0;
+        player.crowns = 0;
         player.isConnected = false;
         player.isDisconnected = true;
     }
-    //Einkommende Nachrichten die von Spielern an den Server gesendet werden.
+    /// <summary>
+    /// Einkommende Nachrichten die von Spielern an den Server gesendet werden. 
+    /// Extrahiert die Commands und gibt die in Commands() weiter
+    /// </summary>
+    /// <param name="spieler">Spieler</param>
+    /// <param name="data">Daten inklusive Command</param>
     private void OnIncommingData(Player spieler, string data)
     {
         string cmd;
@@ -288,18 +308,20 @@ public class StartupServer : MonoBehaviour
         Commands(spieler, data, cmd);
     }
     #endregion
-    /**
-     * Verarbeitet die eingehenden Commands der Spieler
-     */
-    public void Commands(Player player, string data, string cmd)
+    /// <summary>
+    /// Verarbeitet die eingehenden Commands der Spieler
+    /// </summary>
+    /// <param name="player">Spieler</param>
+    /// <param name="data">Daten</param>
+    /// <param name="cmd">Command</param>
+    private void Commands(Player player, string data, string cmd)
     {
-        // Zeigt alle einkommenden Nachrichten an
-        //Logging.add(Logging.Type.Normal, "StartupServer", "Commands", player.name + " " + player.id + " -> " + cmd + "   ---   " + data);
+        Logging.log(Logging.LogType.Debug, "StartupServer", "Commands", "Eingehende Nachricht: " + player.name + " " + player.id + " -> " + cmd + "   ---   " + data);
         // Sucht nach Command
         switch (cmd)
         {
             default:
-                Logging.add(Logging.Type.Warning, "StartupServer", "Commands", "Unkown Command: (" + player.id + ") " + player.name + " -> " + cmd + " - " + data);
+                Logging.log(Logging.LogType.Warning, "StartupServer", "Commands", "Unkown Command: (" + player.id + ") " + player.name + " -> " + cmd + " - " + data);
                 break;
 
             case "#ClientClosed":
@@ -310,7 +332,6 @@ public class StartupServer : MonoBehaviour
                 SendMSG("#ConnectionEstablished", player);
                 break;
             case "#ClientFocusChange":
-                //Debug.Log("FocusChange (" + player.id + ") " + player.name + ": InGame: " + data);
                 break;
             case "#GetSpielerUpdate":
                 UpdateSpielerBroadcast();
@@ -326,7 +347,6 @@ public class StartupServer : MonoBehaviour
                 ChangePlayerName(player, data);
                 break;
             case "#PlayerPing":
-                Debug.Log("PlayerPing: "+ player.name +" -> "+data);
                 PlayerPing(player, data);
                 UpdatePing();
                 break;
@@ -340,17 +360,17 @@ public class StartupServer : MonoBehaviour
                 break;
         }
     }
-    /**
-     * Fordert alle Spieler auf die RemoteConfig neuzuladen
-     */
+    /// <summary>
+    /// Fordert alle Spieler auf die RemoteConfig neuzuladen
+    /// </summary>
     public void UpdateRemoteConfig()
     {
         Broadcast("#UpdateRemoteConfig");
         LoadConfigs.FetchRemoteConfig();
     }
-    /**
-     * Sperrt die Gameselection für X sekunden, um fehler bei Scenen wechseln in der Verbindung zu verhindern
-     */
+    /// <summary>
+    /// Sperrt die Gameselection für 5 Sekunden, um Fehler bei Scenenwechseln in der Verbindung zu verhindern
+    /// </summary>
     private void SperreGameSelection()
     {
         allowedStartTime = DateTime.Now.AddSeconds(5);
@@ -360,14 +380,17 @@ public class StartupServer : MonoBehaviour
         }
         gesperrtfuerSekundenAnzeige.SetActive(true);
     }
+    /// <summary>
+    /// Aktualisiert die Anzeige, wie viele Sekunden die Spielauswahl noch gesperrt ist
+    /// </summary>
     private void UpdateGesperrtGameSelection()
     {
         gesperrtfuerSekundenAnzeige.GetComponent<TMP_Text>().text = "Spiele sind noch " + ((allowedStartTime.Hour - DateTime.Now.Hour)*60*60 + (allowedStartTime.Minute - DateTime.Now.Minute) * 60 + (allowedStartTime.Second - DateTime.Now.Second)) + " Sekunden gesperrt.";
     }
-    /**
-     * Entsperrt die Gameselection
-     */
-    public void EntsperreGameSelection()
+    /// <summary>
+    /// Entsperrt die Gameselection
+    /// </summary>
+    private void EntsperreGameSelection()
     {
         allowedStartTime = DateTime.MinValue;
         for (int i = 0; i < ServerControlGameSelection.transform.childCount; i++)
@@ -377,13 +400,12 @@ public class StartupServer : MonoBehaviour
         gesperrtfuerSekundenAnzeige.SetActive(false);
         DisplayGameFiles();
     }
-
-    
-    /**
-     * Init Lobby Anzeigen
-     */
+    /// <summary>
+    /// Init Lobbyanzeigen
+    /// </summary>
     private void InitPlayerLobby()
     {
+        Logging.log(Logging.LogType.Debug, "StartupServer", "InitPlayerLobby", "Spieleranzeige wird aktualisiert.");
         // Für Server Host
         SpielerAnzeigeLobby[0].transform.GetChild(4).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Top4");
         SpielerAnzeigeLobby[0].transform.GetChild(4).gameObject.SetActive(false);
@@ -403,16 +425,17 @@ public class StartupServer : MonoBehaviour
             SpielerAnzeigeLobby[i + 1].transform.GetChild(5).GetComponent<TMP_Text>().text = "";
         }
     }
-    /**
-     * Sendet die aktualisierten Spielerinfos an alle Spieler
-     */
+    /// <summary>
+    /// Sendet die aktualisierten Spielerinfos an alle Spieler
+    /// </summary>
     private void UpdateSpielerBroadcast()
     {
         Broadcast(UpdateSpieler(), Config.PLAYERLIST);
     }
-    /**
-     * Updatet die Spieler Informations Anzeigen und gibt diese als String zurück 
-     */
+    /// <summary>
+    /// Updatet die Spieler Informationsanzeigen und gibt diese als String zurück
+    /// </summary>
+    /// <returns>#UpdateSpieler [ID]<0-8>[ID][NAME]<>[NAME][PUNKTE]<>[PUNKTE][ICON]<>[ICON]</returns>
     private string UpdateSpieler()
     {
         string msg = "#UpdateSpieler [ID]0[ID][NAME]" + Config.PLAYER_NAME + "[NAME][PUNKTE]" + Config.SERVER_PLAYER_POINTS + "[PUNKTE][ICON]" + Config.SERVER_ICON.name + "[ICON]";
@@ -434,7 +457,6 @@ public class StartupServer : MonoBehaviour
             else
                 SpielerAnzeigeLobby[player.id].SetActive(false);
         }
-        //msg = msg.Substring(0, msg.Length - 9);
 
         GameObject.Find("Lobby/Title_LBL/Spieleranzahl").GetComponent<TMP_Text>().text = connectedplayer + "/" + (Config.PLAYERLIST.Length + 1);
         SpielerAnzeigeLobby[0].SetActive(true);
@@ -458,10 +480,12 @@ public class StartupServer : MonoBehaviour
                 bilderliste.Add(sprite.name);
             GameObject.Find("ServerControl/ControlField/SpielerIconWechseln/Bilder").GetComponent<TMP_Dropdown>().AddOptions(bilderliste);
         }
-        Debug.Log(msg);
+        Logging.log(Logging.LogType.Debug, "StartupServer", "UpdateSpieler", msg);
         return msg;
     }
-
+    /// <summary>
+    /// Sendet ein Pingupdate an alle Spieler
+    /// </summary>
     private void UpdatePing()
     {
         string msg = "#UpdatePing [0]" + SpielerAnzeigeLobby[0].transform.GetChild(3).GetComponent<Image>().sprite.name + "[0]";
@@ -469,8 +493,12 @@ public class StartupServer : MonoBehaviour
         {
             msg += "[" + player.id + "]" + SpielerAnzeigeLobby[player.id].transform.GetChild(3).GetComponent<Image>().sprite.name + "[" + player.id + "]";
         }
+        Logging.log(Logging.LogType.Debug, "StartupServer", "UpdatePing", msg);
         Broadcast(msg);
     }
+    /// <summary>
+    /// Sendet ein Kronenupdate an alle Spieler
+    /// </summary>
     private void UpdateCrowns()
     {
         int top1 = -1;
@@ -604,13 +632,15 @@ public class StartupServer : MonoBehaviour
         {
             msg += "[" + player.id + "]" + player.crowns + "[" + player.id + "]";
         }
+        Logging.log(Logging.LogType.Debug, "StartupServer", "UpdateCrowns", msg);
         Broadcast(msg);
     }
-
     #region Spieler Namen Ändern
-    /**
-     * Prüft ob der übergebene Name bereits von einem Spieler oder dem Server belegt ist
-     */
+    /// <summary>
+    /// Prüft ob der übergebene Name bereits von einem Spieler oder dem Server belegt ist
+    /// </summary>
+    /// <param name="name">zu prüfender Name</param>
+    /// <returns>true, false</returns>
     private bool SpielernameIstBelegt(string name)
     {
         if (Config.PLAYER_NAME == name)
@@ -620,17 +650,19 @@ public class StartupServer : MonoBehaviour
                 return true;
         return false;
     }
-    /**
-     * Speichert den Namen, den sich der neu Verbundene Spieler geben will.
-     * Zudem wird die GameVersion verglichen.
-     */
+    /// <summary>
+    /// Speichert den Namen, den sich der neu verbundene Spieler geben will.
+    /// Zudem wird die Gameversion verglichen.
+    /// </summary>
+    /// <param name="player">Spieler</param>
+    /// <param name="data">[NAME]<name>[NAME][VERSION]<gameversion>[VERSION]</param>
     private void ClientSetName(Player player, String data)
     {
         string version = data.Replace("[VERSION]", "|").Split('|')[1];
         // Spieler hat eine falsche Version
         if (version != Config.APPLICATION_VERSION)
         {
-            Logging.add(Logging.Type.Warning, "Server", "ClientSetName", "Spieler ID: " + player.id + " versucht mit einer falschen Version beizutreten.Spieler Version: " + version + " | Server Version: " + Config.APPLICATION_VERSION);
+            Logging.log(Logging.LogType.Warning, "Server", "ClientSetName", "Spieler ID: " + player.id + " versucht mit einer falschen Version beizutreten.Spieler Version: " + version + " | Server Version: " + Config.APPLICATION_VERSION);
             SendMSG("#WrongVersion " + Application.version, player);
             ClientClosed(player);
             return;
@@ -641,6 +673,7 @@ public class StartupServer : MonoBehaviour
             name = name.Substring(0, Config.MAX_PLAYER_NAME_LENGTH);
         if (!SpielernameIstBelegt(name))
         {
+            Logging.log(Logging.LogType.Normal, "StartupServer", "ClientSetName", "Spieler " + player.name + " heißt jetzt " + name);
             player.name = name;
             SendMSG("#SpielerChangeName " + name, player);
             UpdateSpielerBroadcast();
@@ -655,22 +688,27 @@ public class StartupServer : MonoBehaviour
             else
                 break;
         }
+        Logging.log(Logging.LogType.Normal, "StartupServer", "ClientSetName", "Spieler " + player.name + "heißt jetzt " + name);
         player.name = name;
         SendMSG("#SpielerChangeName " + name, player);
-        // Sendet Update an alle Spieler & Updatet Spieler Anzeigen#SpielerChangeName
+        // Sendet Update an alle Spieler & Updatet Spieler Anzeigen
         UpdateSpielerBroadcast();
-    }   
-    /**
-     * Erlaubt/Verbietet Namenswechsel bei Spielern
-     */
+    }
+    /// <summary>
+    /// Erlaubt/Verbietet Namenswechsel von Spielern
+    /// </summary>
+    /// <param name="toggle">Toggle</param>
     public void SpielerUmbenennenToggle(Toggle toggle)
     {
+        Logging.log(Logging.LogType.Normal, "StartupServer", "SpielerUmbenennenToggle", "Spieler dürfen sich umbenennen: "+ toggle.isOn);
         Config.ALLOW_PLAYERNAME_CHANGE = toggle.isOn;
         Broadcast("#AllowNameChange " + toggle.isOn);
     }
-    /**
-     * Spieler Ändert Namen
-     */
+    /// <summary>
+    /// Spieler ändert Namen
+    /// </summary>
+    /// <param name="p">Spieler</param>
+    /// <param name="data">Neuer Name</param>
     private void ChangePlayerName(Player p, string data)
     {
         if (!Config.ALLOW_PLAYERNAME_CHANGE)
@@ -682,6 +720,7 @@ public class StartupServer : MonoBehaviour
             name = name.Substring(0, Config.MAX_PLAYER_NAME_LENGTH);
         if (!SpielernameIstBelegt(name))
         {
+            Logging.log(Logging.LogType.Normal, "StartupServer", "ChangePlayerName", "Spieler " + p.name + "heißt jetzt " + name);
             p.name = name;
             UpdateSpielerBroadcast();
             return;
@@ -697,12 +736,14 @@ public class StartupServer : MonoBehaviour
         }
         if (vorher == name)
             return;
+        Logging.log(Logging.LogType.Normal, "StartupServer", "ChangePlayerName", "Spieler " + p.name + "heißt jetzt " + name);
         p.name = name;
         UpdateSpielerBroadcast();
     }
-    /**
-    * Benennt einen Spieler um
-    */
+    /// <summary>
+    /// Server benennt einen Spieler um
+    /// </summary>
+    /// <param name="input">Neuer Name des Spielers</param>
     public void SpielerUmbenennenNamen(TMP_InputField input)
     {
         TMP_Dropdown drop = GameObject.Find("ServerControl/ControlField/SpielerUmbenennen/Dropdown").GetComponent<TMP_Dropdown>();
@@ -718,6 +759,7 @@ public class StartupServer : MonoBehaviour
                 name = name.Substring(0, Config.MAX_PLAYER_NAME_LENGTH);
             if (!SpielernameIstBelegt(name))
             {
+                Logging.log(Logging.LogType.Normal, "StartupServer", "SpielerUmbenennenNamen", "Spieler " + Config.PLAYER_NAME + "heißt jetzt " + name);
                 Config.PLAYER_NAME = name;
                 UpdateSpielerBroadcast();
                 return;
@@ -733,6 +775,7 @@ public class StartupServer : MonoBehaviour
             }
             if (name == vorher)
                 return;
+            Logging.log(Logging.LogType.Normal, "StartupServer", "SpielerUmbenennenNamen", "Spieler " + Config.PLAYER_NAME + "heißt jetzt " + name);
             Config.PLAYER_NAME = name;
             UpdateSpielerBroadcast();
         }
@@ -749,6 +792,7 @@ public class StartupServer : MonoBehaviour
                 name = name.Substring(0, Config.MAX_PLAYER_NAME_LENGTH);
             if (!SpielernameIstBelegt(name))
             {
+                Logging.log(Logging.LogType.Normal, "StartupServer", "SpielerUmbenennenNamen", "Spieler " + Config.PLAYERLIST[id - 1].name + "heißt jetzt " + name);
                 Config.PLAYERLIST[id - 1].name = name;
                 UpdateSpielerBroadcast();
                 return;
@@ -764,57 +808,68 @@ public class StartupServer : MonoBehaviour
             }
             if (name == vorher)
                 return;
+
+            Logging.log(Logging.LogType.Normal, "StartupServer", "SpielerUmbenennenNamen", "Spieler " + Config.PLAYERLIST[id - 1].name + "heißt jetzt " + name);
             Config.PLAYERLIST[id - 1].name = name;
             UpdateSpielerBroadcast();
         }
     }
     #endregion
-    /**
-     * Wirft den angegebenen Spieler raus
-     */
+    /// <summary>
+    /// Server wirft den angegebenen Spieler raus
+    /// </summary>
+    /// <param name="dropdown">Spielerauswahl</param>
     public void SpielerRauswerfen(TMP_Dropdown dropdown)
     {
         if (dropdown.options[dropdown.value].text == "")
             return;
         int playerid = Int32.Parse(dropdown.options[dropdown.value].text.Split('|')[0]);
+        
         SendMSG("#ServerClosed", Config.PLAYERLIST[playerid - 1]);
-        Config.PLAYERLIST[playerid - 1].name = "";
-        Config.PLAYERLIST[playerid - 1].isConnected = false;
-        Config.PLAYERLIST[playerid - 1].isDisconnected = true;
+        Logging.log(Logging.LogType.Normal, "StartupServer", "SpielerRauswerfen", "Spieler " + Config.PLAYERLIST[playerid - 1].name + " wird gekickt.");
+        ClientClosed(Config.PLAYERLIST[playerid - 1]);
         UpdateSpielerBroadcast();
     }
     #region Spieler Icon Ändern
-    /**
-     * Erlaubt Spielern das Icon zu wechseln
-     */
+    /// <summary>
+    /// Erlaubt Spielern das Icon zu wechseln
+    /// </summary>
+    /// <param name="toggle">Toggle</param>
     public void SpielerIconToggle(Toggle toggle)
     {
+        Logging.log(Logging.LogType.Normal, "StartupServer", "SpielerIconToggle", "Spieler dürfen ihr Icon wechseln: "+ toggle.isOn);
         Config.ALLOW_ICON_CHANGE = toggle.isOn;
     }
-    /**
-     *  Wechselt das Icon eines Spielers
-     */
+    /// <summary>
+    /// Wechselt das Icon eines Spielers vom Server aus
+    /// </summary>
+    /// <param name="Icon">ID des Icons</param>
     public void SpielerIconWechsel(TMP_Dropdown Icon)
     {
         TMP_Dropdown drop = GameObject.Find("ServerControl/ControlField/SpielerIconWechseln/Dropdown").GetComponent<TMP_Dropdown>();
         if (drop.options[drop.value].text == "")
         {
             Config.SERVER_ICON = Resources.Load<Sprite>("Images/ProfileIcons/" + Icon.options[Icon.value].text);
+            Logging.log(Logging.LogType.Normal, "StartupServer", "SpielerIconWechsel", "Server hat nun das Icon: "+ Config.SERVER_ICON.name);
             UpdateSpielerBroadcast();
             return;
         }
         int id = Int32.Parse(drop.options[drop.value].text.Split('|')[0]);
         Config.PLAYERLIST[id - 1].icon = Resources.Load<Sprite>("Images/ProfileIcons/" + Icon.options[Icon.value].text);
+        Logging.log(Logging.LogType.Normal, "StartupServer", "SpielerIconWechsel", "Spieler " + Config.PLAYERLIST[id - 1].name + " hat nun das Icon: " + Config.PLAYERLIST[id - 1].icon.name);
         UpdateSpielerBroadcast();
     }
-    /**
-     * Icon Wechsel eines Spielers
-     */
+    /// <summary>
+    /// Icon Wechsel eines Spielers auf Anfrage des Spielers
+    /// </summary>
+    /// <param name="p">Spieler</param>
+    /// <param name="data">Name des geforderten Icons</param>
     private void SpielerIconChange(Player p, string data)
     {
         Sprite neuesIcon;
         if (data.Equals("0")) // Initial Änderung Icon
         {
+            Logging.log(Logging.LogType.Normal, "StartupServer", "SpielerIconChange", "Spieler " + p.name + " bekommt sein initial Icon.");
             if (p.name.ToLower().Contains("spieler"))
             {
                 neuesIcon = FindIconByName("Samurai");
@@ -888,7 +943,7 @@ public class StartupServer : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning("Unknown Playername for init Icon Change: "+ p.name);
+                Logging.log(Logging.LogType.Warning, "StartupServer", "SpielerIconChange", "Spielername für Icons ist unbekannt: " + p.name);
             }
         }
 
@@ -897,8 +952,14 @@ public class StartupServer : MonoBehaviour
             return;
 
         neuesIcon = Config.PLAYER_ICONS[(Config.PLAYER_ICONS.IndexOf(p.icon) + 1) % Config.PLAYER_ICONS.Count];
+        Logging.log(Logging.LogType.Normal, "StartupServer", "SpielerIconChange", "Spieler " + p.name + " hat nun das Icon: "+ neuesIcon.name);
         IconFestlegen(p, neuesIcon);
     }
+    /// <summary>
+    /// Gibt ein Sprite eines Icons zurück das per Name gesucht wird
+    /// </summary>
+    /// <param name="name">Name des neuen Icons</param>
+    /// <returns>Sprite, null</returns>
     private Sprite FindIconByName(string name)
     {
         foreach (Sprite sprite in Config.PLAYER_ICONS)
@@ -906,8 +967,14 @@ public class StartupServer : MonoBehaviour
             if (sprite.name.Equals(name))
                 return sprite;
         }
+        Logging.log(Logging.LogType.Warning, "StartupServer", "FindIconByName", "Icon " + name + " konnte nicht gefunden werden.");
         return null;
     }
+    /// <summary>
+    /// Spieler wird ein neues Icon zugewiesen
+    /// </summary>
+    /// <param name="p">Spieler</param>
+    /// <param name="neuesIcon">Neues Icon für den Spieler</param>
     private void IconFestlegen(Player p, Sprite neuesIcon)
     {
         if (neuesIcon == null)
@@ -925,10 +992,11 @@ public class StartupServer : MonoBehaviour
         // Update an alle
         UpdateSpielerBroadcast();
     }
-
-    /**
-     * Prüft ob das übergebene Icon bereits vom Server oder einem anderen Spieler benutzt wird
-     */
+    /// <summary>
+    /// Prüft ob das übergebene Icon bereits vom Server oder einem anderen Spieler benutzt wird
+    /// </summary>
+    /// <param name="icon">Icon</param>
+    /// <returns>true, false</returns>
     private bool IconWirdGeradeGenutzt(Sprite icon)
     {
         if (Config.SERVER_ICON == icon)
@@ -938,32 +1006,36 @@ public class StartupServer : MonoBehaviour
                 return true;
         return false;
     }
-    /**
-     * Ändert das Icon des Servers
-     */
+    /// <summary>
+    /// Ändert das Icon des Servers
+    /// </summary>
     public void ServerIconChange()
     {
         if (!Config.isServer)
             return;
         Config.SERVER_ICON = Config.PLAYER_ICONS[(Config.PLAYER_ICONS.IndexOf(Config.SERVER_ICON) + 1) % Config.PLAYER_ICONS.Count];
+        Logging.log(Logging.LogType.Normal, "StartupServer", "ServerIconChange", "Server hat nun das Icon: " + Config.SERVER_ICON.name);
         UpdateSpielerBroadcast();
     }
     #endregion
-    /**
-     * Ping anzeige der Spieler
-     */
+    /// <summary>
+    /// Pinganzeige Update eines Spieler
+    /// </summary>
+    /// <param name="p">Spieler</param>
+    /// <param name="data">Pingdaten</param>
     public void PlayerPing(Player p, string data)
     {
+        Logging.log(Logging.LogType.Normal, "StartupServer", "PlayerPing", "PlayerPing: " + p.name + " -> " + data);
         int ping = Int32.Parse(data);
-        if (ping <= 10)
+        if (ping <= 15)
         {
             SpielerAnzeigeLobby[p.id].transform.GetChild(3).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Ping/Ping 3");
         }
-        else if (ping > 10 && ping <= 25)
+        else if (ping > 15 && ping <= 50)
         {
             SpielerAnzeigeLobby[p.id].transform.GetChild(3).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Ping/Ping 2");
         }
-        else if (ping > 25 && ping <= 100)
+        else if (ping > 50 && ping <= 100)
         {
             SpielerAnzeigeLobby[p.id].transform.GetChild(3).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Ping/Ping 1");
         }
@@ -973,11 +1045,13 @@ public class StartupServer : MonoBehaviour
         }
     }
     #region MiniSpielauswahl
-    /**
-     * Wechselt das angezeigt Minigame in der Lobby für die Spieler
-     */
+    /// <summary>
+    /// Wechselt das angezeigt Minigame in der Lobby für die Spieler
+    /// </summary>
+    /// <param name="drop">Minispiel Auswahl</param>
     public void SwitchMiniGame(TMP_Dropdown drop)
     {
+        Logging.log(Logging.LogType.Normal, "StartupServer", "SwitchMiniGame", "MiniGame wird gewechselt: " + drop.options[drop.value]);
         foreach (GameObject go in SpielerMiniGames)
             go.SetActive(false);
 
@@ -992,19 +1066,21 @@ public class StartupServer : MonoBehaviour
         }
     }
     #region TickTackToe
-    /**
-     * Zeigt TickTackToe für alle Spieler an
-     */
+    /// <summary>
+    /// Zeigt TickTackToe für alle Spieler an
+    /// </summary>
     private void SwitchToTickTackToe()
     {
         SpielerMiniGames[0].SetActive(true);
         Broadcast("#SwitchToTickTackToe");
     }
-    /**
-     * Bestimmt den ersten Zug gegen einen Spieler
-     */
+    /// <summary>
+    /// Bestimmt den ersten Zug gegen einen Spieler
+    /// </summary>
+    /// <param name="player">Spieler</param>
     private void StartTickTackToe(Player player)
     {
+        Logging.log(Logging.LogType.Debug, "StartupServer", "StartTickTackToe", "Spieler " + player.name + " startet TickTackToe.");
         string msg = "";
         int beginner = UnityEngine.Random.Range(0, 2);
         int initzug = UnityEngine.Random.Range(1,10);
@@ -1019,9 +1095,11 @@ public class StartupServer : MonoBehaviour
         }
         SendMSG("#TickTackToeZug " + msg, player);
     }
-    /**
-     * Lässt den Server einen Zug machen & prüft ob das Spiel beendet ist
-     */
+    /// <summary>
+    /// Lässt den Server einen Zug machen & prüft ob das Spiel beendet ist
+    /// </summary>
+    /// <param name="player">Spieler</param>
+    /// <param name="data">TickTackToe Daten</param>
     private void TickTackToeSpielerZug(Player player, string data)
     {
         // Freie Felder berechnen
@@ -1044,9 +1122,10 @@ public class StartupServer : MonoBehaviour
     }
     #endregion
     #endregion
-    /**
-     * Wechsel zw. Spielauswahl & Kontrollfelder des Servers
-     */
+    /// <summary>
+    /// Wechsel zwischen Spielauswahl & Kontrollfelder des Servers
+    /// </summary>
+    /// <param name="s">Spielauswahl oder Kontrollfelder</param>
     public void WechselGameSelControlFie(string s)
     {
         if (s == "Spielauswahl")
@@ -1058,18 +1137,20 @@ public class StartupServer : MonoBehaviour
         {
             ServerControlControlField.SetActive(true);
             ServerControlGameSelection.SetActive(false);
-            UpdateSpieler();
         }
         else
         {
-            Logging.add(Logging.Type.Warning, "StartupServer", "WechselGameSelectionFie", "Unbekannte Auswahl: WechselGameSelControlFie -> " + s);
+            Logging.log(Logging.LogType.Warning, "StartupServer", "WechselGameSelectionFie", "Unbekannte Auswahl: WechselGameSelControlFie -> " + s);
         }
     }
     #region Crowns
+    /// <summary>
+    /// Ändert die Anzahl der Kronen die ein Spieler besitzt
+    /// </summary>
     public void CrownsAdd(GameObject button)
     {
         int pos = Int32.Parse(button.transform.parent.parent.name.Replace("Player (", "").Replace(")", "")) - 1;
-
+        Logging.log(Logging.LogType.Debug, "StartupServer", "CrownsAdd", "Spieler ID: " + (pos+1) + " erhält einen Kronen Punkt.");
         // Server
         if (pos == -1)
         {
@@ -1094,6 +1175,10 @@ public class StartupServer : MonoBehaviour
         }
         UpdateCrowns();
     }
+    /// <summary>
+    /// Ändert die Anzahl der Kronen die ein Spieler besitzt
+    /// </summary>
+    /// <param name="input">Eingegebene Anzahl der Kronen die hinzugefügt werden</param>
     public void CrownsAddX(TMP_InputField input)
     {
         int punkte = 0;
@@ -1104,10 +1189,11 @@ public class StartupServer : MonoBehaviour
         }
         catch (Exception e)
         {
+            Logging.log(Logging.LogType.Warning, "StartupServer", "CrownsAddX", "Eingabe konnte nicht verarbeitet werden.", e);
             return;
         }
         int pos = Int32.Parse(input.transform.parent.parent.name.Replace("Player (", "").Replace(")", "")) - 1;
-
+        Logging.log(Logging.LogType.Debug, "StartupServer", "CrownsAddX", "Spieler ID: " + (pos+1) + " erhält " + punkte + " Kronen Punkt.");
         // Server
         if (pos == -1)
         {
@@ -1122,128 +1208,128 @@ public class StartupServer : MonoBehaviour
         UpdateCrowns();
     }
     #endregion
-
-    /**
-     * Die geladenen Spiele in der GameÜbersicht an
-     */
-    public void DisplayGameFiles()
+    /// <summary>
+    /// Zeigt die geladenen Spiele in der GameÜbersicht an
+    /// </summary>
+    private void DisplayGameFiles()
     {
         if (!ServerControlGameSelection.activeInHierarchy)
             return;
+        Logging.log(Logging.LogType.Debug, "StartupServer", "DisplayGameFiles", "Verfügbare Spiele werden angezeigt.");
 
         TMP_Dropdown QuizDropdown = GameObject.Find("Quiz/QuizAuswahl").GetComponent<TMP_Dropdown>();
         QuizDropdown.ClearOptions();
-        QuizDropdown.AddOptions(Config.QUIZ_SPIEL.getQuizzeAsStringList());
+        QuizDropdown.AddOptions(Config.QUIZ_SPIEL.getGamesAsStringList());
 
         TMP_Dropdown ListenDropdown = GameObject.Find("Listen/ListenAuswahl").GetComponent<TMP_Dropdown>();
         ListenDropdown.ClearOptions();
-        ListenDropdown.AddOptions(Config.LISTEN_SPIEL.getListenAsStringList());
+        ListenDropdown.AddOptions(Config.LISTEN_SPIEL.getGamesAsStringList());
 
         TMP_Dropdown MosaikDropdown = GameObject.Find("Mosaik/Auswahl").GetComponent<TMP_Dropdown>();
         MosaikDropdown.ClearOptions();
-        MosaikDropdown.AddOptions(Config.MOSAIK_SPIEL.getListenAsStringList());
+        MosaikDropdown.AddOptions(Config.MOSAIK_SPIEL.getGamesAsStringList());
 
         TMP_Dropdown GeheimwoerterDropdown = GameObject.Find("Geheimwörter/Auswahl").GetComponent<TMP_Dropdown>();
         GeheimwoerterDropdown.ClearOptions();
-        GeheimwoerterDropdown.AddOptions(Config.GEHEIMWOERTER_SPIEL.getListenAsStringList());
+        GeheimwoerterDropdown.AddOptions(Config.GEHEIMWOERTER_SPIEL.getGamesAsStringList());
 
         TMP_Dropdown WerBietetMehrDropdown = GameObject.Find("WerBietetMehr/Auswahl").GetComponent<TMP_Dropdown>();
         WerBietetMehrDropdown.ClearOptions();
-        WerBietetMehrDropdown.AddOptions(Config.WERBIETETMEHR_SPIEL.getQuizzeAsStringList());
+        WerBietetMehrDropdown.AddOptions(Config.WERBIETETMEHR_SPIEL.getGamesAsList());
 
         TMP_Dropdown AuktionDropdown = GameObject.Find("Auktion/Auswahl").GetComponent<TMP_Dropdown>();
         AuktionDropdown.ClearOptions();
-        AuktionDropdown.AddOptions(Config.AUKTION_SPIEL.getListenAsStringList());
+        AuktionDropdown.AddOptions(Config.AUKTION_SPIEL.getGamesAsStringList());
 
         TMP_Dropdown SloxikonDropdown = GameObject.Find("Sloxikon/Auswahl").GetComponent<TMP_Dropdown>();
         SloxikonDropdown.ClearOptions();
         SloxikonDropdown.AddOptions(Config.SLOXIKON_SPIEL.getGamesAsStringList());
     }
     #region Starte Spiele
-    /**
-     * Startet das Flaggen Spiel
-     */
+    /// <summary>
+    /// Startet das Flaggen Spiel
+    /// </summary>
     public void StarteFlaggen()
     {
-        Logging.add(Logging.Type.Normal, "StartupServer", "StarteFlaggen", "Flaggen starts");
+        Logging.log(Logging.LogType.Normal, "StartupServer", "StarteFlaggen", "Flaggen starts");
 
         SceneManager.LoadScene("Flaggen");
         Broadcast("#StarteSpiel Flaggen");
     }
-    /**
-     * Startet das Quiz Spiel -> Alle Spieler laden in die neue Scene
-     */
+    /// <summary>
+    /// Startet das Quiz Spiel -> Alle Spieler laden in die neue Scene
+    /// </summary>
     public void StarteQuiz(TMP_Dropdown drop)
     {
         Config.QUIZ_SPIEL.setSelected(Config.QUIZ_SPIEL.getQuizByIndex(drop.value));
-        Logging.add(Logging.Type.Normal, "StartupServer", "StarteQuiz", "Quiz starts: " + Config.QUIZ_SPIEL.getSelected().getTitel());
+        Logging.log(Logging.LogType.Normal, "StartupServer", "StarteQuiz", "Quiz starts: " + Config.QUIZ_SPIEL.getSelected().getTitel());
 
         SceneManager.LoadScene("Quiz");
         Broadcast("#StarteSpiel Quiz");
     }
-    /**
-     * Startet das Listen Spiel -> Alle Spieler laden in die neue Scene
-     */
+    /// <summary>
+    /// Startet das Listen Spiel -> Alle Spieler laden in die neue Scene
+    /// </summary>
     public void StarteListen(TMP_Dropdown drop)
     {
         Config.LISTEN_SPIEL.setSelected(Config.LISTEN_SPIEL.getListe(drop.value));
-        Logging.add(Logging.Type.Normal, "StartupServer", "StarteListen", "Listen starts: " + Config.LISTEN_SPIEL.getSelected().getTitel());
+        Logging.log(Logging.LogType.Normal, "StartupServer", "StarteListen", "Listen starts: " + Config.LISTEN_SPIEL.getSelected().getTitel());
 
         SceneManager.LoadScene("Listen");
         Broadcast("#StarteSpiel Listen");
     }
-    /**
-     * Starte das Mosaik Spiel -> Alle Spieler laden in die neue Scene
-     */
+    /// <summary>
+    /// Starte das Mosaik Spiel -> Alle Spieler laden in die neue Scene
+    /// </summary>
     public void StarteMosaik(TMP_Dropdown drop)
     {
         Config.MOSAIK_SPIEL.setSelected(Config.MOSAIK_SPIEL.getMosaik(drop.value));
-        Logging.add(Logging.Type.Normal, "StartupServer", "StarteMosaik", "Mosaik starts: " + Config.MOSAIK_SPIEL.getSelected().getTitel());
+        Logging.log(Logging.LogType.Normal, "StartupServer", "StarteMosaik", "Mosaik starts: " + Config.MOSAIK_SPIEL.getSelected().getTitel());
 
         SceneManager.LoadScene("Mosaik");
         Broadcast("#StarteSpiel Mosaik");
     }
-    /**
-     * Starte das Geheimwörter Spiel -> Alle Spieler laden in die neue Scene
-     */
+    /// <summary>
+    /// Starte das Geheimwörter Spiel -> Alle Spieler laden in die neue Scene
+    /// </summary>
     public void StarteGeheimwörter(TMP_Dropdown drop)
     {
         Config.GEHEIMWOERTER_SPIEL.setSelected(Config.GEHEIMWOERTER_SPIEL.getListe(drop.value));
-        Logging.add(Logging.Type.Normal, "StartupServer", "StarteGeheimwörter", "Geheimwörter starts: " + Config.GEHEIMWOERTER_SPIEL.getSelected().getTitel());
+        Logging.log(Logging.LogType.Normal, "StartupServer", "StarteGeheimwörter", "Geheimwörter starts: " + Config.GEHEIMWOERTER_SPIEL.getSelected().getTitel());
 
         SceneManager.LoadScene("Geheimwörter");
         Broadcast("#StarteSpiel Geheimwörter");
     }
-    /**
-     * Starte das WerBietetMehr Spiel -> Alle Spieler laden in die neue Scene
-     */
+    /// <summary>
+    /// Starte das WerBietetMehr Spiel -> Alle Spieler laden in die neue Scene
+    /// </summary>
     public void StarteWerBietetMehr(TMP_Dropdown drop)
     {
         Config.WERBIETETMEHR_SPIEL.setSelected(Config.WERBIETETMEHR_SPIEL.getQuizByIndex(drop.value));
-        Logging.add(Logging.Type.Normal, "StartupServer", "StarteWerBietetMehr", "WerBietetMehr starts: " + Config.WERBIETETMEHR_SPIEL.getSelected().getTitel());
+        Logging.log(Logging.LogType.Normal, "StartupServer", "StarteWerBietetMehr", "WerBietetMehr starts: " + Config.WERBIETETMEHR_SPIEL.getSelected().getTitel());
 
         SceneManager.LoadScene("WerBietetMehr");
         Broadcast("#StarteSpiel WerBietetMehr");
     }
-    /**
-     * Starte das Auktion Spiel -> Alle Spieler laden in die neue Scene
-     */
+    /// <summary>
+    /// Starte das Auktion Spiel -> Alle Spieler laden in die neue Scene
+    /// </summary>
     public void StarteAuktion(TMP_Dropdown drop)
     {
         Config.AUKTION_SPIEL.setSelected(Config.AUKTION_SPIEL.getAuktion(drop.value));
-        Logging.add(Logging.Type.Normal, "StartupServer", "StarteAuktion", "Auktion starts: " + Config.AUKTION_SPIEL.getSelected().getTitel());
+        Logging.log(Logging.LogType.Normal, "StartupServer", "StarteAuktion", "Auktion starts: " + Config.AUKTION_SPIEL.getSelected().getTitel());
 
         //SceneManager.LoadSceneAsync("Auktion");
         Broadcast("#StarteSpiel Auktion");
         SceneManager.LoadScene("Auktion");
     }
-    /**
-     * Starte das Sloxikon Spiel -> Alle Spieler laden in die neue Scene
-     */
+    /// <summary>
+    /// Starte das Sloxikon Spiel -> Alle Spieler laden in die neue Scene
+    /// </summary>
     public void StarteSloxikon(TMP_Dropdown drop)
     {
         Config.SLOXIKON_SPIEL.setSelected(Config.SLOXIKON_SPIEL.getQuizByIndex(drop.value));
-        Logging.add(Logging.Type.Normal, "StartupServer", "StarteSloxikon", "Sloxikon starts: " + Config.SLOXIKON_SPIEL.getSelected().getTitel());
+        Logging.log(Logging.LogType.Normal, "StartupServer", "StarteSloxikon", "Sloxikon starts: " + Config.SLOXIKON_SPIEL.getSelected().getTitel());
 
         //SceneManager.LoadSceneAsync("Auktion");
         Broadcast("#StarteSpiel Sloxikon");

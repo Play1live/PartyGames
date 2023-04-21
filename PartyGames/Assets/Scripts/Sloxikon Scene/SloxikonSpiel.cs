@@ -10,6 +10,7 @@ public class SloxikonSpiel
 
     public SloxikonSpiel()
     {
+        Logging.log(Logging.LogType.Debug, "SloxikonSpiel", "SloxikonSpiel", "Lade Spieldateien");
         games = new List<Sloxikon>();
 
         foreach (string sfile in Directory.GetFiles(Config.MedienPath + path))

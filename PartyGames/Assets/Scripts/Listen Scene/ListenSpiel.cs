@@ -9,6 +9,7 @@ public class ListenSpiel
 
     public ListenSpiel()
     {
+        Logging.log(Logging.LogType.Debug, "ListenSpiel", "ListenSpiel", "Lade Spiele");
         listen = new List<Listen>();
 
         foreach (string sfile in Directory.GetFiles(Config.MedienPath + "/Spiele/Listen"))
@@ -49,7 +50,7 @@ public class ListenSpiel
     public void setSelected(Listen liste) { selected = liste; }
     public Listen getSelected() { return selected; }
 
-    public List<string> getListenAsStringList()
+    public List<string> getGamesAsStringList()
     {
         List<string> listen = new List<string>();
         foreach (Listen liste in getListen())

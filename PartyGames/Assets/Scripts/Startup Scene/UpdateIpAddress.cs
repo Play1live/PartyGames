@@ -8,6 +8,11 @@ using UnityEngine;
 
 public class UpdateIpAddress
 {
+    /// <summary>
+    /// Lädt die aktuelle IP-Adresse des Servers und vergleicht dies mit der Game-DNS-Adresse. 
+    /// Falls die Game-DNS-Adresse != der des Servers ist, wird diese bei No-IP.com aktualisiert. Wenn die dazu notwendigen Daten eingegeben wurden. 
+    /// </summary>
+    /// <returns>Ergebnis der Aktualisierung der DNS-Adresse</returns>
     public bool UpdateNoIP_DNS()
     {
         // Lade aktuelle IP-Adresse
@@ -15,11 +20,11 @@ public class UpdateIpAddress
         // Lade DNS-IP-Adresse
         IPAddress[] domainip = Dns.GetHostAddresses(Config.SERVER_CONNECTION_IP);
 
-        Debug.Log("Aktuelle IP: " + ipaddress + "  DNS-IP: " + domainip[0].ToString());
+        Logging.log(Logging.LogType.Normal, "UpdateIpAddress", "UpdateNoIP_DNS", "Aktuelle IP: " + ipaddress + "  DNS-IP: " + domainip[0].ToString());
         // Wenn die DNS-IP gleich der aktuellen des Servers ist, dann muss kein IP Update durchgeführt werden
         if (ipaddress == domainip[0].ToString())
         {
-            Debug.Log("DNS-IP ist aktuell.");
+            Logging.log(Logging.LogType.Normal, "UpdateIpAddress", "UpdateNoIP_DNS", "DNS - IP ist aktuell.");
             return true;
         }
 
@@ -60,7 +65,7 @@ public class UpdateIpAddress
             }
             else
             {
-                Debug.LogError("Dateiinhalt ist fehlerhaft: Datei: No-IP Settings.txt -- Zeile: "+zeile);
+                Logging.log(Logging.LogType.Warning, "UpdateIpAddress", "UpdateNoIP_DNS", "Dateiinhalt ist fehlerhaft: Datei: No - IP Settings.txt-- Zeile: "+zeile);
                 return false;
             }
         }
@@ -82,12 +87,12 @@ public class UpdateIpAddress
         // Ergebnis auf Erfolg oder Fehler prüfen
         if (result.Contains("good") || result.Contains("nochg"))
         {
-            Debug.Log("IP-Adresse erfolgreich aktualisiert.");
+            Logging.log(Logging.LogType.Normal, "UpdateIpAddress", "UpdateNoIP_DNS", "IP-Adresse erfolgreich aktualisiert.");
             return true;
         }
         else
         {
-            Debug.LogError("Fehler beim Aktualisieren der IP-Adresse. AktuelleIP: "+ ipaddress +" HTTP-Result: "+ result);
+            Logging.log(Logging.LogType.Warning, "UpdateIpAddress", "UpdateNoIP_DNS", "Fehler beim Aktualisieren der IP - Adresse. AktuelleIP: "+ ipaddress +" HTTP - Result: "+ result);
             return false;
         }
     }

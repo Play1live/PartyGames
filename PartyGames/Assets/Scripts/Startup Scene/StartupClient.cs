@@ -30,35 +30,7 @@ public class StartupClient : MonoBehaviour
         #region Client Verbindungsaufbau zum Server
         if (!Config.CLIENT_STARTED)
         {
-            // Create the socket
-            try
-            {
-                Config.CLIENT_TCP = new TcpClient(Config.SERVER_CONNECTION_IP, Config.SERVER_CONNECTION_PORT);
-                Config.CLIENT_STARTED = true;
-                Logging.add(Logging.Type.Normal, "StartupClient", "Start", "Verbindung zum Server wurde hergestellt.");
-                Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server wurde hergestellt.";
-            }
-            catch (Exception e)
-            {
-                Logging.add(Logging.Type.Fatal, "StartupClient", "Start", "Verbindung zum Server nicht möglich.", e);
-                Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server nicht möglich. \n" + e;
-                Config.CLIENT_STARTED = false;
-                try
-                {
-                    CloseSocket();
-                }
-                catch (Exception e1)
-                {
-                    Logging.add(Logging.Type.Fatal, "StartupClient", "Start", "Socket konnte nicht geschlossen werden.", e1);
-                    //ConnectingToServerLBL.GetComponent<TMP_Text>().text = ConnectingToServerLBL.GetComponent<TMP_Text>().text + "\n\nVerbindung zum Server nicht möglich." + e;
-                }
-                transform.gameObject.SetActive(false);
-                Logging.add(Logging.Type.Normal, "StartupClient", "Start", "Client wird ins Hauptmenü geladen.");
-                SceneManager.LoadSceneAsync("Startup");
-                return;
-            }
-            // Verbindung erfolgreich
-            Config.HAUPTMENUE_FEHLERMELDUNG = "";
+            StarteClient();
         }
         else
         {
@@ -68,35 +40,7 @@ public class StartupClient : MonoBehaviour
         }
         #endregion
 
-        StartCoroutine(TestConnectionToServer());
-        StartCoroutine(TestIfStartConnectionError());
-    }
-    
-    IEnumerator TestIfStartConnectionError()
-    {
-        yield return new WaitForSeconds(10);
-        for (int i = 0; i < Config.PLAYERLIST.Length; i++)
-        {
-            if (SpielerAnzeigeLobby[i + 1].transform.GetChild(2).GetComponent<TMP_Text>().text == Config.PLAYER_NAME)
-            {
-                yield break;
-            }
-        }
-        CloseSocket();
-        Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server war fehlerhaft. Bitte versuche es erneut.";
-        SceneManager.LoadSceneAsync("StartUp");
-    }
-
-    IEnumerator TestConnectionToServer()
-    {
-        while (Config.CLIENT_STARTED)
-        {
-            yield return new WaitUntil(() => PingWarteAufAntwort == false);
-            PingWarteAufAntwort = true;
-            SendToServer("#TestConnection");
-            Config.PingTime = DateTime.Now;
-            yield return new WaitForSeconds(5);
-        }
+        StartCoroutine(TestIfStartConnectionError()); 
     }
 
     void Update()
@@ -123,15 +67,90 @@ public class StartupClient : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        Logging.add(Logging.Type.Normal, "StartupClient", "OnApplicationQuit", "Client wird geschlossen.");
+        Logging.log(Logging.LogType.Normal, "StartupClient", "OnApplicationQuit", "Client wird geschlossen.");
         SendToServer("#ClientClosed");
         CloseSocket();
     }
 
+    /// <summary>
+    /// Testet nach der Verbindung zum Server, ob die Verbindung erfolgreich und ohne Fehler funktioniert hat. 
+    /// Falls die Verbindung fehlerhaft war, wird diese beendet und der Client lädt ins Hauptmenü.
+    /// </summary>
+    IEnumerator TestIfStartConnectionError()
+    {
+        Logging.log(Logging.LogType.Normal, "StartupClient", "TestIfStartConnectionError", "Testet in 10 Sekunden (oder wenn die Spieleranzeige aktualisiert wird) ob die Verbindung erfolgreich war.");
+        DateTime in10sec = DateTime.Now.AddSeconds(10);
+        yield return new WaitUntil(() => (DateTime.Compare(DateTime.Now, in10sec) > 0 ||
+        (SpielerAnzeigeLobby[0].transform.GetChild(2).GetComponent<TMP_Text>().text.Length > 0 &&
+            SpielerAnzeigeLobby[1].transform.GetChild(2).GetComponent<TMP_Text>().text.Length > 0)));
+
+        if (SpielerAnzeigeLobby[0].transform.GetChild(2).GetComponent<TMP_Text>().text.Length > 0 &&
+            SpielerAnzeigeLobby[1].transform.GetChild(2).GetComponent<TMP_Text>().text.Length > 0)
+        {
+            Logging.log(Logging.LogType.Normal, "StartupClient", "TestIfStartConnectionError", "Verbindung zum Server war erfolgreich.");
+            yield break;
+        }
+
+        CloseSocket();
+        Logging.log(Logging.LogType.Warning, "StartupClient", "TestIfStartConnectionError", "Verbindung zum Server war fehlerhaft.");
+        Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server war fehlerhaft. Bitte versuche es erneut.\nWenn dieser Fehler erneut auftritt, starte das Programm bitte neu!";
+        SceneManager.LoadSceneAsync("StartUp");
+    }
+    /// <summary>
+    /// Testet alle paar Sekunden die Verbindung zum Server. 
+    /// Dient zugleich der Ping Berechnung und Aktualisierung.
+    /// </summary>
+    IEnumerator TestConnectionToServer()
+    {
+        Logging.log(Logging.LogType.Debug, "StartupClient", "TestConnectionToServer", "Startet den Verbindungstest zum Server.");
+        while (Config.CLIENT_STARTED)
+        {
+            yield return new WaitUntil(() => PingWarteAufAntwort == false);
+            Logging.log(Logging.LogType.Debug, "StartupClient", "TestConnectionToServer", "Testet die Verbindung zum Server.");
+            PingWarteAufAntwort = true;
+            SendToServer("#TestConnection");
+            Config.PingTime = DateTime.Now;
+            yield return new WaitForSeconds(5);
+        }
+    }
     #region Verbindungen
-    /**
-     * Trennt die Verbindung zum Server
-     */
+    /// <summary>
+    /// Startet den Client mit der Verbindung zum Server
+    /// </summary>
+    private void StarteClient()
+    {
+        Logging.log(Logging.LogType.Normal, "StartupClient", "OnEnable", "Verbindung zwischen Client und Server wird aufgebaut...");
+        try
+        {
+            Config.CLIENT_TCP = new TcpClient(Config.SERVER_CONNECTION_IP, Config.SERVER_CONNECTION_PORT);
+            Config.CLIENT_STARTED = true;
+            Logging.log(Logging.LogType.Normal, "StartupClient", "OnEnable", "Verbindung wurde erfolgreich aufgebaut.");
+            Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server wurde hergestellt.";
+        }
+        catch (Exception e)
+        {
+            Logging.log(Logging.LogType.Warning, "StartupClient", "OnEnable", "Verbindung zum Server nicht möglich.", e);
+            Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server nicht möglich. \n" + e;
+            Config.CLIENT_STARTED = false;
+            try
+            {
+                CloseSocket();
+            }
+            catch (Exception e1)
+            {
+                Logging.log(Logging.LogType.Error, "StartupClient", "OnEnable", "Socket konnte nicht geschlossen werden.", e1);
+            }
+            transform.gameObject.SetActive(false);
+            Logging.log(Logging.LogType.Normal, "StartupClient", "OnEnable", "Client wird ins Hauptmenü geladen.");
+            SceneManager.LoadSceneAsync("Startup");
+            return;
+        }
+        // Verbindung erfolgreich
+        Config.HAUPTMENUE_FEHLERMELDUNG = "";
+    }
+    /// <summary>
+    /// Trennt die Verbindung zum Server
+    /// </summary>
     private void CloseSocket()
     {
         if (!Config.CLIENT_STARTED)
@@ -140,15 +159,15 @@ public class StartupClient : MonoBehaviour
         Config.CLIENT_TCP.Close();
         Config.CLIENT_STARTED = false;
 
-        Logging.add(Logging.Type.Normal, "StartupClient", "CloseSocket", "Verbindung zum Server wurde getrennt. Client wird in das Hauptmenü geladen.");
+        Logging.log(Logging.LogType.Normal, "StartupClient", "CloseSocket", "Verbindung zum Server wurde getrennt. Client wird in das Hauptmenü geladen.");
     }
     #endregion
-
     #region Kommunikation
-    /**
-     * Sendet einen Command zum Server
-     */
-    public void SendToServer(string data)
+    /// <summary>
+    /// Sendet einen Befehl zum Server
+    /// </summary>
+    /// <param name="data"></param>
+    private void SendToServer(string data)
     {
         if (!Config.CLIENT_STARTED)
             return;
@@ -162,15 +181,16 @@ public class StartupClient : MonoBehaviour
         }
         catch (Exception e)
         {
-            Logging.add(Logging.Type.Error, "Client", "SendToServer", "Nachricht an Server konnte nicht gesendet werden." + e);
+            Logging.log(Logging.LogType.Warning, "StartupClient", "SendToServer", "Nachricht an Server konnte nicht gesendet werden. Nachricht: " + data, e);
             Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server wurde verloren.";
             CloseSocket();
             SceneManager.LoadSceneAsync("StartUp");
         }
     }
-    /**
-     * Eingehende Nachrichten vom Server
-     */
+    /// <summary>
+    /// Eingehende Nachrichten vom Server
+    /// </summary>
+    /// <param name="data">Eingehende Nachricht</param>
     private void OnIncomingData(string data)
     {
         string cmd;
@@ -183,20 +203,22 @@ public class StartupClient : MonoBehaviour
         Commands(data, cmd);
     }
     #endregion
-    /**
-     * Verarbeitet die Commands vom Server
-     */
-    public void Commands(string data, string cmd)
+    /// <summary>
+    /// Verarbeitet die Befehle vom Server
+    /// </summary>
+    /// <param name="data">Befehldaten</param>
+    /// <param name="cmd">Befehl</param>
+    private void Commands(string data, string cmd)
     {
-        //Debug.Log("Eingehend: " + cmd + " -> " + data);
+        Logging.log(Logging.LogType.Debug, "StartupClient", "Commands", "Eingehende Nachricht vom Server: " + cmd + " -> " + data);
         switch (cmd)
         {
             default:
-                Logging.add(Logging.Type.Warning, "StartupClient", "Commands", "Unkown Command -> " + cmd + " - " + data);
+                Logging.log(Logging.LogType.Warning, "StartupClient", "Commands", "Unkown Command: " + cmd + " -> " + data);
                 break;
 
-            #region Universal Commands
             case "#ServerClosed":
+                Logging.log(Logging.LogType.Normal, "StartupClient", "Commands", "Die Verbindung wurde vom Server beendet.");
                 CloseSocket();
                 Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung wurde Serverseitig beendet.";
                 SceneManager.LoadSceneAsync("StartUp");
@@ -210,7 +232,6 @@ public class StartupClient : MonoBehaviour
                 SendToServer("#PlayerPing " + ping);
                 PingWarteAufAntwort = false;
                 break;
-            #endregion
 
             case "#UpdateRemoteConfig":
                 LoadConfigs.FetchRemoteConfig();
@@ -220,6 +241,12 @@ public class StartupClient : MonoBehaviour
                 break;
             case "#WrongVersion":
                 WrongVersion(data);
+                break;
+            case "#ServerVoll":
+                // TODO: ServerVoll Befehl einbauen
+                break;
+            case "#SpielerChangeName":
+                SpielerChangeName(data);
                 break;
             case "#UpdateSpieler":
                 UpdateSpieler(data);
@@ -232,9 +259,6 @@ public class StartupClient : MonoBehaviour
                 break;
             case "#AllowNameChange":
                 AllowNameChange(data);
-                break;
-            case "#SpielerChangeName":
-                SpielerChangeName(data);
                 break;
 
             case "#StarteSpiel":
@@ -253,11 +277,10 @@ public class StartupClient : MonoBehaviour
                 break;
         }
     }
-
-    /**
-     * Aktualisiert die eigene ID und die der anderen
-     * #SetID <1-8>
-     */
+    /// <summary>
+    /// Aktualisiert die eigene ID und die der anderen
+    /// </summary>
+    /// <param name="data">#SetID <1-8></param>
     private void SetID(String data)
     {
         int idparse;
@@ -267,7 +290,7 @@ public class StartupClient : MonoBehaviour
         }
         catch (Exception e)
         {
-            Logging.add(Logging.Type.Error, "StartupClient", "SetID", "ID konnte nicht geladen werden.", e);
+            Logging.log(Logging.LogType.Error, "StartupClient", "SetID", "ID konnte nicht geladen werden. ID: "+ data, e);
             return;
         }
         // IDs festlegen
@@ -277,66 +300,71 @@ public class StartupClient : MonoBehaviour
         }
         Config.PLAYER_ID = idparse;
 
-        /*
-        Config.PLAYER_ID = idparse;
-        idparse--;
-        for (int i = 0; i < Config.PLAYERLIST.Length; i++)
-        {
-            Config.PLAYERLIST[i].id = (idparse + i) % Config.PLAYERLIST.Length + 1;
-        }*/
         SendToServer("#ClientSetName [NAME]" + Config.PLAYER_NAME + "[NAME][VERSION]" + Config.APPLICATION_VERSION + "[VERSION]");
 
         Hauptmenue.SetActive(false);
         Lobby.SetActive(true);
     }
-    /**
-     * Ändert den Namen des Spielers
-     */
+    /// <summary>
+    /// Ändert den Namen des Spielers
+    /// </summary>
+    /// <param name="data"></param>
     private void SpielerChangeName(string data)
     {
+        Logging.log(Logging.LogType.Normal, "StartupClient", "SpielerChangeName", "Spielername ist nun: " + data);
         Config.PLAYER_NAME = data;
 
         SendToServer("#SpielerIconChange 0"); // Für namentliches Icon
+
+        StopCoroutine(TestConnectionToServer());
+        StartCoroutine(TestConnectionToServer());
     }
-    /**
-     * Beendet beitrittsversuche, wenn der Server eine andere Version hat
-     * #WrongVersion <version>
-     */
+    /// <summary>
+    /// Beendet beitrittsversuche, wenn der Server eine andere Version hat
+    /// </summary>
+    /// <param name="data">#WrongVersion <version></param>
     private void WrongVersion(String data)
     {
-        GameObject.Find("ConnectingToServer_LBL").gameObject.GetComponent<TMP_Text>().text = "Du versuchst mit einer falschen Version beizutreten.\n Deine Version: " + Config.APPLICATION_VERSION + "\n Benötigte Version: " + data;
-        Logging.add(Logging.Type.Error, "StartupClient", "WrongVersion", "Du versuchst mit einer falschen Version beizutreten. Deine Version: " + Config.APPLICATION_VERSION + "- Benötigte Version: " + data);
+        // TODO: Wrongversion testen
+        Logging.log(Logging.LogType.Warning, "StartupClient", "WrongVersion", "Client versucht mit einer falschen Version beizutreten. Deine Version: " + Config.APPLICATION_VERSION + "- Benötigte Version: " + data);
+        Config.HAUPTMENUE_FEHLERMELDUNG = "Du versuchst mit einer falschen Version beizutreten.\n Deine Version: " + Config.APPLICATION_VERSION + "\n Benötigte Version: " + data;
         CloseSocket();
         SceneManager.LoadSceneAsync("StartUpScene");
     }
-    /**
-     *  Zeigt Namensänderung an
-     */
+    /// <summary>
+    /// Zeigt das Namensänderungsfeld an
+    /// </summary>
+    /// <param name="data"></param>
     private void AllowNameChange(string data)
     {
+        Logging.log(Logging.LogType.Normal, "StartupClient", "AllowNameChange", "Namensänderungen sind nun möglich: " + data);
         UmbenennenFeld.SetActive(Boolean.Parse(data));
     }
-    /**
-     * Sendet Namensänderung an Server
-     */
+    /// <summary>
+    /// Sendet Namensänderunganfrage an Server
+    /// </summary>
+    /// <param name="input"></param>
     public void ChangePlayerName(TMP_InputField input)
     {
-        if (Config.PLAYERLIST[Config.PLAYER_ID].name == input.text)
+        if (Config.PLAYERLIST[Config.PLAYER_ID].name == input.text || input.text.Length == 0)
             return;
+        Logging.log(Logging.LogType.Normal, "StartupClient", "ChangePlayerName", "Namens wechsel Anfrage: " + input.text);
         SendToServer("#ChangePlayerName " + input.text);
     }
-    /**
-     * Sendet eine Iconeänderung an den Server
-     */
+    /// <summary>
+    /// Sendet eine Iconeänderungsanfrage an den Server
+    /// </summary>
     public void ChangeIcon()
     {
+        Logging.log(Logging.LogType.Normal, "StartupClient", "ChangeIcon", "Icon wechsel Anfrage.");
         SendToServer("#SpielerIconChange");
     }
-    /**
-     * Init Lobby Anzeigen
-     */
+    /// <summary>
+    /// Initialisiert die Lobbyanzeigen
+    /// </summary>
     private void InitPlayerLobby()
     {
+        Logging.log(Logging.LogType.Normal, "StartupClient", "InitPlayerLobby", "Spielerlobby wird initialisiert.");
         // Für Server Host
         SpielerAnzeigeLobby[0].transform.GetChild(4).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Top4");
         SpielerAnzeigeLobby[0].transform.GetChild(4).gameObject.SetActive(false);
@@ -358,12 +386,13 @@ public class StartupClient : MonoBehaviour
             SpielerAnzeigeLobby[i + 1].transform.GetChild(6).gameObject.SetActive(false);
         }
     }
-    /**
-     * Updated die Spieler
-     * #UpdateSpieler
-     */
+    /// <summary>
+    /// Updated die Spieleranzeige
+    /// </summary>
+    /// <param name="data">#UpdateSpieler [ID]<0-8>[ID][NAMEN]<>[NAMEN][PUNKTE]<>[PUNKTE][ICON]<>[ICON][TRENNER]...</param>
     private void UpdateSpieler(String data)
     {
+        Logging.log(Logging.LogType.Debug, "StartupClient", "UpdateSpieler", "Spieleranzeige wird aktualisiert. "+ data);
         string[] spieler = data.Replace("[TRENNER]", "|").Split('|');
         int spieleranzahl = 1;
         foreach (string sp in spieler)
@@ -375,7 +404,7 @@ public class StartupClient : MonoBehaviour
             }
             catch (Exception e)
             {
-                Logging.add(Logging.Type.Error, "Client", "UpdateSpieler", "ID konnte nicht geladen werden.", e);
+                Logging.log(Logging.LogType.Error, "StartupClient", "UpdateSpieler", "ID konnte nicht geladen werden. Data: "+ data, e);
                 return;
             }
 
@@ -415,18 +444,26 @@ public class StartupClient : MonoBehaviour
                 GameObject.Find("Lobby/Title_LBL/Spieleranzahl").GetComponent<TMP_Text>().text = spieleranzahl + "/" + (Config.PLAYERLIST.Length + 1);
         }
     }
-
+    /// <summary>
+    /// Aktualisiert die Pinganzeige der Spieler
+    /// </summary>
+    /// <param name="data">Images der Pinganzeige aller Spieler</param>
     private void UpdatePing(string data)
     {
+        Logging.log(Logging.LogType.Debug, "StartupClient", "UpdatePing", "Pinganzeigen wird aktualisiert. " + data);
         SpielerAnzeigeLobby[0].transform.GetChild(3).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Ping/" + data.Replace("[0]", "|").Split('|')[1]);
         foreach (Player p in Config.PLAYERLIST)
         {
             SpielerAnzeigeLobby[p.id].transform.GetChild(3).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Ping/" + data.Replace("[" + p.id + "]", "|").Split('|')[1]);
         }
     }
-
+    /// <summary>
+    /// Aktualisiert die Kornenanzeige
+    /// </summary>
+    /// <param name="data">Jeweilige Kronenanzahl der Spieler</param>
     private void UpdateCrowns(string data)
     {
+        Logging.log(Logging.LogType.Debug, "StartupClient", "UpdateCrowns", "Kronenanzeige wird aktualisiert. " + data);
         #region Speichert Zahlen
         // Server
         Config.SERVER_CROWNS = Int32.Parse(data.Replace("[0]","|").Split('|')[1]);
@@ -544,17 +581,17 @@ public class StartupClient : MonoBehaviour
 
         #endregion
     }
-
-    /**
-     * Lädt in die angegeben SpielScene
-     */
+    /// <summary>
+    /// Lädt Spieler in die angegeben Spielscene
+    /// </summary>
+    /// <param name="data">Scenenname</param>
     private void StarteSpiel(string data)
     {
-        Logging.add(new Logging(Logging.Type.Normal, "Client", "StarteSpiel", "Spiel wird geladen: " + data));
+        Logging.log(Logging.LogType.Normal, "StartupClient", "StarteSpiel", "Spiel wird geladen: " + data);
         switch (data)
         {
             default:
-                Logging.add(new Logging(Logging.Type.Fatal, "Client", "StarteSpiel", "Unbekanntes Spiel das geladen werden soll. Beende Verbindung"));
+                Logging.log(Logging.LogType.Error, "StartupClient", "StarteSpiel", "Unbekanntes Spiel sooll geladen werden. Beende Verbindung. Spiel: " + data);
                 SendToServer("#ClientClosed");
                 CloseSocket();
                 SceneManager.LoadSceneAsync("StartUpScene");
@@ -582,32 +619,35 @@ public class StartupClient : MonoBehaviour
                 break;
         }
     }
-
     #region MiniGames
     #region TickTackToe
-    /**
-     * Zeigt das TickTackToe Spiel an
-     */
+    /// <summary>
+    /// Blendet das TickTackToe Spiel ein
+    /// </summary>
     private void SwitchToTickTackToe()
     {
+        Logging.log(Logging.LogType.Normal, "StartupClient", "SwitchToTickTackToe", "MiniSpiel wird zu TickTackToe gewechselt.");
         foreach (GameObject go in MiniGames)
             go.SetActive(false);
 
         MiniGames[0].SetActive(true);
     }
-    /**
-     * Startet TickTackToe
-     */
+    /// <summary>
+    /// Startet TickTackToe
+    /// </summary>
     public void StartTickTackToe()
     {
+        Logging.log(Logging.LogType.Normal, "StartupClient", "StartTickTackToe", "TickTackToe wird gestartet.");
         ticktacktoe = "";
         SendToServer("#StartTickTackToe");
     }
-    /**
-     * Zeigt den Zug des Servers an
-     */
+    /// <summary>
+    /// Zeigt den Zug des Servers an
+    /// </summary>
+    /// <param name="data">Daten zum Zug des Servers</param>
     private void TickTackToeZug(string data)
     {
+        Logging.log(Logging.LogType.Normal, "StartupClient", "TickTackToeZug", "TickTackToe Zug wird gewählt.");
         MiniGames[0].transform.GetChild(2).gameObject.SetActive(false);
         MiniGames[0].transform.GetChild(3).gameObject.SetActive(false);
         ticktacktoe = data;
@@ -629,11 +669,13 @@ public class StartupClient : MonoBehaviour
             }
         }
     }
-    /**
-     * TickTackToe ist beendet, Speichert statistik
-     */
+    /// <summary>
+    /// TickTackToe wird beendet. Statistik wird aktualisiert
+    /// </summary>
+    /// <param name="data">TickTackToe Result & Zug des Servers</param>
     private void TickTackToeZugEnde(string data)
     {
+        Logging.log(Logging.LogType.Normal, "StartupClient", "TickTackToeZugEnde", "TickTackToe Spiel ist zuende.");
         // Save Result
         string result = data.Split('|')[1];
         data = data.Split('|')[2];
@@ -645,11 +687,13 @@ public class StartupClient : MonoBehaviour
         MiniGames[0].transform.GetChild(3).gameObject.SetActive(true);
         MiniGames[0].transform.GetChild(4).GetComponent<TMP_Text>().text = "W:" + ticktacktoeRes.Split('W')[1] + " L:" + ticktacktoeRes.Split('L')[1] + " D:" + ticktacktoeRes.Split('D')[1];
     }
-    /**
-     * Macht einen Zug in TickTackToe 
-     */
+    /// <summary>
+    /// Macht einen Zug in TickTackToe & sendet die daten an den Server
+    /// </summary>
+    /// <param name="button">Ausgewähltes Feld</param>
     public void TickTackToeButtonPress(GameObject button)
     {
+        Logging.log(Logging.LogType.Normal, "StartupClient", "TickTackToeButtonPress", "Spieler zieht.");
         // Feld bereits belegt
         if (ticktacktoe.Replace("["+button.name+"]","|").Split('|')[1] != "")
         {
@@ -660,8 +704,6 @@ public class StartupClient : MonoBehaviour
         ticktacktoe = ticktacktoe.Replace("[" + button.name + "][" + button.name + "]", "["+ button.name + "]O[" + button.name + "]");
         SendToServer("#TickTackToeSpielerZug "+ ticktacktoe);
     }
-
     #endregion
-    #endregion
-        
+    #endregion        
 }

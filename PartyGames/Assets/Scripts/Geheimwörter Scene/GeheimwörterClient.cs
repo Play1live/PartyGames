@@ -33,14 +33,6 @@ public class GeheimwörterClient : MonoBehaviour
 
         StartCoroutine(TestConnectionToServer());
     }
-    IEnumerator TestConnectionToServer()
-    {
-        while (Config.CLIENT_STARTED)
-        {
-            SendToServer("#TestConnection");
-            yield return new WaitForSeconds(10);
-        }
-    }
 
     void Update()
     {
@@ -57,7 +49,6 @@ public class GeheimwörterClient : MonoBehaviour
         {
             pressingbuzzer = false;
         }
-
 
         #region Prüft auf Nachrichten vom Server
         if (Config.CLIENT_STARTED)
@@ -81,15 +72,26 @@ public class GeheimwörterClient : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        Logging.add(Logging.Type.Normal, "Client", "OnApplicationQuit", "Client wird geschlossen.");
+        Logging.log(Logging.LogType.Normal, "GeheimwörterClient", "OnApplicationQuit", "Client wird geschlossen.");
         SendToServer("#ClientClosed");
         CloseSocket();
     }
 
+    /// <summary>
+    /// Testet die Verbindumg zum Server
+    /// </summary>
+    IEnumerator TestConnectionToServer()
+    {
+        while (Config.CLIENT_STARTED)
+        {
+            SendToServer("#TestConnection");
+            yield return new WaitForSeconds(10);
+        }
+    }
     #region Verbindungen
-    /**
-     * Trennt die Verbindung zum Server
-     */
+    /// <summary>
+    /// Trennt die Verbindung zum Server
+    /// </summary>
     private void CloseSocket()
     {
         if (!Config.CLIENT_STARTED)
@@ -98,13 +100,14 @@ public class GeheimwörterClient : MonoBehaviour
         Config.CLIENT_TCP.Close();
         Config.CLIENT_STARTED = false;
 
-        Logging.add(Logging.Type.Normal, "Client", "CloseSocket", "Verbindung zum Server wurde getrennt. Client wird in das Hauptmenü geladen.");
+        Logging.log(Logging.LogType.Normal, "GeheimwlrterClient", "CloseSocket", "Verbindung zum Server wurde getrennt. Client wird in das Hauptmenü geladen.");
     }
     #endregion
     #region Kommunikation
-    /**
-     * Sendet eine Nachricht an den Server.
-     */
+    /// <summary>
+    /// Sendet eine Nachricht an den Server.
+    /// </summary>
+    /// <param name="data"></param>
     public void SendToServer(string data)
     {
         if (!Config.CLIENT_STARTED)
@@ -119,15 +122,16 @@ public class GeheimwörterClient : MonoBehaviour
         }
         catch (Exception e)
         {
-            Logging.add(Logging.Type.Error, "Client", "SendToServer", "Nachricht an Server konnte nicht gesendet werden." + e);
+            Logging.log(Logging.LogType.Warning, "GeheimwörterClient", "SendToServer", "Nachricht an Server konnte nicht gesendet werden.", e);
             Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server wurde verloren.";
             CloseSocket();
             SceneManager.LoadSceneAsync("StartUp");
         }
     }
-    /**
-     * Einkommende Nachrichten die vom Sever
-     */
+    /// <summary>
+    /// Einkommende Nachrichten die vom Sever
+    /// </summary>
+    /// <param name="data"></param>
     private void OnIncomingData(string data)
     {
         string cmd;
@@ -140,27 +144,32 @@ public class GeheimwörterClient : MonoBehaviour
         Commands(data, cmd);
     }
     #endregion
-    /**
-     * Eingehende Commands vom Server
-     */
-    public void Commands(string data, string cmd)
+    /// <summary>
+    /// Eingehende Commands vom Server
+    /// </summary>
+    /// <param name="data">Befehlsargumente</param>
+    /// <param name="cmd">Befehl</param>
+    private void Commands(string data, string cmd)
     {
-        //Debug.Log("Eingehend: " + cmd + " -> " + data);
+        Logging.log(Logging.LogType.Debug, "GeheimwörterClient", "Commands", "Eingehende Nachrichten: " + cmd + " -> " + data);
         switch (cmd)
         {
             default:
-                Logging.add(Logging.Type.Warning, "QuizClient", "Commands", "Unkown Command -> " + cmd + " - " + data);
+                Logging.log(Logging.LogType.Warning, "GeheimwörterClient", "Commands", "Unkown Command: " + cmd + " -> " + data);
                 break;
 
             #region Universal Commands
             case "#ServerClosed":
+                Logging.log(Logging.LogType.Normal, "GeheimwörterClient", "Commands", "Verbindung zum Server wurde getrennt. Lade ins Hauptmenü");
                 CloseSocket();
                 SceneManager.LoadScene("Startup");
                 break;
             case "#UpdateRemoteConfig":
+                Logging.log(Logging.LogType.Normal, "GeheimwörterClient", "Commands", "RemoteConfig wird aktualisiert.");
                 LoadConfigs.FetchRemoteConfig();
                 break;
             case "#ZurueckInsHauptmenue":
+                Logging.log(Logging.LogType.Normal, "GeheimwörterClient", "Commands", "Spiel wird beendet, lade ins Hauptmenü.");
                 SceneManager.LoadScene("Startup");
                 break;
             #endregion
@@ -214,10 +223,10 @@ public class GeheimwörterClient : MonoBehaviour
                 break;
         }
     }
-
-    /**
-     * Aktualisiert die Spieler Anzeigen
-     */
+    /// <summary>
+    /// Aktualisiert die Spieler Anzeigen
+    /// </summary>
+    /// <param name="data"></param>
     private void UpdateSpieler(string data)
     {
         string[] player = data.Replace("[TRENNER]", "|").Split('|');
@@ -252,63 +261,67 @@ public class GeheimwörterClient : MonoBehaviour
             }
         }
     }
-    /**
-     * Sendet eine Buzzer Anfrage an den Server
-     */
+    /// <summary>
+    /// Sendet eine Buzzer Anfrage an den Server
+    /// </summary>
     public void SpielerBuzzered()
     {
         SendToServer("#SpielerBuzzered");
     }
-    /**
-     * Gibt den Buzzer frei
-     */
+    /// <summary>
+    /// Gibt den Buzzer frei
+    /// </summary>
     private void BuzzerFreigeben()
     {
         for (int i = 0; i < Config.SERVER_MAX_CONNECTIONS; i++)
             SpielerAnzeige[i, 1].SetActive(false);
     }
-    /**
-     * Spielt Sound des Buzzers ab und zeigt welcher Spieler diesen gedrückt hat
-     */
+    /// <summary>
+    /// Spielt Sound des Buzzers ab und zeigt welcher Spieler diesen gedrückt hat
+    /// </summary>
+    /// <param name="data">id</param>
     private void AudioBuzzerPressed(string data)
     {
         BuzzerSound.Play();
         int pId = Int32.Parse(data);
         SpielerAnzeige[Player.getPosInLists(pId), 1].SetActive(true);
     }
-    /**
-     * Zeigt an, welcher Spieler dran ist
-     */
+    /// <summary>
+    /// Zeigt an, welcher Spieler dran ist
+    /// </summary>
+    /// <param name="data">id</param>
     private void SpielerIstDran(string data)
     {
         int pId = Int32.Parse(data);
         SpielerAnzeige[Player.getPosInLists(pId), 1].SetActive(true);
     }
-    /**
-     * Deaktiviert die Spieler ist dran anzeige
-     */
+    /// <summary>
+    /// Deaktiviert die Spieler ist dran Anzeige
+    /// </summary>
+    /// <param name="data">id</param>
     private void SpielerIstNichtDran(string data)
     {
         int pId = Int32.Parse(data);
         SpielerAnzeige[Player.getPosInLists(pId), 1].SetActive(false);
     }
-    /**
-     * Spielt den Sound für eine richtige Antwort ab
-     */
+    /// <summary>
+    /// Spielt den Sound für eine richtige Antwort ab
+    /// </summary>
     private void AudioRichtigeAntwort()
     {
         RichtigeAntwortSound.Play();
     }
-    /**
-     * Spielt den Sound für eine falsche Antwort ab
-     */
+    /// <summary>
+    /// Spielt den Sound für eine falsche Antwort ab
+    /// </summary>
     private void AudioFalscheAntwort()
     {
         FalscheAntwortSound.Play();
     }
-    /**
-     * Zeigt an, ob ein Spieler austabt
-     */
+    /// <summary>
+    /// Zeigt an, ob ein Spieler austabt
+    /// </summary>
+    /// <param name="data">bool</param>
     private void SpielerAusgetabt(string data)
     {
         // AustabenAnzeigen wird deaktiviert
@@ -329,16 +342,18 @@ public class GeheimwörterClient : MonoBehaviour
             SpielerAnzeige[pos, 3].SetActive(type);
         }
     }
-    /**
-     * Sendet die Antworteingabe an den Server
-     */
+    /// <summary>
+    /// Sendet die Antworteingabe an den Server
+    /// </summary>
+    /// <param name="input">Texteingabe</param>
     public void SpielerAntwortEingabeInput(TMP_InputField input)
     {
         SendToServer("#SpielerAntwortEingabe " + input.text);
     }
-    /**
-     * Zeigt das Texteingabefeld an
-     */
+    /// <summary>
+    /// Zeigt das Texteingabefeld an
+    /// </summary>
+    /// <param name="data">bool</param>
     private void TexteingabeAnzeigen(string data)
     {
         bool anzeigen = Boolean.Parse(data);
@@ -350,9 +365,10 @@ public class GeheimwörterClient : MonoBehaviour
         else
             SpielerAntwortEingabe.SetActive(false);
     }
-    /**
-     * Zeigt die Textantworten aller Spieler an
-     */
+    /// <summary>
+    /// Zeigt die Textantworten aller Spieler an
+    /// </summary>
+    /// <param name="data">Zeigt die Textantworten der Spieler</param>
     private void TextantwortenAnzeigen(string data)
     {
         bool boolean = bool.Parse(data.Replace("[BOOL]", "|").Split('|')[1]);
@@ -372,9 +388,9 @@ public class GeheimwörterClient : MonoBehaviour
             SpielerAnzeige[Player.getPosInLists(i), 7].GetComponentInChildren<TMP_InputField>().text = text.Replace("[ID" + i + "]", "|").Split('|')[1];
         }
     }
-    /**
-     * Initialisiert die Anzeigen der Scene
-     */
+    /// <summary>
+    /// Initialisiert die Anzeigen der Scene
+    /// </summary>
     private void InitAnzeigen()
     {
         WoerterAnzeige = GameObject.Find("GeheimwörterAnzeige/Outline/Woerter").GetComponent<TMP_Text>();
@@ -412,8 +428,10 @@ public class GeheimwörterClient : MonoBehaviour
             SpielerAnzeige[i, 6].SetActive(false); // Server Settings
             SpielerAnzeige[i, 7].SetActive(false);
         }
-    } 
-    
+    }
+    /// <summary>
+    /// Blendet alle Geheimwörterelemente aus
+    /// </summary>
     private void GeheimwoerterHide()
     {
         WoerterAnzeige.text = "";
@@ -425,6 +443,9 @@ public class GeheimwörterClient : MonoBehaviour
             Liste[i].SetActive(false);
         }
     }
+    /// <summary>
+    /// Leert Geheimwörterelemente
+    /// </summary>
     private void GeheimwoerterNeue()
     {
         WoerterAnzeige.text = "";
@@ -432,6 +453,10 @@ public class GeheimwörterClient : MonoBehaviour
         LoesungsWortAnzeige.text = "";
         LoesungsWortAnzeige.transform.parent.gameObject.SetActive(false);
     }
+    /// <summary>
+    /// Zeigt den notwendigen Code an
+    /// </summary>
+    /// <param name="data">Codeelemente</param>
     private void GeheimwoerterCode(string data)
     {
         string[] code = data.Replace("<#>", "|").Split('|');
@@ -442,17 +467,23 @@ public class GeheimwörterClient : MonoBehaviour
             Liste[i].SetActive(true);
         }
     }
+    /// <summary>
+    /// Zeigt die Geheimwörter an
+    /// </summary>
+    /// <param name="data"></param>
     private void GeheimwoerterWorteZeigen(string data)
     {
         WoerterAnzeige.text = data.Replace("<>", "\n");
         KategorieAnzeige.text = "";
     }
+    /// <summary>
+    /// Zeigt die Lösung an
+    /// </summary>
+    /// <param name="data">Lösungsinhalte</param>
     private void GeheimwoerterLoesung(string data)
     {
         LoesungsWortAnzeige.text = data.Replace("[TRENNER]", "|").Split('|')[0];
         LoesungsWortAnzeige.transform.parent.gameObject.SetActive(true);
         KategorieAnzeige.text = data.Replace("[TRENNER]", "|").Split('|')[1].Replace("<>", "\n");
     }
-
-
 }

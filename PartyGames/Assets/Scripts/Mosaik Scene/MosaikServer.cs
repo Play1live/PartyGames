@@ -56,18 +56,6 @@ public class MosaikServer : MonoBehaviour
             if (spieler.isConnected == false)
                 continue;
 
-
-            #region Prüft ob Clients noch verbunden sind
-            /*if (!isConnected(spieler.tcp) && spieler.isConnected == true)
-            {
-                Debug.LogWarning(spieler.id);
-                spieler.tcp.Close();
-                spieler.isConnected = false;
-                spieler.isDisconnected = true;
-                Logging.add(new Logging(Logging.Type.Normal, "Server", "Update", "Spieler ist nicht mehr Verbunden. ID: " + spieler.id));
-                continue;
-            }*/
-            #endregion
             #region Sucht nach neuen Nachrichten
             /*else*/
             if (spieler.isConnected == true)
@@ -92,7 +80,7 @@ public class MosaikServer : MonoBehaviour
                 {
                     if (Config.PLAYERLIST[i].isDisconnected == true)
                     {
-                        Logging.add(Logging.Type.Normal, "QuizServer", "Update", "Spieler hat die Verbindung getrennt. ID: " + Config.PLAYERLIST[i].id);
+                        Logging.log(Logging.LogType.Normal, "MosaikServer", "Update", "Spieler hat die Verbindung getrennt. ID: " + Config.PLAYERLIST[i].id);
                         Broadcast(Config.PLAYERLIST[i].name + " has disconnected", Config.PLAYERLIST);
                         Config.PLAYERLIST[i].isConnected = false;
                         Config.PLAYERLIST[i].isDisconnected = false;
@@ -109,65 +97,17 @@ public class MosaikServer : MonoBehaviour
     private void OnApplicationQuit()
     {
         Broadcast("#ServerClosed", Config.PLAYERLIST);
-        Logging.add(new Logging(Logging.Type.Normal, "Server", "OnApplicationQuit", "Server wird geschlossen"));
+        Logging.log(Logging.LogType.Normal, "Server", "OnApplicationQuit", "Server wird geschlossen");
         Config.SERVER_TCP.Server.Close();
     }
 
     #region Server Stuff
-    #region Verbindungen
-    /**
-     * Prüft ob eine Verbindung zum gegebenen Client noch besteht
-     */
-    private bool isConnected(TcpClient c)
-    {
-        /*try
-        {
-            if (c != null && c.Client != null && c.Client.Connected)
-            {
-                if (c.Client.Poll(0, SelectMode.SelectRead))
-                {
-                    return !(c.Client.Receive(new byte[1], SocketFlags.Peek) == 0);
-                }
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        catch
-        {
-            return false;
-        }*/
-        if (c != null && c.Client != null && c.Client.Connected)
-        {
-            if ((c.Client.Poll(0, SelectMode.SelectWrite)) && (!c.Client.Poll(0, SelectMode.SelectError)))
-            {
-                byte[] buffer = new byte[1];
-                if (c.Client.Receive(buffer, SocketFlags.Peek) == 0)
-                {
-                    return false;
-                }
-                else
-                {
-                    return true;
-                }
-            }
-            else
-            {
-                return false;
-            }
-        }
-        else
-        {
-            return false;
-        }
-    }
-    #endregion
     #region Kommunikation
-    /**
-     * Sendet eine Nachricht an den übergebenen Spieler
-     */
+    /// <summary>
+    /// Sendet eine Nachricht an den übergebenen Spieler
+    /// </summary>
+    /// <param name="data">Nachricht</param>
+    /// <param name="sc">Spieler</param>
     private void SendMSG(string data, Player sc)
     {
         try
@@ -178,14 +118,16 @@ public class MosaikServer : MonoBehaviour
         }
         catch (Exception e)
         {
-            Logging.add(new Logging(Logging.Type.Error, "Server", "SendMessage", "Nachricht an Client: " + sc.id + " (" + sc.name + ") konnte nicht gesendet werden." + e));
+            Logging.log(Logging.LogType.Warning, "MosaikServer", "SendMSG", "Nachricht an Client: " + sc.id + " (" + sc.name + ") konnte nicht gesendet werden.", e);
             // Verbindung zum Client wird getrennt
             ClientClosed(sc);
         }
     }
-    /**
-     * Sendet eine Nachricht an alle verbundenen Spieler
-     */
+    /// <summary>
+    /// Sendet eine Nachricht an alle verbundenen Spieler
+    /// </summary>
+    /// <param name="data">Nachricht</param>
+    /// <param name="spieler">Spielerliste</param>
     private void Broadcast(string data, Player[] spieler)
     {
         foreach (Player sc in spieler)
@@ -194,9 +136,10 @@ public class MosaikServer : MonoBehaviour
                 SendMSG(data, sc);
         }
     }
-    /**
-     * Sendet eine Nachricht an alle verbundenen Spieler
-     */
+    /// <summary>
+    /// Sendet eine Nachricht an alle verbundenen Spieler
+    /// </summary>
+    /// <param name="data">Nachricht</param>
     private void Broadcast(string data)
     {
         foreach (Player sc in Config.PLAYERLIST)
@@ -205,9 +148,11 @@ public class MosaikServer : MonoBehaviour
                 SendMSG(data, sc);
         }
     }
-    /**
-     * Einkommende Nachrichten die von Spielern an den Server gesendet werden.
-     */
+    /// <summary>
+    /// Einkommende Nachrichten die von Spielern an den Server gesendet werden.
+    /// </summary>
+    /// <param name="spieler">Spieler</param>
+    /// <param name="data">Nachricht</param>
     private void OnIncommingData(Player spieler, string data)
     {
         string cmd;
@@ -220,18 +165,21 @@ public class MosaikServer : MonoBehaviour
         Commands(spieler, data, cmd);
     }
     #endregion
-    /**
-     * Einkommende Befehle von Spielern
-     */
-    public void Commands(Player player, string data, string cmd)
+    /// <summary>
+    /// Einkommende Befehle von Spielern
+    /// </summary>
+    /// <param name="player">Spieler</param>
+    /// <param name="data">Befehlsargumente</param>
+    /// <param name="cmd">Befehl</param>
+    private void Commands(Player player, string data, string cmd)
     {
         // Zeigt alle einkommenden Nachrichten an
-        //Debug.Log(player.name + " " + player.id + " -> " + cmd + "   ---   " + data);
+        Logging.log(Logging.LogType.Debug, "MosaikServer", "Commands", "Eingehende Nachricht: " + player.name + " " + player.id + " -> " + cmd + "   ---   " + data);
         // Sucht nach Command
         switch (cmd)
         {
             default:
-                Logging.add(Logging.Type.Warning, "QuizServer", "Commands", "Unkown Command -> " + cmd + " - " + data);
+                Logging.log(Logging.LogType.Warning, "MosaikServer", "Commands", "Unkown Command: " + cmd + " -> " + data);
                 break;
 
             case "#ClientClosed":
@@ -257,17 +205,18 @@ public class MosaikServer : MonoBehaviour
         }
     }
     #endregion
-    /**
-     * Fordert alle Clients auf die RemoteConfig neuzuladen
-     */
+    /// <summary>
+    /// Fordert alle Clients auf die RemoteConfig neuzuladen
+    /// </summary>
     public void UpdateRemoteConfig()
     {
         Broadcast("#UpdateRemoteConfig");
         LoadConfigs.FetchRemoteConfig();
     }
-    /**
-     * Spieler beendet das Spiel
-     */
+    /// <summary>
+    /// Spieler beendet das Spiel
+    /// </summary>
+    /// <param name="player">Spieler</param>
     private void ClientClosed(Player player)
     {
         player.icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
@@ -276,24 +225,25 @@ public class MosaikServer : MonoBehaviour
         player.isConnected = false;
         player.isDisconnected = true;
     }
-    /**
-     *  Spiel Verlassen & Zurück in die Lobby laden
-     */
+    /// <summary>
+    /// Spiel Verlassen & Zurück in die Lobby laden
+    /// </summary>
     public void SpielVerlassenButton()
     {
         SceneManager.LoadScene("Startup");
         Broadcast("#ZurueckInsHauptmenue");
     }
-    /**
-     * Sendet aktualisierte Spielerinfos an alle Spieler
-     */
+    /// <summary>
+    /// Sendet aktualisierte Spielerinfos an alle Spieler
+    /// </summary>
     private void UpdateSpielerBroadcast()
     {
         Broadcast(UpdateSpieler(), Config.PLAYERLIST);
     }
-    /**
-     * Aktualisiert die Spieler Anzeige Informationen & gibt diese als Text zurück
-     */
+    /// <summary>
+    /// Aktualisiert die Spieler Anzeige Informationen & gibt diese als Text zurück
+    /// </summary>
+    /// <returns>#UpdateSpieler ...</returns>
     private string UpdateSpieler()
     {
         string msg = "#UpdateSpieler [ID]0[ID][PUNKTE]" + Config.SERVER_PLAYER_POINTS + "[PUNKTE]";
@@ -314,11 +264,12 @@ public class MosaikServer : MonoBehaviour
         }
         return msg;
     }
-    /**
-     * Initialisiert die Anzeigen zu beginn
-     */
+    /// <summary>
+    /// Initialisiert die Anzeigen zu beginn
+    /// </summary>
     private void InitAnzeigen()
     {
+        Logging.log(Logging.LogType.Debug, "MosaikServer", "InitAnzeigen", "Initialisiert die Anzeigen");
         // Buzzer Deaktivieren
         GameObject.Find("Einstellungen/BuzzerAktivierenToggle").GetComponent<Toggle>().isOn = false;
         BuzzerAnzeige = GameObject.Find("Einstellungen/BuzzerIstAktiviert");
@@ -355,79 +306,61 @@ public class MosaikServer : MonoBehaviour
             SpielerGeladenAnzeige.transform.GetChild(i).gameObject.SetActive(false);
         }
     }
-    /**
-     * Wechselt das Mosaik Game
-     */
-    public void ChangeMosaik(TMP_Dropdown drop)
-    {
-        Config.MOSAIK_SPIEL.setSelected(Config.MOSAIK_SPIEL.getMosaik(drop.value));
-        bildIndex = 0;
-
-        Bild[0].transform.parent.gameObject.GetComponent<Image>().sprite = Config.MOSAIK_SPIEL.getBeispiel();
-        Bild[0].transform.parent.gameObject.SetActive(false);
-        BildTitel = GameObject.Find("MosaikAnzeige/Server/Titel").GetComponent<TMP_Text>();
-        BildTitel.text = Config.MOSAIK_SPIEL.getBeispiel().name;
-        
-        bildIndex = 0;
-        bildListeText.GetComponent<TMP_Text>().text = "- Beispiel";
-        for (int i = 0; i < Config.MOSAIK_SPIEL.getSelected().getNames().Count; i++)
-        {
-            bildListeText.GetComponent<TMP_Text>().text += "\n- " + Config.MOSAIK_SPIEL.getSelected().getNames()[i];
-        }
-
-        BildVorschau[0].GetComponent<Image>().sprite = Config.MOSAIK_SPIEL.getBeispiel();
-    }
-
     #region Buzzer
-    /**
-     * Aktiviert/Deaktiviert den Buzzer für alle Spieler
-     */
+    /// <summary>
+    /// Aktiviert/Deaktiviert den Buzzer für alle Spieler
+    /// </summary>
+    /// <param name="toggle">Toggle</param>
     public void BuzzerAktivierenToggle(Toggle toggle)
     {
         buzzerIsOn = toggle.isOn;
         BuzzerAnzeige.SetActive(toggle.isOn);
     }
-    /**
-     * Spielt Sound ab, sperrt den Buzzer und zeigt den Spieler an
-     */
+    /// <summary>
+    /// Spielt Sound ab, sperrt den Buzzer und zeigt den Spieler an
+    /// </summary>
+    /// <param name="p">Spieler</param>
     private void SpielerBuzzered(Player p)
     {
         if (!buzzerIsOn)
         {
-            Debug.Log(p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
+            Logging.log(Logging.LogType.Normal, "MosaikServer", "SpielerBuzzered", p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
             return;
         }
-        Debug.LogWarning("B: " + p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
+        Logging.log(Logging.LogType.Warning, "MosaikServer", "SpielerBuzzered", "B: " + p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
         buzzerIsOn = false;
         Broadcast("#AudioBuzzerPressed " + p.id);
         BuzzerSound.Play();
         SpielerAnzeige[p.id - 1, 1].SetActive(true);
     }
-    /**
-     * Gibt den Buzzer für alle Spieler frei
-     */
+    /// <summary>
+    /// Gibt den Buzzer für alle Spieler frei
+    /// </summary>
     public void SpielerBuzzerFreigeben()
     {
         for (int i = 0; i < Config.SERVER_MAX_CONNECTIONS; i++)
             SpielerAnzeige[i, 1].SetActive(false);
         buzzerIsOn = BuzzerAnzeige.activeInHierarchy;
-        Debug.LogWarning("Buzzer freigegeben.");
+        Logging.log(Logging.LogType.Warning, "MosaikServer", "SpielerBuzzerFreigeben", "Buzzer wird freigegeben");
         Broadcast("#BuzzerFreigeben");
     }
     #endregion
     #region Spieler Ausgetabt Anzeige
-    /**
-     * Austaben wird allen/keinen Spielern angezeigt
-     */
+    /// <summary>
+    /// Austaben wird allen/keinen Spielern angezeigt
+    /// </summary>
+    /// <param name="toggle">Toogle</param>
     public void AustabenAllenZeigenToggle(Toggle toggle)
     {
         AustabbenAnzeigen.SetActive(toggle.isOn);
         if (toggle.isOn == false)
             Broadcast("#SpielerAusgetabt 0");
     }
-    /**
-     * Spieler Tabt aus, wird ggf allen gezeigt
-     */
+    /// <summary>
+    /// Spieler Tabt aus, wird ggf allen gezeigt
+    /// </summary>
+    /// <param name="player">Spieler</param>
+    /// <param name="data">bool</param>
     private void ClientFocusChange(Player player, string data)
     {
         bool ausgetabt = !Boolean.Parse(data);
@@ -437,24 +370,26 @@ public class MosaikServer : MonoBehaviour
     }
     #endregion
     #region Punkte
-    /**
-     * Punkte Pro Richtige Antworten Anzeigen
-     */
+    /// <summary>
+    /// Punkte Pro Richtige Antworten Anzeigen
+    /// </summary>
+    /// <param name="input">Punkteeingabe</param>
     public void ChangePunkteProRichtigeAntwort(TMP_InputField input)
     {
         PunkteProRichtige = Int32.Parse(input.text);
     }
-    /**
-     * Punkte Pro Falsche Antworten Anzeigen
-     */
+    /// <summary>
+    /// Punkte Pro Falsche Antworten Anzeigen
+    /// </summary>
+    /// <param name="input">Punkteeingabe</param>
     public void ChangePunkteProFalscheAntwort(TMP_InputField input)
     {
         PunkteProFalsche = Int32.Parse(input.text);
     }
-
-    /**
-     * Vergibt an den Spieler Punkte für eine richtige Antwort
-     */
+    /// <summary>
+    /// Vergibt an den Spieler Punkte für eine richtige Antwort
+    /// </summary>
+    /// <param name="player">Spieler</param>
     public void PunkteRichtigeAntwort(GameObject player)
     {
         Broadcast("#AudioRichtigeAntwort");
@@ -464,9 +399,10 @@ public class MosaikServer : MonoBehaviour
         Config.PLAYERLIST[pIndex].points += PunkteProRichtige;
         UpdateSpielerBroadcast();
     }
-    /**
-     * Vergibt an alle anderen Spieler Punkte bei einer falschen Antwort
-     */
+    /// <summary>
+    /// Vergibt an alle anderen Spieler Punkte bei einer falschen Antwort
+    /// </summary>
+    /// <param name="player">Spieler</param>
     public void PunkteFalscheAntwort(GameObject player)
     {
         Broadcast("#AudioFalscheAntwort");
@@ -480,9 +416,10 @@ public class MosaikServer : MonoBehaviour
         Config.SERVER_PLAYER_POINTS += PunkteProFalsche;
         UpdateSpielerBroadcast();
     }
-    /**
-     * Ändert die Punkte des Spielers (+-1)
-     */
+    /// <summary>
+    /// Ändert die Punkte des Spielers (+-1)
+    /// </summary>
+    /// <param name="button">Spielerauswahl</param>
     public void PunkteManuellAendern(GameObject button)
     {
         int pId = Int32.Parse(button.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
@@ -498,9 +435,10 @@ public class MosaikServer : MonoBehaviour
         }
         UpdateSpielerBroadcast();
     }
-    /**
-     * Ändert die Punkte des Spielers, variable Punkte
-     */
+    /// <summary>
+    /// Ändert die Punkte des Spielers, variable Punkte
+    /// </summary>
+    /// <param name="input">Punkteeingabe</param>
     public void PunkteManuellAendern(TMP_InputField input)
     {
         int pId = Int32.Parse(input.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
@@ -513,9 +451,10 @@ public class MosaikServer : MonoBehaviour
     }
     #endregion
     #region Spieler ist (Nicht-)Dran
-    /**
-     * Aktiviert den Icon Rand beim Spieler
-     */
+    /// <summary>
+    /// Aktiviert den Icon Rand beim Spieler
+    /// </summary>
+    /// <param name="button">Spieler</param>
     public void SpielerIstDran(GameObject button)
     {
         int pId = Int32.Parse(button.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
@@ -523,9 +462,10 @@ public class MosaikServer : MonoBehaviour
         buzzerIsOn = false;
         Broadcast("#SpielerIstDran " + pId);
     }
-    /**
-     * Versteckt den Icon Rand beim Spieler
-     */
+    /// <summary>
+    /// Versteckt den Icon Rand beim Spieler
+    /// </summary>
+    /// <param name="button">Spieler</param>
     public void SpielerIstNichtDran(GameObject button)
     {
         int pId = Int32.Parse(button.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
@@ -538,13 +478,13 @@ public class MosaikServer : MonoBehaviour
         Broadcast("#SpielerIstNichtDran " + pId);
     }
     #endregion
-
     #region Mosaik Anzeige
-    /**
-     * Initialisiert die Anzeigen des Quizzes
-     */
+    /// <summary>
+    /// Initialisiert die Anzeigen des Quizzes
+    /// </summary>
     private void InitMosaik()
     {
+        Logging.log(Logging.LogType.Debug, "MosaikServer", "InitMosaik", "Anzeigen werden initialisiert");
         BildTitel = GameObject.Find("MosaikAnzeige/Server/Titel").GetComponent<TMP_Text>();
         BildTitel.text = "(0/"+Config.MOSAIK_SPIEL.getSelected().getSprites().Count + ") " + Config.MOSAIK_SPIEL.getBeispiel().name;
         // ImageAnzeige
@@ -575,20 +515,11 @@ public class MosaikServer : MonoBehaviour
         {
             bildListeText.GetComponent<TMP_Text>().text += "\n- " + Config.MOSAIK_SPIEL.getSelected().getNames()[i];
         }
-
-        List<string> games = new List<string>();
-        foreach (Mosaik m in Config.MOSAIK_SPIEL.getMosaike())
-        {
-            games.Add(m.getTitel());
-        }
-        GameObject.Find("Einstellungen/ChangeMosaik").GetComponent<TMP_Dropdown>().ClearOptions();
-        GameObject.Find("Einstellungen/ChangeMosaik").GetComponent<TMP_Dropdown>().AddOptions(games);
-        GameObject.Find("Einstellungen/ChangeMosaik").GetComponent<TMP_Dropdown>().value = Config.MOSAIK_SPIEL.getIndex(Config.MOSAIK_SPIEL.getSelected());
-
     }
-    /**
-     * Blendet das Nächste/Vorherige Element in der Vorschau ein
-     */
+    /// <summary>
+    /// Blendet das Nächste/Vorherige Element in der Vorschau ein
+    /// </summary>
+    /// <param name="vor">+-1</param>
     public void MosaikNächstesElement(int vor)
     {
         if ((bildIndex + vor) < 0 || (bildIndex + vor) > Config.MOSAIK_SPIEL.getSelected().getURLs().Count)
@@ -627,19 +558,20 @@ public class MosaikServer : MonoBehaviour
             BildVorschau[i].SetActive(true);
         }
     }
-    // TODO:  TEIL 5: Lösung dafür finden das ich im Overlay sehe wenn alle fertig geladen sind
-
+    /// <summary>
+    /// Lädt ein Bild aus dem Internet und zeigt dieses an
+    /// </summary>
+    /// <param name="imageUrl">URL</param>
     IEnumerator LoadImageFromWeb(string imageUrl)
     {
-        Debug.Log("Loading Image: "+ imageUrl);
+        Logging.log(Logging.LogType.Normal, "MosaikServer", "LoadImageFromWeb", "Lädt Bild herunter: " + imageUrl);
         // TEIL 1: Download des Bildes
         UnityWebRequest www = UnityWebRequestTexture.GetTexture(imageUrl);
         yield return www.SendWebRequest();
 
         if (www.result != UnityWebRequest.Result.Success)
         {
-            Debug.Log(www.error);
-            // TODO: Handling, nachricht an server, der erneut befehl geben kann/ oder custom bild einblenden
+            Logging.log(Logging.LogType.Warning, "MosaikServer", "LoadImageFromWeb", "Bild konnte nicht herunter geladen werden: " + www.error);
         }
         else
         {
@@ -652,19 +584,25 @@ public class MosaikServer : MonoBehaviour
         }
         yield return null;
     }
+    /// <summary>
+    /// Zeigt an, wenn ein Spieler das Bild geladen hat
+    /// </summary>
+    /// <param name="p">Spieler</param>
+    /// <param name="data"></param>
     private void SpielerHatBildGeladen(Player p, string data)
     {
         if (data.Equals("error"))
         {
-            Debug.LogError(p.name + " konnte das Bild nicht laden.");
+            Logging.log(Logging.LogType.Warning, "MosaikServer", "SpielerHatBildGeladen", "Spieler konnte Bild nicht laden.");
             return;
         }
         GameObject SpielerGeladenAnzeige = GameObject.Find("SpielerGeladenAnzeige");
         SpielerGeladenAnzeige.transform.GetChild(p.id - 1).gameObject.SetActive(true);
     }
-    /**
-     * Zeigt allen das ausgewählte Element
-     */
+    /// <summary>
+    /// Zeigt allen das ausgewählte Element
+    /// </summary>
+    /// <param name="einblenden">bool</param>
     public void MosaikEinblendenAusblenden(bool einblenden)
     {
         if (einblenden == true && bildIndex > 0 && Config.MOSAIK_SPIEL.getSelected().getIstGeladen()[bildIndex - 1] == false)
@@ -763,9 +701,9 @@ public class MosaikServer : MonoBehaviour
         }
 
     }
-    /**
-     * Löst zufällige Cover auf
-     */
+    /// <summary>
+    /// Löst zufällige Cover auf
+    /// </summary>
     public void MosaikZufälligesAuflösen()
     {
         if (coverlist.Count == 0)
@@ -781,9 +719,10 @@ public class MosaikServer : MonoBehaviour
         Bild[random].SetActive(true);
         BildVorschau[random].SetActive(false);
     }
-    /**
-     * Löst bestimmtes Cover auf
-     */
+    /// <summary>
+    /// Löst bestimmtes Cover auf
+    /// </summary>
+    /// <param name="go">Coverauswahl</param>
     public void MosaikBestimmtesAuflösen(Button go)
     {
         int index = Int32.Parse(go.gameObject.name.Replace("Cover (", "").Replace(")", ""));
@@ -796,9 +735,9 @@ public class MosaikServer : MonoBehaviour
         go.gameObject.SetActive(false);
         coverlist.Remove(index);
     }
-    /**
-     * Löst alle Cover auf
-     */
+    /// <summary>
+    /// Löst alle Cover auf
+    /// </summary>
     public void MosaikAllesAuflösen()
     {
         if (coverlist.Count == 0)
@@ -816,6 +755,9 @@ public class MosaikServer : MonoBehaviour
         }
     }
     #endregion
+    /// <summary>
+    /// Lädt Bild aus dem Internet und zeigt dieses
+    /// </summary>
     private void LoadImageIntoPreview()
     {
         BildVorschau[0].transform.parent.GetComponent<RectTransform>().sizeDelta = VorschauRect;
@@ -867,6 +809,10 @@ public class MosaikServer : MonoBehaviour
         }
         #endregion
     }
+    /// <summary>
+    /// Toggle GridLayoutGroup
+    /// </summary>
+    /// <param name="ob"></param>
     IEnumerator ToggleGridLayoutGroup(GameObject ob)
     {
         yield return new WaitForSeconds(0.01f);
@@ -875,8 +821,10 @@ public class MosaikServer : MonoBehaviour
         ob.GetComponent<GridLayoutGroup>().enabled = false;
         yield return null;
     }
-
-
+    /// <summary>
+    /// Lädt ein Bild per Url aus dem Netz
+    /// </summary>
+    /// <param name="input">Urleingabe</param>
     public void DownloadCustom(TMP_InputField input)
     {
         if (input.text.Length == 0)
@@ -901,19 +849,21 @@ public class MosaikServer : MonoBehaviour
             BildVorschau[i].SetActive(true);
         }
     }
-
+    /// <summary>
+    /// Lädt ein Bild aus dem Netz direkt in die Scene
+    /// </summary>
+    /// <param name="imageUrl">URL</param>
     IEnumerator LoadImageFromWebIntoScene(string imageUrl)
     {
-        Debug.Log("Loading Image: " + imageUrl);
+        Logging.log(Logging.LogType.Normal, "MosaikServer", "LoadImageFromWebIntoScene", "Lädt Bild herunter: " + imageUrl);
         // TEIL 1: Download des Bildes
         UnityWebRequest www = UnityWebRequestTexture.GetTexture(imageUrl);
         yield return www.SendWebRequest();
 
         if (www.result != UnityWebRequest.Result.Success)
         {
-            Debug.LogError(www.error);
+            Logging.log(Logging.LogType.Warning, "MosaikServer", "LoadImageFromWebIntoScene", "Bild konnte nicht heruntergeladen werden: " + www.error);
             yield break;
-            // TODO: Handling, nachricht an server, der erneut befehl geben kann/ oder custom bild einblenden
         }
         else
         {

@@ -10,6 +10,7 @@ public class WerBietetMehrSpiel
 
     public WerBietetMehrSpiel()
     {
+        Logging.log(Logging.LogType.Debug, "WerBietetMehrSpiel", "WerBietetMehrSpiel", "Spiele werden geladen.");
         liste = new List<WerBietetMehr>();
 
         foreach (string sfile in Directory.GetFiles(Config.MedienPath + path))
@@ -34,7 +35,7 @@ public class WerBietetMehrSpiel
     public List<WerBietetMehr> getSpiele() { return liste; }
     public WerBietetMehr getSelected() { return selected; }
     public void setSelected(WerBietetMehr liste) { selected = liste; }
-    public List<string> getQuizzeAsStringList()
+    public List<string> getGamesAsList()
     {
         List<string> quizzes = new List<string>();
         foreach (WerBietetMehr quiz in getSpiele())

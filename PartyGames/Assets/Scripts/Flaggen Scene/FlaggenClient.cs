@@ -32,14 +32,6 @@ public class FlaggenClient : MonoBehaviour
 
         StartCoroutine(TestConnectionToServer());
     }
-    IEnumerator TestConnectionToServer()
-    {
-        while (Config.CLIENT_STARTED)
-        {
-            SendToServer("#TestConnection");
-            yield return new WaitForSeconds(10);
-        }
-    }
 
     void Update()
     {
@@ -57,7 +49,6 @@ public class FlaggenClient : MonoBehaviour
             pressingbuzzer = false;
         }
         
-
         #region Prüft auf Nachrichten vom Server
         if (Config.CLIENT_STARTED)
         {
@@ -77,18 +68,29 @@ public class FlaggenClient : MonoBehaviour
     {
         SendToServer("#ClientFocusChange " + focus);
     }
-
+    
     private void OnApplicationQuit()
     {
-        Logging.add(Logging.Type.Normal, "Client", "OnApplicationQuit", "Client wird geschlossen.");
+        Logging.log(Logging.LogType.Normal, "FlaggenClient", "OnApplicationQuit", "Client wird geschlossen.");
         SendToServer("#ClientClosed");
         CloseSocket();
     }
 
+    /// <summary>
+    /// Testet die Verbindung zum Server
+    /// </summary>
+    IEnumerator TestConnectionToServer()
+    {
+        while (Config.CLIENT_STARTED)
+        {
+            SendToServer("#TestConnection");
+            yield return new WaitForSeconds(10);
+        }
+    }
     #region Verbindungen
-    /**
-     * Trennt die Verbindung zum Server
-     */
+    /// <summary>
+    /// Trennt die Verbindung zum Server
+    /// </summary>
     private void CloseSocket()
     {
         if (!Config.CLIENT_STARTED)
@@ -97,14 +99,15 @@ public class FlaggenClient : MonoBehaviour
         Config.CLIENT_TCP.Close();
         Config.CLIENT_STARTED = false;
 
-        Logging.add(Logging.Type.Normal, "Client", "CloseSocket", "Verbindung zum Server wurde getrennt. Client wird in das Hauptmenü geladen.");
+        Logging.log(Logging.LogType.Normal, "FlaggenClient", "CloseSocket", "Verbindung zum Server wurde getrennt. Client wird in das Hauptmenü geladen.");
     }
     #endregion
     #region Kommunikation
-    /**
-     * Sendet eine Nachricht an den Server.
-     */
-    public void SendToServer(string data)
+    /// <summary>
+    /// Sendet eine Nachricht an den Server.
+    /// </summary>
+    /// <param name="data">Nachricht</param>
+    private void SendToServer(string data)
     {
         if (!Config.CLIENT_STARTED)
             return;
@@ -118,15 +121,16 @@ public class FlaggenClient : MonoBehaviour
         }
         catch (Exception e)
         {
-            Logging.add(Logging.Type.Error, "Client", "SendToServer", "Nachricht an Server konnte nicht gesendet werden." + e);
+            Logging.log(Logging.LogType.Warning, "FlaggenClient", "SendToServer", "Nachricht an Server konnte nicht gesendet werden.", e);
             Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server wurde verloren.";
             CloseSocket();
             SceneManager.LoadSceneAsync("StartUp");
         }
     }
-    /**
-     * Einkommende Nachrichten die vom Sever
-     */
+    /// <summary>
+    /// Einkommende Nachrichten die vom Sever
+    /// </summary>
+    /// <param name="data">Nachricht</param>
     private void OnIncomingData(string data)
     {
         string cmd;
@@ -139,27 +143,32 @@ public class FlaggenClient : MonoBehaviour
         Commands(data, cmd);
     }
     #endregion
-    /**
-     * Eingehende Commands vom Server
-     */
-    public void Commands(string data, string cmd)
+    /// <summary>
+    /// Eingehende Commands vom Server
+    /// </summary>
+    /// <param name="data">Befehlsargumente</param>
+    /// <param name="cmd">Befehl</param>
+    private void Commands(string data, string cmd)
     {
-        //Debug.Log("Eingehend: " + cmd + " -> " + data);
+        Logging.log(Logging.LogType.Debug, "FlaggenClient", "Commands", "Eingehende Nachricht: " + cmd + " -> " + data);
         switch (cmd)
         {
             default:
-                Logging.add(Logging.Type.Warning, "QuizClient", "Commands", "Unkown Command -> " + cmd + " - " + data);
+                Logging.log(Logging.LogType.Warning, "FlaggenClient", "Commands", "Unkown Command: " + cmd + " -> " + data);
                 break;
 
             #region Universal Commands
             case "#ServerClosed":
+                Logging.log(Logging.LogType.Normal, "FlaggenClient", "Commands", "Verbindung zum Server wurde getrennt. Lade ins Hauptmenü.");
                 CloseSocket();
                 SceneManager.LoadScene("Startup");
                 break;
             case "#UpdateRemoteConfig":
+                Logging.log(Logging.LogType.Warning, "FlaggenClient", "Commands", "Aktualisiere RemoteConfig");
                 LoadConfigs.FetchRemoteConfig();
                 break;
             case "#ZurueckInsHauptmenue":
+                Logging.log(Logging.LogType.Warning, "FlaggenClient", "Commands", "Spiel wurde beendet, lade ins Hauptmenü.");
                 SceneManager.LoadScene("Startup");
                 break;
             #endregion
@@ -204,10 +213,10 @@ public class FlaggenClient : MonoBehaviour
                 break;
         }
     }
-
-    /**
-     * Aktualisiert die Spieler Anzeigen
-     */
+    /// <summary>
+    /// Aktualisiert die Spieler Anzeigen
+    /// </summary>
+    /// <param name="data"></param>
     private void UpdateSpieler(string data)
     {
         string[] player = data.Replace("[TRENNER]", "|").Split('|');
@@ -242,63 +251,67 @@ public class FlaggenClient : MonoBehaviour
             }
         }
     }
-    /**
-     * Sendet eine Buzzer Anfrage an den Server
-     */
-    public void SpielerBuzzered()
+    /// <summary>
+    /// Sendet eine Buzzer Anfrage an den Server
+    /// </summary>
+    private void SpielerBuzzered()
     {
         SendToServer("#SpielerBuzzered");
     }
-    /**
-     * Gibt den Buzzer frei
-     */
+    /// <summary>
+    /// Gibt den Buzzer frei
+    /// </summary>
     private void BuzzerFreigeben()
     {
         for (int i = 0; i < Config.SERVER_MAX_CONNECTIONS; i++)
             SpielerAnzeige[i, 1].SetActive(false);
     }
-    /**
-     * Spielt Sound des Buzzers ab und zeigt welcher Spieler diesen gedrückt hat
-     */
+    /// <summary>
+    /// Spielt Sound des Buzzers ab und zeigt welcher Spieler diesen gedrückt hat
+    /// </summary>
+    /// <param name="data"></param>
     private void AudioBuzzerPressed(string data)
     {
         BuzzerSound.Play();
         int pId = Int32.Parse(data);
         SpielerAnzeige[Player.getPosInLists(pId), 1].SetActive(true);
     }
-    /**
-     * Zeigt an, welcher Spieler dran ist
-     */
+    /// <summary>
+    /// Zeigt an, welcher Spieler dran ist
+    /// </summary>
+    /// <param name="data"></param>
     private void SpielerIstDran(string data)
     {
         int pId = Int32.Parse(data);
         SpielerAnzeige[Player.getPosInLists(pId), 1].SetActive(true);
     }
-    /**
-     * Deaktiviert die Spieler ist dran anzeige
-     */
+    /// <summary>
+    /// Deaktiviert die Spieler ist dran Anzeige
+    /// </summary>
+    /// <param name="data"></param>
     private void SpielerIstNichtDran(string data)
     {
         int pId = Int32.Parse(data);
         SpielerAnzeige[Player.getPosInLists(pId), 1].SetActive(false);
     }
-    /**
-     * Spielt den Sound für eine richtige Antwort ab
-     */
+    /// <summary>
+    /// Spielt den Sound für eine richtige Antwort ab
+    /// </summary>
     private void AudioRichtigeAntwort()
     {
         RichtigeAntwortSound.Play();
     }
-    /**
-     * Spielt den Sound für eine falsche Antwort ab
-     */
+    /// <summary>
+    /// Spielt den Sound für eine falsche Antwort ab
+    /// </summary>
     private void AudioFalscheAntwort()
     {
         FalscheAntwortSound.Play();
     }
-    /**
-     * Zeigt an, ob ein Spieler austabt
-     */
+    /// <summary>
+    /// Zeigt an, ob ein Spieler austabt
+    /// </summary>
+    /// <param name="data"></param>
     private void SpielerAusgetabt(string data)
     {
         // AustabenAnzeigen wird deaktiviert
@@ -319,9 +332,10 @@ public class FlaggenClient : MonoBehaviour
             SpielerAnzeige[pos, 3].SetActive(type);
         }
     }
-    /**
-     * Zeigt das Texteingabefeld an
-     */
+    /// <summary>
+    /// Zeigt das Texteingabefeld an
+    /// </summary>
+    /// <param name="data"></param>
     private void TexteingabeAnzeigen(string data)
     {
         bool anzeigen = Boolean.Parse(data);
@@ -332,9 +346,10 @@ public class FlaggenClient : MonoBehaviour
         else
             SpielerAntwortEingabe.SetActive(false);
     }
-    /**
-     * Zeigt die Textantworten aller Spieler an
-     */
+    /// <summary>
+    /// Zeigt die Textantworten aller Spieler an
+    /// </summary>
+    /// <param name="data"></param>
     private void TextantwortenAnzeigen(string data)
     {
         bool anzeigen = Boolean.Parse(data.Replace("[BOOL]", "|").Split('|')[1]);
@@ -353,19 +368,20 @@ public class FlaggenClient : MonoBehaviour
             SpielerAnzeige[Player.getPosInLists(i), 6].GetComponentInChildren<TMP_InputField>().text = text.Replace("[ID"+i+"]","|").Split('|')[1];
         }
     }
-    /**
-     * Sendet die Antworteingabe an den Server
-     */
+    /// <summary>
+    /// Sendet die Antworteingabe an den Server
+    /// </summary>
+    /// <param name="input"></param>
     public void SpielerAntwortEingabeInput(TMP_InputField input)
     {
         SendToServer("#SpielerAntwortEingabe "+input.text);
     }
-
-    /**
-     * Initialisiert die Anzeigen der Scene
-     */
+    /// <summary>
+    /// Initialisiert die Anzeigen der Scene
+    /// </summary>
     private void InitAnzeigen()
     {
+        Logging.log(Logging.LogType.Debug, "FlaggenClient", "InitAnzeigen", "Anzeigen werden initialisiert.");
         // Anzeigen für alle
         FlaggenOutline = GameObject.Find("FlaggenAnzeigen/FlaggenImageOutline");
         FlaggenOutline.SetActive(false);
@@ -392,19 +408,17 @@ public class FlaggenClient : MonoBehaviour
             {
                 GameObject.Find("SpielerAnzeige/Player (" + (i + 1) + ")/ServerControl").SetActive(false); // Server Control für Spieler ausblenden
             }
-            catch (Exception e)
-            {
-            }
+            catch {}
             SpielerAnzeige[i, 0].SetActive(false);
             SpielerAnzeige[i, 1].SetActive(false);
             SpielerAnzeige[i, 3].SetActive(false);
             SpielerAnzeige[i, 6].SetActive(false);
         }
     }
-
-    /**
-     * Zeigt die Flagge an
-     */
+    /// <summary>
+    /// Zeigt die Flagge an
+    /// </summary>
+    /// <param name="data"></param>
     private void FlaggenAnzeige(string data)
     {
         FlaggenOutline.SetActive(true); // Blendet Outline ein
@@ -419,13 +433,13 @@ public class FlaggenClient : MonoBehaviour
         }
         Antwort.SetActive(false); // Blendet Antwort aus
     }
-    /**
-     * Zeigt die gesuchte Antwort an
-     */
+    /// <summary>
+    /// Zeigt die gesuchte Antwort an
+    /// </summary>
+    /// <param name="data"></param>
     private void FlaggenShowAntwort(string data)
     {
         Antwort.SetActive(true);
         Antwort.GetComponent<TMP_Text>().text = data;
     }
-
 }

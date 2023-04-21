@@ -14,16 +14,13 @@ public class WerBietetMehrScene : MonoBehaviour
     [SerializeField] GameObject[] DeactivateForServer;
     [SerializeField] GameObject[] DeactivateForClient;
 
-    private void Start()
+    void OnEnable()
     {
         Application.targetFrameRate = 120;
 #if UNITY_EDITOR
         Application.targetFrameRate = 200;
 #endif
-    }
 
-    void OnEnable()
-    {
         if (Config.isServer)
         {
             Client.SetActive(false);
@@ -45,9 +42,12 @@ public class WerBietetMehrScene : MonoBehaviour
 
         StartCoroutine(IntroAnimation());
     }
-
+    /// <summary>
+    /// Spielt die IntroAnimation ab.
+    /// </summary>
     IEnumerator IntroAnimation()
     {
+        Logging.log(Logging.LogType.Debug, "WerBietetMehrScene", "IntroAnimation", "Intro wird abgespielt.");
         IntroSound.Play();
         IntroGO.SetActive(true);
 
@@ -55,16 +55,5 @@ public class WerBietetMehrScene : MonoBehaviour
         yield return new WaitForSeconds(10);
 
         IntroGO.SetActive(false);
-    }
-
-    void Update()
-    {
-        
-    }
-
-    private void OnApplicationQuit()
-    {
-        //Logging.add(Logging.Type.Normal, "StartupScene", "OnApplicationQuit", "Programm wird beendet");
-        //MedienUtil.WriteLogsInDirectory();
     }
 }

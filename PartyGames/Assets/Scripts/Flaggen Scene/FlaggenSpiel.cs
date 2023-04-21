@@ -8,6 +8,7 @@ public class FlaggenSpiel
     private Sprite fragezeichen;
     public FlaggenSpiel()
     {
+        Logging.log(Logging.LogType.Debug, "FlaggenSpiel", "FlaggenSpiel", "Lade Spiele");
         flaggen = new List<Flagge>();
         // Speichert Fragezeichenflagge
         fragezeichen = Resources.Load<Sprite>("Spiele/Flaggen/#Fragezeichen");

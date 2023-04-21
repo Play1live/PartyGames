@@ -46,25 +46,25 @@ public class QuizScene : MonoBehaviour
         StartCoroutine(IntroAnimation());
     }
 
+    /// <summary>
+    /// Spielt die Introanimation ab
+    /// </summary>
     IEnumerator IntroAnimation()
     {
+        Logging.log(Logging.LogType.Debug, "QuizScene", "IntroAnimation", "Spiele Introanimation ab.");
         IntroSound.Play();
         IntroGO.SetActive(true);
 
         //Wait for 10 secs.
         yield return new WaitForSeconds(10);
-
         IntroGO.SetActive(false);
     }
 
     void Update()
     {
-        
     }
 
     private void OnApplicationQuit()
     {
-        //Logging.add(Logging.Type.Normal, "StartupScene", "OnApplicationQuit", "Programm wird beendet");
-        //MedienUtil.WriteLogsInDirectory();
     }
 }

@@ -6,7 +6,6 @@ using UnityEngine.UI;
 
 public class Flagge
 {
-
     private string path; // Nur mit Ländernamen
     private string name;
     private Sprite bild;
@@ -17,6 +16,7 @@ public class Flagge
 
     public Flagge(Sprite sprite, bool loadInhalt)
     {
+        Logging.log(Logging.LogType.Debug, "Flagge", "Flagge", "Lade Flagge: " + sprite.name + " Inhalt: " + loadInhalt);
         this.path = "";
         this.name = sprite.name.Replace("_Flagge", "");
         this.bild = sprite;

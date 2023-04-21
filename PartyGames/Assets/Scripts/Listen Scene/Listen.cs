@@ -19,6 +19,7 @@ public class Listen
 
     public Listen(string path)
     {
+        Logging.log(Logging.LogType.Debug, "Listen", "Listen", "Lade Spieldatei: " + path);
         this.path = path;
         string temp = path.Split('\\')[path.Split('\\').Length - 1];
         this.titel = temp.Split('/')[temp.Split('/').Length - 1].Replace(".txt", "");
@@ -71,21 +72,18 @@ public class Listen
                 }
                 else
                 {
-                    Debug.LogWarning("Listen.cs ~ Unknown Type: " + s);
+                    Logging.log(Logging.LogType.Warning, "Listen", "Listen", "Unbekannter Dateiinhalt: " + titel + " " + s);
                 }
             }
             catch (Exception e)
             {
-                Debug.LogError("Fehler beim Laden von Listen: " + titel + " ->  " + s);
+                Logging.log(Logging.LogType.Warning, "Listen", "Listen", "Fehler beim Laden von Listen: " + titel + "->  " + s, e);
             }
         }
 
         auswahlElemente.AddRange(alleElemente);
         // Randomizer
         auswahlElemente = ShuffelList(alleElemente);
-
-        // Lösche Daten zu int
-        //alleElemente = DatumZuInt(alleElemente);
 
         Sorting(); // Sortiert Liste
     }
@@ -127,7 +125,7 @@ public class Listen
 
         else
         {
-            Debug.LogWarning("No Way to Sort List");
+            Logging.log(Logging.LogType.Warning, "Listen", "Listen", "No Way to Sort List");
         }
     }
 

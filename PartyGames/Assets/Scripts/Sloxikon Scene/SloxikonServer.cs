@@ -50,20 +50,7 @@ public class SloxikonServer : MonoBehaviour
             if (spieler.isConnected == false)
                 continue;
 
-
-            #region Prüft ob Clients noch verbunden sind
-            /*if (!isConnected(spieler.tcp) && spieler.isConnected == true)
-            {
-                Debug.LogWarning(spieler.id);
-                spieler.tcp.Close();
-                spieler.isConnected = false;
-                spieler.isDisconnected = true;
-                Logging.add(new Logging(Logging.Type.Normal, "Server", "Update", "Spieler ist nicht mehr Verbunden. ID: " + spieler.id));
-                continue;
-            }*/
-            #endregion
             #region Sucht nach neuen Nachrichten
-            /*else*/
             if (spieler.isConnected == true)
             {
                 NetworkStream stream = spieler.tcp.GetStream();
@@ -78,7 +65,6 @@ public class SloxikonServer : MonoBehaviour
                 }
             }
             #endregion
-
             #region Spieler Disconnected Message
             for (int i = 0; i < Config.PLAYERLIST.Length; i++)
             {
@@ -86,7 +72,7 @@ public class SloxikonServer : MonoBehaviour
                 {
                     if (Config.PLAYERLIST[i].isDisconnected == true)
                     {
-                        Logging.add(Logging.Type.Normal, "QuizServer", "Update", "Spieler hat die Verbindung getrennt. ID: " + Config.PLAYERLIST[i].id);
+                        Logging.log(Logging.LogType.Normal, "QuizServer", "Update", "Spieler hat die Verbindung getrennt. ID: " + Config.PLAYERLIST[i].id);
                         Broadcast(Config.PLAYERLIST[i].name + " has disconnected", Config.PLAYERLIST);
                         Config.PLAYERLIST[i].isConnected = false;
                         Config.PLAYERLIST[i].isDisconnected = false;
@@ -103,65 +89,17 @@ public class SloxikonServer : MonoBehaviour
     private void OnApplicationQuit()
     {
         Broadcast("#ServerClosed", Config.PLAYERLIST);
-        Logging.add(new Logging(Logging.Type.Normal, "Server", "OnApplicationQuit", "Server wird geschlossen"));
+        Logging.log(Logging.LogType.Normal, "Server", "OnApplicationQuit", "Server wird geschlossen");
         Config.SERVER_TCP.Server.Close();
     }
 
     #region Server Stuff
-    #region Verbindungen
-    /**
-     * Prüft ob eine Verbindung zum gegebenen Client noch besteht
-     */
-    private bool isConnected(TcpClient c)
-    {
-        /*try
-        {
-            if (c != null && c.Client != null && c.Client.Connected)
-            {
-                if (c.Client.Poll(0, SelectMode.SelectRead))
-                {
-                    return !(c.Client.Receive(new byte[1], SocketFlags.Peek) == 0);
-                }
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        catch
-        {
-            return false;
-        }*/
-        if (c != null && c.Client != null && c.Client.Connected)
-        {
-            if ((c.Client.Poll(0, SelectMode.SelectWrite)) && (!c.Client.Poll(0, SelectMode.SelectError)))
-            {
-                byte[] buffer = new byte[1];
-                if (c.Client.Receive(buffer, SocketFlags.Peek) == 0)
-                {
-                    return false;
-                }
-                else
-                {
-                    return true;
-                }
-            }
-            else
-            {
-                return false;
-            }
-        }
-        else
-        {
-            return false;
-        }
-    }
-    #endregion
     #region Kommunikation
-    /**
-     * Sendet eine Nachricht an den übergebenen Spieler
-     */
+    /// <summary>
+    /// Sendet eine Nachricht an den übergebenen Spieler
+    /// </summary>
+    /// <param name="data"></param>
+    /// <param name="sc"></param>
     private void SendMSG(string data, Player sc)
     {
         try
@@ -172,14 +110,16 @@ public class SloxikonServer : MonoBehaviour
         }
         catch (Exception e)
         {
-            Logging.add(new Logging(Logging.Type.Error, "Server", "SendMessage", "Nachricht an Client: " + sc.id + " (" + sc.name + ") konnte nicht gesendet werden." + e));
+            Logging.log(Logging.LogType.Warning, "SloxikonServer", "SendMSG", "Nachricht an Client: " + sc.id + " (" + sc.name + ") konnte nicht gesendet werden.", e);
             // Verbindung zum Client wird getrennt
             ClientClosed(sc);
         }
     }
-    /**
-     * Sendet eine Nachricht an alle verbundenen Spieler
-     */
+    /// <summary>
+    /// Sendet eine Nachricht an alle verbundenen Spieler
+    /// </summary>
+    /// <param name="data"></param>
+    /// <param name="spieler"></param>
     private void Broadcast(string data, Player[] spieler)
     {
         foreach (Player sc in spieler)
@@ -188,9 +128,10 @@ public class SloxikonServer : MonoBehaviour
                 SendMSG(data, sc);
         }
     }
-    /**
-     * Sendet eine Nachricht an alle verbundenen Spieler
-     */
+    /// <summary>
+    /// Sendet eine Nachricht an alle verbundenen Spieler
+    /// </summary>
+    /// <param name="data"></param>
     private void Broadcast(string data)
     {
         foreach (Player sc in Config.PLAYERLIST)
@@ -199,9 +140,11 @@ public class SloxikonServer : MonoBehaviour
                 SendMSG(data, sc);
         }
     }
-    /**
-     * Einkommende Nachrichten die von Spielern an den Server gesendet werden.
-     */
+    /// <summary>
+    /// Einkommende Nachrichten die von Spielern an den Server gesendet werden.
+    /// </summary>
+    /// <param name="spieler"></param>
+    /// <param name="data"></param>
     private void OnIncommingData(Player spieler, string data)
     {
         string cmd;
@@ -214,18 +157,21 @@ public class SloxikonServer : MonoBehaviour
         Commands(spieler, data, cmd);
     }
     #endregion
-    /**
-     * Einkommende Befehle von Spielern
-     */
-    public void Commands(Player player, string data, string cmd)
+    /// <summary>
+    /// Einkommende Befehle von Spielern
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="data"></param>
+    /// <param name="cmd"></param>
+    private void Commands(Player player, string data, string cmd)
     {
         // Zeigt alle einkommenden Nachrichten an
-        //Debug.Log(player.name + " " + player.id + " -> " + cmd + "   ---   " + data);
+        Logging.log(Logging.LogType.Debug, "SloxikonServer", "Commands", "Eingehende Nachricht: " + cmd + " -> " + data);
         // Sucht nach Command
         switch (cmd)
         {
             default:
-                Logging.add(Logging.Type.Warning, "QuizServer", "Commands", "Unkown Command -> " + cmd + " - " + data);
+                Logging.log(Logging.LogType.Warning, "SloxikonServer", "Commands", "Unkown Command: " + cmd + " -> " + data);
                 break;
 
             case "#ClientClosed":
@@ -251,17 +197,18 @@ public class SloxikonServer : MonoBehaviour
         }
     }
     #endregion
-    /**
-     * Fordert alle Clients auf die RemoteConfig neuzuladen
-     */
+    /// <summary>
+    /// Fordert alle Clients auf die RemoteConfig neuzuladen
+    /// </summary>
     public void UpdateRemoteConfig()
     {
         Broadcast("#UpdateRemoteConfig");
         LoadConfigs.FetchRemoteConfig();
     }
-    /**
-     * Spieler beendet das Spiel
-     */
+    /// <summary>
+    /// Spieler beendet das Spiel
+    /// </summary>
+    /// <param name="player"></param>
     private void ClientClosed(Player player)
     {
         player.icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
@@ -270,24 +217,25 @@ public class SloxikonServer : MonoBehaviour
         player.isConnected = false;
         player.isDisconnected = true;
     }
-    /**
-     *  Spiel Verlassen & Zurück in die Lobby laden
-     */
+    /// <summary>
+    /// Spiel Verlassen & Zurück in die Lobby laden
+    /// </summary>
     public void SpielVerlassenButton()
     {
         SceneManager.LoadScene("Startup");
         Broadcast("#ZurueckInsHauptmenue");
     }
-    /**
-     * Sendet aktualisierte Spielerinfos an alle Spieler
-     */
+    /// <summary>
+    /// Sendet aktualisierte Spielerinfos an alle Spieler
+    /// </summary>
     private void UpdateSpielerBroadcast()
     {
         Broadcast(UpdateSpieler(), Config.PLAYERLIST);
     }
-    /**
-     * Aktualisiert die Spieler Anzeige Informationen & gibt diese als Text zurück
-     */
+    /// <summary>
+    /// Aktualisiert die Spieler Anzeige Informationen & gibt diese als Text zurück
+    /// </summary>
+    /// <returns></returns>
     private string UpdateSpieler()
     {
         string msg = "#UpdateSpieler [ID]0[ID][PUNKTE]" + Config.SERVER_PLAYER_POINTS + "[PUNKTE]";
@@ -310,11 +258,12 @@ public class SloxikonServer : MonoBehaviour
         }
         return msg;
     }
-    /**
-     * Initialisiert die Anzeigen zu beginn
-     */
+    /// <summary>
+    /// Initialisiert die Anzeigen zu beginn
+    /// </summary>
     private void InitAnzeigen()
     {
+        Logging.log(Logging.LogType.Debug, "SloxikonServer", "InitAnzeigen", "Initialisiert die Anzeigen");
         GameObject.Find("ServerSide/FrageAnzeigenToggle").GetComponent<Toggle>().isOn = false;
         // Buzzer Deaktivieren
         GameObject.Find("ServerSide/BuzzerAktivierenToggle").GetComponent<Toggle>().isOn = false;
@@ -363,123 +312,88 @@ public class SloxikonServer : MonoBehaviour
         ChangeQuiz.GetComponent<TMP_Dropdown>().AddOptions(quizzes);
         ChangeQuiz.GetComponent<TMP_Dropdown>().value = Config.QUIZ_SPIEL.getIndex(Config.QUIZ_SPIEL.getSelected());
     }
-
-    #region Quiz Fragen Anzeige
-    /**
-     * Initialisiert die Anzeigen des Quizzes
-     */
+    #region Sloxikon Anzeige
+    /// <summary>
+    /// Initialisiert die Anzeigen des Quizzes
+    /// </summary>
     private void InitSloxikon()
     {
         aktuellesThema = 0;
         GameObject.Find("Server/Titel").GetComponent<TMP_Text>().text = Config.SLOXIKON_SPIEL.getSelected().getTitel();
         GameObject.Find("Server/ThemenVorschau").GetComponent<TMP_Text>().text = Config.SLOXIKON_SPIEL.getSelected().getThemenListe();
-
+        Thema = GameObject.Find("Sloxikon/Thema");
+        Thema.SetActive(false);
+        Antworten = new GameObject[10];
+        for (int i = 0; i < 10; i++)
+        {
+            Antworten[i] = GameObject.Find("Sloxikon/Grid/Answer ("+i+")");
+            Antworten[i].SetActive(false);
+        }
     }
-    /**
-     * Ändert das ausgewählte Quiz
-     */
+    /// <summary>
+    /// Ändert das ausgewählte Quiz
+    /// </summary>
+    /// <param name="drop"></param>
     public void ChangeQuiz(TMP_Dropdown drop)
     {
-        // Wählt neues Quiz aus
-        Config.QUIZ_SPIEL.setSelected(Config.QUIZ_SPIEL.getQuizByIndex(drop.value));
-        Logging.add(Logging.Type.Normal, "QuizServer", "ChangeQuiz", "Quiz starts: " + Config.QUIZ_SPIEL.getSelected().getTitel());
-        // Aktualisiert die Anzeigen
-        aktuellesThema = 0;
-        GameObject.Find("QuizAnzeigen/Titel").GetComponent<TMP_Text>().text = Config.QUIZ_SPIEL.getSelected().getTitel();
-        GameObject.Find("QuizAnzeigen/FragenIndex2").GetComponentInChildren<TMP_Text>().text = "";
-        GameObject.Find("QuizAnzeigen/FragenIndex1").GetComponentInChildren<TMP_Text>().text = "";
-        GameObject.Find("Frage").GetComponentInChildren<TMP_Text>().text = "";
-        if (Config.QUIZ_SPIEL.getSelected().getFragenCount() > 0)
-        {
-            LoadQuestionIntoScene(0);
-        }
-    }
-    /**
-     * Navigiert durch die Fragen, zeigt/versteckt diese
-     */
-    public void NavigateThroughQuestions(string type)
-    {
-        switch (type)
-        {
-            default:
-                Debug.LogError("NavigateThroughQuestions: unbekannter Typ");
-                Logging.add(Logging.Type.Error, "QuizServer", "NavigateThroughQuestions", "unbekannter Typ -> " + type);
-                break;
-            case "previous":
-                if (aktuellesThema <= 0)
-                    return;
-                aktuellesThema--;
-                LoadQuestionIntoScene(aktuellesThema);
-                break;
-            case "next":
-                if (aktuellesThema >= (Config.QUIZ_SPIEL.getSelected().getFragenCount() - 1))
-                    return;
-                aktuellesThema++;
-                LoadQuestionIntoScene(aktuellesThema);
-                break;
-        }
-    }
-    /**
-     * Lädt die Frage nach Index, für die Server Vorschau
-     */
-    private void LoadQuestionIntoScene(int index)
-    {
-        GameObject.Find("QuizAnzeigen/FragenVorschau").GetComponent<TMP_Text>().text = "Frage:\n"+Config.QUIZ_SPIEL.getSelected().getFrage(index).getFrage();
-        GameObject.Find("QuizAnzeigen/AntwortVorschau").GetComponent<TMP_Text>().text = "Antwort:\n"+ Config.QUIZ_SPIEL.getSelected().getFrage(index).getAntwort();
-        GameObject.Find("QuizAnzeigen/InfoVorschau").GetComponent<TMP_Text>().text = "Info:\n"+Config.QUIZ_SPIEL.getSelected().getFrage(index).getInfo();
-        GameObject.Find("QuizAnzeigen/FragenIndex2").GetComponentInChildren<TMP_Text>().text = (aktuellesThema+1)+"/" + Config.QUIZ_SPIEL.getSelected().getFragenCount();
+        
     }
     #endregion
     #region Buzzer
-    /**
-     * Aktiviert/Deaktiviert den Buzzer für alle Spieler
-     */
+    /// <summary>
+    /// Aktiviert/Deaktiviert den Buzzer für alle Spieler
+    /// </summary>
+    /// <param name="toggle"></param>
     public void BuzzerAktivierenToggle(Toggle toggle)
     {
         buzzerIsOn = toggle.isOn;
         BuzzerAnzeige.SetActive(toggle.isOn);
     }
-    /**
-     * Spielt Sound ab, sperrt den Buzzer und zeigt den Spieler an
-     */
+    /// <summary>
+    /// Spielt Sound ab, sperrt den Buzzer und zeigt den Spieler an
+    /// </summary>
+    /// <param name="p"></param>
     private void SpielerBuzzered(Player p)
     {
         if (!buzzerIsOn)
         {
-            Debug.Log(p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
+            Logging.log(Logging.LogType.Normal, "SloxikonServer", "SpielerBuzzered", p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
             return;
         }
-        Debug.LogWarning("B: "+p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
+        Logging.log(Logging.LogType.Warning, "SloxikonServer", "SpielerBuzzered", "B: " + p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
         buzzerIsOn = false;
         Broadcast("#AudioBuzzerPressed " + p.id);
         BuzzerSound.Play();
         SpielerAnzeige[p.id - 1, 1].SetActive(true);
     }
-    /**
-     * Gibt den Buzzer für alle Spieler frei
-     */
+    /// <summary>
+    /// Gibt den Buzzer für alle Spieler frei
+    /// </summary>
     public void SpielerBuzzerFreigeben()
     {
         for (int i = 0; i < Config.SERVER_MAX_CONNECTIONS; i++)
             SpielerAnzeige[i, 1].SetActive(false);
         buzzerIsOn = BuzzerAnzeige.activeInHierarchy;
-        Debug.LogWarning("Buzzer freigegeben.");
+        Logging.log(Logging.LogType.Warning, "SloxikonServer", "SpielerBuzzerFreigeben", "Buzzer wurde freigegeben.");
         Broadcast("#BuzzerFreigeben");
     }
     #endregion
     #region Spieler Ausgetabt Anzeige
-    /**
-     * Austaben wird allen/keinen Spielern angezeigt
-     */
+    /// <summary>
+    /// Austaben wird allen/keinen Spielern angezeigt
+    /// </summary>
+    /// <param name="toggle"></param>
     public void AustabenAllenZeigenToggle(Toggle toggle)
     {
         AustabbenAnzeigen.SetActive(toggle.isOn);
         if (toggle.isOn == false)
             Broadcast("#SpielerAusgetabt 0");
     }
-    /**
-     * Spieler Tabt aus, wird ggf allen gezeigt
-     */
+    /// <summary>
+    /// Spieler Tabt aus, wird ggf allen gezeigt
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="data"></param>
     private void ClientFocusChange(Player player, string data)
     {
         bool ausgetabt = !Boolean.Parse(data);
@@ -489,24 +403,28 @@ public class SloxikonServer : MonoBehaviour
     }
     #endregion
     #region Textantworten der Spieler
-    /**
-     * Blendet die Texteingabe für die Spieler ein
-     */
+    /// <summary>
+    /// Blendet die Texteingabe für die Spieler ein
+    /// </summary>
+    /// <param name="toggle"></param>
     public void TexteingabeAnzeigenToggle(Toggle toggle)
     {
         TextEingabeAnzeige.SetActive(toggle.isOn);
         Broadcast("#TexteingabeAnzeigen "+ toggle.isOn);
     }
-    /**
-    * Aktualisiert die Antwort die der Spieler eingibt
-    */
-    public void SpielerAntwortEingabe(Player p, string data)
+    /// <summary>
+    /// Aktualisiert die Antwort die der Spieler eingibt
+    /// </summary>
+    /// <param name="p"></param>
+    /// <param name="data"></param>
+    private void SpielerAntwortEingabe(Player p, string data)
     {
         SpielerAnzeige[p.id - 1, 6].GetComponentInChildren<TMP_InputField>().text = data;
     }
-    /**
-     * Blendet die Textantworten der Spieler ein
-     */
+    /// <summary>
+    /// Blendet die Textantworten der Spieler ein
+    /// </summary>
+    /// <param name="toggle"></param>
     public void TextantwortenAnzeigeToggle(Toggle toggle)
     {
         TextAntwortenAnzeige.SetActive(toggle.isOn);
@@ -524,24 +442,26 @@ public class SloxikonServer : MonoBehaviour
     }
     #endregion
     #region Punkte
-    /**
-     * Punkte Pro Richtige Antworten Anzeigen
-     */
+    /// <summary>
+    /// Punkte Pro Richtige Antworten Anzeigen
+    /// </summary>
+    /// <param name="input"></param>
     public void ChangePunkteProRichtigeAntwort(TMP_InputField input)
     {
         PunkteProRichtige = Int32.Parse(input.text);
     }
-    /**
-     * Punkte Pro Falsche Antworten Anzeigen
-     */
+    /// <summary>
+    /// Punkte Pro Falsche Antworten Anzeigen
+    /// </summary>
+    /// <param name="input"></param>
     public void ChangePunkteProFalscheAntwort(TMP_InputField input)
     {
         PunkteProFalsche = Int32.Parse(input.text);
     }
-    
-    /**
-     * Vergibt an den Spieler Punkte für eine richtige Antwort
-     */
+    /// <summary>
+    /// Vergibt an den Spieler Punkte für eine richtige Antwort
+    /// </summary>
+    /// <param name="player"></param>
     public void PunkteRichtigeAntwort(GameObject player)
     {
         Broadcast("#AudioRichtigeAntwort");
@@ -551,9 +471,10 @@ public class SloxikonServer : MonoBehaviour
         Config.PLAYERLIST[pIndex].points += PunkteProRichtige;
         UpdateSpielerBroadcast();
     }
-    /**
-     * Vergibt an alle anderen Spieler Punkte bei einer falschen Antwort
-     */
+    /// <summary>
+    /// Vergibt an alle anderen Spieler Punkte bei einer falschen Antwort
+    /// </summary>
+    /// <param name="player"></param>
     public void PunkteFalscheAntwort(GameObject player)
     {
         Broadcast("#AudioFalscheAntwort");
@@ -567,9 +488,10 @@ public class SloxikonServer : MonoBehaviour
         Config.SERVER_PLAYER_POINTS += PunkteProFalsche;
         UpdateSpielerBroadcast();
     }
-    /**
-     * Ändert die Punkte des Spielers (+-1)
-     */
+    /// <summary>
+    /// Ändert die Punkte des Spielers (+-1)
+    /// </summary>
+    /// <param name="button"></param>
     public void PunkteManuellAendern(GameObject button)
     {
         int pId = Int32.Parse(button.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
@@ -585,9 +507,10 @@ public class SloxikonServer : MonoBehaviour
         }
         UpdateSpielerBroadcast();
     }
-    /**
-     * Ändert die Punkte des Spielers, variable Punkte
-     */
+    /// <summary>
+    /// Ändert die Punkte des Spielers, variable Punkte
+    /// </summary>
+    /// <param name="input"></param>
     public void PunkteManuellAendern(TMP_InputField input)
     {
         int pId = Int32.Parse(input.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
@@ -600,9 +523,10 @@ public class SloxikonServer : MonoBehaviour
     }
     #endregion
     #region Spieler ist (Nicht-)Dran
-    /**
-     * Aktiviert den Icon Rand beim Spieler
-     */
+    /// <summary>
+    /// Aktiviert den Icon Rand beim Spieler
+    /// </summary>
+    /// <param name="button"></param>
     public void SpielerIstDran(GameObject button)
     {
         int pId = Int32.Parse(button.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
@@ -612,9 +536,10 @@ public class SloxikonServer : MonoBehaviour
         buzzerIsOn = false;
         Broadcast("#SpielerIstDran "+pId);
     }
-    /**
-     * Versteckt den Icon Rand beim Spieler
-     */
+    /// <summary>
+    /// Versteckt den Icon Rand beim Spieler
+    /// </summary>
+    /// <param name="button"></param>
     public void SpielerIstNichtDran(GameObject button)
     {
         int pId = Int32.Parse(button.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
@@ -627,5 +552,4 @@ public class SloxikonServer : MonoBehaviour
         Broadcast("#SpielerIstNichtDran " + pId);
     }
     #endregion
-
 }

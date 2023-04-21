@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net.Sockets;
 using UnityEngine;
 
@@ -10,7 +9,7 @@ public class Config
     public static string APPLICATION_VERSION = Application.version;
     public static bool FULLSCREEN = false;
     public static string MedienPath = Application.persistentDataPath + @"\Medien";
-    public static List<Logging> log;
+    public static bool DEBUG_MODE = false;
 
     // Server Infos
     public static bool isServer = false;
@@ -21,6 +20,7 @@ public class Config
     public static bool SERVER_STARTED;
     public static bool SERVER_ALL_CONNECTED;
 
+    // Server stats
     public static Sprite SERVER_ICON = Resources.Load<Sprite>("Images/ProfileIcons/empty");
     public static int SERVER_PLAYER_POINTS = 0;
     public static int SERVER_CROWNS = 0;
@@ -28,7 +28,6 @@ public class Config
     // Client Infos
     public static TcpClient CLIENT_TCP;
     public static bool CLIENT_STARTED;
-    public static DateTime PingTime = DateTime.MinValue;
 
     // Spieler
     public static Player[] PLAYERLIST;
@@ -36,6 +35,7 @@ public class Config
     public static string PLAYER_NAME = "Spieler" + UnityEngine.Random.Range(1000, 10000);
     public static int MAX_PLAYER_NAME_LENGTH = 12;
     public static int PLAYER_ID = 0;
+    public static DateTime PingTime;
 
     // Spiele
     public static FlaggenSpiel FLAGGEN_SPIEL;

@@ -14,6 +14,7 @@ public class Mosaik
 
     public Mosaik(string path)
     {
+        Logging.log(Logging.LogType.Debug, "Mosaik", "Mosaik", "Lade Mosaikspiel: " + path);
         string temp = path.Split('\\')[path.Split('\\').Length - 1];
         this.titel = temp.Split('/')[temp.Split('/').Length - 1].Replace(".txt", "");
         sprites = new List<Sprite>();
@@ -29,14 +30,15 @@ public class Mosaik
                 string name = zeile.Substring("- ".Length).Replace(" [!#!] ", "|").Split('|')[0];
                 string url = zeile.Substring("- ".Length).Replace(" [!#!] ", "|").Split('|')[1];
 
-                
-
                 sprites.Add(null);
                 names.Add(name);
                 urls.Add(url);
                 istGeladen.Add(false);
             }
-
+            else
+            {
+                Logging.log(Logging.LogType.Warning, "Mosaik", "Mosaik", "Unbekanntes Objekt gefunden: " + titel + "  -  " + zeile);
+            }
         }
     }
 

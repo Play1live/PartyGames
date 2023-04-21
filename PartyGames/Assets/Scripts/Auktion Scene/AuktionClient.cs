@@ -30,14 +30,6 @@ public class AuktionClient : MonoBehaviour
 
         StartCoroutine(TestConnectionToServer());
     }
-    IEnumerator TestConnectionToServer()
-    {
-        while (Config.CLIENT_STARTED)
-        {
-            SendToServer("#TestConnection");
-            yield return new WaitForSeconds(10);
-        }
-    }
 
     void Update()
     {
@@ -63,15 +55,26 @@ public class AuktionClient : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        Logging.add(Logging.Type.Normal, "Client", "OnApplicationQuit", "Client wird geschlossen.");
+        Logging.log(Logging.LogType.Normal, "AuktionClient", "OnApplicationQuit", "Client wird geschlossen.");
         SendToServer("#ClientClosed");
         CloseSocket();
     }
 
+    /// <summary>
+    /// Testet die Verbindung zum Server
+    /// </summary>
+    IEnumerator TestConnectionToServer()
+    {
+        while (Config.CLIENT_STARTED)
+        {
+            SendToServer("#TestConnection");
+            yield return new WaitForSeconds(10);
+        }
+    }
     #region Verbindungen
-    /**
-     * Trennt die Verbindung zum Server
-     */
+    /// <summary>
+    /// Trennt die Verbindung zum Server
+    /// </summary>
     private void CloseSocket()
     {
         if (!Config.CLIENT_STARTED)
@@ -80,13 +83,14 @@ public class AuktionClient : MonoBehaviour
         Config.CLIENT_TCP.Close();
         Config.CLIENT_STARTED = false;
 
-        Logging.add(Logging.Type.Normal, "Client", "CloseSocket", "Verbindung zum Server wurde getrennt. Client wird in das Hauptmenü geladen.");
+        Logging.log(Logging.LogType.Normal, "AuktionClient", "CloseSocket", "Verbindung zum Server wurde getrennt. Client wird in das Hauptmenü geladen.");
     }
     #endregion
     #region Kommunikation
-    /**
-     * Sendet eine Nachricht an den Server.
-     */
+    /// <summary>
+    /// Sendet eine Nachricht an den Server.
+    /// </summary>
+    /// <param name="data"></param>
     public void SendToServer(string data)
     {
         if (!Config.CLIENT_STARTED)
@@ -101,15 +105,16 @@ public class AuktionClient : MonoBehaviour
         }
         catch (Exception e)
         {
-            Logging.add(Logging.Type.Error, "Client", "SendToServer", "Nachricht an Server konnte nicht gesendet werden." + e);
+            Logging.log(Logging.LogType.Warning, "AuktionClient", "SendToServer", "Nachricht an Server konnte nicht gesendet werden.", e);
             Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server wurde verloren.";
             CloseSocket();
             SceneManager.LoadSceneAsync("StartUp");
         }
     }
-    /**
-     * Einkommende Nachrichten die vom Sever
-     */
+    /// <summary>
+    /// Einkommende Nachrichten die vom Sever
+    /// </summary>
+    /// <param name="data"></param>
     private void OnIncomingData(string data)
     {
         string cmd;
@@ -122,27 +127,32 @@ public class AuktionClient : MonoBehaviour
         Commands(data, cmd);
     }
     #endregion
-    /**
-     * Eingehende Commands vom Server
-     */
+    /// <summary>
+    /// Eingehende Commands vom Server
+    /// </summary>
+    /// <param name="data"></param>
+    /// <param name="cmd"></param>
     public void Commands(string data, string cmd)
     {
-        //Debug.Log("Eingehend: " + cmd + " -> " + data);
+        Logging.log(Logging.LogType.Debug, "AuktionClient", "Commands", "Eingehende Nachricht: " + cmd + " -> " + data);
         switch (cmd)
         {
             default:
-                Logging.add(Logging.Type.Warning, "QuizClient", "Commands", "Unkown Command -> " + cmd + " - " + data);
+                Logging.log(Logging.LogType.Warning, "AuktionClient", "Commands", "Unkown Command: " + cmd + " -> " + data);
                 break;
 
             #region Universal Commands
             case "#ServerClosed":
+                Logging.log(Logging.LogType.Normal, "AuktionClient", "Commands", "Verbindung zum Server wurde getrennt. Lade zurück ins Hauptmenü");
                 CloseSocket();
                 SceneManager.LoadScene("Startup");
                 break;
             case "#UpdateRemoteConfig":
+                Logging.log(Logging.LogType.Debug, "AuktionClient", "Commands", "RemoteConfig wird aktualisiert");
                 LoadConfigs.FetchRemoteConfig();
                 break;
             case "#ZurueckInsHauptmenue":
+                Logging.log(Logging.LogType.Debug, "AuktionClient", "Commands", "Spiel wird beendet, lade ins Hauptmenü.");
                 SceneManager.LoadScene("Startup");
                 break;
             #endregion
@@ -160,7 +170,7 @@ public class AuktionClient : MonoBehaviour
                 break;
 
             case "#AuktionDownloadImages":
-                Debug.LogWarning(data);
+                Logging.log(Logging.LogType.Normal, "AuktionClient", "Commands", "Client soll alle Bilder laden: " + data);
                 AuktionDownloadImages(data);
                 break;
             case "#ShowCustomImage":
@@ -183,10 +193,10 @@ public class AuktionClient : MonoBehaviour
                 break;
         }
     }
-
-    /**
-     * Aktualisiert die Spieler Anzeigen
-     */
+    /// <summary>
+    /// Aktualisiert die Spieler Anzeigen
+    /// </summary>
+    /// <param name="data"></param>
     private void UpdateSpieler(string data)
     {
         string[] player = data.Replace("[TRENNER]", "|").Split('|');
@@ -234,25 +244,28 @@ public class AuktionClient : MonoBehaviour
             
         }
     }
-    /**
-     * Zeigt an, welcher Spieler dran ist
-     */
+    /// <summary>
+    /// Zeigt an, welcher Spieler dran ist
+    /// </summary>
+    /// <param name="data"></param>
     private void SpielerIstDran(string data)
     {
         int pId = Int32.Parse(data);
         SpielerAnzeige[Player.getPosInLists(pId), 1].SetActive(true);
     }
-    /**
-     * Deaktiviert die Spieler ist dran anzeige
-     */
+    /// <summary>
+    /// Deaktiviert die Spieler ist dran anzeige
+    /// </summary>
+    /// <param name="data"></param>
     private void SpielerIstNichtDran(string data)
     {
         int pId = Int32.Parse(data);
         SpielerAnzeige[Player.getPosInLists(pId), 1].SetActive(false);
     }
-    /**
-     * Zeigt an, ob ein Spieler austabt
-     */
+    /// <summary>
+    /// Zeigt an, ob ein Spieler austabt
+    /// </summary>
+    /// <param name="data"></param>
     private void SpielerAusgetabt(string data)
     {
         // AustabenAnzeigen wird deaktiviert
@@ -273,10 +286,9 @@ public class AuktionClient : MonoBehaviour
             SpielerAnzeige[pos, 3].SetActive(type);
         }
     }
-
-    /**
-     * Initialisiert die Anzeigen der Scene
-     */
+    /// <summary>
+    /// Initialisiert die Anzeigen der Scene
+    /// </summary>
     private void InitAnzeigen()
     {
         // Spieler Anzeige
@@ -319,7 +331,10 @@ public class AuktionClient : MonoBehaviour
         BildAnzeige.gameObject.SetActive(false);
 
     }
- 
+    /// <summary>
+    /// Lädt Bilder per URL herunter
+    /// </summary>
+    /// <param name="data"></param>
     private void AuktionDownloadImages(string data)
     {
         int anz = Int32.Parse(data.Replace("[ANZ]", "|").Split('|')[1]);
@@ -335,6 +350,10 @@ public class AuktionClient : MonoBehaviour
         }
         StartCoroutine(DownloadAllImages());
     }
+    /// <summary>
+    /// Lädt die benötigten Bilder herunter
+    /// </summary>
+    /// <returns></returns>
     IEnumerator DownloadAllImages()
     {
         for (int i = 0; i < urls.GetLength(0); i++)
@@ -346,7 +365,7 @@ public class AuktionClient : MonoBehaviour
                 yield return www.SendWebRequest();
                 if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
                 {
-                    Debug.LogError("Auktion: Bild konnte nicht geladen werden: " + url + " << " + www.error);
+                    Logging.log(Logging.LogType.Warning, "AukitonClient", "DownloadAllImages", "Bild konnte nicht geladen werden: " + url + " << " + www.error);
                     SendToServer("#ImageDownloadError "+ url);
                 }
                 else
@@ -372,15 +391,26 @@ public class AuktionClient : MonoBehaviour
         SendToServer("#ImageDownloadedSuccessful");
         yield return null;
     }
-
+    /// <summary>
+    /// Zeigt ein per URL eingefügtes Bild an
+    /// </summary>
+    /// <param name="data"></param>
     private void ShowCustomImage(string data)
     {
         StartCoroutine(LoadImageIntoScene(data));
     }
+    /// <summary>
+    /// Blendet die Bildanzeige aus
+    /// </summary>
     private void HideImage()
     {
         BildAnzeige.gameObject.SetActive(false);
     }
+    /// <summary>
+    /// Lädt ein Bild in die Scene und zeigt dieses dann an
+    /// </summary>
+    /// <param name="url"></param>
+    /// <returns></returns>
     IEnumerator LoadImageIntoScene(string url)
     {
         UnityWebRequest www = UnityWebRequestTexture.GetTexture(url);
@@ -388,7 +418,7 @@ public class AuktionClient : MonoBehaviour
 
         if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
         {
-            Debug.LogError("Auktion: Bild konnte nicht geladen werden: " + url + " << " + www.error);
+            Logging.log(Logging.LogType.Warning, "AuktionClient", "LoadImageIntoScene", "Bild konnte nicht geladen werden: " + url + " << " + www.error);
             SendToServer("#LoadImageIntoSceneError");
         }
         else
@@ -401,6 +431,10 @@ public class AuktionClient : MonoBehaviour
         }
         yield return null;
     }
+    /// <summary>
+    /// Aktualisiert das Guthaben des Spielerkontos
+    /// </summary>
+    /// <param name="data"></param>
     private void SpielerKonto(string data)
     {
         if (!data.EndsWith("€"))
@@ -416,6 +450,10 @@ public class AuktionClient : MonoBehaviour
             SpielerAnzeige[i, 7].GetComponent<TMP_InputField>().text = data;
         }
     }
+    /// <summary>
+    /// Zeigt Verkaufselement an
+    /// </summary>
+    /// <param name="data"></param>
     private void ShowItemImage(string data)
     {
         int item = Int32.Parse(data.Split('|')[0]);
@@ -423,6 +461,10 @@ public class AuktionClient : MonoBehaviour
         BildAnzeige.sprite = bilder[item, bild];
         BildAnzeige.gameObject.SetActive(true);
     }
+    /// <summary>
+    /// Zeigt die Konten der anderen Spieler an
+    /// </summary>
+    /// <param name="data"></param>
     private void ShowAllKonten(string data)
     {
         bool toggle = bool.Parse(data);
@@ -433,6 +475,10 @@ public class AuktionClient : MonoBehaviour
         }
         SpielerAnzeige[Player.getPosInLists(Config.PLAYER_ID), 7].SetActive(true);
     }
+    /// <summary>
+    /// Zeigt die GUV aller Spieler an
+    /// </summary>
+    /// <param name="data"></param>
     private void ShowAllGuv(string data)
     {
         bool toggle = bool.Parse(data);
