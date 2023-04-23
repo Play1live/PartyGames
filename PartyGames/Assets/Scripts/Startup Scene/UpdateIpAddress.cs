@@ -42,6 +42,7 @@ public class UpdateIpAddress
                     fs.Write(info, 0, info.Length);
                 }
             }
+            Logging.log(Logging.LogType.Normal, "UpdateIpAddress", "UpdateNoIP_DNS", "Autostart wurde abgebrochen, keine Kontodaten zum Aktualisieren der DNS-IP vorhanden.");
             return false;
         }
 

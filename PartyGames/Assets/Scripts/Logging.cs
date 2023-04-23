@@ -88,7 +88,6 @@ public class Logging
         else if (type == LogType.Fatal)
             Debug.LogError("FATAL >> " + message);
 #endif
-
     }
 }
 

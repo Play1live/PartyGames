@@ -20,43 +20,46 @@ public class StartupScene : MonoBehaviour
         Config.isServer = true;
         Config.PLAYER_NAME = "Henryk";
 #endif
-            /*Testzwecke*/
+        /*Testzwecke*/
         Config.DEBUG_MODE = true;
-        //Config.isServer = !Config.isServer;
+        Config.isServer = !Config.isServer;
         //Config.isServer = true;
 
-
-        Logging.log(Logging.LogType.Normal, "StartupScene", "Start", "Application Version: "+ Config.APPLICATION_VERSION);
-        Logging.log(Logging.LogType.Normal, "StartupScene", "Start", "Debugmode: " + Config.DEBUG_MODE);
-        WriteGameVersionFile();
-
-        if (!Config.CLIENT_STARTED && !Config.SERVER_STARTED)
+        if (!Config.APPLICATION_INIT)
         {
+            Logging.log(Logging.LogType.Normal, "StartupScene", "Start", "Application Version: " + Config.APPLICATION_VERSION);
+            Logging.log(Logging.LogType.Normal, "StartupScene", "Start", "Debugmode: " + Config.DEBUG_MODE);
+            WriteGameVersionFile();
+
             LoadConfigs.FetchRemoteConfig();    // L‰dt Config
             MedienUtil.CreateMediaDirectory();
             StartCoroutine(LoadGameFilesAsync());
-            Client.SetActive(false);
-            Server.SetActive(false);
-        }
 
-        // Init PlayerlistZeigt die geladenen Spiele in der Game‹bersicht an
-        if (Config.PLAYERLIST == null)
-        {
-            InitPlayerlist();
-            Hauptmenue.SetActive(true);
-            Lobby.SetActive(false);
-            ServerControl.SetActive(false);
-        }
-
-        // Zeigt die Spielversion & den tempor‰ren Spielernamen an
-        if (Hauptmenue.activeInHierarchy)
-        {
-            GameObject.Find("ChooseYourName_TXT").gameObject.GetComponent<TMP_InputField>().text = Config.PLAYER_NAME;
+            // Init PlayerlistZeigt die geladenen Spiele in der Game‹bersicht an
+            if (Config.PLAYERLIST == null)
+            {
+                InitPlayerlist();
+                Hauptmenue.SetActive(true);
+                Lobby.SetActive(false);
+                ServerControl.SetActive(false);
+            }
             if (Config.isServer)
                 GameObject.Find("Version_LBL").gameObject.GetComponent<TMP_Text>().text = "Version: " + Config.APPLICATION_VERSION + "    Medien: " + Config.MedienPath;
             else
                 GameObject.Find("Version_LBL").gameObject.GetComponent<TMP_Text>().text = "Version: " + Config.APPLICATION_VERSION;
+
+            Config.APPLICATION_INIT = true;
         }
+
+        if (!Config.CLIENT_STARTED && !Config.SERVER_STARTED)
+        {
+            Client.SetActive(false);
+            Server.SetActive(false);
+        }
+        // Zeigt den tempor‰ren Spielernamen an
+        if (Hauptmenue.activeInHierarchy)
+            GameObject.Find("ChooseYourName_TXT").gameObject.GetComponent<TMP_InputField>().text = Config.PLAYER_NAME;
+
 
         StartCoroutine(AutostartServer());
     }
@@ -163,6 +166,9 @@ public class StartupScene : MonoBehaviour
     /// </summary>
     public void StartConnection()
     {
+        if (Config.CLIENT_STARTED || Config.SERVER_STARTED)
+            return;
+
         Config.PLAYER_NAME = GameObject.Find("ChooseYourName_TXT").gameObject.GetComponent<TMP_InputField>().text;
         // Game is Player
         if (!Config.isServer)

@@ -39,8 +39,6 @@ public class StartupClient : MonoBehaviour
             SendToServer("#GetSpielerUpdate");
         }
         #endregion
-
-        StartCoroutine(TestIfStartConnectionError()); 
     }
 
     void Update()
@@ -80,6 +78,15 @@ public class StartupClient : MonoBehaviour
     {
         Logging.log(Logging.LogType.Normal, "StartupClient", "TestIfStartConnectionError", "Testet in 10 Sekunden (oder wenn die Spieleranzeige aktualisiert wird) ob die Verbindung erfolgreich war.");
         DateTime in10sec = DateTime.Now.AddSeconds(10);
+        yield return new WaitUntil(() => (DateTime.Compare(DateTime.Now, in10sec) > 0 || SearchNameInPlayerList(Config.PLAYER_NAME)));
+
+        if (SearchNameInPlayerList(Config.PLAYER_NAME))
+        {
+            Logging.log(Logging.LogType.Normal, "StartupClient", "TestIfStartConnectionError", "Verbindung zum Server war erfolgreich.");
+            yield break;
+        }
+
+        /*
         yield return new WaitUntil(() => (DateTime.Compare(DateTime.Now, in10sec) > 0 ||
         (SpielerAnzeigeLobby[0].transform.GetChild(2).GetComponent<TMP_Text>().text.Length > 0 &&
             SpielerAnzeigeLobby[1].transform.GetChild(2).GetComponent<TMP_Text>().text.Length > 0)));
@@ -89,7 +96,7 @@ public class StartupClient : MonoBehaviour
         {
             Logging.log(Logging.LogType.Normal, "StartupClient", "TestIfStartConnectionError", "Verbindung zum Server war erfolgreich.");
             yield break;
-        }
+        }*/
 
         CloseSocket();
         Logging.log(Logging.LogType.Warning, "StartupClient", "TestIfStartConnectionError", "Verbindung zum Server war fehlerhaft.");
@@ -97,11 +104,28 @@ public class StartupClient : MonoBehaviour
         SceneManager.LoadSceneAsync("StartUp");
     }
     /// <summary>
+    /// Durchsucht die Spielerliste nach einem Namen
+    /// </summary>
+    /// <param name="name">Namen</param>
+    /// <returns>true: Name ist enthalten; false: Name ist nicht enthalten</returns>
+    private bool SearchNameInPlayerList(string name)
+    {
+        for (int i = 0; i <= Config.PLAYERLIST.Length; i++)
+        {
+            if (SpielerAnzeigeLobby[i].transform.GetChild(2).GetComponent<TMP_Text>().text.Equals(""))
+                continue;
+            if (SpielerAnzeigeLobby[i].transform.GetChild(2).GetComponent<TMP_Text>().text.Equals(name))
+                return true;
+        }
+        return false;
+    }
+    /// <summary>
     /// Testet alle paar Sekunden die Verbindung zum Server. 
     /// Dient zugleich der Ping Berechnung und Aktualisierung.
     /// </summary>
     IEnumerator TestConnectionToServer()
     {
+        yield return new WaitForSeconds(5);
         Logging.log(Logging.LogType.Debug, "StartupClient", "TestConnectionToServer", "Startet den Verbindungstest zum Server.");
         while (Config.CLIENT_STARTED)
         {
@@ -119,17 +143,18 @@ public class StartupClient : MonoBehaviour
     /// </summary>
     private void StarteClient()
     {
-        Logging.log(Logging.LogType.Normal, "StartupClient", "OnEnable", "Verbindung zwischen Client und Server wird aufgebaut...");
+        Logging.log(Logging.LogType.Normal, "StartupClient", "StarteClient", "Verbindung zwischen Client und Server wird aufgebaut...");
         try
         {
-            Config.CLIENT_TCP = new TcpClient(Config.SERVER_CONNECTION_IP, Config.SERVER_CONNECTION_PORT);
+            Config.CLIENT_TCP = new TcpClient("localhost", Config.SERVER_CONNECTION_PORT); // TODO: entfernen
+            //Config.CLIENT_TCP = new TcpClient(Config.SERVER_CONNECTION_IP, Config.SERVER_CONNECTION_PORT);
             Config.CLIENT_STARTED = true;
-            Logging.log(Logging.LogType.Normal, "StartupClient", "OnEnable", "Verbindung wurde erfolgreich aufgebaut.");
+            Logging.log(Logging.LogType.Normal, "StartupClient", "StarteClient", "Verbindung wurde erfolgreich aufgebaut.");
             Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server wurde hergestellt.";
         }
         catch (Exception e)
         {
-            Logging.log(Logging.LogType.Warning, "StartupClient", "OnEnable", "Verbindung zum Server nicht möglich.", e);
+            Logging.log(Logging.LogType.Warning, "StartupClient", "StarteClient", "Verbindung zum Server nicht möglich.", e);
             Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server nicht möglich. \n" + e;
             Config.CLIENT_STARTED = false;
             try
@@ -138,10 +163,10 @@ public class StartupClient : MonoBehaviour
             }
             catch (Exception e1)
             {
-                Logging.log(Logging.LogType.Error, "StartupClient", "OnEnable", "Socket konnte nicht geschlossen werden.", e1);
+                Logging.log(Logging.LogType.Error, "StartupClient", "StarteClient", "Socket konnte nicht geschlossen werden.", e1);
             }
             transform.gameObject.SetActive(false);
-            Logging.log(Logging.LogType.Normal, "StartupClient", "OnEnable", "Client wird ins Hauptmenü geladen.");
+            Logging.log(Logging.LogType.Normal, "StartupClient", "StarteClient", "Client wird ins Hauptmenü geladen.");
             SceneManager.LoadSceneAsync("Startup");
             return;
         }
@@ -240,10 +265,12 @@ public class StartupClient : MonoBehaviour
                 SetID(data);
                 break;
             case "#WrongVersion":
+                StopCoroutine(TestIfStartConnectionError());
                 WrongVersion(data);
                 break;
-            case "#ServerVoll":
-                // TODO: ServerVoll Befehl einbauen
+            case "#ServerFull":
+                StopCoroutine(TestIfStartConnectionError());
+                ServerFull();
                 break;
             case "#SpielerChangeName":
                 SpielerChangeName(data);
@@ -304,6 +331,9 @@ public class StartupClient : MonoBehaviour
 
         Hauptmenue.SetActive(false);
         Lobby.SetActive(true);
+
+        StopCoroutine(TestIfStartConnectionError());
+        StartCoroutine(TestIfStartConnectionError());
     }
     /// <summary>
     /// Ändert den Namen des Spielers
@@ -323,13 +353,23 @@ public class StartupClient : MonoBehaviour
     /// Beendet beitrittsversuche, wenn der Server eine andere Version hat
     /// </summary>
     /// <param name="data">#WrongVersion <version></param>
-    private void WrongVersion(String data)
+    private void WrongVersion(string data)
     {
-        // TODO: Wrongversion testen
         Logging.log(Logging.LogType.Warning, "StartupClient", "WrongVersion", "Client versucht mit einer falschen Version beizutreten. Deine Version: " + Config.APPLICATION_VERSION + "- Benötigte Version: " + data);
         Config.HAUPTMENUE_FEHLERMELDUNG = "Du versuchst mit einer falschen Version beizutreten.\n Deine Version: " + Config.APPLICATION_VERSION + "\n Benötigte Version: " + data;
         CloseSocket();
-        SceneManager.LoadSceneAsync("StartUpScene");
+        SceneManager.LoadSceneAsync("Startup");
+    }
+    /// <summary>
+    /// beendet den Beitrittsversuch, wenn der Server voll ist
+    /// </summary>
+    /// <param name="data"></param>
+    private void ServerFull()
+    {
+        Logging.log(Logging.LogType.Warning, "StartupClient", "ServerFull", "Client versucht beizutreten. Server ist aber voll!");
+        Config.HAUPTMENUE_FEHLERMELDUNG = "Der Server ist bereits voll.";
+        CloseSocket();
+        SceneManager.LoadSceneAsync("Startup");
     }
     /// <summary>
     /// Zeigt das Namensänderungsfeld an

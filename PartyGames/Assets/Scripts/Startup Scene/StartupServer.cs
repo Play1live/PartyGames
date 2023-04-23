@@ -186,9 +186,10 @@ public class StartupServer : MonoBehaviour
     private void AcceptTcpClient(IAsyncResult ar)
     {
         // Spieler sind voll
-        if (Config.SERVER_ALL_CONNECTED)
-          return;
+        // if (Config.SERVER_ALL_CONNECTED)
+        // return;
 
+        Logging.log(Logging.LogType.Debug, "StartupServer", "AcceptTcpClient", "Ein neuer Spieler verbindet sich...");
         // Sucht freien Spieler Platz
         Player freierS = null;
         foreach (Player sp in Config.PLAYERLIST)
@@ -202,9 +203,17 @@ public class StartupServer : MonoBehaviour
         // Spieler sind voll
         if (freierS == null)
         {
-            SendMSG("#ServerVoll", freierS);
+            Logging.log(Logging.LogType.Warning, "StartupServer", "AcceptTcpClient", "Server ist voll. Spieler wird abgelehnt.");
+            Player temp = new Player(100);
+            temp.name = "full";
+            TcpListener ll = (TcpListener)ar.AsyncState;
+            temp.tcp = ll.EndAcceptTcpClient(ar);
+            // Log ausgabe und Clientseite testen weil es nicht geht
+            SendMSG("#ServerFull", temp);
+            startListening();
             return;
         }
+
 
         TcpListener listener = (TcpListener)ar.AsyncState;
         freierS.isConnected = true;
@@ -221,15 +230,13 @@ public class StartupServer : MonoBehaviour
             }
         }
         Config.SERVER_ALL_CONNECTED = tempAllConnected;
-        Debug.Log("Server full: "+ Config.SERVER_ALL_CONNECTED);
         Logging.log(Logging.LogType.Debug, "StartupServer", "AcceptTcpClient", "Server ist voll: " + Config.SERVER_ALL_CONNECTED);
         startListening();
 
         // Sendet neuem Spieler zugehörige ID
         SendMSG("#SetID " + freierS.id, freierS);
-        Logging.log(Logging.LogType.Normal, "Server", "AcceptTcpClient", "Spieler: " + freierS.id + " ist jetzt verbunden. IP:" + freierS.tcp.Client.RemoteEndPoint);
+        Logging.log(Logging.LogType.Normal, "StartupServer", "AcceptTcpClient", "Spieler: " + freierS.id + " ist jetzt verbunden. IP:" + freierS.tcp.Client.RemoteEndPoint);
     }
-
     #endregion
     #region Kommunikation
     /// <summary>
@@ -249,7 +256,7 @@ public class StartupServer : MonoBehaviour
         {
             Logging.log(Logging.LogType.Warning, "Server", "SendMSG", "Nachricht an Client: " + sc.id + " (" + sc.name + ") konnte nicht gesendet werden." + e);
             // Verbindung zum Client wird getrennt
-            //ClientClosed(sc);
+            ClientClosed(sc);
         }
     }
     /// <summary>
@@ -348,7 +355,7 @@ public class StartupServer : MonoBehaviour
                 break;
             case "#PlayerPing":
                 PlayerPing(player, data);
-                UpdatePing();
+                //UpdatePing();
                 break;
 
             // Minigames
@@ -662,7 +669,7 @@ public class StartupServer : MonoBehaviour
         // Spieler hat eine falsche Version
         if (version != Config.APPLICATION_VERSION)
         {
-            Logging.log(Logging.LogType.Warning, "Server", "ClientSetName", "Spieler ID: " + player.id + " versucht mit einer falschen Version beizutreten.Spieler Version: " + version + " | Server Version: " + Config.APPLICATION_VERSION);
+            Logging.log(Logging.LogType.Warning, "StartupServer", "ClientSetName", "Spieler ID: " + player.id + " versucht mit einer falschen Version beizutreten.Spieler Version: " + version + " | Server Version: " + Config.APPLICATION_VERSION);
             SendMSG("#WrongVersion " + Application.version, player);
             ClientClosed(player);
             return;
@@ -1137,6 +1144,8 @@ public class StartupServer : MonoBehaviour
         {
             ServerControlControlField.SetActive(true);
             ServerControlGameSelection.SetActive(false);
+
+            UpdateSpieler();
         }
         else
         {

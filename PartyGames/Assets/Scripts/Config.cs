@@ -10,6 +10,7 @@ public class Config
     public static bool FULLSCREEN = false;
     public static string MedienPath = Application.persistentDataPath + @"\Medien";
     public static bool DEBUG_MODE = false;
+    public static bool APPLICATION_INIT = false;
 
     // Server Infos
     public static bool isServer = false;
@@ -29,12 +30,12 @@ public class Config
     public static TcpClient CLIENT_TCP;
     public static bool CLIENT_STARTED;
 
-    // Spieler
+    // Spieler stats
     public static Player[] PLAYERLIST;
     public static List<Sprite> PLAYER_ICONS;
+    public static int PLAYER_ID = 0;
     public static string PLAYER_NAME = "Spieler" + UnityEngine.Random.Range(1000, 10000);
     public static int MAX_PLAYER_NAME_LENGTH = 12;
-    public static int PLAYER_ID = 0;
     public static DateTime PingTime;
 
     // Spiele
