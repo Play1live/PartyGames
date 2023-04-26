@@ -517,8 +517,8 @@ public class AuktionServer : MonoBehaviour
                 temp = temp.Substring(3);
             msg += "[" + j + "]" + temp + "[" + j + "]";
         }
-        Logging.log(Logging.LogType.Warning, "AuktionServer", "SendImageURLs", "#AuktionDownloadImages " + p.name);
-        SendMessage("#AuktionDownloadImages "+msg, p);
+        Logging.log(Logging.LogType.Warning, "AuktionServer", "SendImageURLs", "#AuktionDownloadImages " + msg + p.name);
+        SendMSG("#AuktionDownloadImages "+msg, p);
     }
     #region Spieler Ausgetabt Anzeige
     /// <summary>
@@ -641,10 +641,17 @@ public class AuktionServer : MonoBehaviour
         }
         else
         {
-            Texture2D texture = ((DownloadHandlerTexture)www.downloadHandler).texture;
-            Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero);
-            BildAnzeige.sprite = sprite;
-            BildAnzeige.gameObject.SetActive(true);
+            try
+            {
+                Texture2D texture = ((DownloadHandlerTexture)www.downloadHandler).texture;
+                Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero);
+                BildAnzeige.sprite = sprite;
+                BildAnzeige.gameObject.SetActive(true);
+            }
+            catch (Exception e)
+            {
+                Logging.log(Logging.LogType.Warning, "AuktionServer", "LoadImageIntoScene", "Custombild konnte nicht geladen werden: " + url + " << ", e);
+            }
         }
         yield return null;
     }

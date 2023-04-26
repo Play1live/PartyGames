@@ -11,6 +11,9 @@ public class Config
     public static string MedienPath = Application.persistentDataPath + @"\Medien";
     public static bool DEBUG_MODE = false;
     public static bool APPLICATION_INIT = false;
+    // Updater Data
+    public static string UPDATER_DOWNLOAD_URL;
+    public static string UPDATER_LATEST_VERSION;
 
     // Server Infos
     public static bool isServer = false;
@@ -49,6 +52,7 @@ public class Config
     public static SloxikonSpiel SLOXIKON_SPIEL;
 
     // Scenenspezifisches
+    public static string GAME_TITLE = "Startup";
     // Hauptmenue
     public static string HAUPTMENUE_FEHLERMELDUNG = "";
     // Lobby

@@ -423,11 +423,19 @@ public class AuktionClient : MonoBehaviour
         }
         else
         {
-            Texture2D texture = ((DownloadHandlerTexture)www.downloadHandler).texture;
-            Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero);
-            BildAnzeige.sprite = sprite;
-            BildAnzeige.gameObject.SetActive(true);
-            SendToServer("#LoadImageIntoSceneSuccess");
+            try
+            {
+                Texture2D texture = ((DownloadHandlerTexture)www.downloadHandler).texture;
+                Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero);
+                BildAnzeige.sprite = sprite;
+                BildAnzeige.gameObject.SetActive(true);
+                SendToServer("#LoadImageIntoSceneSuccess");
+            }
+            catch (Exception e)
+            {
+                Logging.log(Logging.LogType.Warning, "AuktionServer", "LoadImageIntoScene", "Custombild konnte nicht geladen werden: " + url + " << ", e);
+                SendToServer("#ImageDownloadError");
+            }
         }
         yield return null;
     }

@@ -5,6 +5,9 @@ using System.Text;
 
 public class MedienUtil
 {
+    /// <summary>
+    /// Erstellt die für die Gamefiles notwendigen Ordner und Beispieldateien.
+    /// </summary>
     public static void CreateMediaDirectory()
     {
         Logging.log(Logging.LogType.Debug, "MediaUtil", "CreateMediaDirectory", "Erstelle benötigte Ordner für Spieldateien");

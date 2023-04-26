@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -171,6 +172,9 @@ public class StartupServer : MonoBehaviour
         // Verbindung erfolgreich
         Config.HAUPTMENUE_FEHLERMELDUNG = "";
         SperreGameSelection();
+
+        // Sendet PingUpdate alle paar sekunden
+        StartCoroutine(UpdatePingOnTime());
     }
     /// <summary>
     /// Startet das empfangen von Nachrichten von Clients
@@ -368,12 +372,22 @@ public class StartupServer : MonoBehaviour
         }
     }
     /// <summary>
-    /// Fordert alle Spieler auf die RemoteConfig neuzuladen
+    /// Fordert alle Spieler auf die RemoteConfig neuzuladen 
+    /// Lädt die Spieler des Servers neu
     /// </summary>
     public void UpdateRemoteConfig()
     {
         Broadcast("#UpdateRemoteConfig");
         LoadConfigs.FetchRemoteConfig();
+        StartCoroutine(LoadGameFilesAsync());
+    }
+    /// <summary>
+    /// Lädt die vorbereiteten Spieldateien
+    /// </summary>
+    IEnumerator LoadGameFilesAsync()
+    {
+        SetupSpiele.LoadGameFiles();
+        yield return null;
     }
     /// <summary>
     /// Sperrt die Gameselection für 5 Sekunden, um Fehler bei Scenenwechseln in der Verbindung zu verhindern
@@ -502,6 +516,14 @@ public class StartupServer : MonoBehaviour
         }
         Logging.log(Logging.LogType.Debug, "StartupServer", "UpdatePing", msg);
         Broadcast(msg);
+    }
+    IEnumerator UpdatePingOnTime()
+    {
+        while (Config.SERVER_STARTED)
+        {
+            yield return new WaitForSeconds(5);
+            UpdatePing();
+        }
     }
     /// <summary>
     /// Sendet ein Kronenupdate an alle Spieler
@@ -1261,7 +1283,7 @@ public class StartupServer : MonoBehaviour
     public void StarteFlaggen()
     {
         Logging.log(Logging.LogType.Normal, "StartupServer", "StarteFlaggen", "Flaggen starts");
-
+        Config.GAME_TITLE = "Flaggen";
         SceneManager.LoadScene("Flaggen");
         Broadcast("#StarteSpiel Flaggen");
     }
@@ -1272,7 +1294,7 @@ public class StartupServer : MonoBehaviour
     {
         Config.QUIZ_SPIEL.setSelected(Config.QUIZ_SPIEL.getQuizByIndex(drop.value));
         Logging.log(Logging.LogType.Normal, "StartupServer", "StarteQuiz", "Quiz starts: " + Config.QUIZ_SPIEL.getSelected().getTitel());
-
+        Config.GAME_TITLE = "Quiz";
         SceneManager.LoadScene("Quiz");
         Broadcast("#StarteSpiel Quiz");
     }
@@ -1283,7 +1305,7 @@ public class StartupServer : MonoBehaviour
     {
         Config.LISTEN_SPIEL.setSelected(Config.LISTEN_SPIEL.getListe(drop.value));
         Logging.log(Logging.LogType.Normal, "StartupServer", "StarteListen", "Listen starts: " + Config.LISTEN_SPIEL.getSelected().getTitel());
-
+        Config.GAME_TITLE = "Listen";
         SceneManager.LoadScene("Listen");
         Broadcast("#StarteSpiel Listen");
     }
@@ -1294,7 +1316,7 @@ public class StartupServer : MonoBehaviour
     {
         Config.MOSAIK_SPIEL.setSelected(Config.MOSAIK_SPIEL.getMosaik(drop.value));
         Logging.log(Logging.LogType.Normal, "StartupServer", "StarteMosaik", "Mosaik starts: " + Config.MOSAIK_SPIEL.getSelected().getTitel());
-
+        Config.GAME_TITLE = "Mosaik";
         SceneManager.LoadScene("Mosaik");
         Broadcast("#StarteSpiel Mosaik");
     }
@@ -1305,7 +1327,7 @@ public class StartupServer : MonoBehaviour
     {
         Config.GEHEIMWOERTER_SPIEL.setSelected(Config.GEHEIMWOERTER_SPIEL.getListe(drop.value));
         Logging.log(Logging.LogType.Normal, "StartupServer", "StarteGeheimwörter", "Geheimwörter starts: " + Config.GEHEIMWOERTER_SPIEL.getSelected().getTitel());
-
+        Config.GAME_TITLE = "Geheimwörter";
         SceneManager.LoadScene("Geheimwörter");
         Broadcast("#StarteSpiel Geheimwörter");
     }
@@ -1316,7 +1338,7 @@ public class StartupServer : MonoBehaviour
     {
         Config.WERBIETETMEHR_SPIEL.setSelected(Config.WERBIETETMEHR_SPIEL.getQuizByIndex(drop.value));
         Logging.log(Logging.LogType.Normal, "StartupServer", "StarteWerBietetMehr", "WerBietetMehr starts: " + Config.WERBIETETMEHR_SPIEL.getSelected().getTitel());
-
+        Config.GAME_TITLE = "WerBietetMehr";
         SceneManager.LoadScene("WerBietetMehr");
         Broadcast("#StarteSpiel WerBietetMehr");
     }
@@ -1327,10 +1349,9 @@ public class StartupServer : MonoBehaviour
     {
         Config.AUKTION_SPIEL.setSelected(Config.AUKTION_SPIEL.getAuktion(drop.value));
         Logging.log(Logging.LogType.Normal, "StartupServer", "StarteAuktion", "Auktion starts: " + Config.AUKTION_SPIEL.getSelected().getTitel());
-
-        //SceneManager.LoadSceneAsync("Auktion");
-        Broadcast("#StarteSpiel Auktion");
+        Config.GAME_TITLE = "Auktion";
         SceneManager.LoadScene("Auktion");
+        Broadcast("#StarteSpiel Auktion");
     }
     /// <summary>
     /// Starte das Sloxikon Spiel -> Alle Spieler laden in die neue Scene
@@ -1339,10 +1360,9 @@ public class StartupServer : MonoBehaviour
     {
         Config.SLOXIKON_SPIEL.setSelected(Config.SLOXIKON_SPIEL.getQuizByIndex(drop.value));
         Logging.log(Logging.LogType.Normal, "StartupServer", "StarteSloxikon", "Sloxikon starts: " + Config.SLOXIKON_SPIEL.getSelected().getTitel());
-
-        //SceneManager.LoadSceneAsync("Auktion");
-        Broadcast("#StarteSpiel Sloxikon");
+        Config.GAME_TITLE = "Sloxikon";
         SceneManager.LoadScene("Sloxikon");
+        Broadcast("#StarteSpiel Sloxikon");
     }
     #endregion
 

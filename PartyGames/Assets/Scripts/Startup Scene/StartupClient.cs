@@ -146,8 +146,7 @@ public class StartupClient : MonoBehaviour
         Logging.log(Logging.LogType.Normal, "StartupClient", "StarteClient", "Verbindung zwischen Client und Server wird aufgebaut...");
         try
         {
-            Config.CLIENT_TCP = new TcpClient("localhost", Config.SERVER_CONNECTION_PORT); // TODO: entfernen
-            //Config.CLIENT_TCP = new TcpClient(Config.SERVER_CONNECTION_IP, Config.SERVER_CONNECTION_PORT);
+            Config.CLIENT_TCP = new TcpClient(Config.SERVER_CONNECTION_IP, Config.SERVER_CONNECTION_PORT);
             Config.CLIENT_STARTED = true;
             Logging.log(Logging.LogType.Normal, "StartupClient", "StarteClient", "Verbindung wurde erfolgreich aufgebaut.");
             Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server wurde hergestellt.";
@@ -628,6 +627,7 @@ public class StartupClient : MonoBehaviour
     private void StarteSpiel(string data)
     {
         Logging.log(Logging.LogType.Normal, "StartupClient", "StarteSpiel", "Spiel wird geladen: " + data);
+        Config.GAME_TITLE = data;
         switch (data)
         {
             default:

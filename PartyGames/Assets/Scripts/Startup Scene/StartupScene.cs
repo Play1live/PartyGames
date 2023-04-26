@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Text;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public class StartupScene : MonoBehaviour
@@ -14,6 +16,8 @@ public class StartupScene : MonoBehaviour
     [SerializeField] GameObject Lobby;
     [SerializeField] GameObject ServerControl;
 
+    private bool UpdaterIsUpToDate = false;
+
     void Start()
     {
 #if UNITY_EDITOR
@@ -22,9 +26,10 @@ public class StartupScene : MonoBehaviour
 #endif
         /*Testzwecke*/
         Config.DEBUG_MODE = true;
-        Config.isServer = !Config.isServer;
+        //Config.isServer = !Config.isServer;
         //Config.isServer = true;
 
+        Config.GAME_TITLE = "Startup";
         if (!Config.APPLICATION_INIT)
         {
             Logging.log(Logging.LogType.Normal, "StartupScene", "Start", "Application Version: " + Config.APPLICATION_VERSION);
@@ -33,7 +38,9 @@ public class StartupScene : MonoBehaviour
 
             LoadConfigs.FetchRemoteConfig();    // Lädt Config
             MedienUtil.CreateMediaDirectory();
+            StartCoroutine(UpdateGameUpdater());
             StartCoroutine(LoadGameFilesAsync());
+            StartCoroutine(EnableConnectionButton());
 
             // Init PlayerlistZeigt die geladenen Spiele in der GameÜbersicht an
             if (Config.PLAYERLIST == null)
@@ -58,7 +65,7 @@ public class StartupScene : MonoBehaviour
         }
         // Zeigt den temporären Spielernamen an
         if (Hauptmenue.activeInHierarchy)
-            GameObject.Find("ChooseYourName_TXT").gameObject.GetComponent<TMP_InputField>().text = Config.PLAYER_NAME;
+            Hauptmenue.transform.GetChild(3).GetComponent<TMP_InputField>().text = Config.PLAYER_NAME;
 
 
         StartCoroutine(AutostartServer());
@@ -96,6 +103,116 @@ public class StartupScene : MonoBehaviour
     }
 
     /// <summary>
+    /// Aktualisiert den Updater sofern dieser veraltet ist
+    /// </summary>
+    IEnumerator UpdateGameUpdater()
+    {
+        Config.HAUPTMENUE_FEHLERMELDUNG = "Initialisiere Spieldateien...";
+        yield return new WaitForSeconds(3);
+        yield return new WaitUntil(() => Config.SERVER_CONNECTION_IP != "localhost"); // RemoteConfig wurd geladen
+#if UNITY_EDITOR
+        UpdaterIsUpToDate = true;
+        Config.HAUPTMENUE_FEHLERMELDUNG = "";
+        yield break;
+#endif
+        yield return null;
+        // Erstelle den Path zur Versionsdatei des Updaters
+        Logging.log(Logging.LogType.Debug, "StartupScene", "UpdateGameUpdater", "Starte die Aktualisierung des Updaters.");
+        string datapath = Application.dataPath;
+        string GameFiles = datapath.Split('/')[datapath.Split('/').Length - 1];
+        string UpdaterFiles = datapath.Split('/')[datapath.Split('/').Length - 2];
+        string UpdaterVersionPath = datapath.Replace("/" + GameFiles, "").Replace("\\" + GameFiles, "").Replace("/" + UpdaterFiles, "").Replace("\\" + UpdaterFiles, "");
+        Logging.log(Logging.LogType.Debug, "StartupScene", "UpdateGameUpdater", "Updaterversion File: " + UpdaterVersionPath + "/Version.txt");
+        
+        // Lösche alten UpdateZip
+        if (File.Exists(UpdaterVersionPath + @"/Updater.zip"))
+            File.Delete(UpdaterVersionPath + @"/Updater.zip");
+
+        // Lade Version des Updaters
+        string updaterVersion = "";
+        if (File.Exists(UpdaterVersionPath + "/Version.txt"))
+        {
+            updaterVersion = File.ReadAllText(UpdaterVersionPath + "/Version.txt");
+        }
+        else
+        {
+            Logging.log(Logging.LogType.Error, "StartupScene", "UpdateGameUpdater", "Updaterversion konnte nicht gefunden werden. Path: " + UpdaterVersionPath + "/Version.txt");
+            if (!File.Exists(UpdaterVersionPath + "/PartyGamesUpdater.exe"))
+            {
+                Config.HAUPTMENUE_FEHLERMELDUNG = "";
+                UpdaterIsUpToDate = true;
+                yield break;
+            }
+        }
+
+        // Prüfe Versionen
+        if (Config.UPDATER_LATEST_VERSION != updaterVersion)
+        {
+            Config.HAUPTMENUE_FEHLERMELDUNG = "Updater ist veraltet und wird nun aktualisiert...";
+            Logging.log(Logging.LogType.Normal, "StartupScene", "UpdateGameUpdater", "Updater ist veraltet.");
+            UnityWebRequest dlreq = new UnityWebRequest(Config.UPDATER_DOWNLOAD_URL);
+            dlreq.downloadHandler = new DownloadHandlerFile(UpdaterVersionPath + @"/Updater.zip");
+            UnityWebRequestAsyncOperation op = dlreq.SendWebRequest();
+            while (!op.isDone)
+            {
+                yield return null;
+            }
+            if (dlreq.result.Equals(dlreq.error))
+            {
+                Config.HAUPTMENUE_FEHLERMELDUNG = "Updater konnte nicht aktualisiert werden, bitte starte das Spiel einmal neu.";
+                Logging.log(Logging.LogType.Error, "StartupScene", "DownloadUpdater", "Updater konnte nicht heruntergeladen werden. " + dlreq.error);
+                UpdaterIsUpToDate = true;
+                yield break;
+            }
+            else
+            {
+                Config.HAUPTMENUE_FEHLERMELDUNG = "Updater ist veraltet und wird nun aktualisiert..";
+                Logging.log(Logging.LogType.Normal, "StartupScene", "DownloadUpdater", "Updater wurde erfolgreich heruntergeladen.");
+            }
+            dlreq.Dispose();
+
+            yield return new WaitForSeconds(0.2f);
+            #region Unzip File
+            Config.HAUPTMENUE_FEHLERMELDUNG = "Updater ist veraltet und wird nun aktualisiert.";
+            Logging.log(Logging.LogType.Normal, "StartupScene", "DownloadUpdater", "Updaterdateien werden entpackt.");
+            ZipFile.ExtractToDirectory(UpdaterVersionPath + @"/Updater.zip", UpdaterVersionPath, true);
+            Logging.log(Logging.LogType.Normal, "StartupScene", "DownloadUpdater", "Updaterdateien wurden erfolgreich entpackt.");
+            #endregion
+
+            Config.HAUPTMENUE_FEHLERMELDUNG = "Updater wurde erfolgreich aktualisiert.";
+
+            // Lösche alten Version File
+            if (File.Exists(UpdaterVersionPath + "/Version.txt"))
+                File.Delete(UpdaterVersionPath + "/Version.txt");
+
+            // Lösche alten UpdateZip
+            if (File.Exists(UpdaterVersionPath + @"/Updater.zip"))
+                File.Delete(UpdaterVersionPath + @"/Updater.zip");
+
+            UpdaterIsUpToDate = true;
+            yield return null;
+        }
+        else
+        {
+            Config.HAUPTMENUE_FEHLERMELDUNG = "";
+            Logging.log(Logging.LogType.Normal, "StartupScene", "UpdateGameUpdater", "Updater ist bereits aktuell.");
+            UpdaterIsUpToDate = true;
+            yield break;
+        }
+    }
+    /// <summary>
+    /// Aktiviert den Verbinden Button, nachdem die RemoteConfig erfolgreich geladen wurde, damit die Spieler nicht 
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator EnableConnectionButton()
+    {
+        Hauptmenue.transform.GetChild(4).gameObject.SetActive(false);
+        yield return new WaitUntil(() => Config.SERVER_CONNECTION_IP != "localhost"); // RemoteConfig wurd geladen
+        yield return new WaitUntil(() => UpdaterIsUpToDate == true); // Warte bis die Version des Updater aktualisiert wurde
+        Logging.log(Logging.LogType.Debug, "StartupScene", "EnableConnectionButton", "Spieler darf sich nun verbinden.");
+        Hauptmenue.transform.GetChild(4).gameObject.SetActive(true);
+    }
+    /// <summary>
     /// Startet den Server automatisch.
     /// Wenn die IP-Adresse nicht aktualisiert werden konnte, dann wird abgebrochen.
     /// </summary>
@@ -105,7 +222,7 @@ public class StartupScene : MonoBehaviour
         {
             // Updatet die IP-Adresse nachdem die RemoteConfig geladen wurde
             yield return new WaitUntil(() => Config.SERVER_CONNECTION_IP != "localhost");
-            GameObject.Find("Hauptmenue/IPandPort").GetComponent<TMP_Text>().text = Config.SERVER_CONNECTION_IP + ":" + Config.SERVER_CONNECTION_PORT;
+            Hauptmenue.transform.GetChild(0).GetComponent<TMP_Text>().text = Config.SERVER_CONNECTION_IP + ":" + Config.SERVER_CONNECTION_PORT;
             bool updatedSuccessful = new UpdateIpAddress().UpdateNoIP_DNS();
 
             yield return new WaitForSeconds(1);
@@ -150,9 +267,9 @@ public class StartupScene : MonoBehaviour
             input.text = input.text.Substring(0, Config.MAX_PLAYER_NAME_LENGTH);
 
         if (input.text.Length < 3)
-            GameObject.Find("ConnectToServer_BTN").GetComponent<Button>().interactable = false;
+            Hauptmenue.transform.GetChild(4).GetComponent<Button>().interactable = false;
         else
-            GameObject.Find("ConnectToServer_BTN").GetComponent<Button>().interactable = true;
+            Hauptmenue.transform.GetChild(4).GetComponent<Button>().interactable = true;
     }
     /// <summary>
     /// Beendet das Spiel auf Button
@@ -199,6 +316,15 @@ public class StartupScene : MonoBehaviour
                 byte[] info = new UTF8Encoding(true).GetBytes(Config.APPLICATION_VERSION);
                 // Add some information to the file.
                 fs.Write(info, 0, info.Length);
+            }
+        }
+        else
+        {
+            string version = File.ReadAllText(Application.dataPath.Replace("\\PartyGames_Data", "").Replace("/PartyGames_Data", "") + @"/Version.txt");
+            if (version != Config.APPLICATION_VERSION)
+            {
+                File.Delete(Application.dataPath.Replace("\\PartyGames_Data", "").Replace("/PartyGames_Data", "") + @"/Version.txt");
+                WriteGameVersionFile();
             }
         }
         Logging.log(Logging.LogType.Debug, "StartupScene", "WriteGameVersionFile", "Spiel Version wurde für den Updater aktualisiert.");

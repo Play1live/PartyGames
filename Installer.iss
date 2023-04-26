@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "PartyGames"
-#define MyAppVersion "1.8"
+#define MyAppVersion "1.9"
 #define MyAppPublisher "Play1live"
 #define MyAppExeName "PartyGamesUpdater.exe"
 #define MyAppAssocName MyAppName + ""
@@ -25,7 +25,7 @@ DisableProgramGroupPage=yes
 PrivilegesRequired=lowest
 OutputDir=C:\Users\henry\Desktop
 OutputBaseFilename=PartyGames Installer
-SetupIconFile=C:\Users\henry\Desktop\PartyGames\PartyGames\Assets\Media\Images\Spielshows_Logo.ico
+SetupIconFile=E:\ActiveCoding\PartyGames\PartyGames\Assets\Media\Images\Spielshows_Logo.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
@@ -37,8 +37,8 @@ Name: "german"; MessagesFile: "compiler:Languages\German.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Users\henry\Desktop\PartyGames\PartyGamesUpdater\Builds\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\henry\Desktop\PartyGames\PartyGamesUpdater\Builds\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "E:\ActiveCoding\PartyGames\PartyGamesUpdater\Builds\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "E:\ActiveCoding\PartyGames\PartyGamesUpdater\Builds\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Registry]

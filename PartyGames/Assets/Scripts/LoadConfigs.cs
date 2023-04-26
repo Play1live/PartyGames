@@ -31,6 +31,11 @@ public class LoadConfigs
         Config.FULLSCREEN = ConfigManager.appConfig.GetBool("Program_Fullscreen");
         Logging.log(Logging.LogType.Debug, "LoadConfigs", "ApplyRemoteSettings", "Fullscreen: " + Config.FULLSCREEN);
 
+        Config.UPDATER_DOWNLOAD_URL = ConfigManager.appConfig.GetString("Updater_Download_Link");
+        Logging.log(Logging.LogType.Debug, "LoadConfigs", "ApplyRemoteSettings", "Updater URL: " + Config.UPDATER_DOWNLOAD_URL);
+        Config.UPDATER_LATEST_VERSION = ConfigManager.appConfig.GetString("Updater_Download_Version");
+        Logging.log(Logging.LogType.Debug, "LoadConfigs", "ApplyRemoteSettings", "Updater Version: " + Config.UPDATER_LATEST_VERSION);
+
         MoveToPrimaryDisplay(); // Schiebt das Programm auf den Primären Monitor
         Logging.log(Logging.LogType.Normal, "LoadConfigs", "ApplyRemoteSettings", "Fetching Config completed...");
     }

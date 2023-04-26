@@ -791,7 +791,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e4f1b1ff916a2cc4f824397fe7724cf6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  url: 
   type: {fileID: 997996366}
   slider: {fileID: 1547824680}
 --- !u!4 &1054705960
@@ -963,7 +962,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 0}
   m_FillRect: {fileID: 161335547}
   m_HandleRect: {fileID: 0}

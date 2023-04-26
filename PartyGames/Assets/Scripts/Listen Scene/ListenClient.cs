@@ -929,7 +929,7 @@ public class ListenClient : MonoBehaviour
     private void ListenAufloesen(string data)
     {
         // Bereits eingefügtes mit Infos versehen
-        string[] msg = data.Replace("[]","|").Split('|');
+        string[] msg = data.Replace("<#!#>", "|").Split('|');
         for (int i = 0; i < msg.Length; i++)
         {
             int index = Int32.Parse(msg[i].Replace("[TRENNER]", "|").Split('|')[0]);
