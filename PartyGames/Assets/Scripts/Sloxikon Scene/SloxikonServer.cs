@@ -13,6 +13,9 @@ public class SloxikonServer : MonoBehaviour
     GameObject BuzzerAnzeige;
     bool buzzerIsOn = false;
     int aktuellesThema = 0;
+
+    int serverantwort = 0;
+
     GameObject AustabbenAnzeigen;
     GameObject TextEingabeAnzeige;
     GameObject TextAntwortenAnzeige;
@@ -31,6 +34,8 @@ public class SloxikonServer : MonoBehaviour
     void OnEnable()
     {
         PlayerConnected = new bool[Config.SERVER_MAX_CONNECTIONS];
+        if (!Config.SERVER_STARTED)
+            return;
         InitAnzeigen();
         InitSloxikon();
     }
@@ -184,7 +189,7 @@ public class SloxikonServer : MonoBehaviour
                 ClientFocusChange(player, data);
                 break;
 
-            case "#JoinQuiz":
+            case "#JoinSloxikon":
                 PlayerConnected[player.id - 1] = true;
                 UpdateSpielerBroadcast();
                 break;
@@ -264,7 +269,6 @@ public class SloxikonServer : MonoBehaviour
     private void InitAnzeigen()
     {
         Logging.log(Logging.LogType.Debug, "SloxikonServer", "InitAnzeigen", "Initialisiert die Anzeigen");
-        GameObject.Find("ServerSide/FrageAnzeigenToggle").GetComponent<Toggle>().isOn = false;
         // Buzzer Deaktivieren
         GameObject.Find("ServerSide/BuzzerAktivierenToggle").GetComponent<Toggle>().isOn = false;
         BuzzerAnzeige = GameObject.Find("ServerSide/BuzzerIstAktiviert");
@@ -274,13 +278,6 @@ public class SloxikonServer : MonoBehaviour
         GameObject.Find("ServerSide/AusgetabtSpielernZeigenToggle").GetComponent<Toggle>().isOn = false;
         AustabbenAnzeigen = GameObject.Find("ServerSide/AusgetabtWirdSpielernGezeigen");
         AustabbenAnzeigen.SetActive(false);
-        // Spieler Texteingabe
-        GameObject.Find("ServerSide/TexteingabeAnzeigenToggle").GetComponent<Toggle>().isOn = false;
-        TextEingabeAnzeige = GameObject.Find("ServerSide/TexteingabeWirdAngezeigt");
-        TextEingabeAnzeige.SetActive(false);
-        GameObject.Find("ServerSide/TextantwortenAnzeigenToggle").GetComponent<Toggle>().isOn = false;
-        TextAntwortenAnzeige = GameObject.Find("ServerSide/TextantwortenWerdenAngezeigt");
-        TextAntwortenAnzeige.SetActive(false);
         // Punkte Pro Richtige Antwort
         GameObject.Find("ServerSide/PunkteProRichtigeAntwort").GetComponent<TMP_InputField>().text = ""+PunkteProRichtige;
         // Punkte Pro Falsche Antwort
@@ -303,14 +300,6 @@ public class SloxikonServer : MonoBehaviour
             SpielerAnzeige[i, 3].SetActive(false); // Ausgetabt Einblendung
             SpielerAnzeige[i, 6].SetActive(true); // Spieler Antwort
         }
-        // Change Quiz
-        GameObject ChangeQuiz = GameObject.Find("ServerSide/ChangeQuiz");
-        ChangeQuiz.GetComponent<TMP_Dropdown>().ClearOptions();
-        List<string> quizzes = new List<string>();
-        foreach (Quiz quiz in Config.QUIZ_SPIEL.getQuizze())
-            quizzes.Add(quiz.getTitel());
-        ChangeQuiz.GetComponent<TMP_Dropdown>().AddOptions(quizzes);
-        ChangeQuiz.GetComponent<TMP_Dropdown>().value = Config.QUIZ_SPIEL.getIndex(Config.QUIZ_SPIEL.getSelected());
     }
     #region Sloxikon Anzeige
     /// <summary>
@@ -318,25 +307,145 @@ public class SloxikonServer : MonoBehaviour
     /// </summary>
     private void InitSloxikon()
     {
-        aktuellesThema = 0;
-        GameObject.Find("Server/Titel").GetComponent<TMP_Text>().text = Config.SLOXIKON_SPIEL.getSelected().getTitel();
+        Logging.log(Logging.LogType.Debug, "InitSloxikon", "InitAnzeigen", "Initialisiert Sloxikonanzeigen");
+        GameObject.Find("Sloxikon/Titel").GetComponent<TMP_Text>().text = "";//Config.SLOXIKON_SPIEL.getSelected().getTitel();
         GameObject.Find("Server/ThemenVorschau").GetComponent<TMP_Text>().text = Config.SLOXIKON_SPIEL.getSelected().getThemenListe();
+        aktuellesThema = 0;
+        GameObject.Find("Server/Element").GetComponent<TMP_Text>().text = Config.SLOXIKON_SPIEL.getSelected().getThemen()[aktuellesThema];
         Thema = GameObject.Find("Sloxikon/Thema");
         Thema.SetActive(false);
-        Antworten = new GameObject[10];
-        for (int i = 0; i < 10; i++)
+        Antworten = new GameObject[9];
+        for (int i = 0; i < 9; i++)
         {
-            Antworten[i] = GameObject.Find("Sloxikon/Grid/Answer ("+i+")");
+            Antworten[i] = GameObject.Find("Sloxikon/Grid/Answer ("+(i+1)+")");
             Antworten[i].SetActive(false);
+            Antworten[i].transform.GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/ProfileIcons/empty");
+            Antworten[i].transform.GetChild(2).GetComponentInChildren<TMP_InputField>().text = "";
+            GameObject grid = Antworten[i].transform.GetChild(3).gameObject;
+
+            for (int j = 0; j < 8; j++)
+            {
+                GameObject child = grid.transform.GetChild(j).gameObject;
+                if (Config.SERVER_MAX_CONNECTIONS > j && Config.PLAYERLIST[j].isConnected)
+                {
+                    child.GetComponent<Image>().sprite = Config.PLAYERLIST[j].icon;
+                    child.GetComponent<Image>().color = new Color(255, 255, 255, 0.5f);
+                    child.gameObject.SetActive(true);
+                }
+                else
+                {
+                    child.GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/ProfileIcons/empty");
+                    child.GetComponent<Image>().color = new Color(255, 255, 255, 1);
+                    child.gameObject.SetActive(false);
+                }
+            }
         }
     }
-    /// <summary>
-    /// Ändert das ausgewählte Quiz
-    /// </summary>
-    /// <param name="drop"></param>
-    public void ChangeQuiz(TMP_Dropdown drop)
+
+    public void NavigateThrough(int vor)
     {
-        
+        if ((aktuellesThema + vor) >= Config.SLOXIKON_SPIEL.getSelected().getThemen().Count)
+        {
+            aktuellesThema = Config.SLOXIKON_SPIEL.getSelected().getThemen().Count - 1;
+            return;
+        }
+        if ((aktuellesThema + vor) < 0)
+        {
+            aktuellesThema = 0;
+            return;
+        }
+        aktuellesThema = aktuellesThema + vor;
+        GameObject.Find("Server/Element").GetComponent<TMP_Text>().text = Config.SLOXIKON_SPIEL.getSelected().getThemen()[aktuellesThema];
+    }
+    public void ShowTitel()
+    {
+        Broadcast("SloxikonShowTitel " + Config.SLOXIKON_SPIEL.getSelected().getTitel());
+        GameObject.Find("Sloxikon/Titel").GetComponent<TMP_Text>().text = Config.SLOXIKON_SPIEL.getSelected().getTitel();
+    }
+    public void HideAll()
+    {
+
+    }
+    public void ShowThema()
+    {
+        Broadcast("SloxikonShowThema " + Config.SLOXIKON_SPIEL.getSelected().getThemen()[aktuellesThema]);
+        Thema.SetActive(true);
+        Thema.GetComponentInChildren<TMP_InputField>().text = Config.SLOXIKON_SPIEL.getSelected().getThemen()[aktuellesThema];
+
+
+        // Zuweisung wer welche antwort gibt
+        List<int> list = new List<int>();
+        list.Add(0);
+        for (int i = 0; i < Config.PLAYERLIST.Length; i++)
+        {
+            if (Config.PLAYERLIST[i].isConnected)
+                list.Add(list.Count);
+        }
+        int anzahl = list.Count;
+        for (int i = 0; i < Config.PLAYERLIST.Length; i++)
+        {
+            if (Config.PLAYERLIST[i].isConnected)
+            {
+                int random = UnityEngine.Random.Range(0, list.Count);
+                Antworten[random].transform.GetChild(1).GetComponent<Image>().sprite = Config.PLAYERLIST[i].icon;
+                Antworten[random].transform.GetChild(1).GetComponentInChildren<TMP_Text>().text = "" + Config.PLAYERLIST[i].id;
+                Antworten[random].transform.GetChild(1).GetComponent<Image>().color = new Color(255, 255, 255, 0.5f);
+                //Antworten[random].transform.GetChild(1).GetComponentInChildren<TMP_Text>().gameObject.SetActive(false);
+                // eher unsichtbar machen sonst error
+                list.Remove(random);
+            }
+        }
+        // Blendet spielerselect aus
+        for (int j = 0; j < Config.PLAYERLIST.Length; j++)
+        {
+            if (Config.PLAYERLIST[j].isConnected)
+            {
+                for (int i = 0; i < 8; i++)
+                {
+                    Antworten[i].transform.GetChild(3).GetComponent<Image>().sprite = Config.PLAYERLIST[j].icon;
+                    Antworten[i].transform.GetChild(3).GetComponent<Image>().color = new Color(255, 255, 255, 0.5f);
+                    Antworten[i].transform.GetChild(3).gameObject.SetActive(true);
+                }
+            }
+        }
+        // Serverantwort
+        Antworten[list[0]].transform.GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/ProfileIcons/empty");
+        Antworten[list[0]].transform.GetChild(1).GetComponentInChildren<TMP_Text>().text = "0";
+        Antworten[list[0]].transform.GetChild(1).GetComponent<Image>().color = new Color(255, 255, 255, 0.5f);
+        //Antworten[list[0]].transform.GetChild(1).GetComponentInChildren<TMP_Text>().gameObject.SetActive(false);
+        // eher unsichtbar machen sonst error
+        serverantwort = list[0];
+        // Vorgefertigte Antwort zeigen
+        Antworten[serverantwort].transform.GetChild(2).GetComponentInChildren<TMP_InputField>().text = Config.SLOXIKON_SPIEL.getSelected().getAntwort()[aktuellesThema];
+    }
+    public void ShowAllAntworten()
+    {
+        // für den Server vorher schon anzeigen
+
+        string msg = "";
+        for (int i = 0; i < 9; i++)
+        {
+            msg += "[" + i + "]" + Antworten[i].transform.GetChild(2).GetComponentInChildren<TMP_InputField>().text + "[" + i + "]";
+            // Blendet ShowTXT button aus
+            Antworten[i].transform.GetChild(0).GetChild(0).GetComponent<Button>().enabled = false;
+        }
+        Broadcast("SloxikonShowAllAntworten " + msg);
+    }
+    public void ShowAntwort(int antwortindex)
+    {
+        string msg = "";
+        msg += "[" + antwortindex + "]" + Antworten[antwortindex].transform.GetChild(2).GetComponentInChildren<TMP_InputField>().text + "[" + antwortindex + "]";
+        // Blendet ShowTXT button aus
+        Antworten[antwortindex].transform.GetChild(0).GetChild(0).GetComponent<Button>().enabled = false;
+        Broadcast("SloxikonShowAllAntworten " + msg);       
+    }
+    public void ShowOwner(int ownerindex)
+    {
+
+    }
+    public void PlayerSelectAnswer(GameObject Player)
+    {
+
     }
     #endregion
     #region Buzzer

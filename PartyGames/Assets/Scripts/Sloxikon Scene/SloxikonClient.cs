@@ -20,10 +20,10 @@ public class SloxikonClient : MonoBehaviour
 
     void OnEnable()
     {
-        InitAnzeigen();
-
         if (!Config.CLIENT_STARTED)
             return;
+
+        InitAnzeigen();
         SendToServer("#JoinSloxikon");
 
         StartCoroutine(TestConnectionToServer());
