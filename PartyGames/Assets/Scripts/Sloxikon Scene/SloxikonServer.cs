@@ -390,9 +390,12 @@ public class SloxikonServer : MonoBehaviour
                 Antworten[random].transform.GetChild(1).GetComponent<Image>().sprite = Config.PLAYERLIST[i].icon;
                 Antworten[random].transform.GetChild(1).GetComponentInChildren<TMP_Text>().text = "" + Config.PLAYERLIST[i].id;
                 Antworten[random].transform.GetChild(1).GetComponent<Image>().color = new Color(255, 255, 255, 0.5f);
+                Antworten[random].transform.GetChild(0).GetChild(1).GetComponent<Button>().interactable = true;
+                Antworten[list[0]].transform.GetChild(0).GetChild(0).GetComponent<Button>().interactable = true;
                 //Antworten[random].transform.GetChild(1).GetComponentInChildren<TMP_Text>().gameObject.SetActive(false);
                 // eher unsichtbar machen sonst error
                 list.Remove(random);
+                Antworten[random].SetActive(true);
             }
         }
         // Blendet spielerselect aus
@@ -412,6 +415,9 @@ public class SloxikonServer : MonoBehaviour
         Antworten[list[0]].transform.GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/ProfileIcons/empty");
         Antworten[list[0]].transform.GetChild(1).GetComponentInChildren<TMP_Text>().text = "0";
         Antworten[list[0]].transform.GetChild(1).GetComponent<Image>().color = new Color(255, 255, 255, 0.5f);
+        Antworten[list[0]].transform.GetChild(0).GetChild(0).GetComponent<Button>().interactable = true;
+        Antworten[list[0]].transform.GetChild(0).GetChild(1).GetComponent<Button>().interactable = true;
+        Antworten[list[0]].SetActive(true);
         //Antworten[list[0]].transform.GetChild(1).GetComponentInChildren<TMP_Text>().gameObject.SetActive(false);
         // eher unsichtbar machen sonst error
         serverantwort = list[0];
@@ -421,31 +427,43 @@ public class SloxikonServer : MonoBehaviour
     public void ShowAllAntworten()
     {
         // für den Server vorher schon anzeigen
+        int anz = 0;
+        for (int i = 0; i < 9; i++)
+        {
+            if (Antworten[i].activeInHierarchy)
+                anz++;
+        }
 
         string msg = "";
         for (int i = 0; i < 9; i++)
         {
             msg += "[" + i + "]" + Antworten[i].transform.GetChild(2).GetComponentInChildren<TMP_InputField>().text + "[" + i + "]";
             // Blendet ShowTXT button aus
-            Antworten[i].transform.GetChild(0).GetChild(0).GetComponent<Button>().enabled = false;
+            Antworten[i].transform.GetChild(0).GetChild(0).GetComponent<Button>().interactable = false;
         }
-        Broadcast("SloxikonShowAllAntworten " + msg);
+        Broadcast("SloxikonShowAllAntworten " + anz + "~" + msg);
     }
     public void ShowAntwort(int antwortindex)
     {
-        string msg = "";
-        msg += "[" + antwortindex + "]" + Antworten[antwortindex].transform.GetChild(2).GetComponentInChildren<TMP_InputField>().text + "[" + antwortindex + "]";
+        antwortindex = antwortindex - 1;
+        string msg = antwortindex + "~" + Antworten[antwortindex].transform.GetChild(2).GetComponentInChildren<TMP_InputField>().text;
         // Blendet ShowTXT button aus
-        Antworten[antwortindex].transform.GetChild(0).GetChild(0).GetComponent<Button>().enabled = false;
-        Broadcast("SloxikonShowAllAntworten " + msg);       
+        Antworten[antwortindex].transform.GetChild(0).GetChild(0).GetComponent<Button>().interactable = false;
+        Broadcast("SloxikonShowAntwort " + msg);       
     }
     public void ShowOwner(int ownerindex)
     {
-
+        ownerindex = ownerindex - 1;
+        Antworten[ownerindex].transform.GetChild(1).GetComponent<Image>().color = new Color(255, 255, 255, 1f);
+        // Blendet ShowTXT button aus
+        Antworten[ownerindex].transform.GetChild(0).GetChild(1).GetComponent<Button>().interactable = false;
+        Broadcast("SloxikonShowOwner" + ownerindex + "~" + Antworten[ownerindex].transform.GetChild(1).GetComponent<Image>().sprite.name);
     }
     public void PlayerSelectAnswer(GameObject Player)
     {
-
+        Debug.LogWarning(Player.name);
+        Debug.LogWarning(Player.transform.parent.name);
+        Debug.LogWarning(Player.transform.parent.parent.name);
     }
     #endregion
     #region Buzzer
