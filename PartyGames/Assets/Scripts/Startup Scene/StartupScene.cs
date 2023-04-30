@@ -115,7 +115,9 @@ public class StartupScene : MonoBehaviour
         Config.HAUPTMENUE_FEHLERMELDUNG = "";
         yield break;
 #endif
+#pragma warning disable CS0162 // Unerreichbarer Code wurde entdeckt. (ist aber erreichbar)
         yield return null;
+#pragma warning restore CS0162 // Unerreichbarer Code wurde entdeckt. (ist aber erreichbar)
         // Erstelle den Path zur Versionsdatei des Updaters
         Logging.log(Logging.LogType.Debug, "StartupScene", "UpdateGameUpdater", "Starte die Aktualisierung des Updaters.");
         string datapath = Application.dataPath;

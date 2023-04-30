@@ -13,12 +13,13 @@ public class SloxikonServer : MonoBehaviour
     GameObject BuzzerAnzeige;
     bool buzzerIsOn = false;
     int aktuellesThema = 0;
-
-    int serverantwort = 0;
+    bool liveupdate = false;
+    string[] playeranswers;
 
     GameObject AustabbenAnzeigen;
     GameObject TextEingabeAnzeige;
     GameObject TextAntwortenAnzeige;
+    GameObject PlayerLiveUpdateAnzeige;
     GameObject[,] SpielerAnzeige;
     bool[] PlayerConnected;
     int PunkteProRichtige = 3;
@@ -307,10 +308,13 @@ public class SloxikonServer : MonoBehaviour
     /// </summary>
     private void InitSloxikon()
     {
-        Logging.log(Logging.LogType.Debug, "InitSloxikon", "InitAnzeigen", "Initialisiert Sloxikonanzeigen");
+        Logging.log(Logging.LogType.Debug, "SloxikonServer", "InitSloxikon", "Initialisiert Sloxikonanzeigen");
         GameObject.Find("Sloxikon/Titel").GetComponent<TMP_Text>().text = "";//Config.SLOXIKON_SPIEL.getSelected().getTitel();
         GameObject.Find("Server/ThemenVorschau").GetComponent<TMP_Text>().text = Config.SLOXIKON_SPIEL.getSelected().getThemenListe();
+        playeranswers = new string[Config.PLAYERLIST.Length];
         aktuellesThema = 0;
+        PlayerLiveUpdateAnzeige = GameObject.Find("Server/PlayerLiveAnswerUpdateAnzeige");
+        PlayerLiveUpdateAnzeige.SetActive(false);
         GameObject.Find("Server/Element").GetComponent<TMP_Text>().text = Config.SLOXIKON_SPIEL.getSelected().getThemen()[aktuellesThema];
         Thema = GameObject.Find("Sloxikon/Thema");
         Thema.SetActive(false);
@@ -341,7 +345,10 @@ public class SloxikonServer : MonoBehaviour
             }
         }
     }
-
+    /// <summary>
+    /// Navigiert durch die Themen
+    /// </summary>
+    /// <param name="vor">+-1 (vor/zurück)</param>
     public void NavigateThrough(int vor)
     {
         if ((aktuellesThema + vor) >= Config.SLOXIKON_SPIEL.getSelected().getThemen().Count)
@@ -359,73 +366,108 @@ public class SloxikonServer : MonoBehaviour
     }
     public void ShowTitel()
     {
-        Broadcast("SloxikonShowTitel " + Config.SLOXIKON_SPIEL.getSelected().getTitel());
+        Logging.log(Logging.LogType.Debug, "SloxikonServer", "ShowTitel", "Zeige Titel des Games an. " + Config.SLOXIKON_SPIEL.getSelected().getTitel());
+        Broadcast("#SloxikonShowTitel " + Config.SLOXIKON_SPIEL.getSelected().getTitel());
         GameObject.Find("Sloxikon/Titel").GetComponent<TMP_Text>().text = Config.SLOXIKON_SPIEL.getSelected().getTitel();
     }
+    /// <summary>
+    /// Blendet alle Anzeigen aus
+    /// </summary>
     public void HideAll()
     {
-
+        Logging.log(Logging.LogType.Debug, "SloxikonServer", "HideAll", "Blendet Anzeigen aus");
+        Broadcast("#SloxikonHideAll");
+        Thema.SetActive(false);
+        // Falls jemand disconnected alle Anzeigen ausblenden
+        for (int i = 0; i < Config.PLAYERLIST.Length + 1; i++)
+        {
+            Antworten[i].SetActive(false);
+        }
     }
+    /// <summary>
+    /// Blendet ausgewähltes Thema ein
+    /// </summary>
     public void ShowThema()
     {
-        Broadcast("SloxikonShowThema " + Config.SLOXIKON_SPIEL.getSelected().getThemen()[aktuellesThema]);
+        Logging.log(Logging.LogType.Debug, "SloxikonServer", "ShowThema", "Zeige neues Thema. " + Config.SLOXIKON_SPIEL.getSelected().getThemen()[aktuellesThema]);
+        // Zuweisung wer welche antwort gibt
+        List<int> playerList = new List<int>();
+        playerList.Add(0);
+        for (int i = 0; i < Config.PLAYERLIST.Length; i++)
+        {
+            if (Config.PLAYERLIST[i].isConnected)
+                playerList.Add(Config.PLAYERLIST[i].id);
+        }
+        List<int> positionList = new List<int>();
+        positionList.AddRange(playerList);
+
+        Broadcast("#SloxikonShowThema " + Config.SLOXIKON_SPIEL.getSelected().getThemen()[aktuellesThema] + "|" + playerList.Count);
         Thema.SetActive(true);
         Thema.GetComponentInChildren<TMP_InputField>().text = Config.SLOXIKON_SPIEL.getSelected().getThemen()[aktuellesThema];
 
+        // Falls jemand disconnected alle Anzeigen ausblenden
+        for (int i = 0; i < Config.PLAYERLIST.Length + 1; i++)
+        {
+            Antworten[i].SetActive(false);
+        }
 
-        // Zuweisung wer welche antwort gibt
-        List<int> list = new List<int>();
-        list.Add(0);
-        for (int i = 0; i < Config.PLAYERLIST.Length; i++)
+        while (playerList.Count > 0)
         {
-            if (Config.PLAYERLIST[i].isConnected)
-                list.Add(list.Count);
-        }
-        int anzahl = list.Count;
-        for (int i = 0; i < Config.PLAYERLIST.Length; i++)
-        {
-            if (Config.PLAYERLIST[i].isConnected)
+            int pid = playerList[UnityEngine.Random.Range(0, playerList.Count)];
+            playerList.Remove(pid);
+            int pos = positionList[UnityEngine.Random.Range(0, playerList.Count)];
+            positionList.Remove(pos);
+            
+            #region Server Einblenden
+            if (pid == 0)
             {
-                int random = UnityEngine.Random.Range(0, list.Count);
-                Antworten[random].transform.GetChild(1).GetComponent<Image>().sprite = Config.PLAYERLIST[i].icon;
-                Antworten[random].transform.GetChild(1).GetComponentInChildren<TMP_Text>().text = "" + Config.PLAYERLIST[i].id;
-                Antworten[random].transform.GetChild(1).GetComponent<Image>().color = new Color(255, 255, 255, 0.5f);
-                Antworten[random].transform.GetChild(0).GetChild(1).GetComponent<Button>().interactable = true;
-                Antworten[list[0]].transform.GetChild(0).GetChild(0).GetComponent<Button>().interactable = true;
-                //Antworten[random].transform.GetChild(1).GetComponentInChildren<TMP_Text>().gameObject.SetActive(false);
-                // eher unsichtbar machen sonst error
-                list.Remove(random);
-                Antworten[random].SetActive(true);
+                // Server ShowTXT & ShowOwner aktualisieren
+                Antworten[pos].transform.GetChild(0).GetChild(0).GetComponent<Button>().interactable = true; // ShowTXT
+                Antworten[pos].transform.GetChild(0).GetChild(1).GetComponent<Button>().interactable = true; // ShowOwner
+                // Source
+                Antworten[pos].transform.GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/ProfileIcons/empty");
+                Antworten[pos].transform.GetChild(1).GetComponentInChildren<TMP_Text>().text = "0";
+                Antworten[pos].transform.GetChild(1).GetComponent<Image>().color = new Color(255, 255, 255, 0.5f);
+                Antworten[pos].SetActive(true);
+                Antworten[pos].transform.GetChild(2).GetComponentInChildren<TMP_InputField>().text = Config.SLOXIKON_SPIEL.getSelected().getAntwort()[aktuellesThema];
             }
+            #endregion
+            #region Clients Einbinden
+            else
+            {
+                // Server ShowTXT & ShowOwner aktualisieren
+                Antworten[pos].transform.GetChild(0).GetChild(0).GetComponent<Button>().interactable = true; // ShowTXT
+                Antworten[pos].transform.GetChild(0).GetChild(1).GetComponent<Button>().interactable = true; // ShowOwner
+                // Source
+                Antworten[pos].transform.GetChild(1).GetComponent<Image>().sprite = Config.PLAYERLIST[Player.getPosInLists(pid)].icon;
+                Antworten[pos].transform.GetChild(1).GetComponentInChildren<TMP_Text>().text = pid + "";
+                Antworten[pos].transform.GetChild(1).GetComponent<Image>().color = new Color(255, 255, 255, 0.5f);
+                Antworten[pos].SetActive(true);
+                Antworten[pos].transform.GetChild(2).GetComponentInChildren<TMP_InputField>().text = "";
+            }
+            #endregion
         }
-        // Blendet spielerselect aus
+        // Blendet spielerselect ein
         for (int j = 0; j < Config.PLAYERLIST.Length; j++)
         {
             if (Config.PLAYERLIST[j].isConnected)
             {
-                for (int i = 0; i < 8; i++)
+                for (int i = 0; i < Config.PLAYERLIST.Length; i++)
                 {
-                    Antworten[i].transform.GetChild(3).GetComponent<Image>().sprite = Config.PLAYERLIST[j].icon;
-                    Antworten[i].transform.GetChild(3).GetComponent<Image>().color = new Color(255, 255, 255, 0.5f);
-                    Antworten[i].transform.GetChild(3).gameObject.SetActive(true);
+                    Antworten[i].transform.GetChild(3).GetChild(j).GetComponent<Button>().image.sprite = Config.PLAYERLIST[j].icon;
+                    Antworten[i].transform.GetChild(3).GetChild(j).GetComponent<Button>().image.color = new Color(255, 255, 255, 0.5f);
+                    Antworten[i].transform.GetChild(3).GetChild(j).GetComponent<Button>().interactable = true;
+                    Antworten[i].transform.GetChild(3).GetChild(j).gameObject.SetActive(true);
                 }
             }
         }
-        // Serverantwort
-        Antworten[list[0]].transform.GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/ProfileIcons/empty");
-        Antworten[list[0]].transform.GetChild(1).GetComponentInChildren<TMP_Text>().text = "0";
-        Antworten[list[0]].transform.GetChild(1).GetComponent<Image>().color = new Color(255, 255, 255, 0.5f);
-        Antworten[list[0]].transform.GetChild(0).GetChild(0).GetComponent<Button>().interactable = true;
-        Antworten[list[0]].transform.GetChild(0).GetChild(1).GetComponent<Button>().interactable = true;
-        Antworten[list[0]].SetActive(true);
-        //Antworten[list[0]].transform.GetChild(1).GetComponentInChildren<TMP_Text>().gameObject.SetActive(false);
-        // eher unsichtbar machen sonst error
-        serverantwort = list[0];
-        // Vorgefertigte Antwort zeigen
-        Antworten[serverantwort].transform.GetChild(2).GetComponentInChildren<TMP_InputField>().text = Config.SLOXIKON_SPIEL.getSelected().getAntwort()[aktuellesThema];
     }
+    /// <summary>
+    /// Blendet alle Antwortmöglichkeiten ein
+    /// </summary>
     public void ShowAllAntworten()
     {
+        Logging.log(Logging.LogType.Debug, "SloxikonServer", "ShowAllAntworten", "Zeige alle Antwortmöglichkeiten an.");
         // für den Server vorher schon anzeigen
         int anz = 0;
         for (int i = 0; i < 9; i++)
@@ -437,33 +479,94 @@ public class SloxikonServer : MonoBehaviour
         string msg = "";
         for (int i = 0; i < 9; i++)
         {
-            msg += "[" + i + "]" + Antworten[i].transform.GetChild(2).GetComponentInChildren<TMP_InputField>().text + "[" + i + "]";
+            msg += "[" + i + "] " + Antworten[i].transform.GetChild(2).GetComponentInChildren<TMP_InputField>().text + "[" + i + "]";
             // Blendet ShowTXT button aus
             Antworten[i].transform.GetChild(0).GetChild(0).GetComponent<Button>().interactable = false;
         }
-        Broadcast("SloxikonShowAllAntworten " + anz + "~" + msg);
+        Broadcast("#SloxikonShowAllAntworten " + anz + "|" + msg);
     }
+    /// <summary>
+    /// Blendet bestimmte Antwort ein
+    /// </summary>
+    /// <param name="antwortindex">1-9</param>
     public void ShowAntwort(int antwortindex)
     {
+        Logging.log(Logging.LogType.Debug, "SloxikonServer", "ShowAntwort", "Zeige Antwortmöglichkeit " + antwortindex + " an.");
         antwortindex = antwortindex - 1;
-        string msg = antwortindex + "~" + Antworten[antwortindex].transform.GetChild(2).GetComponentInChildren<TMP_InputField>().text;
+        string msg = antwortindex + "| " + Antworten[antwortindex].transform.GetChild(2).GetComponentInChildren<TMP_InputField>().text;
         // Blendet ShowTXT button aus
         Antworten[antwortindex].transform.GetChild(0).GetChild(0).GetComponent<Button>().interactable = false;
-        Broadcast("SloxikonShowAntwort " + msg);       
+        Broadcast("#SloxikonShowAntwort " + msg);       
     }
+    /// <summary>
+    /// Blendet den Autor der Antwortmöglichkeit ein
+    /// </summary>
+    /// <param name="ownerindex">1-9</param>
     public void ShowOwner(int ownerindex)
     {
+        Logging.log(Logging.LogType.Debug, "SloxikonServer", "ShowOwner", "Zeige den Autor der Antwortmöglichkeit " + ownerindex + " an.");
         ownerindex = ownerindex - 1;
         Antworten[ownerindex].transform.GetChild(1).GetComponent<Image>().color = new Color(255, 255, 255, 1f);
         // Blendet ShowTXT button aus
         Antworten[ownerindex].transform.GetChild(0).GetChild(1).GetComponent<Button>().interactable = false;
-        Broadcast("SloxikonShowOwner" + ownerindex + "~" + Antworten[ownerindex].transform.GetChild(1).GetComponent<Image>().sprite.name);
+        Broadcast("#SloxikonShowOwner " + ownerindex + "|" + Antworten[ownerindex].transform.GetChild(1).GetComponent<Image>().sprite.name);
     }
+    /// <summary>
+    /// Wählt für Spieler eine Antwortmöglichkeit aus
+    /// </summary>
+    /// <param name="Player">Spieler</param>
     public void PlayerSelectAnswer(GameObject Player)
     {
-        Debug.LogWarning(Player.name);
-        Debug.LogWarning(Player.transform.parent.name);
-        Debug.LogWarning(Player.transform.parent.parent.name);
+        Logging.log(Logging.LogType.Debug, "SloxikonServer", "PlayerSelectAnswer", "Spieler " + Player.name + " wählt Antwortmöglichkeit " + Player.transform.parent.parent.name);
+        int pid = Int32.Parse(Player.name.Replace("P (", "").Replace(")", "")) - 1;
+        int answer = Int32.Parse(Player.transform.parent.parent.name.Replace("Answer (", "").Replace(")", "")) - 1;
+
+        Broadcast("#SloxikonPlayerSelectedAnswer " + answer + "|" + pid);
+
+        for (int i = 0; i < Config.PLAYERLIST.Length + 1; i++)
+        {
+            Antworten[i].transform.GetChild(3).GetChild(pid).GetComponent<Button>().image.color = new Color(255, 255, 255, 0.50f);
+            Antworten[i].transform.GetChild(3).GetChild(pid).GetComponent<Button>().interactable = true;
+        }
+        Antworten[answer].transform.GetChild(3).GetChild(pid).GetComponent<Button>().image.color = new Color(255, 255, 255, 1f);
+        Antworten[answer].transform.GetChild(3).GetChild(pid).GetComponent<Button>().interactable = false;
+    }
+    /// <summary>
+    /// Toggelt die live Aktualisierung 
+    /// </summary>
+    /// <param name="toggle">Toggle</param>
+    public void ToggleLivePlayerAnswers(Toggle toggle)
+    {
+        liveupdate = toggle.isOn;
+        PlayerLiveUpdateAnzeige.SetActive(toggle.isOn);
+        if (toggle.isOn)
+        {
+            StartCoroutine(DisplayLivePlayerAnswers());
+        }
+        else
+        {
+            Logging.log(Logging.LogType.Debug, "SloxikonServer", "ToggleLivePlayerAnswers", "Spielerantworteneingabe werden nicht mehr aktualisiert.");
+            StopCoroutine(DisplayLivePlayerAnswers());
+        }
+    }
+    /// <summary>
+    /// Aktualisiert die Spielereingaben regelmäßig
+    /// </summary>
+    IEnumerator DisplayLivePlayerAnswers()
+    {
+        Logging.log(Logging.LogType.Debug, "SloxikonServer", "DisplayLivePlayerAnswers", "Spielerantworteneingabe werden ab jetzt aktualisiert.");
+        while (liveupdate) {
+            for (int i = 0; i < Config.PLAYERLIST.Length; i++)
+            {
+                int id = Int32.Parse(Antworten[i].transform.GetChild(1).GetComponentInChildren<TMP_Text>().text);
+                if (id != 0)
+                    Antworten[i].transform.GetChild(2).GetComponentInChildren<TMP_InputField>().text = playeranswers[id - 1];
+                //else
+                    //Antworten[i].transform.GetChild(2).GetComponentInChildren<TMP_InputField>().text = Config.SLOXIKON_SPIEL.getSelected().getThemen()[aktuellesThema];
+            }   
+            yield return new WaitForSeconds(0.25f);
+        }
+        yield return null;
     }
     #endregion
     #region Buzzer
@@ -547,6 +650,9 @@ public class SloxikonServer : MonoBehaviour
     private void SpielerAntwortEingabe(Player p, string data)
     {
         SpielerAnzeige[p.id - 1, 6].GetComponentInChildren<TMP_InputField>().text = data;
+
+        // Speicherung der Eingabe
+        playeranswers[p.id - 1] = data;
     }
     /// <summary>
     /// Blendet die Textantworten der Spieler ein

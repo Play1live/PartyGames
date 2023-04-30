@@ -24,6 +24,12 @@ public class SloxikonScene : MonoBehaviour
 
     void OnEnable()
     {
+        if (!Config.SERVER_STARTED && !Config.CLIENT_STARTED)
+        {
+            SceneManager.LoadScene("Startup");
+            return;
+        }
+
         if (Config.isServer)
         {
             Client.SetActive(false);
