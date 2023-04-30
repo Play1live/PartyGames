@@ -16,10 +16,15 @@ public class SloxikonClient : MonoBehaviour
 
     GameObject Thema;
     GameObject[] Antworten;
+    Coroutine TimerCoroutine;
+
+    GameObject Timer;
 
     [SerializeField] AudioSource BuzzerSound;
     [SerializeField] AudioSource RichtigeAntwortSound;
     [SerializeField] AudioSource FalscheAntwortSound;
+    [SerializeField] AudioSource Moeoep;
+    [SerializeField] AudioSource Beeep;
 
     void OnEnable()
     {
@@ -225,6 +230,12 @@ public class SloxikonClient : MonoBehaviour
             case "#SloxikonPlayerSelectedAnswer":
                 PlayerSelectAnswer(data);
                 break;
+            case "#SloxikonTimerStarten":
+                TimerStarten(data);
+                break;
+            case "#SloxikonTimerStop":
+                TimerStop();
+                break;
         } 
     }
     /// <summary>
@@ -291,6 +302,8 @@ public class SloxikonClient : MonoBehaviour
                 }
             }
         }
+        Timer = GameObject.Find("Sloxikon/TimerSekundenAnzeige");
+        Timer.SetActive(false);
     }
     /// <summary>
     /// Blendet den Spieltitel ein
@@ -406,6 +419,59 @@ public class SloxikonClient : MonoBehaviour
         Antworten[pid].transform.GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/ProfileIcons/"+spritename);
         Antworten[pid].transform.GetChild(1).gameObject.SetActive(true);
         Antworten[pid].SetActive(true);
+    }
+    /// <summary>
+    /// Startet den Timer und bricht den alten, falls dieser noch läuft, ab
+    /// </summary>
+    private void TimerStarten(string data)
+    {
+        Logging.log(Logging.LogType.Debug, "SloxikonClient", "TimerStarten", "Startet den Timer");
+
+        if (TimerCoroutine != null)
+            StopCoroutine(TimerCoroutine);
+        int sekunden = Int32.Parse(data);
+        TimerCoroutine = StartCoroutine(RunTimer(sekunden));
+    }
+    /// <summary>
+    /// Beendet den Timer
+    /// </summary>
+    private void TimerStop()
+    {
+        Logging.log(Logging.LogType.Debug, "SloxikonClient", "TimerStop", "Beendet den Timer");
+        Timer.SetActive(false);
+        if (TimerCoroutine != null)
+        {
+            StopCoroutine(TimerCoroutine);
+            TimerCoroutine = null;
+        }
+    }
+    /// <summary>
+    /// Timer läuft
+    /// </summary>
+    /// <param name="seconds">Dauer</param>
+    IEnumerator RunTimer(int seconds)
+    {
+        Logging.log(Logging.LogType.Debug, "SloxikonClient", "RunTimer", "Timer läuft: " + seconds);
+        Timer.SetActive(true);
+
+        while (seconds >= 0)
+        {
+            Timer.GetComponentInChildren<TMP_Text>().text = "" + seconds;
+
+            if (seconds == 0)
+            {
+                Beeep.Play();
+            }
+            // Moep Sound bei sekunden
+            if (seconds == 1 || seconds == 2 || seconds == 3 || seconds == 10 || seconds == 30 || seconds == 60) // 10-0
+            {
+                Moeoep.Play();
+            }
+            seconds--;
+            yield return new WaitForSecondsRealtime(1);
+        }
+        Timer.SetActive(false);
+        yield break;
     }
     /// <summary>
     /// Spieler wählt Antwortmöglichkeit ein

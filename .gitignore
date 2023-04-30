@@ -61,3 +61,6 @@ crashlytics-build.properties
 # Backtrace 
 Backtrace Configuration.asset
 Backtrace Configuration.asset.meta
+
+#Versionfile will be generated ingame
+PartyGames/Assets/Version.txt
