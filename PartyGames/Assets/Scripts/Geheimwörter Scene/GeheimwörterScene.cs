@@ -48,6 +48,12 @@ public class GeheimwörterScene : MonoBehaviour
         StartCoroutine(IntroAnimation());
     }
 
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+    }
+
+
     /// <summary>
     /// Spielt die Introanimation ab
     /// </summary>

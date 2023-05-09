@@ -21,6 +21,7 @@ public class WerBietetMehrClient : MonoBehaviour
     GameObject SpielerAntwortEingabe;
     GameObject[,] SpielerAnzeige;
     bool pressingbuzzer = false;
+    Coroutine timerCoroutine;
 
     [SerializeField] AudioSource BuzzerSound;
     [SerializeField] AudioSource RichtigeAntwortSound;
@@ -82,6 +83,11 @@ public class WerBietetMehrClient : MonoBehaviour
         CloseSocket();
     }
 
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+    }
+
     /// <summary>
     /// Testet die Verbindung zum Server alle 10 Sekunden. 
     /// Beendet den Server, sobald die Verbindung getrennt wurde.
@@ -94,6 +100,7 @@ public class WerBietetMehrClient : MonoBehaviour
             SendToServer("#TestConnection");
             yield return new WaitForSeconds(10);
         }
+        yield break;
     }
     /// <summary>
     /// Lässt den Timer ablaufen
@@ -562,7 +569,8 @@ public class WerBietetMehrClient : MonoBehaviour
         Logging.log(Logging.LogType.Debug, "WerBietetMehrClient", "TimerStarten", "Starte den Timer mit " + data + " Sekunden.");
         int sekunden = Int32.Parse(data);
 
-        StopCoroutine(RunTimer(0));
+        if (timerCoroutine != null)
+            StopCoroutine(timerCoroutine);
         StartCoroutine(RunTimer(sekunden));
     }
     /// <summary>

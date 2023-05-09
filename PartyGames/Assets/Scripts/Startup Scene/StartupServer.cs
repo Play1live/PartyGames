@@ -131,6 +131,11 @@ public class StartupServer : MonoBehaviour
         Config.SERVER_TCP.Stop();
     }
 
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+    }
+
     #region Verbindungen
     /// <summary>
     /// Startet den Server

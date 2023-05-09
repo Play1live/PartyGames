@@ -46,6 +46,12 @@ public class ListenScene : MonoBehaviour
         StartCoroutine(IntroAnimation());
     }
 
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+    }
+
+
     /// <summary>
     /// Spiele die Introanimation ab
     /// </summary>

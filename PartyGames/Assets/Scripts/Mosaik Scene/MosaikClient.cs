@@ -80,6 +80,11 @@ public class MosaikClient : MonoBehaviour
         CloseSocket();
     }
 
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+    }
+
     /// <summary>
     /// Testet die Verbindung zum Server
     /// </summary>
@@ -90,6 +95,7 @@ public class MosaikClient : MonoBehaviour
             SendToServer("#TestConnection");
             yield return new WaitForSeconds(10);
         }
+        yield break;
     }
     #region Verbindungen
     /// <summary>
@@ -545,7 +551,7 @@ public class MosaikClient : MonoBehaviour
             Bild[i].SetActive(true);
         }
 
-        yield return null;
+        yield break;
     }
     /// <summary>
     /// Löst bestimmtes Cover auf
@@ -656,6 +662,6 @@ public class MosaikClient : MonoBehaviour
         }
         #endregion
         Bild[0].transform.parent.gameObject.SetActive(true);
-        yield return null;
+        yield break;
     }
 }

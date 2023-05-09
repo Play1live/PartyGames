@@ -51,6 +51,12 @@ public class MosaikScene : MonoBehaviour
         //StartCoroutine(GetTexture());
     }
 
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+    }
+
+
     /// <summary>
     /// Spielt die IntroAnimation an
     /// </summary>

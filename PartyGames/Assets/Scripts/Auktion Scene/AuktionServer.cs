@@ -97,6 +97,7 @@ public class AuktionServer : MonoBehaviour
     /// </summary>
     IEnumerator LoadAllAuktionImages()
     {
+        Logging.log(Logging.LogType.Normal, "AuktionServer", "LoadAllAuktionImages", "Alle Bilder werden heruntergeladen.");
         if (Config.AUKTION_SPIEL.getSelected() == null)
             yield break;
 
@@ -125,6 +126,7 @@ public class AuktionServer : MonoBehaviour
         // Anzeigen
         yield return null;
         InitAuktion();
+        yield break;
     }
     #region Server Stuff
     #region Kommunikation
@@ -632,6 +634,7 @@ public class AuktionServer : MonoBehaviour
     /// <param name="url"></param>
     IEnumerator LoadImageIntoScene(string url)
     {
+        Logging.log(Logging.LogType.Normal, "AuktionServer", "LoadImageIntoScene", "Bild wird heruntergeladen.");
         UnityWebRequest www = UnityWebRequestTexture.GetTexture(url);
         yield return www.SendWebRequest();
 
@@ -653,7 +656,7 @@ public class AuktionServer : MonoBehaviour
                 Logging.log(Logging.LogType.Warning, "AuktionServer", "LoadImageIntoScene", "Custombild konnte nicht geladen werden: " + url + " << ", e);
             }
         }
-        yield return null;
+        yield break;
     }
     /// <summary>
     /// Aktualisiert die Spielerkonten (legt den Wert fest)

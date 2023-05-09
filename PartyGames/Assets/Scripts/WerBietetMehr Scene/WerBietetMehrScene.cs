@@ -42,6 +42,11 @@ public class WerBietetMehrScene : MonoBehaviour
 
         StartCoroutine(IntroAnimation());
     }
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+    }
+
     /// <summary>
     /// Spielt die IntroAnimation ab.
     /// </summary>

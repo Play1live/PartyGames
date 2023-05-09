@@ -77,6 +77,11 @@ public class GeheimwörterClient : MonoBehaviour
         CloseSocket();
     }
 
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+    }
+
     /// <summary>
     /// Testet die Verbindumg zum Server
     /// </summary>
@@ -87,6 +92,7 @@ public class GeheimwörterClient : MonoBehaviour
             SendToServer("#TestConnection");
             yield return new WaitForSeconds(10);
         }
+        yield break;
     }
     #region Verbindungen
     /// <summary>

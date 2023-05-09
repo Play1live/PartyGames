@@ -60,6 +60,11 @@ public class AuktionClient : MonoBehaviour
         CloseSocket();
     }
 
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+    }
+
     /// <summary>
     /// Testet die Verbindung zum Server
     /// </summary>
@@ -70,6 +75,7 @@ public class AuktionClient : MonoBehaviour
             SendToServer("#TestConnection");
             yield return new WaitForSeconds(10);
         }
+        yield break;
     }
     #region Verbindungen
     /// <summary>
@@ -356,6 +362,7 @@ public class AuktionClient : MonoBehaviour
     /// <returns></returns>
     IEnumerator DownloadAllImages()
     {
+        Logging.log(Logging.LogType.Normal, "AuktionServer", "DownloadAllImages", "Alle Bilder werden heruntergeladen.");
         for (int i = 0; i < urls.GetLength(0); i++)
         {
             for (int j = 0; j < urls.GetLength(1); j++)
@@ -389,7 +396,7 @@ public class AuktionClient : MonoBehaviour
 
         // Server senden
         SendToServer("#ImageDownloadedSuccessful");
-        yield return null;
+        yield break;
     }
     /// <summary>
     /// Zeigt ein per URL eingefügtes Bild an
@@ -413,6 +420,7 @@ public class AuktionClient : MonoBehaviour
     /// <returns></returns>
     IEnumerator LoadImageIntoScene(string url)
     {
+        Logging.log(Logging.LogType.Normal, "AuktionServer", "LoadImageIntoScene", "Bild wird heruntergeladen.");
         UnityWebRequest www = UnityWebRequestTexture.GetTexture(url);
         yield return www.SendWebRequest();
 
@@ -437,7 +445,7 @@ public class AuktionClient : MonoBehaviour
                 SendToServer("#ImageDownloadError");
             }
         }
-        yield return null;
+        yield break;
     }
     /// <summary>
     /// Aktualisiert das Guthaben des Spielerkontos

@@ -101,6 +101,11 @@ public class ListenClient : MonoBehaviour
         CloseSocket();
     }
 
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+    }
+
     /// <summary>
     /// Testet die Verbindung zum Server
     /// </summary>
@@ -111,6 +116,7 @@ public class ListenClient : MonoBehaviour
             SendToServer("#TestConnection");
             yield return new WaitForSeconds(10);
         }
+        yield break;
     }
     #region Verbindungen
     /// <summary>

@@ -36,6 +36,8 @@ public class WerBietetMehrServer : MonoBehaviour
     int PunkteProRichtige = 4;
     int PunkteProFalsche = 1;
 
+    Coroutine timerCoroutine;
+
     [SerializeField] AudioSource BuzzerSound;
     [SerializeField] AudioSource RichtigeAntwortSound;
     [SerializeField] AudioSource FalscheAntwortSound;
@@ -97,6 +99,11 @@ public class WerBietetMehrServer : MonoBehaviour
             #endregion
         }
         #endregion
+    }
+
+    private void OnDisable()
+    {
+        StopAllCoroutines();
     }
 
     private void OnApplicationQuit()
@@ -669,8 +676,9 @@ public class WerBietetMehrServer : MonoBehaviour
         int sekunden = Int32.Parse(TimerSekunden.text);
         Broadcast("#WBMTimerStarten " + (sekunden));
 
-        StopCoroutine(RunTimer(0));
-        StartCoroutine(RunTimer(sekunden));
+        if (timerCoroutine != null)
+            StopCoroutine(timerCoroutine);
+        timerCoroutine = StartCoroutine(RunTimer(sekunden));
     }
     /// <summary>
     /// Wechselt die Anzeige, welche Kreuze ein-/ausgeblendet werden

@@ -70,6 +70,11 @@ public class StartupClient : MonoBehaviour
         CloseSocket();
     }
 
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+    }
+
     /// <summary>
     /// Testet nach der Verbindung zum Server, ob die Verbindung erfolgreich und ohne Fehler funktioniert hat. 
     /// Falls die Verbindung fehlerhaft war, wird diese beendet und der Client lädt ins Hauptmenü.

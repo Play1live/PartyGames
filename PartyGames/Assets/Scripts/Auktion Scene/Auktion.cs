@@ -27,8 +27,7 @@ public class Auktion
                     string name = tmp[0];
                     float preis = float.Parse(tmp[1]);
                     string url = tmp[2];
-                    Sprite[] bilder = new Sprite[5]; // TODO: Die bilder direkt beim reinladen laden und dort durch Coroutines, wenns gar nicht geht, dann wie mosaik
-                                                     // probeweise den link von Mosaik nehmen von github, da gehts mit coroutines
+                    Sprite[] bilder = new Sprite[5]; 
                     string[] bilderURL = new string[5];
                     bilderURL[0] = tmp[3];
                     bilderURL[1] = tmp[4];

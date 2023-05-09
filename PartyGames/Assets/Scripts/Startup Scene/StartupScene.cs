@@ -102,6 +102,11 @@ public class StartupScene : MonoBehaviour
         Logging.log(Logging.LogType.Debug, "StartupScene", "OnApplicationQuit", "Spiel wird beendet.");
     }
 
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+    }
+
     /// <summary>
     /// Aktualisiert den Updater sofern dieser veraltet ist
     /// </summary>

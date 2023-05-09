@@ -45,6 +45,12 @@ public class FlaggenScene : MonoBehaviour
         StartCoroutine(IntroAnimation());
     }
 
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+    }
+
+
     /// <summary>
     /// Spielt Introanimation ab
     /// </summary>

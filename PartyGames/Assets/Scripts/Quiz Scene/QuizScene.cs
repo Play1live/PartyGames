@@ -46,6 +46,12 @@ public class QuizScene : MonoBehaviour
         StartCoroutine(IntroAnimation());
     }
 
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+    }
+
+
     /// <summary>
     /// Spielt die Introanimation ab
     /// </summary>

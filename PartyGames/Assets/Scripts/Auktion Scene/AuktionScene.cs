@@ -48,6 +48,12 @@ public class AuktionScene : MonoBehaviour
         StartCoroutine(IntroAnimation());
     }
 
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+    }
+
+
     /// <summary>
     /// Starte die Introanimation
     /// </summary>

@@ -75,6 +75,11 @@ public class QuizClient : MonoBehaviour
         CloseSocket();
     }
 
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+    }
+
     /// <summary>
     /// Testet die Verbindung zum Server
     /// </summary>
@@ -86,6 +91,7 @@ public class QuizClient : MonoBehaviour
             SendToServer("#TestConnection");
             yield return new WaitForSeconds(10);
         }
+        yield break;
     }
     #region Verbindungen
     /// <summary>

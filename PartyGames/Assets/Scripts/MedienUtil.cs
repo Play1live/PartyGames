@@ -25,7 +25,51 @@ public class MedienUtil
         {
             using (FileStream fs = File.Create(quizvorlage))
             {
-                byte[] info = new UTF8Encoding(true).GetBytes("Frage: Das ist meine \"Frage\"? \nAntwort: Haus des  Rundfunks \nInfo: Hier kann was richtig cooles stehen \nFrage: Das ist meine \"Frage\"? \nAntwort: Haus des  Rundfunks \nInfo: Hier kann was richtig cooles stehen");
+                byte[] info = new UTF8Encoding(true).GetBytes(
+                    // 1-10
+                    "Frage: 1\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    // 11-20
+                    "Frage: 11\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    // 21-30
+                    "Frage: 21\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    // 31-40
+                    "Frage: 31\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos" +
+                    "Frage: Text\nAntwort: Antwort\nInfo: Infos");
                 // Add some information to the file.
                 fs.Write(info, 0, info.Length);
             }
@@ -79,7 +123,17 @@ public class MedienUtil
         {
             using (FileStream fs = File.Create(auktiovorlage))
             {
-                byte[] info = new UTF8Encoding(true).GetBytes(""); // TODO
+                byte[] info = new UTF8Encoding(true).GetBytes(
+                    "- Name <!#!#!> 0,00 <!#!#!> ShopURL <!#!#!> BildUrl1 <!#!#!> BildUrl2 <!#!#!> BildUrl3 <!#!#!> BildUrl4 <!#!#!> BildUrl5\n" +
+                    "- Name <!#!#!> 0,00 <!#!#!> ShopURL <!#!#!> BildUrl1 <!#!#!> BildUrl2 <!#!#!> BildUrl3 <!#!#!> BildUrl4 <!#!#!> BildUrl5\n" +
+                    "- Name <!#!#!> 0,00 <!#!#!> ShopURL <!#!#!> BildUrl1 <!#!#!> BildUrl2 <!#!#!> BildUrl3 <!#!#!> BildUrl4 <!#!#!> BildUrl5\n" +
+                    "- Name <!#!#!> 0,00 <!#!#!> ShopURL <!#!#!> BildUrl1 <!#!#!> BildUrl2 <!#!#!> BildUrl3 <!#!#!> BildUrl4 <!#!#!> BildUrl5\n" +
+                    "- Name <!#!#!> 0,00 <!#!#!> ShopURL <!#!#!> BildUrl1 <!#!#!> BildUrl2 <!#!#!> BildUrl3 <!#!#!> BildUrl4 <!#!#!> BildUrl5\n" +
+                    "- Name <!#!#!> 0,00 <!#!#!> ShopURL <!#!#!> BildUrl1 <!#!#!> BildUrl2 <!#!#!> BildUrl3 <!#!#!> BildUrl4 <!#!#!> BildUrl5\n" +
+                    "- Name <!#!#!> 0,00 <!#!#!> ShopURL <!#!#!> BildUrl1 <!#!#!> BildUrl2 <!#!#!> BildUrl3 <!#!#!> BildUrl4 <!#!#!> BildUrl5\n" +
+                    "- Name <!#!#!> 0,00 <!#!#!> ShopURL <!#!#!> BildUrl1 <!#!#!> BildUrl2 <!#!#!> BildUrl3 <!#!#!> BildUrl4 <!#!#!> BildUrl5\n" +
+                    "- Name <!#!#!> 0,00 <!#!#!> ShopURL <!#!#!> BildUrl1 <!#!#!> BildUrl2 <!#!#!> BildUrl3 <!#!#!> BildUrl4 <!#!#!> BildUrl5\n" +
+                    "- Name <!#!#!> 0,00 <!#!#!> ShopURL <!#!#!> BildUrl1 <!#!#!> BildUrl2 <!#!#!> BildUrl3 <!#!#!> BildUrl4 <!#!#!> BildUrl5\n");
                 // Add some information to the file.
                 fs.Write(info, 0, info.Length);
             }
@@ -105,7 +159,7 @@ public class MedienUtil
         {
             using (FileStream fs = File.Create(sloxikonvorlage))
             {
-                byte[] info = new UTF8Encoding(true).GetBytes("- Thema [!#!] Antwort");
+                byte[] info = new UTF8Encoding(true).GetBytes("- Thema [!#!] Antwort\n- Thema [!#!] Antwort");
                 // Add some information to the file.
                 fs.Write(info, 0, info.Length);
             }

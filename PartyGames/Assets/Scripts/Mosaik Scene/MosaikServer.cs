@@ -101,6 +101,11 @@ public class MosaikServer : MonoBehaviour
         Config.SERVER_TCP.Server.Close();
     }
 
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+    }
+
     #region Server Stuff
     #region Kommunikation
     /// <summary>
@@ -819,7 +824,7 @@ public class MosaikServer : MonoBehaviour
         ob.GetComponent<GridLayoutGroup>().enabled = true;
         yield return new WaitForSeconds(0.01f);
         ob.GetComponent<GridLayoutGroup>().enabled = false;
-        yield return null;
+        yield break;
     }
     /// <summary>
     /// Lädt ein Bild per Url aus dem Netz
@@ -965,6 +970,6 @@ public class MosaikServer : MonoBehaviour
             Bild[i].GetComponent<Animator>().enabled = false;
             Bild[i].SetActive(true);
         }
-        yield return null;
+        yield break;
     }
 }
