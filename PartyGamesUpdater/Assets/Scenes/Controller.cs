@@ -31,7 +31,6 @@ public class Controller : MonoBehaviour
     void Awake()
     {
         DownloadPath = Application.dataPath.Replace("\\PartyGamesUpdater_Data", "").Replace("/PartyGamesUpdater_Data", "");
-        FetchRemoteConfig();
     }
     void Update()
     {
@@ -49,6 +48,7 @@ public class Controller : MonoBehaviour
     void Start()
     {
         WriteGameVersionFile();
+		FetchRemoteConfig();
         UnityEngine.Debug.Log(Application.dataPath);
         UnityEngine.Debug.Log(Application.persistentDataPath);
 

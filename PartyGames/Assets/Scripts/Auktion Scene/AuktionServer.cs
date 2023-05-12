@@ -25,6 +25,7 @@ public class AuktionServer : MonoBehaviour
     [SerializeField] AudioSource BuzzerSound;
     [SerializeField] AudioSource RichtigeAntwortSound;
     [SerializeField] AudioSource FalscheAntwortSound;
+    [SerializeField] AudioSource DisconnectSound;
 
     void OnEnable()
     {
@@ -212,6 +213,7 @@ public class AuktionServer : MonoBehaviour
             case "#ClientClosed":
                 ClientClosed(player);
                 UpdateSpielerBroadcast();
+                PlayDisconnectSound();
                 break;
             case "#TestConnection":
                 break;
@@ -295,7 +297,7 @@ public class AuktionServer : MonoBehaviour
             if (buyeditems.Length > 1)
                 buyeditems = buyeditems.Substring(1);
 
-            msg += "[TRENNER][ID]" + p.id + "[ID][PUNKTE]" + p.points + "[PUNKTE][KONTO]"+ SpielerAnzeige[p.id - 1, 7].GetComponent<TMP_InputField>().text + "[KONTO][GUV]"+ SpielerAnzeige[p.id - 1, 8].GetComponent<TMP_InputField>().text + "[GUV][ITEMS]" + buyeditems + "[ITEMS]";
+            msg += "[TRENNER][ID]" + p.id + "[ID][PUNKTE]" + p.points + "[PUNKTE][ONLINE]"+p.isConnected+"[ONLINE][KONTO]"+ SpielerAnzeige[p.id - 1, 7].GetComponent<TMP_InputField>().text + "[KONTO][GUV]"+ SpielerAnzeige[p.id - 1, 8].GetComponent<TMP_InputField>().text + "[GUV][ITEMS]" + buyeditems + "[ITEMS]";
             if (p.isConnected && PlayerConnected[i])
             {
                 SpielerAnzeige[i, 0].SetActive(true);
@@ -396,6 +398,13 @@ public class AuktionServer : MonoBehaviour
 
             AuktionsElemente[i, 0].SetActive(false);
         }
+    }
+    /// <summary>
+    /// Spielt den Disconnect Sound ab
+    /// </summary>
+    private void PlayDisconnectSound()
+    {
+        DisconnectSound.Play();
     }
     /// <summary>
     /// Initialisiert die Anzeigen der Auktion

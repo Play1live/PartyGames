@@ -28,6 +28,7 @@ public class WerBietetMehrClient : MonoBehaviour
     [SerializeField] AudioSource FalscheAntwortSound;
     [SerializeField] AudioSource Moeoep;
     [SerializeField] AudioSource Beeep;
+    [SerializeField] AudioSource DisconnectSound;
 
     void OnEnable()
     {
@@ -360,16 +361,30 @@ public class WerBietetMehrClient : MonoBehaviour
                 SpielerAnzeige[pos, 4].GetComponent<TMP_Text>().text = Config.PLAYERLIST[pos].name;
                 SpielerAnzeige[pos, 5].GetComponent<TMP_Text>().text = Config.PLAYERLIST[pos].points+"";
                 // Verbundene Spieler anzeigen
-                if (Config.PLAYERLIST[pos].name != "")
+                bool connected = bool.Parse(sp.Replace("[ONLINE]", "|").Split('|')[1]);
+                if (Config.PLAYERLIST[pos].name != "" && connected)
                 {
                     SpielerAnzeige[pos, 0].SetActive(true);
                 }
                 else
                 {
+                    if (SpielerAnzeige[pos, 0].activeInHierarchy && !connected)
+                    {
+                        Config.PLAYERLIST[pos].name = "";
+                        PlayDisconnectSound();
+                    }
+
                     SpielerAnzeige[pos, 0].SetActive(false);
                 }
             }
         }
+    }
+    /// <summary>
+    /// Spielt den Disconnect Sound ab
+    /// </summary>
+    private void PlayDisconnectSound()
+    {
+        DisconnectSound.Play();
     }
     /// <summary>
     /// Sendet eine Buzzer Anfrage an den Server

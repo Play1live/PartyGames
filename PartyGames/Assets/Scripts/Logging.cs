@@ -55,7 +55,11 @@ public class Logging
     /// <param name="msg">Auszugebene Nachricht mit evtl. Exception</param>
     private static void generate(LogType type, string klasse, string methode, string msg)
     {
+#if UNITY_EDITOR
+        print(type, "[" + methode + "] " + msg);
+#else
         print(type, "[" + klasse + " - " + methode + "] " + msg); 
+#endif
     }
     /// <summary>
     /// Gibt die Lognachricht aus

@@ -22,6 +22,9 @@ public class StartupServer : MonoBehaviour
     [SerializeField] GameObject gesperrtfuerSekundenAnzeige;
     DateTime allowedStartTime;
 
+    [SerializeField] AudioSource ConnectSound;
+    [SerializeField] AudioSource DisconnectSound;
+
     void Start()
     {
         if (Config.SERVER_STARTED)
@@ -223,7 +226,6 @@ public class StartupServer : MonoBehaviour
             return;
         }
 
-
         TcpListener listener = (TcpListener)ar.AsyncState;
         freierS.isConnected = true;
         freierS.tcp = listener.EndAcceptTcpClient(ar);
@@ -343,6 +345,7 @@ public class StartupServer : MonoBehaviour
             case "#ClientClosed":
                 ClientClosed(player);
                 UpdateSpielerBroadcast();
+                PlayDisconnectSound();
                 break;
             case "#TestConnection":
                 SendMSG("#ConnectionEstablished", player);
@@ -355,6 +358,8 @@ public class StartupServer : MonoBehaviour
 
             case "#ClientSetName":
                 ClientSetName(player, data);
+
+                PlayConnectSound();
                 break;
             case "#SpielerIconChange":
                 SpielerIconChange(player, data);
@@ -393,6 +398,8 @@ public class StartupServer : MonoBehaviour
     {
         SetupSpiele.LoadGameFiles();
         yield return null;
+        DisplayGameFiles();
+        yield break;
     }
     /// <summary>
     /// Sperrt die Gameselection für 5 Sekunden, um Fehler bei Scenenwechseln in der Verbindung zu verhindern
@@ -683,6 +690,20 @@ public class StartupServer : MonoBehaviour
             if (Config.PLAYERLIST[i].name == name)
                 return true;
         return false;
+    }
+    /// <summary>
+    /// Spielt den Connect Sound ab
+    /// </summary>
+    private void PlayConnectSound()
+    {
+        ConnectSound.Play();
+    }
+    /// <summary>
+    /// Spielt den Disconnect Sound ab
+    /// </summary>
+    private void PlayDisconnectSound()
+    {
+        DisconnectSound.Play();
     }
     /// <summary>
     /// Speichert den Namen, den sich der neu verbundene Spieler geben will.
@@ -1166,6 +1187,7 @@ public class StartupServer : MonoBehaviour
         {
             ServerControlGameSelection.SetActive(true);
             ServerControlControlField.SetActive(false);
+            DisplayGameFiles();
         }
         else if (s == "Kontrollfelder")
         {
@@ -1249,7 +1271,7 @@ public class StartupServer : MonoBehaviour
     /// </summary>
     private void DisplayGameFiles()
     {
-        if (!ServerControlGameSelection.activeInHierarchy)
+        if (!ServerControlGameSelection.activeInHierarchy || !ServerControl.activeInHierarchy)
             return;
         Logging.log(Logging.LogType.Debug, "StartupServer", "DisplayGameFiles", "Verfügbare Spiele werden angezeigt.");
 

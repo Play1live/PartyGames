@@ -24,6 +24,7 @@ public class MosaikClient : MonoBehaviour
     [SerializeField] AudioSource BuzzerSound;
     [SerializeField] AudioSource RichtigeAntwortSound;
     [SerializeField] AudioSource FalscheAntwortSound;
+    [SerializeField] AudioSource DisconnectSound;
 
     void OnEnable()
     {
@@ -249,16 +250,30 @@ public class MosaikClient : MonoBehaviour
                 SpielerAnzeige[pos, 4].GetComponent<TMP_Text>().text = Config.PLAYERLIST[pos].name;
                 SpielerAnzeige[pos, 5].GetComponent<TMP_Text>().text = Config.PLAYERLIST[pos].points+"";
                 // Verbundene Spieler anzeigen
-                if (Config.PLAYERLIST[pos].name != "")
+                bool connected = bool.Parse(sp.Replace("[ONLINE]", "|").Split('|')[1]);
+                if (Config.PLAYERLIST[pos].name != "" && connected)
                 {
                     SpielerAnzeige[pos, 0].SetActive(true);
                 }
                 else
                 {
+                    if (SpielerAnzeige[pos, 0].activeInHierarchy && !connected)
+                    {
+                        Config.PLAYERLIST[pos].name = "";
+                        PlayDisconnectSound();
+                    }
+
                     SpielerAnzeige[pos, 0].SetActive(false);
                 }
             }
         }
+    }
+    /// <summary>
+    /// Spielt den Disconnect Sound ab
+    /// </summary>
+    private void PlayDisconnectSound()
+    {
+        DisconnectSound.Play();
     }
     /// <summary>
     /// Sendet eine Buzzer Anfrage an den Server
@@ -422,10 +437,20 @@ public class MosaikClient : MonoBehaviour
                     StartCoroutine(LoadImageFromWeb(url));
                 }
             }
+            
             // TEIL 2: Zeigt Bild in der Szene an und behält die Seitenverhältnisse bei
             #region Teil 2
             Bild[0].transform.parent.GetComponent<RectTransform>().sizeDelta = BildRect;
-            Texture2D myTexture = Bild[0].transform.parent.gameObject.GetComponent<Image>().sprite.texture;
+            Texture2D myTexture = null;
+            try
+            {
+                myTexture = Bild[0].transform.parent.gameObject.GetComponent<Image>().sprite.texture;
+            }
+            catch (Exception e)
+            {
+                Logging.log(Logging.LogType.Warning, "MosaikClient", "MosaikEinblendenAusblenden", "Bildgröße konnte nicht geladen werden.", e);
+                return;
+            }
             Sprite sprite = Sprite.Create(myTexture, new Rect(0, 0, myTexture.width, myTexture.height), new Vector2(0.5f, 0.5f), 100);
             GameObject imageObject = Bild[0].transform.parent.gameObject;
             imageObject.GetComponent<Image>().sprite = sprite;

@@ -25,6 +25,7 @@ public class SloxikonClient : MonoBehaviour
     [SerializeField] AudioSource FalscheAntwortSound;
     [SerializeField] AudioSource Moeoep;
     [SerializeField] AudioSource Beeep;
+    [SerializeField] AudioSource DisconnectSound;
 
     void OnEnable()
     {
@@ -196,6 +197,9 @@ public class SloxikonClient : MonoBehaviour
             case "#TextantwortenAnzeigen":
                 TextantwortenAnzeigen(data);
                 break;
+            case "#SpielersTurn":
+                SpielersTurn(data);
+                break;
             case "#SpielerIstDran":
                 SpielerIstDran(data);
                 break;
@@ -204,12 +208,6 @@ public class SloxikonClient : MonoBehaviour
                 break;
             case "#AudioBuzzerPressed":
                 AudioBuzzerPressed(data);
-                break;
-            case "#AudioRichtigeAntwort":
-                AudioRichtigeAntwort();
-                break;
-            case "#AudioFalscheAntwort":
-                AudioFalscheAntwort();
                 break;
             case "#BuzzerFreigeben":
                 BuzzerFreigeben();
@@ -383,6 +381,17 @@ public class SloxikonClient : MonoBehaviour
         }
     }
     /// <summary>
+    /// Spieler ist dran
+    /// </summary>
+    public void SpielersTurn(string id)
+    {
+        int pid = Int32.Parse(id);
+
+        for (int i = 0; i < Config.SERVER_MAX_CONNECTIONS; i++)
+            SpielerAnzeige[i, 1].SetActive(false);
+        SpielerAnzeige[(pid - 1), 1].SetActive(true);
+    }
+    /// <summary>
     /// Blendet alle Antwortmöglichkeiten ein
     /// </summary>
     /// <param name="data"></param>
@@ -528,16 +537,30 @@ public class SloxikonClient : MonoBehaviour
                 SpielerAnzeige[pos, 4].GetComponent<TMP_Text>().text = Config.PLAYERLIST[pos].name;
                 SpielerAnzeige[pos, 5].GetComponent<TMP_Text>().text = Config.PLAYERLIST[pos].points+"";
                 // Verbundene Spieler anzeigen
-                if (Config.PLAYERLIST[pos].name != "")
+                bool connected = bool.Parse(sp.Replace("[ONLINE]", "|").Split('|')[1]);
+                if (Config.PLAYERLIST[pos].name != "" && connected)
                 {
                     SpielerAnzeige[pos, 0].SetActive(true);
                 }
                 else
                 {
+                    if (SpielerAnzeige[pos, 0].activeInHierarchy && !connected)
+                    {
+                        Config.PLAYERLIST[pos].name = "";
+                        PlayDisconnectSound();
+                    }
+
                     SpielerAnzeige[pos, 0].SetActive(false);
                 }
             }
         }
+    }
+    /// <summary>
+    /// Spielt den Disconnect Sound ab
+    /// </summary>
+    private void PlayDisconnectSound()
+    {
+        DisconnectSound.Play();
     }
     /// <summary>
     /// Sendet eine Buzzer Anfrage an den Server
@@ -581,20 +604,6 @@ public class SloxikonClient : MonoBehaviour
     {
         int pId = Int32.Parse(data);
         SpielerAnzeige[Player.getPosInLists(pId), 1].SetActive(false);
-    }
-    /// <summary>
-    /// Spielt den Sound für eine richtige Antwort ab
-    /// </summary>
-    private void AudioRichtigeAntwort()
-    {
-        RichtigeAntwortSound.Play();
-    }
-    /// <summary>
-    /// Spielt den Sound für eine falsche Antwort ab
-    /// </summary>
-    private void AudioFalscheAntwort()
-    {
-        FalscheAntwortSound.Play();
     }
     /// <summary>
     /// Zeigt an, ob ein Spieler austabt

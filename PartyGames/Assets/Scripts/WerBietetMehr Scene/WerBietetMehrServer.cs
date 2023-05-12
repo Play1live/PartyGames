@@ -43,6 +43,7 @@ public class WerBietetMehrServer : MonoBehaviour
     [SerializeField] AudioSource FalscheAntwortSound;
     [SerializeField] AudioSource Moeoep;
     [SerializeField] AudioSource Beeep;
+    [SerializeField] AudioSource DisconnectSound;
 
     void OnEnable()
     {
@@ -225,6 +226,7 @@ public class WerBietetMehrServer : MonoBehaviour
             case "#ClientClosed":
                 ClientClosed(player);
                 UpdateSpielerBroadcast();
+                PlayDisconnectSound();
                 break;
             case "#TestConnection":
                 break;
@@ -285,7 +287,7 @@ public class WerBietetMehrServer : MonoBehaviour
         for (int i = 0; i < Config.PLAYERLIST.Length; i++)
         {
             Player p = Config.PLAYERLIST[i];
-            msg += "[TRENNER][ID]" + p.id + "[ID][PUNKTE]" + p.points + "[PUNKTE]";
+            msg += "[TRENNER][ID]" + p.id + "[ID][PUNKTE]" + p.points + "[PUNKTE][ONLINE]"+p.isConnected+"[ONLINE]";
             if (p.isConnected && PlayerConnected[i])
             {
                 connectedplayer++;
@@ -300,6 +302,13 @@ public class WerBietetMehrServer : MonoBehaviour
         }
         Logging.log(Logging.LogType.Debug, "WerBietetMehrServer", "UpdateSpieler", "Spieler werden aktualisiert: " + msg);
         return msg;
+    }
+    /// <summary>
+    /// Spielt den Disconnect Sound ab
+    /// </summary>
+    private void PlayDisconnectSound()
+    {
+        DisconnectSound.Play();
     }
     /// <summary>
     /// Spiel Verlassen & Zurück in die Lobby laden

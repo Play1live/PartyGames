@@ -26,7 +26,7 @@ public class Quiz
         string[] zeilen = LadeDateien.listInhalt(path);
         for (int i = 0; i < zeilen.Length; )
         {
-            string frage = zeilen[i].Replace("\\n", "\n");
+            string frage = zeilen[i];
             i++;
             string antwort = zeilen[i].Replace("\\n", "\n");
             i++;

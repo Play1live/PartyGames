@@ -4265,6 +4265,7 @@ MonoBehaviour:
   FalscheAntwortSound: {fileID: 883957236}
   Moeoep: {fileID: 883957241}
   Beeep: {fileID: 883957240}
+  DisconnectSound: {fileID: 1911061903}
 --- !u!1 &320968285
 GameObject:
   m_ObjectHideFlags: 0
@@ -5576,6 +5577,7 @@ MonoBehaviour:
   FalscheAntwortSound: {fileID: 883957236}
   Moeoep: {fileID: 883957241}
   Beeep: {fileID: 883957240}
+  DisconnectSound: {fileID: 1911061903}
 --- !u!1 &425178655
 GameObject:
   m_ObjectHideFlags: 0
@@ -26649,6 +26651,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &1902531919
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26687,6 +26690,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1902531916}
   m_CullTransparentMesh: 1
+--- !u!82 &1911061903 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 3112303309627880050, guid: 1addee56b17e5244396b567b28152820, type: 3}
+  m_PrefabInstance: {fileID: 883957235}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1913873415
 GameObject:
   m_ObjectHideFlags: 0

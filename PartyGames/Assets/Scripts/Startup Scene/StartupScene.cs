@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -39,7 +40,8 @@ public class StartupScene : MonoBehaviour
             LoadConfigs.FetchRemoteConfig();    // L‰dt Config
             MedienUtil.CreateMediaDirectory();
             StartCoroutine(UpdateGameUpdater());
-            StartCoroutine(LoadGameFilesAsync());
+            if (Config.isServer)
+                StartCoroutine(LoadGameFilesAsync());
             StartCoroutine(EnableConnectionButton());
 
             // Init PlayerlistZeigt die geladenen Spiele in der Game‹bersicht an
@@ -67,6 +69,8 @@ public class StartupScene : MonoBehaviour
         if (Hauptmenue.activeInHierarchy)
             Hauptmenue.transform.GetChild(3).GetComponent<TMP_InputField>().text = Config.PLAYER_NAME;
 
+        PlayerPrefs.SetString("PLAYER_DISPLAY_NAME", "Spielername");
+        PlayerPrefs.Save();
 
         StartCoroutine(AutostartServer());
     }
@@ -182,7 +186,18 @@ public class StartupScene : MonoBehaviour
             #region Unzip File
             Config.HAUPTMENUE_FEHLERMELDUNG = "Updater ist veraltet und wird nun aktualisiert.";
             Logging.log(Logging.LogType.Normal, "StartupScene", "DownloadUpdater", "Updaterdateien werden entpackt.");
-            ZipFile.ExtractToDirectory(UpdaterVersionPath + @"/Updater.zip", UpdaterVersionPath, true);
+            try
+            {
+                ZipFile.ExtractToDirectory(UpdaterVersionPath + @"/Updater.zip", UpdaterVersionPath, true);
+            }
+            catch (Exception e)
+            {
+                Config.HAUPTMENUE_FEHLERMELDUNG = "Updater konnte nicht aktualisiert werden!\n" +
+                    "Bitte starte das Programm neu und versuche es erneut.\n\n" +
+                    "Falls der Fehler bestehen bleibt, entpacke die \"Updater.zip\" im Ordner: \n\"" + UpdaterVersionPath + "\"";
+                Logging.log(Logging.LogType.Warning, "StartupScene", "DownloadUpdater", "Updaterdateien konnten nicht entpackt werden.", e);
+                yield break;
+            }
             Logging.log(Logging.LogType.Normal, "StartupScene", "DownloadUpdater", "Updaterdateien wurden erfolgreich entpackt.");
             #endregion
 
@@ -238,7 +253,7 @@ public class StartupScene : MonoBehaviour
             if (updatedSuccessful)
                 StartConnection();
         }
-        yield return null;
+        yield break;
     }
     /// <summary>
     /// L‰dt die vorbereiteten Spieldateien
@@ -246,7 +261,7 @@ public class StartupScene : MonoBehaviour
     IEnumerator LoadGameFilesAsync()
     {
         SetupSpiele.LoadGameFiles();
-        yield return null;
+        yield break;
     }
     /// <summary>
     /// Initialisiert die Config.PLAYERLIST

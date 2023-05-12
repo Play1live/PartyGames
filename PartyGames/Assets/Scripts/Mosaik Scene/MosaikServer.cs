@@ -33,6 +33,7 @@ public class MosaikServer : MonoBehaviour
     [SerializeField] AudioSource BuzzerSound;
     [SerializeField] AudioSource RichtigeAntwortSound;
     [SerializeField] AudioSource FalscheAntwortSound;
+    [SerializeField] AudioSource DisconnectSound;
 
     void OnEnable()
     {
@@ -190,6 +191,7 @@ public class MosaikServer : MonoBehaviour
             case "#ClientClosed":
                 ClientClosed(player);
                 UpdateSpielerBroadcast();
+                PlayDisconnectSound();
                 break;
             case "#TestConnection":
                 break;
@@ -255,7 +257,7 @@ public class MosaikServer : MonoBehaviour
         for (int i = 0; i < Config.PLAYERLIST.Length; i++)
         {
             Player p = Config.PLAYERLIST[i];
-            msg += "[TRENNER][ID]" + p.id + "[ID][PUNKTE]" + p.points + "[PUNKTE]";
+            msg += "[TRENNER][ID]" + p.id + "[ID][PUNKTE]" + p.points + "[PUNKTE][ONLINE]"+p.isConnected+"[ONLINE]";
             if (p.isConnected && PlayerConnected[i])
             {
                 SpielerAnzeige[i, 0].SetActive(true);
@@ -268,6 +270,13 @@ public class MosaikServer : MonoBehaviour
 
         }
         return msg;
+    }
+    /// <summary>
+    /// Spielt den Disconnect Sound ab
+    /// </summary>
+    private void PlayDisconnectSound()
+    {
+        DisconnectSound.Play();
     }
     /// <summary>
     /// Initialisiert die Anzeigen zu beginn
@@ -878,10 +887,10 @@ public class MosaikServer : MonoBehaviour
             Bild[0].transform.parent.gameObject.GetComponent<Image>().sprite = sprite2;
             Bild[0].transform.parent.gameObject.SetActive(true);
 
-            LoadImageIntoPreview();
+            //LoadImageIntoPreview();
         }
         yield return null;
-
+        
         BildVorschau[0].transform.parent.GetComponent<RectTransform>().sizeDelta = VorschauRect;
         GameObject imageObject1 = BildVorschau[0].transform.parent.gameObject;
         Texture2D myTexture1 = Bild[0].transform.parent.gameObject.GetComponent<Image>().sprite.texture;

@@ -66,6 +66,7 @@ public class ListenServer : MonoBehaviour
     [SerializeField] AudioSource BuzzerSound;
     [SerializeField] AudioSource RichtigeAntwortSound;
     [SerializeField] AudioSource FalscheAntwortSound;
+    [SerializeField] AudioSource DisconnectSound;
 
     void OnEnable()
     {
@@ -213,6 +214,7 @@ public class ListenServer : MonoBehaviour
             case "#ClientClosed":
                 ClientClosed(player);
                 UpdateSpielerBroadcast();
+                PlayDisconnectSound();
                 break;
             case "#TestConnection":
                 break;
@@ -535,6 +537,13 @@ public class ListenServer : MonoBehaviour
             return UpdateSpielerInGame();
         }
         return "";
+    }
+    /// <summary>
+    /// Spielt den Disconnect Sound ab
+    /// </summary>
+    private void PlayDisconnectSound()
+    {
+        DisconnectSound.Play();
     }
     /// <summary>
     /// Aktualisiert die Spieler Anzeige in der Lobby & gibt diese als Text zurück

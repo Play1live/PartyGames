@@ -38,6 +38,7 @@ public class FlaggenServer : MonoBehaviour
     [SerializeField] AudioSource BuzzerSound;
     [SerializeField] AudioSource RichtigeAntwortSound;
     [SerializeField] AudioSource FalscheAntwortSound;
+    [SerializeField] AudioSource DisconnectSound;
 
     void OnEnable()
     {
@@ -189,6 +190,7 @@ public class FlaggenServer : MonoBehaviour
             case "#ClientClosed":
                 ClientClosed(player);
                 UpdateSpielerBroadcast();
+                PlayDisconnectSound();
                 break;
             case "#TestConnection":
                 break;
@@ -254,7 +256,7 @@ public class FlaggenServer : MonoBehaviour
         for (int i = 0; i < Config.PLAYERLIST.Length; i++)
         {
             Player p = Config.PLAYERLIST[i];
-            msg += "[TRENNER][ID]" + p.id + "[ID][PUNKTE]" + p.points + "[PUNKTE]";
+            msg += "[TRENNER][ID]" + p.id + "[ID][PUNKTE]" + p.points + "[PUNKTE][ONLINE]"+p.isConnected+"[ONLINE]";
             if (p.isConnected && PlayerConnected[i])
             {
                 SpielerAnzeige[i, 0].SetActive(true);
@@ -334,6 +336,13 @@ public class FlaggenServer : MonoBehaviour
             SearchBar[i] = GameObject.Find("SearchBar/Land (" + (i) + ")");
             SearchBar[i].SetActive(false);
         }
+    }
+    /// <summary>
+    /// Spielt den Disconnect Sound ab
+    /// </summary>
+    private void PlayDisconnectSound()
+    {
+        DisconnectSound.Play();
     }
     #region Buzzer
     /// <summary>

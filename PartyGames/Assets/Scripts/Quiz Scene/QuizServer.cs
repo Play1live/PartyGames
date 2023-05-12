@@ -32,6 +32,7 @@ public class QuizServer : MonoBehaviour
     [SerializeField] AudioSource BuzzerSound;
     [SerializeField] AudioSource RichtigeAntwortSound;
     [SerializeField] AudioSource FalscheAntwortSound;
+    [SerializeField] AudioSource DisconnectSound;
 
     void OnEnable()
     {
@@ -180,6 +181,7 @@ public class QuizServer : MonoBehaviour
             case "#ClientClosed":
                 ClientClosed(player);
                 UpdateSpielerBroadcast();
+                PlayDisconnectSound();
                 break;
             case "#TestConnection":
                 break;
@@ -248,7 +250,7 @@ public class QuizServer : MonoBehaviour
         for (int i = 0; i < Config.PLAYERLIST.Length; i++)
         {
             Player p = Config.PLAYERLIST[i];
-            msg += "[TRENNER][ID]" + p.id + "[ID][PUNKTE]" + p.points + "[PUNKTE]";
+            msg += "[TRENNER][ID]" + p.id + "[ID][PUNKTE]" + p.points + "[PUNKTE][ONLINE]"+p.isConnected+"[ONLINE]";
             if (p.isConnected && PlayerConnected[i])
             {
                 connectedplayer++;
@@ -445,9 +447,9 @@ public class QuizServer : MonoBehaviour
                 LoadQuestionIntoScene(aktuelleFrage);
                 break;
             case "show":
-                GameObject.Find("Frage").GetComponentInChildren<TMP_Text>().text = Config.QUIZ_SPIEL.getSelected().getFrage(aktuelleFrage).getFrage();
+                GameObject.Find("Frage").GetComponentInChildren<TMP_Text>().text = Config.QUIZ_SPIEL.getSelected().getFrage(aktuelleFrage).getFrage().Replace("\\n", "\n");
                 GameObject.Find("QuizAnzeigen/FragenIndex1").GetComponentInChildren<TMP_Text>().text = (aktuelleFrage + 1) + "/" + Config.QUIZ_SPIEL.getSelected().getFragenCount();
-                Broadcast("#FragenAnzeige [BOOL]" + FragenAnzeige.activeInHierarchy + "[BOOL][FRAGE]" + Frage.GetComponentInChildren<TMP_Text>().text);
+                Broadcast("#FragenAnzeige [BOOL]" + FragenAnzeige.activeInHierarchy + "[BOOL][FRAGE]" + Config.QUIZ_SPIEL.getSelected().getFrage(aktuelleFrage).getFrage());
                 break;
             case "clear":
                 GameObject.Find("Frage").GetComponentInChildren<TMP_Text>().text = "";
@@ -457,15 +459,22 @@ public class QuizServer : MonoBehaviour
         }
     }
     /// <summary>
+    /// Spielt den Disconnect Sound ab
+    /// </summary>
+    private void PlayDisconnectSound()
+    {
+        DisconnectSound.Play();
+    }
+    /// <summary>
     /// Lädt die Frage nach Index, für die Server Vorschau
     /// </summary>
     /// <param name="index">Lädt eine Frage des aktuellen Quiz in die Scene</param>
     private void LoadQuestionIntoScene(int index)
     {
         Logging.log(Logging.LogType.Debug, "QuizServer", "LoadQuestionIntoScene", "Lädt die Frage: " + Config.QUIZ_SPIEL.getSelected().getFrage(index).getFrage() + " in die Scene.");
-        GameObject.Find("QuizAnzeigen/FragenVorschau").GetComponent<TMP_Text>().text = "Frage:\n"+Config.QUIZ_SPIEL.getSelected().getFrage(index).getFrage();
-        GameObject.Find("QuizAnzeigen/AntwortVorschau").GetComponent<TMP_Text>().text = "Antwort:\n"+ Config.QUIZ_SPIEL.getSelected().getFrage(index).getAntwort();
-        GameObject.Find("QuizAnzeigen/InfoVorschau").GetComponent<TMP_Text>().text = "Info:\n"+Config.QUIZ_SPIEL.getSelected().getFrage(index).getInfo();
+        GameObject.Find("QuizAnzeigen/FragenVorschau").GetComponent<TMP_Text>().text = "Frage:\n"+Config.QUIZ_SPIEL.getSelected().getFrage(index).getFrage().Replace("\\n", "\n");
+        GameObject.Find("QuizAnzeigen/AntwortVorschau").GetComponent<TMP_Text>().text = "Antwort:\n"+ Config.QUIZ_SPIEL.getSelected().getFrage(index).getAntwort().Replace("\\n", "\n");
+        GameObject.Find("QuizAnzeigen/InfoVorschau").GetComponent<TMP_Text>().text = "Info:\n"+Config.QUIZ_SPIEL.getSelected().getFrage(index).getInfo().Replace("\\n", "\n");
         GameObject.Find("QuizAnzeigen/FragenIndex2").GetComponentInChildren<TMP_Text>().text = (aktuelleFrage+1)+"/" + Config.QUIZ_SPIEL.getSelected().getFragenCount();
     }
     #endregion
@@ -476,7 +485,7 @@ public class QuizServer : MonoBehaviour
     /// <param name="toggle">Toggle</param>
     public void BuzzerAktivierenToggle(Toggle toggle)
     {
-        Logging.log(Logging.LogType.Debug, "WerBietetMehrServer", "BuzzerAktivierenToggle", "Buzzer wird aktiviert: " + toggle.isOn);
+        Logging.log(Logging.LogType.Debug, "QuizServer", "BuzzerAktivierenToggle", "Buzzer wird aktiviert: " + toggle.isOn);
         buzzerIsOn = toggle.isOn;
         BuzzerAnzeige.SetActive(toggle.isOn);
     }
@@ -488,10 +497,10 @@ public class QuizServer : MonoBehaviour
     {
         if (!buzzerIsOn)
         {
-            Logging.log(Logging.LogType.Normal, "WerBietetMehrServer", "SpielerBuzzered", p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
+            Logging.log(Logging.LogType.Normal, "QuizServer", "SpielerBuzzered", p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
             return;
         }
-        Logging.log(Logging.LogType.Warning, "WerBietetMehrServer", "SpielerBuzzered", "B: " + p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
+        Logging.log(Logging.LogType.Warning, "QuizServer", "SpielerBuzzered", "B: " + p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
         buzzerIsOn = false;
         Broadcast("#AudioBuzzerPressed " + p.id);
         BuzzerSound.Play();
@@ -505,7 +514,7 @@ public class QuizServer : MonoBehaviour
         for (int i = 0; i < Config.SERVER_MAX_CONNECTIONS; i++)
             SpielerAnzeige[i, 1].SetActive(false);
         buzzerIsOn = BuzzerAnzeige.activeInHierarchy;
-        Logging.log(Logging.LogType.Warning, "WerBietetMehrServer", "SpielerBuzzerFreigeben", "Buzzer freigegeben");
+        Logging.log(Logging.LogType.Warning, "QuizServer", "SpielerBuzzerFreigeben", "Buzzer freigegeben");
         Broadcast("#BuzzerFreigeben");
     }
     #endregion
@@ -516,7 +525,7 @@ public class QuizServer : MonoBehaviour
     /// <param name="toggle">Toggle</param>
     public void AustabenAllenZeigenToggle(Toggle toggle)
     {
-        Logging.log(Logging.LogType.Debug, "WerBietetMehrServer", "AustabenAllenZeigenToggle", "Angeige: " + toggle.isOn);
+        Logging.log(Logging.LogType.Debug, "QuizServer", "AustabenAllenZeigenToggle", "Angeige: " + toggle.isOn);
         AustabbenAnzeigen.SetActive(toggle.isOn);
         if (toggle.isOn == false)
             Broadcast("#SpielerAusgetabt 0");
@@ -528,7 +537,7 @@ public class QuizServer : MonoBehaviour
     /// <param name="data">Ein-/Ausgetabt</param>
     private void ClientFocusChange(Player player, string data)
     {
-        Logging.log(Logging.LogType.Debug, "WerBietetMehrServer", "ClientFocusChange", "Spieler " + player.name + " ist ausgetabt: " + data);
+        Logging.log(Logging.LogType.Debug, "QuizServer", "ClientFocusChange", "Spieler " + player.name + " ist ausgetabt: " + data);
         bool ausgetabt = !Boolean.Parse(data);
         SpielerAnzeige[(player.id - 1), 3].SetActive(ausgetabt); // Ausgetabt Einblednung
         if (AustabbenAnzeigen.activeInHierarchy)
@@ -543,7 +552,7 @@ public class QuizServer : MonoBehaviour
     public void FrageAnzeigenToggle(Toggle toggle)
     {
         FragenAnzeige.SetActive(toggle.isOn);
-        Broadcast("#FragenAnzeige [BOOL]"+toggle.isOn+"[BOOL][FRAGE]"+Frage.GetComponentInChildren<TMP_Text>().text);
+        Broadcast("#FragenAnzeige [BOOL]"+toggle.isOn+"[BOOL][FRAGE]"+Frage.GetComponentInChildren<TMP_Text>().text.Replace("\n", "\\n"));
     }
     /// <summary>
     /// Blendet die selbst eingegebene Frage ein
@@ -551,7 +560,7 @@ public class QuizServer : MonoBehaviour
     /// <param name="input">Texteingabefeld</param>
     public void EigeneFrageEinblenden(TMP_InputField input)
     {
-        Frage.GetComponentInChildren<TMP_Text>().text = input.text;
+        Frage.GetComponentInChildren<TMP_Text>().text = input.text.Replace("\\n", "\n");
         if (FragenAnzeige.activeInHierarchy)
             Broadcast("#FragenAnzeige [BOOL]" + FragenAnzeige.activeInHierarchy + "[BOOL][FRAGE]" + input.text);
         input.text = "";
@@ -797,16 +806,16 @@ public class QuizServer : MonoBehaviour
 
         // Zeigt Sieger für Server an
         string einheit = GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text;
-        float schatung = float.Parse(SchaetzfragenAnzeige[4].GetComponentInChildren<TMP_Text>().text.Replace(einheit , ""));
-        float ziel = float.Parse(SchaetzfragenAnzeige[2].GetComponentInChildren<TMP_Text>().text.Replace(einheit, ""));
-        float diff = Math.Abs(schatung - ziel);
+        double schatung = double.Parse(SchaetzfragenAnzeige[4].GetComponentInChildren<TMP_Text>().text.Replace(einheit , ""));
+        double ziel = double.Parse(SchaetzfragenAnzeige[2].GetComponentInChildren<TMP_Text>().text.Replace(einheit, ""));
+        double diff = Math.Abs(schatung - ziel);
         foreach (Player p in Config.PLAYERLIST)
         {
             if (!SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].activeInHierarchy)
                 continue;
 
-            float spieler = float.Parse(SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].GetComponentInChildren<TMP_Text>().text.Replace(einheit, ""));
-            float spielerdiff = Math.Abs(spieler - ziel);
+            double spieler = double.Parse(SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].GetComponentInChildren<TMP_Text>().text.Replace(einheit, ""));
+            double spielerdiff = Math.Abs(spieler - ziel);
             if (spielerdiff < diff)
             {
                 schatung = spieler;
@@ -817,8 +826,8 @@ public class QuizServer : MonoBehaviour
         {
             if (!SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].activeInHierarchy)
                 continue;
-            float spieler = float.Parse(SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].GetComponentInChildren<TMP_Text>().text.Replace(einheit, ""));
-            float spielerdiff = Math.Abs(spieler - ziel);
+            double spieler = double.Parse(SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].GetComponentInChildren<TMP_Text>().text.Replace(einheit, ""));
+            double spielerdiff = Math.Abs(spieler - ziel);
             if (spielerdiff == diff)
                 SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].transform.GetChild(3).gameObject.SetActive(true);
         }
@@ -839,7 +848,7 @@ public class QuizServer : MonoBehaviour
         float DifftoNull = Math.Abs(StartPosition);
         float DiffToMax = MaxPosition - StartPosition;
         float WertToMax = DiffToMax / (MaxWert-StartWert);
-        float spielerwert = 0;
+        double spielerwert = 0;
 
         // Ziel Bewegen
         SchaetzfragenAnzeige[2].transform.localPosition = new Vector3(WertToMax*(ZielWert-StartWert) - DifftoNull ,SchaetzfragenAnzeige[2].transform.localPosition.y, 0);
@@ -865,7 +874,7 @@ public class QuizServer : MonoBehaviour
             SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].transform.localPosition = new Vector3(StartPosition, SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].transform.localPosition.y, 0);
             if (p.isConnected)
             {
-                spielerwert = float.Parse(GameObject.Find("SchaetzfragenAnimation/Grid/Icon (" + p.id + ")").GetComponentInChildren<TMP_Text>().text.Replace(GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text, ""));
+                spielerwert = double.Parse(GameObject.Find("SchaetzfragenAnimation/Grid/Icon (" + p.id + ")").GetComponentInChildren<TMP_Text>().text.Replace(GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text, ""));
                 data_text = data_text.Replace("[SPIELER_WERT]", "|").Split('|')[0] + "[SPIELER_WERT]" + spielerwert + "[SPIELER_WERT]";
                 SchaetzfragenAnzeige[(5 + 2 * (p.id - 1))].GetComponent<TMP_Text>().text = data_text;
                 broadcastmsg += "[" + p.id + "]"+spielerwert+"[" + p.id + "]";

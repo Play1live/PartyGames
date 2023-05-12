@@ -20,6 +20,7 @@ public class QuizClient : MonoBehaviour
     [SerializeField] AudioSource BuzzerSound;
     [SerializeField] AudioSource RichtigeAntwortSound;
     [SerializeField] AudioSource FalscheAntwortSound;
+    [SerializeField] AudioSource DisconnectSound;
 
     void OnEnable()
     {
@@ -322,16 +323,30 @@ public class QuizClient : MonoBehaviour
                 SpielerAnzeige[pos, 4].GetComponent<TMP_Text>().text = Config.PLAYERLIST[pos].name;
                 SpielerAnzeige[pos, 5].GetComponent<TMP_Text>().text = Config.PLAYERLIST[pos].points+"";
                 // Verbundene Spieler anzeigen
-                if (Config.PLAYERLIST[pos].name != "")
+                bool connected = bool.Parse(sp.Replace("[ONLINE]", "|").Split('|')[1]);
+                if (Config.PLAYERLIST[pos].name != "" && connected)
                 {
                     SpielerAnzeige[pos, 0].SetActive(true);
                 }
                 else
                 {
+                    if (SpielerAnzeige[pos, 0].activeInHierarchy && !connected)
+                    {
+                        Config.PLAYERLIST[pos].name = "";
+                        PlayDisconnectSound();
+                    }
+
                     SpielerAnzeige[pos, 0].SetActive(false);
                 }
             }
         }
+    }
+    /// <summary>
+    /// Spielt den Disconnect Sound ab
+    /// </summary>
+    private void PlayDisconnectSound()
+    {
+        DisconnectSound.Play();
     }
     /// <summary>
     /// Sendet eine Buzzer Anfrage an den Server
@@ -425,7 +440,7 @@ public class QuizClient : MonoBehaviour
         if (anzeigen)
         {
             Frage.SetActive(true);
-            Frage.GetComponentInChildren<TMP_Text>().text = data.Replace("[FRAGE]", "|").Split('|')[1];
+            Frage.GetComponentInChildren<TMP_Text>().text = data.Replace("[FRAGE]", "|").Split('|')[1].Replace("\\n", "\n");
         }
         else
         {
@@ -532,7 +547,7 @@ public class QuizClient : MonoBehaviour
         data_text += "[EINHEIT]" + einheit+ "[EINHEIT]";
         data_text += "[KOMMASTELLEN]" + stellen + "[KOMMASTELLEN]";
         data_text += "[SPIELER_WERT]0[SPIELER_WERT]";
-        float spielerwert = 0;
+        double spielerwert = 0;
 
         // Spieler
         foreach (Player p in Config.PLAYERLIST)

@@ -34,6 +34,7 @@ public class GeheimwörterServer : MonoBehaviour
     [SerializeField] AudioSource BuzzerSound;
     [SerializeField] AudioSource RichtigeAntwortSound;
     [SerializeField] AudioSource FalscheAntwortSound;
+    [SerializeField] AudioSource DisconnectSound;
 
     void OnEnable()
     {
@@ -184,6 +185,7 @@ public class GeheimwörterServer : MonoBehaviour
             case "#ClientClosed":
                 ClientClosed(player);
                 UpdateSpielerBroadcast();
+                PlayDisconnectSound();
                 break;
             case "#TestConnection":
                 break;
@@ -249,7 +251,7 @@ public class GeheimwörterServer : MonoBehaviour
         for (int i = 0; i < Config.PLAYERLIST.Length; i++)
         {
             Player p = Config.PLAYERLIST[i];
-            msg += "[TRENNER][ID]" + p.id + "[ID][PUNKTE]" + p.points + "[PUNKTE]";
+            msg += "[TRENNER][ID]" + p.id + "[ID][PUNKTE]" + p.points + "[PUNKTE][ONLINE]"+p.isConnected+"[ONLINE]";
             if (p.isConnected && PlayerConnected[i])
             {
                 SpielerAnzeige[i, 0].SetActive(true);
@@ -305,6 +307,13 @@ public class GeheimwörterServer : MonoBehaviour
             SpielerAnzeige[i, 1].SetActive(false); // BuzzerPressed Umrandung
             SpielerAnzeige[i, 3].SetActive(false); // Ausgetabt Einblendung
         }
+    }
+    /// <summary>
+    /// Spielt den Disconnect Sound ab
+    /// </summary>
+    private void PlayDisconnectSound()
+    {
+        DisconnectSound.Play();
     }
     #region Buzzer
     /// <summary>

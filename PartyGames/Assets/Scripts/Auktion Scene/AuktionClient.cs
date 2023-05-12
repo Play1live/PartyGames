@@ -19,6 +19,7 @@ public class AuktionClient : MonoBehaviour
     [SerializeField] AudioSource BuzzerSound;
     [SerializeField] AudioSource RichtigeAntwortSound;
     [SerializeField] AudioSource FalscheAntwortSound;
+    [SerializeField] AudioSource DisconnectSound;
 
     void OnEnable()
     {
@@ -239,12 +240,19 @@ public class AuktionClient : MonoBehaviour
             }
 
             // Verbundene Spieler anzeigen
-            if (Config.PLAYERLIST[pos].name != "")
+            bool connected = bool.Parse(sp.Replace("[ONLINE]", "|").Split('|')[1]);
+            if (Config.PLAYERLIST[pos].name != "" && connected)
             {
                 SpielerAnzeige[pos, 0].SetActive(true);
             }
             else
             {
+                if (SpielerAnzeige[pos, 0].activeInHierarchy && !connected)
+                {
+                    Config.PLAYERLIST[pos].name = "";
+                    PlayDisconnectSound();
+                }
+
                 SpielerAnzeige[pos, 0].SetActive(false);
             }
             
@@ -335,7 +343,13 @@ public class AuktionClient : MonoBehaviour
         //Auktion
         BildAnzeige = GameObject.Find("Auktion/Anzeige/Bild").GetComponent<Image>();
         BildAnzeige.gameObject.SetActive(false);
-
+    }
+    /// <summary>
+    /// Spielt den Disconnect Sound ab
+    /// </summary>
+    private void PlayDisconnectSound()
+    {
+        DisconnectSound.Play();
     }
     /// <summary>
     /// Lädt Bilder per URL herunter

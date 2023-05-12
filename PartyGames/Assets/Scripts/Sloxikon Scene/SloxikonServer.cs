@@ -37,6 +37,7 @@ public class SloxikonServer : MonoBehaviour
     [SerializeField] AudioSource FalscheAntwortSound;
     [SerializeField] AudioSource Moeoep;
     [SerializeField] AudioSource Beeep;
+    [SerializeField] AudioSource DisconnectSound;
 
     void OnEnable()
     {
@@ -189,6 +190,7 @@ public class SloxikonServer : MonoBehaviour
             case "#ClientClosed":
                 ClientClosed(player);
                 UpdateSpielerBroadcast();
+                PlayDisconnectSound();
                 break;
             case "#TestConnection":
                 break;
@@ -255,7 +257,7 @@ public class SloxikonServer : MonoBehaviour
         for (int i = 0; i < Config.PLAYERLIST.Length; i++)
         {
             Player p = Config.PLAYERLIST[i];
-            msg += "[TRENNER][ID]" + p.id + "[ID][PUNKTE]" + p.points + "[PUNKTE]";
+            msg += "[TRENNER][ID]" + p.id + "[ID][PUNKTE]" + p.points + "[PUNKTE][ONLINE]"+p.isConnected+"[ONLINE]";
             if (p.isConnected && PlayerConnected[i])
             {
                 connectedplayer++;
@@ -269,6 +271,13 @@ public class SloxikonServer : MonoBehaviour
 
         }
         return msg;
+    }
+    /// <summary>
+    /// Spielt den Disconnect Sound ab
+    /// </summary>
+    private void PlayDisconnectSound()
+    {
+        DisconnectSound.Play();
     }
     /// <summary>
     /// Initialisiert die Anzeigen zu beginn
@@ -285,10 +294,6 @@ public class SloxikonServer : MonoBehaviour
         GameObject.Find("ServerSide/AusgetabtSpielernZeigenToggle").GetComponent<Toggle>().isOn = false;
         AustabbenAnzeigen = GameObject.Find("ServerSide/AusgetabtWirdSpielernGezeigen");
         AustabbenAnzeigen.SetActive(false);
-        // Punkte Pro Richtige Antwort
-        GameObject.Find("ServerSide/PunkteProRichtigeAntwort").GetComponent<TMP_InputField>().text = ""+PunkteProRichtige;
-        // Punkte Pro Falsche Antwort
-        GameObject.Find("ServerSide/PunkteProFalscheAntwort").GetComponent<TMP_InputField>().text = ""+PunkteProFalsche;
         // Spieler Anzeige
         SpielerAnzeige = new GameObject[Config.SERVER_MAX_CONNECTIONS, 7]; // Anzahl benötigter Elemente
         for (int i = 0; i < Config.SERVER_MAX_CONNECTIONS; i++)
@@ -353,6 +358,8 @@ public class SloxikonServer : MonoBehaviour
         Timer = GameObject.Find("Sloxikon/TimerSekundenAnzeige");
         Timer.SetActive(false);
         TimerSekunden = GameObject.Find("Sloxikon/Server/TimerDauer").GetComponent<TMP_InputField>();
+
+        DisplayRandomSequence();
     }
     /// <summary>
     /// Navigiert durch die Themen
@@ -468,6 +475,51 @@ public class SloxikonServer : MonoBehaviour
                     Antworten[i].transform.GetChild(3).GetChild(j).GetComponent<Button>().interactable = true;
                     Antworten[i].transform.GetChild(3).GetChild(j).gameObject.SetActive(true);
                 }
+            }
+        }
+        DisplayRandomSequence();
+    }
+    /// <summary>
+    /// Legt eine zufällige Reihnfolge der Spieler fest
+    /// </summary>
+    private void DisplayRandomSequence()
+    {
+        GameObject parent = GameObject.Find("Sloxikon/Server/ReihnfolgenAuswahl");
+        for (int i = 0; i < parent.transform.childCount; i++)
+            parent.transform.GetChild(i).gameObject.SetActive(false);
+
+        List<int> ids = new List<int>();
+        foreach (Player p in Config.PLAYERLIST)
+        {
+            if (p.isConnected && p.name.Length > 0)
+                ids.Add(p.id);
+        }
+
+        int length = ids.Count;
+        for (int i = 0; i < length; i++)
+        {
+            int random = ids[UnityEngine.Random.Range(0, ids.Count)];
+            ids.Remove(random);
+            parent.transform.GetChild(i).GetComponent<Button>().image.sprite = Config.PLAYERLIST[Player.getPosInLists(random)].icon;
+            parent.transform.GetChild(i).gameObject.SetActive(true);
+        }
+    }
+    /// <summary>
+    /// Blendet den aktuellen Spieler an, der dran ist
+    /// </summary>
+    public void SelectPlayersTurn(GameObject go)
+    {
+        Sprite sprite = go.GetComponent<Button>().image.sprite;
+
+        foreach (Player p in Config.PLAYERLIST)
+        {
+            if (sprite == p.icon)
+            {
+                Broadcast("#SpielersTurn " + p.id);
+                for (int i = 0; i < Config.SERVER_MAX_CONNECTIONS; i++)
+                    SpielerAnzeige[i, 1].SetActive(false);
+                SpielerAnzeige[(p.id - 1), 1].SetActive(true);
+                break;
             }
         }
     }
@@ -756,36 +808,6 @@ public class SloxikonServer : MonoBehaviour
     public void ChangePunkteProFalscheAntwort(TMP_InputField input)
     {
         PunkteProFalsche = Int32.Parse(input.text);
-    }
-    /// <summary>
-    /// Vergibt an den Spieler Punkte für eine richtige Antwort
-    /// </summary>
-    /// <param name="player"></param>
-    public void PunkteRichtigeAntwort(GameObject player)
-    {
-        Broadcast("#AudioRichtigeAntwort");
-        RichtigeAntwortSound.Play();
-        int pId = Int32.Parse(player.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
-        int pIndex = Player.getPosInLists(pId);
-        Config.PLAYERLIST[pIndex].points += PunkteProRichtige;
-        UpdateSpielerBroadcast();
-    }
-    /// <summary>
-    /// Vergibt an alle anderen Spieler Punkte bei einer falschen Antwort
-    /// </summary>
-    /// <param name="player"></param>
-    public void PunkteFalscheAntwort(GameObject player)
-    {
-        Broadcast("#AudioFalscheAntwort");
-        FalscheAntwortSound.Play();
-        int pId = Int32.Parse(player.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
-        foreach (Player p in Config.PLAYERLIST)
-        {
-            if (pId != p.id && p.isConnected)
-                p.points += PunkteProFalsche;
-        }
-        Config.SERVER_PLAYER_POINTS += PunkteProFalsche;
-        UpdateSpielerBroadcast();
     }
     /// <summary>
     /// Ändert die Punkte des Spielers (+-1)

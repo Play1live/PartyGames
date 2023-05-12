@@ -1196,6 +1196,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &77828128
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3719,6 +3720,7 @@ MonoBehaviour:
   BuzzerSound: {fileID: 883957238}
   RichtigeAntwortSound: {fileID: 883957237}
   FalscheAntwortSound: {fileID: 883957236}
+  DisconnectSound: {fileID: 883957239}
 --- !u!224 &326228004 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 9039012831577584689, guid: af337f845c756d144a96e2fb5978ae57, type: 3}
@@ -4938,6 +4940,7 @@ MonoBehaviour:
   BuzzerSound: {fileID: 883957238}
   RichtigeAntwortSound: {fileID: 883957237}
   FalscheAntwortSound: {fileID: 883957236}
+  DisconnectSound: {fileID: 883957239}
 --- !u!1 &425178655
 GameObject:
   m_ObjectHideFlags: 0
@@ -9713,6 +9716,11 @@ AudioSource:
 --- !u!82 &883957238 stripped
 AudioSource:
   m_CorrespondingSourceObject: {fileID: 996077472497281936, guid: 1addee56b17e5244396b567b28152820, type: 3}
+  m_PrefabInstance: {fileID: 883957235}
+  m_PrefabAsset: {fileID: 0}
+--- !u!82 &883957239 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 3112303309627880050, guid: 1addee56b17e5244396b567b28152820, type: 3}
   m_PrefabInstance: {fileID: 883957235}
   m_PrefabAsset: {fileID: 0}
 --- !u!224 &889000452 stripped

@@ -22,10 +22,14 @@ public class StartupClient : MonoBehaviour
 
     [SerializeField] GameObject UmbenennenFeld;
 
+    [SerializeField] AudioSource ConnectSound;
+    [SerializeField] AudioSource DisconnectSound;
+
     void OnEnable()
     {
         InitPlayerLobby();
 
+        MiniGames[0].transform.parent.parent.gameObject.SetActive(true);
         MiniGames[0].SetActive(true);
         #region Client Verbindungsaufbau zum Server
         if (!Config.CLIENT_STARTED)
@@ -268,6 +272,7 @@ public class StartupClient : MonoBehaviour
                 break;
             case "#SetID":
                 SetID(data);
+                PlayConnectSound();
                 break;
             case "#WrongVersion":
                 StopCoroutine(TestIfStartConnectionError());
@@ -477,11 +482,17 @@ public class StartupClient : MonoBehaviour
                 SpielerAnzeigeLobby[id].GetComponentInChildren<TMP_Text>().text = Config.PLAYERLIST[pos].name;
                 if (Config.PLAYERLIST[pos].name != "")
                 {
+                    if (!SpielerAnzeigeLobby[id].activeInHierarchy)
+                        PlayConnectSound();
+                    
                     SpielerAnzeigeLobby[id].SetActive(true);
                     spieleranzahl++;
                 }
                 else
                 {
+                    if (SpielerAnzeigeLobby[id].activeInHierarchy)
+                        PlayDisconnectSound();
+
                     SpielerAnzeigeLobby[id].SetActive(false);
                 }
             }
@@ -501,6 +512,20 @@ public class StartupClient : MonoBehaviour
         {
             SpielerAnzeigeLobby[p.id].transform.GetChild(3).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Ping/" + data.Replace("[" + p.id + "]", "|").Split('|')[1]);
         }
+    }
+    /// <summary>
+    /// Spielt den Connect Sound ab
+    /// </summary>
+    private void PlayConnectSound()
+    {
+        ConnectSound.Play();
+    }
+    /// <summary>
+    /// Spielt den Disconnect Sound ab
+    /// </summary>
+    private void PlayDisconnectSound()
+    {
+        DisconnectSound.Play();
     }
     /// <summary>
     /// Aktualisiert die Kornenanzeige
@@ -679,6 +704,7 @@ public class StartupClient : MonoBehaviour
         foreach (GameObject go in MiniGames)
             go.SetActive(false);
 
+        MiniGames[0].transform.parent.gameObject.SetActive(true);
         MiniGames[0].SetActive(true);
     }
     /// <summary>

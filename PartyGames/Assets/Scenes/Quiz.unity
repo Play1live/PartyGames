@@ -7348,6 +7348,7 @@ MonoBehaviour:
   BuzzerSound: {fileID: 883957238}
   RichtigeAntwortSound: {fileID: 883957237}
   FalscheAntwortSound: {fileID: 883957236}
+  DisconnectSound: {fileID: 883957240}
 --- !u!1 &313153287
 GameObject:
   m_ObjectHideFlags: 0
@@ -10133,6 +10134,7 @@ MonoBehaviour:
   BuzzerSound: {fileID: 883957238}
   RichtigeAntwortSound: {fileID: 883957237}
   FalscheAntwortSound: {fileID: 883957236}
+  DisconnectSound: {fileID: 883957240}
 --- !u!1 &420170866
 GameObject:
   m_ObjectHideFlags: 0
@@ -23431,6 +23433,11 @@ AudioSource:
 --- !u!82 &883957239 stripped
 AudioSource:
   m_CorrespondingSourceObject: {fileID: 8904324731467846179, guid: 1addee56b17e5244396b567b28152820, type: 3}
+  m_PrefabInstance: {fileID: 883957235}
+  m_PrefabAsset: {fileID: 0}
+--- !u!82 &883957240 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 3112303309627880050, guid: 1addee56b17e5244396b567b28152820, type: 3}
   m_PrefabInstance: {fileID: 883957235}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &888788849
@@ -50053,6 +50060,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &1902531919
 MonoBehaviour:
   m_ObjectHideFlags: 0
