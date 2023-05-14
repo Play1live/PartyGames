@@ -6,7 +6,9 @@ using System.IO.Compression;
 using System.Text;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class StartupScene : MonoBehaviour
@@ -17,6 +19,12 @@ public class StartupScene : MonoBehaviour
     [SerializeField] GameObject Lobby;
     [SerializeField] GameObject ServerControl;
 
+    [SerializeField] GameObject LautstärkeEinstellung;
+    [SerializeField] GameObject ServerEinstellungen;
+
+    [SerializeField] GameObject ModeratedGamesSFX;
+    [SerializeField] AudioMixer audiomixer;
+
     private bool UpdaterIsUpToDate = false;
 
     void Start()
@@ -26,20 +34,25 @@ public class StartupScene : MonoBehaviour
         Config.PLAYER_NAME = "Henryk";
 #endif
         /*Testzwecke*/
-        Config.DEBUG_MODE = true;
+        // Config.DEBUG_MODE = true;
         //Config.isServer = !Config.isServer;
         //Config.isServer = true;
-
+        Debug.LogWarning(Config.SERVER_CONNECTION_IP);
         Config.GAME_TITLE = "Startup";
         if (!Config.APPLICATION_INIT)
         {
             Logging.log(Logging.LogType.Normal, "StartupScene", "Start", "Application Version: " + Config.APPLICATION_VERSION);
             Logging.log(Logging.LogType.Normal, "StartupScene", "Start", "Debugmode: " + Config.DEBUG_MODE);
             WriteGameVersionFile();
-
             LoadConfigs.FetchRemoteConfig();    // Lädt Config
             MedienUtil.CreateMediaDirectory();
             StartCoroutine(UpdateGameUpdater());
+
+            // Lädt die applicationConfig
+            Config.APPLICATION_CONFIG = new ConfigFile(Application.persistentDataPath + "/", "application.config");
+            StartCoroutine(UpdateSoundsVolume());
+
+
             if (Config.isServer)
                 StartCoroutine(LoadGameFilesAsync());
             StartCoroutine(EnableConnectionButton());
@@ -57,24 +70,26 @@ public class StartupScene : MonoBehaviour
             else
                 GameObject.Find("Version_LBL").gameObject.GetComponent<TMP_Text>().text = "Version: " + Config.APPLICATION_VERSION;
 
+            GameObject.Find("ApplicationEinstellungen/Hintergrund/Version").GetComponent<TMP_Text>().text = Config.APPLICATION_VERSION;
             Config.APPLICATION_INIT = true;
         }
+
+        ServerEinstellungen.transform.GetChild(2).GetChild(1).GetChild(0).GetComponent<TMP_InputField>().text = Config.SERVER_CONNECTION_IP;
+        ServerEinstellungen.transform.GetChild(3).GetChild(1).GetChild(0).GetComponent<TMP_InputField>().text = "" + Config.SERVER_CONNECTION_PORT;
 
         if (!Config.CLIENT_STARTED && !Config.SERVER_STARTED)
         {
             Client.SetActive(false);
             Server.SetActive(false);
+            ServerEinstellungen.SetActive(true);
         }
         // Zeigt den temporären Spielernamen an
         if (Hauptmenue.activeInHierarchy)
             Hauptmenue.transform.GetChild(3).GetComponent<TMP_InputField>().text = Config.PLAYER_NAME;
 
-        PlayerPrefs.SetString("PLAYER_DISPLAY_NAME", "Spielername");
-        PlayerPrefs.Save();
-
         StartCoroutine(AutostartServer());
     }
-    
+        
     private void OnEnable()
     {
         Hauptmenue.SetActive(true);
@@ -109,8 +124,30 @@ public class StartupScene : MonoBehaviour
     private void OnDisable()
     {
         StopAllCoroutines();
+        Config.APPLICATION_CONFIG.Save();
     }
 
+    /// <summary>
+    /// Updates SoundVolume (Master, SFX, BGM)
+    /// </summary>
+    IEnumerator UpdateSoundsVolume()
+    {
+        float master = Config.APPLICATION_CONFIG.GetFloat("GAME_MASTER_VOLUME", 0f);
+        audiomixer.SetFloat("MASTER", master);
+        LautstärkeEinstellung.transform.GetChild(1).GetChild(1).GetComponent<Slider>().value = master / 10;
+        LautstärkeEinstellung.transform.GetChild(1).GetChild(1).GetChild(3).GetComponentInChildren<TMP_Text>().text = ((master * 3) + 100) + "%";
+
+        float sfx = Config.APPLICATION_CONFIG.GetFloat("GAME_SFX_VOLUME", 0f);
+        audiomixer.SetFloat("SFX", sfx);
+        LautstärkeEinstellung.transform.GetChild(2).GetChild(1).GetComponent<Slider>().value = sfx / 10;
+        LautstärkeEinstellung.transform.GetChild(2).GetChild(1).GetChild(3).GetComponentInChildren<TMP_Text>().text = ((sfx * 3) + 100) + "%";
+
+        float bgm = Config.APPLICATION_CONFIG.GetFloat("GAME_BGM_VOLUME", 0f);
+        audiomixer.SetFloat("BGM", bgm);
+        LautstärkeEinstellung.transform.GetChild(3).GetChild(1).GetComponent<Slider>().value = bgm / 10;
+        LautstärkeEinstellung.transform.GetChild(3).GetChild(1).GetChild(3).GetComponentInChildren<TMP_Text>().text = ((bgm * 3) + 100) + "%";
+        yield return null;
+    }
     /// <summary>
     /// Aktualisiert den Updater sofern dieser veraltet ist
     /// </summary>
@@ -230,6 +267,8 @@ public class StartupScene : MonoBehaviour
     {
         Hauptmenue.transform.GetChild(4).gameObject.SetActive(false);
         yield return new WaitUntil(() => Config.SERVER_CONNECTION_IP != "localhost"); // RemoteConfig wurd geladen
+        ServerEinstellungen.transform.GetChild(2).GetChild(1).GetChild(0).GetComponent<TMP_InputField>().text = Config.SERVER_CONNECTION_IP;
+        ServerEinstellungen.transform.GetChild(3).GetChild(1).GetChild(0).GetComponent<TMP_InputField>().text = "" + Config.SERVER_CONNECTION_PORT;
         yield return new WaitUntil(() => UpdaterIsUpToDate == true); // Warte bis die Version des Updater aktualisiert wurde
         Logging.log(Logging.LogType.Debug, "StartupScene", "EnableConnectionButton", "Spieler darf sich nun verbinden.");
         Hauptmenue.transform.GetChild(4).gameObject.SetActive(true);
@@ -308,7 +347,10 @@ public class StartupScene : MonoBehaviour
         if (Config.CLIENT_STARTED || Config.SERVER_STARTED)
             return;
 
+        ServerEinstellungen.SetActive(false);
+
         Config.PLAYER_NAME = GameObject.Find("ChooseYourName_TXT").gameObject.GetComponent<TMP_InputField>().text;
+        Config.APPLICATION_CONFIG.SetString("PLAYER_DISPLAY_NAME", Config.PLAYER_NAME);
         // Game is Player
         if (!Config.isServer)
         {
@@ -350,5 +392,86 @@ public class StartupScene : MonoBehaviour
             }
         }
         Logging.log(Logging.LogType.Debug, "StartupScene", "WriteGameVersionFile", "Spiel Version wurde für den Updater aktualisiert.");
+    }
+
+
+    private void SettingsAktualisiereAnzeigen()
+    {
+
+    }
+    public void SettingsChangeIP(TMP_InputField input)
+    {
+        if (Config.CLIENT_STARTED || Config.SERVER_STARTED)
+            return;
+        Config.SERVER_CONNECTION_IP = input.text;
+    }
+    public void SettingsChangePort(TMP_InputField input)
+    {
+        if (Config.CLIENT_STARTED || Config.SERVER_STARTED)
+            return;
+        Config.SERVER_CONNECTION_PORT = int.Parse(input.text);
+    }
+    public void SettingsChangeServerHost(Toggle toggle)
+    {
+        if (Config.CLIENT_STARTED || Config.SERVER_STARTED)
+            return;
+        Config.isServer = toggle.isOn;
+    }
+    public void SettingsChangeNoIPUsername(TMP_InputField input)
+    {
+        if (!File.Exists(Application.persistentDataPath + @"/No-IP Settings.txt"))
+            return;
+
+        string lines = "";
+        foreach (string line in File.ReadAllLines(Application.persistentDataPath + @"/No-IP Settings.txt"))
+        {
+            if (line.StartsWith("No-IP_Benutzername: "))
+                lines += "\n" + "No-IP_Benutzername: " + input.text;
+            else
+                lines += "\n" + line;
+        }
+        if (lines.Length > 3)
+            lines = lines.Substring("\n".Length);
+        File.WriteAllText(Application.persistentDataPath + @"/No-IP Settings.txt", lines);
+    }
+    public void SettingsChangeNoIPPassword(TMP_InputField input)
+    {
+        if (!File.Exists(Application.persistentDataPath + @"/No-IP Settings.txt"))
+            return;
+
+        string lines = "";
+        foreach (string line in File.ReadAllLines(Application.persistentDataPath + @"/No-IP Settings.txt"))
+        {
+            if (line.StartsWith("No-IP_Passwort: "))
+                lines += "\n" + "No-IP_Passwort: " + input.text;
+            else
+                lines += "\n" + line;
+        }
+        if (lines.Length > 3)
+            lines = lines.Substring("\n".Length);
+        File.WriteAllText(Application.persistentDataPath + @"/No-IP Settings.txt", lines);
+    }
+    public void SettingsChangeNoIPHostname(TMP_InputField input)
+    {
+        if (!File.Exists(Application.persistentDataPath + @"/No-IP Settings.txt"))
+            return;
+
+        string lines = "";
+        foreach (string line in File.ReadAllLines(Application.persistentDataPath + @"/No-IP Settings.txt"))
+        {
+            if (line.StartsWith("No-IP_Hostname: "))
+                lines += "\n" + "No-IP_Hostname: " + input.text;
+            else
+                lines += "\n" + line;
+        }
+        if (lines.Length > 3)
+            lines = lines.Substring("\n".Length);
+        File.WriteAllText(Application.persistentDataPath + @"/No-IP Settings.txt", lines);
+    }
+    public void StartCreationTerminal()
+    {
+        Logging.log(Logging.LogType.Normal, "StartupScene", "StartCreationTerminal", "Starte das ContentCreationTerminal");
+        Config.GAME_TITLE = "ContentCreationTerminal";
+        SceneManager.LoadScene("ContentCreationTerminal");
     }
 }

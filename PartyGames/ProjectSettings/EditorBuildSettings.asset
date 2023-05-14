@@ -32,4 +32,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Sloxikon.unity
     guid: 6c20ab13ebd09e34f83ac73aae7f67be
+  - enabled: 1
+    path: Assets/Scenes/ContentCreationTerminal.unity
+    guid: d35b7b6fb5cd75546b787e28bcf61f9f
   m_configObjects: {}

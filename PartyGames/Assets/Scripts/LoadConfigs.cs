@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class LoadConfigs
 {
+    #region RemoteConfig Stuff
 #pragma warning disable CS0618 // Typ oder Element ist veraltet
     public struct userAttributes { }
     public struct appAttriutes { }
@@ -69,4 +70,8 @@ public class LoadConfigs
             Screen.fullScreenMode = FullScreenMode.Windowed;
         }
     }
+    #endregion
+    #region ApplicationConfig
+
+    #endregion
 }

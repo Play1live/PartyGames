@@ -132,6 +132,7 @@ public class StartupServer : MonoBehaviour
         Logging.log(Logging.LogType.Normal, "StartupServer", "OnApplicationQuit", "Server wird geschlossen.");
         //Config.SERVER_TCP.Server.Close();
         Config.SERVER_TCP.Stop();
+        Config.APPLICATION_CONFIG.Save();
     }
 
     private void OnDisable()

@@ -51,6 +51,9 @@ public class Config
     public static AuktionSpiel AUKTION_SPIEL;
     public static SloxikonSpiel SLOXIKON_SPIEL;
 
+    // Application Config
+    public static ConfigFile APPLICATION_CONFIG;
+
     // Scenenspezifisches
     public static string GAME_TITLE = "Startup";
     // Hauptmenue

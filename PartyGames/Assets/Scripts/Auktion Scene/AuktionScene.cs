@@ -51,6 +51,7 @@ public class AuktionScene : MonoBehaviour
     private void OnDisable()
     {
         StopAllCoroutines();
+        Config.APPLICATION_CONFIG.Save();
     }
 
 

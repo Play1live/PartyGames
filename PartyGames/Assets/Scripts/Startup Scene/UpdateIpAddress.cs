@@ -18,7 +18,17 @@ public class UpdateIpAddress
         // Lade aktuelle IP-Adresse
         string ipaddress = new WebClient().DownloadString("https://api.ipify.org");
         // Lade DNS-IP-Adresse
-        IPAddress[] domainip = Dns.GetHostAddresses(Config.SERVER_CONNECTION_IP);
+        IPAddress[] domainip;
+        try
+        {
+            domainip = Dns.GetHostAddresses(Config.SERVER_CONNECTION_IP);
+        }
+        catch (Exception e)
+        {
+            Logging.log(Logging.LogType.Warning, "UpdateIpAddress", "UpdateNoIP_DNS", "Could not resolve host " + Config.SERVER_CONNECTION_IP);
+            return false;
+        }
+        
 
         Logging.log(Logging.LogType.Normal, "UpdateIpAddress", "UpdateNoIP_DNS", "Aktuelle IP: " + ipaddress + "  DNS-IP: " + domainip[0].ToString());
         // Wenn die DNS-IP gleich der aktuellen des Servers ist, dann muss kein IP Update durchgeführt werden
@@ -36,9 +46,9 @@ public class UpdateIpAddress
             {
                 using (FileStream fs = File.Create(noiptxt))
                 {
-                    byte[] info = new UTF8Encoding(true).GetBytes("No-IP_Benutzername: <mustermann>" +
-                        "\nNo-IP_Passwort: <Passwort>" +
-                        "\nNo-IP_Hostname: <hostname>");
+                    byte[] info = new UTF8Encoding(true).GetBytes("No-IP_Benutzername: " +
+                        "\nNo-IP_Passwort: " +
+                        "\nNo-IP_Hostname: ");
                     fs.Write(info, 0, info.Length);
                 }
             }
@@ -70,6 +80,8 @@ public class UpdateIpAddress
                 return false;
             }
         }
+        if (username.Length == 0 || password.Length == 0 || hostname.Length == 0)
+            return false;
 
         // No-IP-Update-URL erstellen
         string url = $"https://dynupdate.no-ip.com/nic/update?hostname={hostname}&myip={ipaddress}";
@@ -80,7 +92,17 @@ public class UpdateIpAddress
         request.Headers.Add("Authorization", "Basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes(username + ":" + password)));
 
         // HTTP-Anfrage senden
-        HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+        HttpWebResponse response;
+        try
+        {
+            response = (HttpWebResponse)request.GetResponse();
+        }
+        catch (Exception e)
+        {
+            Logging.log(Logging.LogType.Warning, "UpdateIpAddress", "UpdateNoIP_DNS", "Konnte keine Webanfrage senden");
+            return false;
+        }
+        
 
         // Serverantwort lesen
         string result = new StreamReader(response.GetResponseStream()).ReadToEnd();

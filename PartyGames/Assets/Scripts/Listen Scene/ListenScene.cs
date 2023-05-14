@@ -49,6 +49,7 @@ public class ListenScene : MonoBehaviour
     private void OnDisable()
     {
         StopAllCoroutines();
+        Config.APPLICATION_CONFIG.Save();
     }
 
 

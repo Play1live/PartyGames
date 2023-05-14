@@ -45,6 +45,7 @@ public class WerBietetMehrScene : MonoBehaviour
     private void OnDisable()
     {
         StopAllCoroutines();
+        Config.APPLICATION_CONFIG.Save();
     }
 
     /// <summary>
