@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class QuizSpiel
 {
+    private int minPlayer = 3;
+    private int maxPlayer = 9;
     public static string path = "/Spiele/Quiz";
     private List<Quiz> quizze;
     private Quiz selectedQuiz;
@@ -33,6 +35,8 @@ public class QuizSpiel
         }
     }
 
+    public int getMinPlayer() { return minPlayer; }
+    public int getMaxPlayer() { return maxPlayer; }
     public List<Quiz> getQuizze() { return quizze; }
     public Quiz getSelected() { return selectedQuiz; }
     public void setSelected(Quiz quiz) { selectedQuiz = quiz; }

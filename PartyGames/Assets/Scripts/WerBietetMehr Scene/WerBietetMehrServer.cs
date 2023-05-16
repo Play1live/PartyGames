@@ -649,7 +649,7 @@ public class WerBietetMehrServer : MonoBehaviour
         }
         if (msg.Length > 2)
             msg = msg.Substring("<>".Length);
-        Broadcast("#WBMAnzahl " + msg); // TODO: für Server elemente anzeigen, bei clients erst nach andrücken
+        Broadcast("#WBMAnzahl " + msg);
     }
     /// <summary>
     /// Blendet die Anzeige an, die besagt, wieviele Elemente aufgezählt werden müssen

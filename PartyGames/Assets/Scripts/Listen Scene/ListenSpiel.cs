@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class ListenSpiel
 {
+    private int minPlayer = 3;
+    private int maxPlayer = 9;
     private List<Listen> listen;
     private Listen selected;
 
@@ -31,6 +33,8 @@ public class ListenSpiel
         }
     }
 
+    public int getMinPlayer() { return minPlayer; }
+    public int getMaxPlayer() { return maxPlayer; }
     public List<Listen> getListen() { return listen; }
     public int getListenLength() { return listen.Count; }
     public int getIndex(Listen liste) { return listen.IndexOf(liste); }

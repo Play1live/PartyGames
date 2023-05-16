@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Text;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.Networking;
@@ -21,6 +22,7 @@ public class StartupScene : MonoBehaviour
 
     [SerializeField] GameObject LautstärkeEinstellung;
     [SerializeField] GameObject ServerEinstellungen;
+    [SerializeField] GameObject GrafikEinstellungen;
 
     [SerializeField] GameObject ModeratedGamesSFX;
     [SerializeField] AudioMixer audiomixer;
@@ -34,10 +36,10 @@ public class StartupScene : MonoBehaviour
         Config.PLAYER_NAME = "Henryk";
 #endif
         /*Testzwecke*/
-        // Config.DEBUG_MODE = true;
+         Config.DEBUG_MODE = true;
         //Config.isServer = !Config.isServer;
         //Config.isServer = true;
-        Debug.LogWarning(Config.SERVER_CONNECTION_IP);
+
         Config.GAME_TITLE = "Startup";
         if (!Config.APPLICATION_INIT)
         {
@@ -50,12 +52,13 @@ public class StartupScene : MonoBehaviour
 
             // Lädt die applicationConfig
             Config.APPLICATION_CONFIG = new ConfigFile(Application.persistentDataPath + "/", "application.config");
+            Config.PLAYER_NAME = Config.APPLICATION_CONFIG.GetString("PLAYER_DISPLAY_NAME", Config.PLAYER_NAME);
             StartCoroutine(UpdateSoundsVolume());
-
 
             if (Config.isServer)
                 StartCoroutine(LoadGameFilesAsync());
             StartCoroutine(EnableConnectionButton());
+            StartCoroutine(UpdateNoIP_DNSAsync());
 
             // Init PlayerlistZeigt die geladenen Spiele in der GameÜbersicht an
             if (Config.PLAYERLIST == null)
@@ -70,24 +73,21 @@ public class StartupScene : MonoBehaviour
             else
                 GameObject.Find("Version_LBL").gameObject.GetComponent<TMP_Text>().text = "Version: " + Config.APPLICATION_VERSION;
 
-            GameObject.Find("ApplicationEinstellungen/Hintergrund/Version").GetComponent<TMP_Text>().text = Config.APPLICATION_VERSION;
             Config.APPLICATION_INIT = true;
         }
 
-        ServerEinstellungen.transform.GetChild(2).GetChild(1).GetChild(0).GetComponent<TMP_InputField>().text = Config.SERVER_CONNECTION_IP;
-        ServerEinstellungen.transform.GetChild(3).GetChild(1).GetChild(0).GetComponent<TMP_InputField>().text = "" + Config.SERVER_CONNECTION_PORT;
+        SettingsAktualisiereAnzeigen();
 
         if (!Config.CLIENT_STARTED && !Config.SERVER_STARTED)
         {
             Client.SetActive(false);
             Server.SetActive(false);
             ServerEinstellungen.SetActive(true);
+            GrafikEinstellungen.SetActive(true);
         }
         // Zeigt den temporären Spielernamen an
         if (Hauptmenue.activeInHierarchy)
             Hauptmenue.transform.GetChild(3).GetComponent<TMP_InputField>().text = Config.PLAYER_NAME;
-
-        StartCoroutine(AutostartServer());
     }
         
     private void OnEnable()
@@ -98,13 +98,13 @@ public class StartupScene : MonoBehaviour
 
         if (Config.isServer)
         {
-            Application.targetFrameRate = 120;
+            Application.targetFrameRate = 200;
             if (Config.SERVER_STARTED)
                 Server.SetActive(true);
         }
         else
         {
-            Application.targetFrameRate = 60;
+            Application.targetFrameRate = 200;
             if (Config.CLIENT_STARTED)
                 Client.SetActive(true);
         }
@@ -113,12 +113,14 @@ public class StartupScene : MonoBehaviour
     void Update()
     {
         if (Hauptmenue.activeInHierarchy)
-            GameObject.Find("ErrorMessage").gameObject.GetComponent<TMP_Text>().text = Config.HAUPTMENUE_FEHLERMELDUNG;
+            Hauptmenue.transform.GetChild(6).gameObject.GetComponent<TMP_Text>().text = Config.HAUPTMENUE_FEHLERMELDUNG;
+        if (ServerControl.activeInHierarchy)
+            ServerControl.transform.GetChild(4).gameObject.GetComponent<TMP_Text>().text = Config.LOBBY_FEHLERMELDUNG;
     }
 
     private void OnApplicationQuit()
     {
-        Logging.log(Logging.LogType.Debug, "StartupScene", "OnApplicationQuit", "Spiel wird beendet.");
+        Logging.log(Logging.LogType.Normal, "StartupScene", "OnApplicationQuit", "Spiel wird beendet.");
     }
 
     private void OnDisable()
@@ -136,12 +138,12 @@ public class StartupScene : MonoBehaviour
         audiomixer.SetFloat("MASTER", master);
         LautstärkeEinstellung.transform.GetChild(1).GetChild(1).GetComponent<Slider>().value = master / 10;
         LautstärkeEinstellung.transform.GetChild(1).GetChild(1).GetChild(3).GetComponentInChildren<TMP_Text>().text = ((master * 3) + 100) + "%";
-
+        yield return null;
         float sfx = Config.APPLICATION_CONFIG.GetFloat("GAME_SFX_VOLUME", 0f);
         audiomixer.SetFloat("SFX", sfx);
         LautstärkeEinstellung.transform.GetChild(2).GetChild(1).GetComponent<Slider>().value = sfx / 10;
         LautstärkeEinstellung.transform.GetChild(2).GetChild(1).GetChild(3).GetComponentInChildren<TMP_Text>().text = ((sfx * 3) + 100) + "%";
-
+        yield return null;
         float bgm = Config.APPLICATION_CONFIG.GetFloat("GAME_BGM_VOLUME", 0f);
         audiomixer.SetFloat("BGM", bgm);
         LautstärkeEinstellung.transform.GetChild(3).GetChild(1).GetComponent<Slider>().value = bgm / 10;
@@ -155,7 +157,7 @@ public class StartupScene : MonoBehaviour
     {
         Config.HAUPTMENUE_FEHLERMELDUNG = "Initialisiere Spieldateien...";
         yield return new WaitForSeconds(3);
-        yield return new WaitUntil(() => Config.SERVER_CONNECTION_IP != "localhost"); // RemoteConfig wurd geladen
+        yield return new WaitUntil(() => Config.REMOTECONFIG_FETCHTED == true);
 #if UNITY_EDITOR
         UpdaterIsUpToDate = true;
         Config.HAUPTMENUE_FEHLERMELDUNG = "";
@@ -259,6 +261,19 @@ public class StartupScene : MonoBehaviour
             yield break;
         }
     }
+    public void UpdateNoIPOnButton()
+    {
+        StartCoroutine(UpdateNoIP_DNSAsync());
+    }
+    /// <summary>
+    /// Aktualisiert die NoIP Adresse
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator UpdateNoIP_DNSAsync()
+    {
+        UpdateIpAddress.UpdateNoIP_DNS();
+        yield break;
+    }
     /// <summary>
     /// Aktiviert den Verbinden Button, nachdem die RemoteConfig erfolgreich geladen wurde, damit die Spieler nicht 
     /// </summary>
@@ -266,33 +281,12 @@ public class StartupScene : MonoBehaviour
     IEnumerator EnableConnectionButton()
     {
         Hauptmenue.transform.GetChild(4).gameObject.SetActive(false);
-        yield return new WaitUntil(() => Config.SERVER_CONNECTION_IP != "localhost"); // RemoteConfig wurd geladen
+        yield return new WaitUntil(() => Config.REMOTECONFIG_FETCHTED == true);
         ServerEinstellungen.transform.GetChild(2).GetChild(1).GetChild(0).GetComponent<TMP_InputField>().text = Config.SERVER_CONNECTION_IP;
         ServerEinstellungen.transform.GetChild(3).GetChild(1).GetChild(0).GetComponent<TMP_InputField>().text = "" + Config.SERVER_CONNECTION_PORT;
         yield return new WaitUntil(() => UpdaterIsUpToDate == true); // Warte bis die Version des Updater aktualisiert wurde
         Logging.log(Logging.LogType.Debug, "StartupScene", "EnableConnectionButton", "Spieler darf sich nun verbinden.");
         Hauptmenue.transform.GetChild(4).gameObject.SetActive(true);
-    }
-    /// <summary>
-    /// Startet den Server automatisch.
-    /// Wenn die IP-Adresse nicht aktualisiert werden konnte, dann wird abgebrochen.
-    /// </summary>
-    IEnumerator AutostartServer()
-    {
-        if (Config.isServer && !Config.SERVER_STARTED)
-        {
-            // Updatet die IP-Adresse nachdem die RemoteConfig geladen wurde
-            yield return new WaitUntil(() => Config.SERVER_CONNECTION_IP != "localhost");
-            Hauptmenue.transform.GetChild(0).GetComponent<TMP_Text>().text = Config.SERVER_CONNECTION_IP + ":" + Config.SERVER_CONNECTION_PORT;
-            bool updatedSuccessful = new UpdateIpAddress().UpdateNoIP_DNS();
-
-            yield return new WaitForSeconds(1);
-
-            // Startet den Server, wenn IP Update erfolgreich war
-            if (updatedSuccessful)
-                StartConnection();
-        }
-        yield break;
     }
     /// <summary>
     /// Lädt die vorbereiteten Spieldateien
@@ -337,7 +331,11 @@ public class StartupScene : MonoBehaviour
     /// </summary>
     public void SpielBeenden()
     {
+#if UNITY_EDITOR
+        EditorApplication.isPlaying = false;
+#else
         Application.Quit();
+#endif
     }
     /// <summary>
     /// Startet den Server/Client
@@ -346,8 +344,10 @@ public class StartupScene : MonoBehaviour
     {
         if (Config.CLIENT_STARTED || Config.SERVER_STARTED)
             return;
-
         ServerEinstellungen.SetActive(false);
+        GrafikEinstellungen.SetActive(false);
+
+        UpdateIpAddress.UpdateNoIP_DNS();
 
         Config.PLAYER_NAME = GameObject.Find("ChooseYourName_TXT").gameObject.GetComponent<TMP_InputField>().text;
         Config.APPLICATION_CONFIG.SetString("PLAYER_DISPLAY_NAME", Config.PLAYER_NAME);
@@ -393,30 +393,62 @@ public class StartupScene : MonoBehaviour
         }
         Logging.log(Logging.LogType.Debug, "StartupScene", "WriteGameVersionFile", "Spiel Version wurde für den Updater aktualisiert.");
     }
-
-
+    /// <summary>
+    /// Aktualisiert die Anzeigen in den Einstellungen
+    /// </summary>
     private void SettingsAktualisiereAnzeigen()
     {
-
+        // Version
+        ServerEinstellungen.transform.parent.parent.parent.parent.GetChild(1).GetComponent<TMP_Text>().text = "v" + Config.APPLICATION_VERSION;
+        // Grafik
+        GrafikEinstellungen.transform.GetChild(2).GetChild(1).GetComponent<TMP_Dropdown>().value = Config.APPLICATION_CONFIG.GetInt("GAME_DISPLAY_RESOLUTION", 2);
+        GrafikEinstellungen.transform.GetChild(3).GetChild(1).GetComponent<Toggle>().isOn = Config.APPLICATION_CONFIG.GetBool("GAME_DISPLAY_FULLSCREEN", true);
+        // Server
+        ServerEinstellungen.transform.GetChild(1).GetChild(1).GetComponent<Toggle>().isOn = Config.isServer;
+        ServerEinstellungen.transform.GetChild(2).GetChild(1).GetChild(0).GetComponent<TMP_InputField>().text = Config.SERVER_CONNECTION_IP;
+        ServerEinstellungen.transform.GetChild(3).GetChild(1).GetChild(0).GetComponent<TMP_InputField>().text = "" + Config.SERVER_CONNECTION_PORT;
+        // NoIP Anzeige
+        if (File.Exists(Application.persistentDataPath + @"/No-IP Settings.txt")) {
+            string[] noiptemp = File.ReadAllLines(Application.persistentDataPath + @"/No-IP Settings.txt");
+            ServerEinstellungen.transform.GetChild(5).GetChild(1).GetComponentInChildren<TMP_InputField>().text = noiptemp[0].Replace(": ", "|").Split('|')[1];
+            ServerEinstellungen.transform.GetChild(6).GetChild(1).GetComponentInChildren<TMP_InputField>().text = noiptemp[1].Replace(": ", "|").Split('|')[1];
+            ServerEinstellungen.transform.GetChild(7).GetChild(1).GetComponentInChildren<TMP_InputField>().text = noiptemp[2].Replace(": ", "|").Split('|')[1];
+        }
     }
+    /// <summary>
+    /// Aktualisiert die IP zum Server
+    /// </summary>
+    /// <param name="input"></param>
     public void SettingsChangeIP(TMP_InputField input)
     {
         if (Config.CLIENT_STARTED || Config.SERVER_STARTED)
             return;
         Config.SERVER_CONNECTION_IP = input.text;
     }
+    /// <summary>
+    /// Aktualisiert den Port zum Server
+    /// </summary>
+    /// <param name="input"></param>
     public void SettingsChangePort(TMP_InputField input)
     {
         if (Config.CLIENT_STARTED || Config.SERVER_STARTED)
             return;
         Config.SERVER_CONNECTION_PORT = int.Parse(input.text);
     }
+    /// <summary>
+    /// Aktualisiert Ob der Client ein Spiel hostet oder einem anderen Spiel beitritt
+    /// </summary>
+    /// <param name="input"></param>
     public void SettingsChangeServerHost(Toggle toggle)
     {
         if (Config.CLIENT_STARTED || Config.SERVER_STARTED)
             return;
         Config.isServer = toggle.isOn;
     }
+    /// <summary>
+    /// Aktualisiert Username für NoIP
+    /// </summary>
+    /// <param name="input"></param>
     public void SettingsChangeNoIPUsername(TMP_InputField input)
     {
         if (!File.Exists(Application.persistentDataPath + @"/No-IP Settings.txt"))
@@ -434,6 +466,10 @@ public class StartupScene : MonoBehaviour
             lines = lines.Substring("\n".Length);
         File.WriteAllText(Application.persistentDataPath + @"/No-IP Settings.txt", lines);
     }
+    /// <summary>
+    /// Aktualisiert Passwort für NoIP
+    /// </summary>
+    /// <param name="input"></param>
     public void SettingsChangeNoIPPassword(TMP_InputField input)
     {
         if (!File.Exists(Application.persistentDataPath + @"/No-IP Settings.txt"))
@@ -451,6 +487,10 @@ public class StartupScene : MonoBehaviour
             lines = lines.Substring("\n".Length);
         File.WriteAllText(Application.persistentDataPath + @"/No-IP Settings.txt", lines);
     }
+    /// <summary>
+    /// Aktualisiert Hostname für NoIP
+    /// </summary>
+    /// <param name="input"></param>
     public void SettingsChangeNoIPHostname(TMP_InputField input)
     {
         if (!File.Exists(Application.persistentDataPath + @"/No-IP Settings.txt"))
@@ -468,10 +508,43 @@ public class StartupScene : MonoBehaviour
             lines = lines.Substring("\n".Length);
         File.WriteAllText(Application.persistentDataPath + @"/No-IP Settings.txt", lines);
     }
+    /// <summary>
+    /// Startet das ContentCreationTerminal
+    /// </summary>
     public void StartCreationTerminal()
     {
         Logging.log(Logging.LogType.Normal, "StartupScene", "StartCreationTerminal", "Starte das ContentCreationTerminal");
         Config.GAME_TITLE = "ContentCreationTerminal";
         SceneManager.LoadScene("ContentCreationTerminal");
+    }
+    /// <summary>
+    /// Löst eingegebene Codes ein
+    /// </summary>
+    /// <param name="input"></param>
+    public void EinstellungenCodeEinloesen(TMP_InputField input)
+    {
+        switch (input.text.ToLower())
+        {
+            default:
+                Logging.log(Logging.LogType.Normal, "StartupScene", "EinstellungenCodeEinloesen", "Eingegebener Code konnte nicht angewendet werden. Eingabe: " + input.text);
+                break;
+        }
+        input.text = "";
+    }
+    /// <summary>
+    /// Aktualisiert die Screen Resolution für den Einzelspieler
+    /// </summary>
+    /// <param name="drop"></param>
+    public void UpdateScreenResolution(TMP_Dropdown drop)
+    {
+        Config.APPLICATION_CONFIG.SetInt("GAME_DISPLAY_RESOLUTION", drop.value);
+    }
+    /// <summary>
+    /// Aktualisiert die Vollbildeinstellung für den Einzelspieler
+    /// </summary>
+    /// <param name="toggle"></param>
+    public void UpdateFullscreen(Toggle toggle)
+    {
+        Config.APPLICATION_CONFIG.SetBool("GAME_DISPLAY_FULLSCREEN", toggle.isOn);
     }
 }

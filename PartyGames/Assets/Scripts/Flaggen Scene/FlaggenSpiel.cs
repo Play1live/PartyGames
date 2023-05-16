@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class FlaggenSpiel
 {
+    private int minPlayer = 3;
+    private int maxPlayer = 9;
     private List<Flagge> flaggen;
     private Sprite fragezeichen;
     public FlaggenSpiel()
@@ -23,6 +25,8 @@ public class FlaggenSpiel
         }
     }
 
+    public int getMinPlayer() { return minPlayer; }
+    public int getMaxPlayer() { return maxPlayer; }
     public List<Flagge> getFlaggen() { return flaggen; }
     public int getFlaggenLength() { return flaggen.Count; }
     public int getIndex(Flagge flagge) { return flaggen.IndexOf(flagge); }

@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class SloxikonSpiel
 {
+    private int minPlayer = 3;
+    private int maxPlayer = 9;
     public static string path = "/Spiele/Sloxikon";
     private List<Sloxikon> games;
     private Sloxikon selected;
@@ -32,6 +34,8 @@ public class SloxikonSpiel
         }
     }
 
+    public int getMinPlayer() { return minPlayer; }
+    public int getMaxPlayer() { return maxPlayer; }
     public List<Sloxikon> getGames() { return games; }
     public Sloxikon getSelected() { return selected; }
     public void setSelected(Sloxikon game) { selected = game; }

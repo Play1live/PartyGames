@@ -13,7 +13,7 @@ public class UpdateIpAddress
     /// Falls die Game-DNS-Adresse != der des Servers ist, wird diese bei No-IP.com aktualisiert. Wenn die dazu notwendigen Daten eingegeben wurden. 
     /// </summary>
     /// <returns>Ergebnis der Aktualisierung der DNS-Adresse</returns>
-    public bool UpdateNoIP_DNS()
+    public static bool UpdateNoIP_DNS()
     {
         // Lade aktuelle IP-Adresse
         string ipaddress = new WebClient().DownloadString("https://api.ipify.org");
@@ -52,7 +52,7 @@ public class UpdateIpAddress
                     fs.Write(info, 0, info.Length);
                 }
             }
-            Logging.log(Logging.LogType.Normal, "UpdateIpAddress", "UpdateNoIP_DNS", "Autostart wurde abgebrochen, keine Kontodaten zum Aktualisieren der DNS-IP vorhanden.");
+            Logging.log(Logging.LogType.Warning, "UpdateIpAddress", "UpdateNoIP_DNS", "Autostart wurde abgebrochen, keine Kontodaten zum Aktualisieren der DNS-IP vorhanden.");
             return false;
         }
 
@@ -99,7 +99,8 @@ public class UpdateIpAddress
         }
         catch (Exception e)
         {
-            Logging.log(Logging.LogType.Warning, "UpdateIpAddress", "UpdateNoIP_DNS", "Konnte keine Webanfrage senden");
+            Config.LOBBY_FEHLERMELDUNG = "IP konnte nicht aktualisiert werden. Überprüfe deine NoIP Eingabe.";
+            Logging.log(Logging.LogType.Warning, "UpdateIpAddress", "UpdateNoIP_DNS", "Konnte keine Webanfrage senden! IP wurde nicht aktualisiert!", e);
             return false;
         }
         
@@ -115,6 +116,7 @@ public class UpdateIpAddress
         }
         else
         {
+            Config.LOBBY_FEHLERMELDUNG = "NoIP hat die Updateanfrage abgelehnt. IP Adresse wurde nicht aktualisiert.";
             Logging.log(Logging.LogType.Warning, "UpdateIpAddress", "UpdateNoIP_DNS", "Fehler beim Aktualisieren der IP - Adresse. AktuelleIP: "+ ipaddress +" HTTP - Result: "+ result);
             return false;
         }

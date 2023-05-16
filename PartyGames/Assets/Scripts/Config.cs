@@ -10,6 +10,7 @@ public class Config
     public static bool FULLSCREEN = false;
     public static string MedienPath = Application.persistentDataPath + @"\Medien";
     public static bool DEBUG_MODE = false;
+    public static bool REMOTECONFIG_FETCHTED = false;
     public static bool APPLICATION_INIT = false;
     // Updater Data
     public static string UPDATER_DOWNLOAD_URL;
@@ -59,6 +60,7 @@ public class Config
     // Hauptmenue
     public static string HAUPTMENUE_FEHLERMELDUNG = "";
     // Lobby
+    public static string LOBBY_FEHLERMELDUNG = "";
     public static bool ALLOW_PLAYERNAME_CHANGE = false;
     public static bool ALLOW_ICON_CHANGE = true;
 }

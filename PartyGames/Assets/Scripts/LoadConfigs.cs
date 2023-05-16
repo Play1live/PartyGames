@@ -42,6 +42,7 @@ public class LoadConfigs
 
         ApplyRemoteSettings();
         Logging.log(Logging.LogType.Normal, "LoadConfigs", "SaveRemoteSettings", "Fetching Config completed...");
+        Config.REMOTECONFIG_FETCHTED = true;
     }
     private static void ApplyRemoteSettings()
     {
@@ -70,8 +71,5 @@ public class LoadConfigs
             Screen.fullScreenMode = FullScreenMode.Windowed;
         }
     }
-    #endregion
-    #region ApplicationConfig
-
     #endregion
 }

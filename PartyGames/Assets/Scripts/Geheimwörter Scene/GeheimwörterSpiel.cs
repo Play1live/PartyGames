@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class GeheimwörterSpiel
 {
+    private int minPlayer = 3;
+    private int maxPlayer = 9;
     private List<Geheimwörter> geheimwoerter;
     private Geheimwörter selected;
 
@@ -34,6 +36,8 @@ public class GeheimwörterSpiel
         }
     }
 
+    public int getMinPlayer() { return minPlayer; }
+    public int getMaxPlayer() { return maxPlayer; }
     public List<Geheimwörter> getListen() { return this.geheimwoerter; }
     public int getIndex(Geheimwörter wort) { return geheimwoerter.IndexOf(wort); }
     public Geheimwörter getListe(int index) { return geheimwoerter[index]; }

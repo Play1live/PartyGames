@@ -15,10 +15,13 @@ public class StartupClient : MonoBehaviour
     [SerializeField] GameObject Hauptmenue;
     [SerializeField] GameObject Lobby;
     [SerializeField] GameObject[] SpielerAnzeigeLobby;
+    [SerializeField] GameObject SpielVorschauElemente;
     [SerializeField] GameObject[] MiniGames;
     private string ticktacktoe = "";
     private string ticktacktoeRes = "W0WL0LD0D";
     private bool PingWarteAufAntwort = false;
+    private string UpdateClientGameVorschau = "";
+    Coroutine UpdateClientGameVorschauCoroutine;
 
     [SerializeField] GameObject UmbenennenFeld;
 
@@ -94,18 +97,6 @@ public class StartupClient : MonoBehaviour
             Logging.log(Logging.LogType.Normal, "StartupClient", "TestIfStartConnectionError", "Verbindung zum Server war erfolgreich.");
             yield break;
         }
-
-        /*
-        yield return new WaitUntil(() => (DateTime.Compare(DateTime.Now, in10sec) > 0 ||
-        (SpielerAnzeigeLobby[0].transform.GetChild(2).GetComponent<TMP_Text>().text.Length > 0 &&
-            SpielerAnzeigeLobby[1].transform.GetChild(2).GetComponent<TMP_Text>().text.Length > 0)));
-
-        if (SpielerAnzeigeLobby[0].transform.GetChild(2).GetComponent<TMP_Text>().text.Length > 0 &&
-            SpielerAnzeigeLobby[1].transform.GetChild(2).GetComponent<TMP_Text>().text.Length > 0)
-        {
-            Logging.log(Logging.LogType.Normal, "StartupClient", "TestIfStartConnectionError", "Verbindung zum Server war erfolgreich.");
-            yield break;
-        }*/
 
         CloseSocket();
         Logging.log(Logging.LogType.Warning, "StartupClient", "TestIfStartConnectionError", "Verbindung zum Server war fehlerhaft.");
@@ -318,12 +309,12 @@ public class StartupClient : MonoBehaviour
     /// Aktualisiert die eigene ID und die der anderen
     /// </summary>
     /// <param name="data">#SetID <1-8></param>
-    private void SetID(String data)
+    private void SetID(string data)
     {
         int idparse;
         try
         {
-            idparse = Int32.Parse(data);
+            idparse = Int32.Parse(data.Replace("[ID]", "|").Split('|')[1]);
         }
         catch (Exception e)
         {
@@ -337,12 +328,20 @@ public class StartupClient : MonoBehaviour
         }
         Config.PLAYER_ID = idparse;
 
+        UpdateClientGameVorschau = data.Replace("[GAMEFILES]", "|").Split('|')[1];
+        if (UpdateClientGameVorschauCoroutine != null)
+        {
+            StopCoroutine(UpdateClientGameVorschauCoroutine);
+            UpdateClientGameVorschauCoroutine = null;
+        }
+        UpdateClientGameVorschauCoroutine = StartCoroutine(ShowGameVorschauElemente());
+
         SendToServer("#ClientSetName [NAME]" + Config.PLAYER_NAME + "[NAME][VERSION]" + Config.APPLICATION_VERSION + "[VERSION]");
 
         Hauptmenue.SetActive(false);
         Lobby.SetActive(true);
 
-        StopCoroutine(TestIfStartConnectionError());
+        //StopCoroutine(TestIfStartConnectionError());
         StartCoroutine(TestIfStartConnectionError());
     }
     /// <summary>
@@ -356,7 +355,7 @@ public class StartupClient : MonoBehaviour
 
         SendToServer("#SpielerIconChange 0"); // Für namentliches Icon
 
-        StopCoroutine(TestConnectionToServer());
+        //StopCoroutine(TestConnectionToServer());
         StartCoroutine(TestConnectionToServer());
     }
     /// <summary>
@@ -440,9 +439,10 @@ public class StartupClient : MonoBehaviour
     /// Updated die Spieleranzeige
     /// </summary>
     /// <param name="data">#UpdateSpieler [ID]<0-8>[ID][NAMEN]<>[NAMEN][PUNKTE]<>[PUNKTE][ICON]<>[ICON][TRENNER]...</param>
-    private void UpdateSpieler(String data)
+    private void UpdateSpieler(string data)
     {
         Logging.log(Logging.LogType.Debug, "StartupClient", "UpdateSpieler", "Spieleranzeige wird aktualisiert. "+ data);
+
         string[] spieler = data.Replace("[TRENNER]", "|").Split('|');
         int spieleranzahl = 1;
         foreach (string sp in spieler)
@@ -499,6 +499,13 @@ public class StartupClient : MonoBehaviour
             if (Lobby.activeInHierarchy)
                 GameObject.Find("Lobby/Title_LBL/Spieleranzahl").GetComponent<TMP_Text>().text = spieleranzahl + "/" + (Config.PLAYERLIST.Length + 1);
         }
+
+        if (UpdateClientGameVorschauCoroutine != null)
+        {
+            StopCoroutine(UpdateClientGameVorschauCoroutine);
+            UpdateClientGameVorschauCoroutine = null;
+        }
+        UpdateClientGameVorschauCoroutine = StartCoroutine(ShowGameVorschauElemente());
     }
     /// <summary>
     /// Aktualisiert die Pinganzeige der Spieler
@@ -651,6 +658,85 @@ public class StartupClient : MonoBehaviour
 
         #endregion
     }
+    /// <summary>
+    /// [ANZ]<>[ANZ][0][0]....[9][SPIELER]<0-9>[SPIELER][TITEL]<..>[TITEL][AVAILABLE]<..>[AVAILABLE][9]
+    /// Anz:     zeigt an wie viele Elemente eingeblendet werden
+    /// [X]..[X] Enthält die Elemente
+    /// [SPIELER]    blendet ein wie viele Spieler die Spiele spielen können & aus wenn zuviele gejoint sind
+    /// [TITEL] enthält den angezeigten Text
+    /// [AVAILABLE] enthält die Anzahl der verschiedenen Spiele, (wenn keine Verschiedenen [zb: UNO = 0])
+    /// <summary>
+    IEnumerator ShowGameVorschauElemente()
+    {
+        Logging.log(Logging.LogType.Normal, "StartupClient", "ShowGameVorschauElemente", "Aktualisiere Gamevorschau Anzeigen \n" + UpdateClientGameVorschau);
+        string data = UpdateClientGameVorschau;
+        if (data.Length == 0)
+            yield break;
+        
+        int connected = 1;
+        for (int i = 0; i < Config.PLAYERLIST.Length; i++)
+            if (Config.PLAYERLIST[i].name.Length > 0)
+                connected++;
+
+        // Blendet alle Elemente aus
+        for (int i = 0; i < SpielVorschauElemente.transform.childCount; i++)
+        {
+            SpielVorschauElemente.transform.GetChild(i).gameObject.SetActive(false);
+            SpielVorschauElemente.transform.GetChild(i).GetChild(0).gameObject.SetActive(false);
+            SpielVorschauElemente.transform.GetChild(i).GetChild(2).gameObject.SetActive(false);
+        }
+        // Blendet neue Infos ein
+        int anz = Int32.Parse(data.Replace("[ANZ]", "|").Split('|')[1]);
+        for (int i = 0; i < anz; i++)
+        {
+            //yield return null;
+            string element = data.Replace("[" + i + "]", "|").Split('|')[1];
+            string playeranz = element.Replace("[SPIELER-ANZ]", "|").Split('|')[1];
+            int min = Int32.Parse(element.Replace("[MIN]", "|").Split('|')[1]);
+            int max = Int32.Parse(element.Replace("[MAX]", "|").Split('|')[1]);
+            string title = element.Replace("[TITEL]", "|").Split('|')[1];
+            string available = element.Replace("[AVAILABLE]", "|").Split('|')[1];
+
+            if (connected < min || connected > max)
+                continue;
+
+            SpielVorschauElemente.transform.GetChild(i).gameObject.SetActive(true);
+            // SpielerAnzahl
+            if (playeranz.Equals("0"))  // Ausblenden
+            {
+                SpielVorschauElemente.transform.GetChild(i).GetChild(0).gameObject.SetActive(false);
+                SpielVorschauElemente.transform.GetChild(i).GetChild(0).GetComponentInChildren<TMP_Text>().text = playeranz;
+            }
+            else
+            {
+                SpielVorschauElemente.transform.GetChild(i).GetChild(0).gameObject.SetActive(true);
+                SpielVorschauElemente.transform.GetChild(i).GetChild(0).GetComponentInChildren<TMP_Text>().text = playeranz;
+            }
+
+            // Titel
+            SpielVorschauElemente.transform.GetChild(i).GetChild(1).GetComponent<TMP_Text>().text = title;
+
+            //yield return null;
+            // Available Einblendung
+            if (available.Equals("0"))
+            {
+                SpielVorschauElemente.transform.GetChild(i).gameObject.SetActive(false);
+            }
+            else if (available.Equals("-1"))// Anzeigen ohne anzahl
+            {
+                SpielVorschauElemente.transform.GetChild(i).GetChild(2).gameObject.SetActive(false);
+                SpielVorschauElemente.transform.GetChild(i).GetChild(2).GetComponentInChildren<TMP_Text>().text = available;
+            }
+            else
+            {
+                SpielVorschauElemente.transform.GetChild(i).GetChild(2).gameObject.SetActive(true);
+                SpielVorschauElemente.transform.GetChild(i).GetChild(2).GetComponentInChildren<TMP_Text>().text = available;
+            }
+            //yield return null;
+        }
+        yield break;
+    }
+
     /// <summary>
     /// Lädt Spieler in die angegeben Spielscene
     /// </summary>

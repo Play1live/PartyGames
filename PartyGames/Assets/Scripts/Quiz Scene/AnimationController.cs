@@ -120,43 +120,6 @@ public class AnimationController : MonoBehaviour
             }
         }
         bool minOnerising = false;
-        // TODO: Zahlen steigen weiter an, wenn bewegung fertig ist
-        /*for (int i = 0; i < 8; i++)
-        {
-            if (!israising[i] || ismoving[i])
-                continue;
-            minOnerising = true;
-
-            DateTime start = DateTime.Now;
-            DateTime max = MaxTime;
-            TimeSpan difference = max - start;
-            double milliseconds = difference.TotalMilliseconds;
-            TimeSpan diff = MaxTime - StartTime;
-            double milisdif = diff.TotalMilliseconds;
-            double rest = (1 - milliseconds / milisdif);
-
-            // Wert Belegen
-            float pos = getSPIELER_POSITION_X(i) + Math.Abs(getSTART_POSITION(i));
-            float maxpos = getMAX_POSITION(i) + Math.Abs(getSTART_POSITION(i));
-            float relativzumax = pos / maxpos;
-            float wert = ((getMAX_WERT(i) - getSTART_WERT(i)) * relativzumax + getSTART_WERT(i));
-            string ausgabe = (int)wert + "";
-            if (getKOMMASTELLEN(i) != 0)
-            {
-                int stellenvorne = ("" + (int)wert).Length;
-                ausgabe = ("" + wert + "000000000000000000000").Substring(0, getKOMMASTELLEN(i) + stellenvorne + 1);
-            }
-            setSPIELER_DISPLAY(i, "" + ausgabe);
-
-            Debug.Log(getSPIELER_DISPLAY(i));
-            // Spieler drüber hinaus
-            if (getSPIELER_DISPLAY(i) >= getSPIELER_WERT(i))
-            {
-                israising[i] = false;
-                setSPIELER_DISPLAY(i, getSPIELER_WERT(i) + "");
-            }
-        }*/
-
 
         // Beenden
         if (!minOneisMoving && !minOnerising)

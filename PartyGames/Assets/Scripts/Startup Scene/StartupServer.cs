@@ -21,6 +21,7 @@ public class StartupServer : MonoBehaviour
 
     [SerializeField] GameObject gesperrtfuerSekundenAnzeige;
     DateTime allowedStartTime;
+    string UpdateClientGameVorschau = "";
 
     [SerializeField] AudioSource ConnectSound;
     [SerializeField] AudioSource DisconnectSound;
@@ -29,7 +30,7 @@ public class StartupServer : MonoBehaviour
     {
         if (Config.SERVER_STARTED)
             SperreGameSelection();
-        
+
         if (!Config.SERVER_STARTED)
             StarteServer();
 
@@ -40,6 +41,8 @@ public class StartupServer : MonoBehaviour
 
         if (ServerControlGameSelection.activeInHierarchy && ServerControlGameSelection.transform.GetChild(1).gameObject.activeInHierarchy)
             DisplayGameFiles();
+        UpdateGameVorschau();
+
         UpdateSpieler();
     }
 
@@ -132,7 +135,6 @@ public class StartupServer : MonoBehaviour
         Logging.log(Logging.LogType.Normal, "StartupServer", "OnApplicationQuit", "Server wird geschlossen.");
         //Config.SERVER_TCP.Server.Close();
         Config.SERVER_TCP.Stop();
-        Config.APPLICATION_CONFIG.Save();
     }
 
     private void OnDisable()
@@ -241,12 +243,14 @@ public class StartupServer : MonoBehaviour
                 break;
             }
         }
+
         Config.SERVER_ALL_CONNECTED = tempAllConnected;
         Logging.log(Logging.LogType.Debug, "StartupServer", "AcceptTcpClient", "Server ist voll: " + Config.SERVER_ALL_CONNECTED);
         startListening();
 
         // Sendet neuem Spieler zugehörige ID
-        SendMSG("#SetID " + freierS.id, freierS);
+        SendMSG("#SetID [ID]" + freierS.id + "[ID][GAMEFILES]" + UpdateClientGameVorschau, freierS);
+        // Dazu die GameFiles
         Logging.log(Logging.LogType.Normal, "StartupServer", "AcceptTcpClient", "Spieler: " + freierS.id + " ist jetzt verbunden. IP:" + freierS.tcp.Client.RemoteEndPoint);
     }
     #endregion
@@ -391,6 +395,7 @@ public class StartupServer : MonoBehaviour
         Broadcast("#UpdateRemoteConfig");
         LoadConfigs.FetchRemoteConfig();
         StartCoroutine(LoadGameFilesAsync());
+        UpdateGameVorschau();
     }
     /// <summary>
     /// Lädt die vorbereiteten Spieldateien
@@ -400,6 +405,7 @@ public class StartupServer : MonoBehaviour
         SetupSpiele.LoadGameFiles();
         yield return null;
         DisplayGameFiles();
+        UpdateSpielerBroadcast();
         yield break;
     }
     /// <summary>
@@ -928,7 +934,7 @@ public class StartupServer : MonoBehaviour
             Logging.log(Logging.LogType.Normal, "StartupServer", "SpielerIconChange", "Spieler " + p.name + " bekommt sein initial Icon.");
             if (p.name.ToLower().Contains("spieler"))
             {
-                neuesIcon = FindIconByName("Samurai");
+                neuesIcon = FindIconByName("Discord");
                 IconFestlegen(p, neuesIcon);
                 return;
             }
@@ -953,7 +959,7 @@ public class StartupServer : MonoBehaviour
                 IconFestlegen(p, neuesIcon);
                 return;
             }
-            else if (p.name.ToLower().Contains("henryk"))
+            else if (p.name.ToLower().Contains("henryk") || p.name.ToLower().Contains("play1live"))
             {
                 neuesIcon = FindIconByName("Henryk");
                 IconFestlegen(p, neuesIcon);
@@ -1099,6 +1105,45 @@ public class StartupServer : MonoBehaviour
         {
             SpielerAnzeigeLobby[p.id].transform.GetChild(3).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Ping/Ping 0");
         }
+    }
+    /// <summary>
+    /// Aktualisiert den GameVorschau String
+    /// </summary>
+    private void UpdateGameVorschau()
+    {
+        List<string> gamelist = new List<string>();
+        // [SPIELER]<0-9>[SPIELER][TITEL]<..>[TITEL][AVAILABLE]<..>[AVAILABLE]
+
+        //ModerierteGames
+        //gamelist.Add("[SPIELER]0[SPIELER][TITEL]Moderierte Games[TITEL][AWAILABLE]0[AVAILABLE]");
+        //Flaggen
+        gamelist.Add("[SPIELER-ANZ]3-9[SPIELER-ANZ][MIN]" + Config.FLAGGEN_SPIEL.getMinPlayer() + "[MIN][MAX]" + Config.FLAGGEN_SPIEL.getMaxPlayer() + "[MAX][TITEL]Flaggen[TITEL][AVAILABLE]" + Config.FLAGGEN_SPIEL.getFlaggen().Count + "[AVAILABLE]");
+        //Quiz
+        gamelist.Add("[SPIELER-ANZ]3-9[SPIELER-ANZ][MIN]" + Config.QUIZ_SPIEL.getMinPlayer() + "[MIN][MAX]" + Config.QUIZ_SPIEL.getMaxPlayer() + "[MAX][TITEL]Quiz[TITEL][AVAILABLE]" + Config.QUIZ_SPIEL.getQuizze().Count + "[AVAILABLE]");
+        //Listen
+        gamelist.Add("[SPIELER-ANZ]3-9[SPIELER-ANZ][MIN]" + Config.LISTEN_SPIEL.getMinPlayer() + "[MIN][MAX]" + Config.LISTEN_SPIEL.getMaxPlayer() + "[MAX][TITEL]Listen[TITEL][AVAILABLE]" + Config.LISTEN_SPIEL.getListen().Count + "[AVAILABLE]");
+        //Mosaik
+        gamelist.Add("[SPIELER-ANZ]3-9[SPIELER-ANZ][MIN]" + Config.MOSAIK_SPIEL.getMinPlayer() + "[MIN][MAX]" + Config.MOSAIK_SPIEL.getMaxPlayer() + "[MAX][TITEL]Mosaik[TITEL][AVAILABLE]" + Config.MOSAIK_SPIEL.getMosaike().Count + "[AVAILABLE]");
+        //WerBietetMehr
+        gamelist.Add("[SPIELER-ANZ]3-9[SPIELER-ANZ][MIN]" + Config.WERBIETETMEHR_SPIEL.getMinPlayer() + "[MIN][MAX]" + Config.WERBIETETMEHR_SPIEL.getMaxPlayer() + "[MAX][TITEL]WerBietetMehr[TITEL][AVAILABLE]" + Config.WERBIETETMEHR_SPIEL.getSpiele().Count + "[AVAILABLE]");
+        //Geheimwörter
+        gamelist.Add("[SPIELER-ANZ]3-9[SPIELER-ANZ][MIN]" + Config.GEHEIMWOERTER_SPIEL.getMinPlayer() + "[MIN][MAX]" + Config.GEHEIMWOERTER_SPIEL.getMaxPlayer() + "[MAX][TITEL]Geheimwörter[TITEL][AVAILABLE]" + Config.GEHEIMWOERTER_SPIEL.getListen().Count + "[AVAILABLE]");
+        //Auktion
+        gamelist.Add("[SPIELER-ANZ]3-9[SPIELER-ANZ][MIN]" + Config.AUKTION_SPIEL.getMinPlayer() + "[MIN][MAX]" + Config.AUKTION_SPIEL.getMaxPlayer() + "[MAX][TITEL]Auktion[TITEL][AVAILABLE]" + Config.AUKTION_SPIEL.getAuktionen().Count + "[AVAILABLE]");
+        //Sloxikon
+        gamelist.Add("[SPIELER-ANZ]3-9[SPIELER-ANZ][MIN]" + Config.SLOXIKON_SPIEL.getMinPlayer() + "[MIN][MAX]" + Config.SLOXIKON_SPIEL.getMaxPlayer() + "[MAX][TITEL]Sloxikon[TITEL][AVAILABLE]" + Config.SLOXIKON_SPIEL.getGames().Count + "[AVAILABLE]");
+        //Unmoderierte Games
+        //gamelist.Add("[SPIELER]0[SPIELER][TITEL]Unmoderierte Games[TITEL][AWAILABLE]0[AVAILABLE]");
+
+
+        string msg = "";
+        for (int i = 0; i < gamelist.Count; i++)
+        {
+            msg += "[" + i + "]" + gamelist[i] + "[" + i + "]";
+        }
+
+        UpdateClientGameVorschau = "[ANZ]" + gamelist.Count + "[ANZ]" + msg;
+        Logging.log(Logging.LogType.Normal, "StartupServer", "UpdateGameVorschau", "Gamevorschau: " + UpdateClientGameVorschau);
     }
     #region MiniSpielauswahl
     /// <summary>

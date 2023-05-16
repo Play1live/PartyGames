@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class WerBietetMehrSpiel
 {
+    private int minPlayer = 3;
+    private int maxPlayer = 9;
     public static string path = "/Spiele/WerBietetMehr";
     private List<WerBietetMehr> liste;
     private WerBietetMehr selected;
@@ -32,6 +34,8 @@ public class WerBietetMehrSpiel
         }
     }
 
+    public int getMinPlayer() { return minPlayer; }
+    public int getMaxPlayer() { return maxPlayer; }
     public List<WerBietetMehr> getSpiele() { return liste; }
     public WerBietetMehr getSelected() { return selected; }
     public void setSelected(WerBietetMehr liste) { selected = liste; }

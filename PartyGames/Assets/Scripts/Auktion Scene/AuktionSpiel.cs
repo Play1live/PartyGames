@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class AuktionSpiel
 {
+    private int minPlayer = 3;
+    private int maxPlayer = 9;
     private List<Auktion> elemente;
     private Auktion selected;
 
@@ -32,6 +34,8 @@ public class AuktionSpiel
         }
     }
 
+    public int getMinPlayer() { return minPlayer; }
+    public int getMaxPlayer() { return maxPlayer; }
     public List<Auktion> getAuktionen() { return elemente; }
     public int getIndex(Auktion auktion) { return elemente.IndexOf(auktion); }
     public Auktion getAuktion(int index) { return elemente[index]; }

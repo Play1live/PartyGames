@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class MosaikSpiel
 {
+    private int minPlayer = 3;
+    private int maxPlayer = 9;
     public static string path = "/Spiele/Mosaik";
     private List<Mosaik> mosaike;
     private Mosaik selected;
@@ -35,6 +37,8 @@ public class MosaikSpiel
         }
     }
 
+    public int getMinPlayer() { return minPlayer; }
+    public int getMaxPlayer() { return maxPlayer; }
     public List<Mosaik> getMosaike() { return mosaike; }
     public int getIndex(Mosaik mosaik) { return mosaike.IndexOf(mosaik); }
     public int getIndex(string titel) { foreach (Mosaik mosaik in mosaike) if (mosaik.getTitel().ToLower().Equals(titel.ToLower())) return mosaike.IndexOf(mosaik); return -1; }
