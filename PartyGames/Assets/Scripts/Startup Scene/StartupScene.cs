@@ -36,60 +36,31 @@ public class StartupScene : MonoBehaviour
         Config.PLAYER_NAME = "Henryk";
 #endif
         /*Testzwecke*/
-         Config.DEBUG_MODE = true;
+        Config.DEBUG_MODE = true;
         //Config.isServer = !Config.isServer;
         //Config.isServer = true;
 
         Config.GAME_TITLE = "Startup";
-        if (!Config.APPLICATION_INIT)
+        if (Config.APPLICATION_INITED == true)
         {
-            Logging.log(Logging.LogType.Normal, "StartupScene", "Start", "Application Version: " + Config.APPLICATION_VERSION);
-            Logging.log(Logging.LogType.Normal, "StartupScene", "Start", "Debugmode: " + Config.DEBUG_MODE);
-            WriteGameVersionFile();
-            LoadConfigs.FetchRemoteConfig();    // Lädt Config
-            MedienUtil.CreateMediaDirectory();
-            StartCoroutine(UpdateGameUpdater());
+            SettingsAktualisiereAnzeigen();
+            LoadConfigs.MoveToPrimaryDisplayFullscreen();
 
-            // Lädt die applicationConfig
-            Config.APPLICATION_CONFIG = new ConfigFile(Application.persistentDataPath + "/", "application.config");
-            Config.PLAYER_NAME = Config.APPLICATION_CONFIG.GetString("PLAYER_DISPLAY_NAME", Config.PLAYER_NAME);
-            StartCoroutine(UpdateSoundsVolume());
-
-            if (Config.isServer)
-                StartCoroutine(LoadGameFilesAsync());
-            StartCoroutine(EnableConnectionButton());
-            StartCoroutine(UpdateNoIP_DNSAsync());
-
-            // Init PlayerlistZeigt die geladenen Spiele in der GameÜbersicht an
-            if (Config.PLAYERLIST == null)
+            if (!Config.CLIENT_STARTED && !Config.SERVER_STARTED)
             {
-                InitPlayerlist();
-                Hauptmenue.SetActive(true);
-                Lobby.SetActive(false);
-                ServerControl.SetActive(false);
+                Client.SetActive(false);
+                Server.SetActive(false);
+                ServerEinstellungen.SetActive(true);
+                GrafikEinstellungen.SetActive(true);
             }
-            if (Config.isServer)
-                GameObject.Find("Version_LBL").gameObject.GetComponent<TMP_Text>().text = "Version: " + Config.APPLICATION_VERSION + "    Medien: " + Config.MedienPath;
-            else
-                GameObject.Find("Version_LBL").gameObject.GetComponent<TMP_Text>().text = "Version: " + Config.APPLICATION_VERSION;
-
-            Config.APPLICATION_INIT = true;
+            // Zeigt den temporären Spielernamen an
+            if (Hauptmenue.activeInHierarchy)
+                Hauptmenue.transform.GetChild(3).GetComponent<TMP_InputField>().text = Config.PLAYER_NAME;
         }
 
-        SettingsAktualisiereAnzeigen();
-
-        if (!Config.CLIENT_STARTED && !Config.SERVER_STARTED)
-        {
-            Client.SetActive(false);
-            Server.SetActive(false);
-            ServerEinstellungen.SetActive(true);
-            GrafikEinstellungen.SetActive(true);
-        }
-        // Zeigt den temporären Spielernamen an
-        if (Hauptmenue.activeInHierarchy)
-            Hauptmenue.transform.GetChild(3).GetComponent<TMP_InputField>().text = Config.PLAYER_NAME;
+        GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(1).gameObject.SetActive(false);
     }
-        
+
     private void OnEnable()
     {
         Hauptmenue.SetActive(true);
@@ -112,6 +83,55 @@ public class StartupScene : MonoBehaviour
 
     void Update()
     {
+        if (!Config.APPLICATION_INITED)
+        {
+            Logging.log(Logging.LogType.Normal, "StartupScene", "Start", "Application Version: " + Config.APPLICATION_VERSION);
+            Logging.log(Logging.LogType.Normal, "StartupScene", "Start", "Debugmode: " + Config.DEBUG_MODE);
+            WriteGameVersionFile();
+            LoadConfigs.FetchRemoteConfig();    // Lädt Config
+            MedienUtil.CreateMediaDirectory();
+            StartCoroutine(UpdateGameUpdater());
+
+            // Lädt die applicationConfig
+            Config.APPLICATION_CONFIG = new ConfigFile(Application.persistentDataPath + "/", "application.config");
+            Config.PLAYER_NAME = Config.APPLICATION_CONFIG.GetString("PLAYER_DISPLAY_NAME", Config.PLAYER_NAME);
+            UpdateSoundsVolume();
+
+            if (Config.isServer)
+                StartCoroutine(LoadGameFilesAsync());
+            StartCoroutine(EnableConnectionButton());
+            StartCoroutine(UpdateNoIP_DNSAsync());
+
+            // Init PlayerlistZeigt die geladenen Spiele in der GameÜbersicht an
+            if (Config.PLAYERLIST == null)
+            {
+                InitPlayerlist();
+                Hauptmenue.SetActive(true);
+                Lobby.SetActive(false);
+                ServerControl.SetActive(false);
+            }
+            if (Config.isServer)
+                GameObject.Find("Version_LBL").gameObject.GetComponent<TMP_Text>().text = "Version: " + Config.APPLICATION_VERSION + "    Medien: " + Config.MedienPath;
+            else
+                GameObject.Find("Version_LBL").gameObject.GetComponent<TMP_Text>().text = "Version: " + Config.APPLICATION_VERSION;
+
+            Config.APPLICATION_INITED = true;
+
+            SettingsAktualisiereAnzeigen();
+
+            if (!Config.CLIENT_STARTED && !Config.SERVER_STARTED)
+            {
+                Client.SetActive(false);
+                Server.SetActive(false);
+                ServerEinstellungen.SetActive(true);
+                GrafikEinstellungen.SetActive(true);
+            }
+            // Zeigt den temporären Spielernamen an
+            if (Hauptmenue.activeInHierarchy)
+                Hauptmenue.transform.GetChild(3).GetComponent<TMP_InputField>().text = Config.PLAYER_NAME;
+        }
+
+
         if (Hauptmenue.activeInHierarchy)
             Hauptmenue.transform.GetChild(6).gameObject.GetComponent<TMP_Text>().text = Config.HAUPTMENUE_FEHLERMELDUNG;
         if (ServerControl.activeInHierarchy)
@@ -132,23 +152,22 @@ public class StartupScene : MonoBehaviour
     /// <summary>
     /// Updates SoundVolume (Master, SFX, BGM)
     /// </summary>
-    IEnumerator UpdateSoundsVolume()
+    private void UpdateSoundsVolume()
     {
         float master = Config.APPLICATION_CONFIG.GetFloat("GAME_MASTER_VOLUME", 0f);
         audiomixer.SetFloat("MASTER", master);
         LautstärkeEinstellung.transform.GetChild(1).GetChild(1).GetComponent<Slider>().value = master / 10;
         LautstärkeEinstellung.transform.GetChild(1).GetChild(1).GetChild(3).GetComponentInChildren<TMP_Text>().text = ((master * 3) + 100) + "%";
-        yield return null;
+
         float sfx = Config.APPLICATION_CONFIG.GetFloat("GAME_SFX_VOLUME", 0f);
         audiomixer.SetFloat("SFX", sfx);
         LautstärkeEinstellung.transform.GetChild(2).GetChild(1).GetComponent<Slider>().value = sfx / 10;
         LautstärkeEinstellung.transform.GetChild(2).GetChild(1).GetChild(3).GetComponentInChildren<TMP_Text>().text = ((sfx * 3) + 100) + "%";
-        yield return null;
+
         float bgm = Config.APPLICATION_CONFIG.GetFloat("GAME_BGM_VOLUME", 0f);
         audiomixer.SetFloat("BGM", bgm);
         LautstärkeEinstellung.transform.GetChild(3).GetChild(1).GetComponent<Slider>().value = bgm / 10;
         LautstärkeEinstellung.transform.GetChild(3).GetChild(1).GetChild(3).GetComponentInChildren<TMP_Text>().text = ((bgm * 3) + 100) + "%";
-        yield return null;
     }
     /// <summary>
     /// Aktualisiert den Updater sofern dieser veraltet ist
@@ -156,6 +175,7 @@ public class StartupScene : MonoBehaviour
     IEnumerator UpdateGameUpdater()
     {
         Config.HAUPTMENUE_FEHLERMELDUNG = "Initialisiere Spieldateien...";
+
         yield return new WaitForSeconds(3);
         yield return new WaitUntil(() => Config.REMOTECONFIG_FETCHTED == true);
 #if UNITY_EDITOR
@@ -344,10 +364,24 @@ public class StartupScene : MonoBehaviour
     {
         if (Config.CLIENT_STARTED || Config.SERVER_STARTED)
             return;
+        GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(1).gameObject.SetActive(true);
         ServerEinstellungen.SetActive(false);
         GrafikEinstellungen.SetActive(false);
 
         UpdateIpAddress.UpdateNoIP_DNS();
+
+        foreach (Player p in Config.PLAYERLIST)
+        {
+            p.crowns = 0;
+            p.isConnected = false;
+            p.isDisconnected = false;
+            p.name = "";
+            p.points = 0;
+            p.tcp = null;
+            p.icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
+        }
+        Config.SERVER_PLAYER_POINTS = 0;
+        Config.SERVER_CROWNS = 0;
 
         Config.PLAYER_NAME = GameObject.Find("ChooseYourName_TXT").gameObject.GetComponent<TMP_InputField>().text;
         Config.APPLICATION_CONFIG.SetString("PLAYER_DISPLAY_NAME", Config.PLAYER_NAME);
@@ -507,6 +541,14 @@ public class StartupScene : MonoBehaviour
         if (lines.Length > 3)
             lines = lines.Substring("\n".Length);
         File.WriteAllText(Application.persistentDataPath + @"/No-IP Settings.txt", lines);
+    }
+    /// <summary>
+    /// Toggelt die spielbezogene Datenübermittlung
+    /// </summary>
+    /// <param name="toggle"></param>
+    public void SettingsToggleUebermittelnDaten(Toggle toggle)
+    {
+        GameObject.Find("Backtrace").SetActive(toggle.isOn);
     }
     /// <summary>
     /// Startet das ContentCreationTerminal

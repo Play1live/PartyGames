@@ -2203,7 +2203,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 200, y: -745.925}
+  m_AnchoredPosition: {x: 200, y: -1035.315}
   m_SizeDelta: {x: 400, y: 170.39}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &405104263934355218
@@ -2234,7 +2234,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "<size=25><b><u>1.8c</u></b></size>\n<b><size=19>neue Spiele</size></b>\nAuktion\r\nFlaggen\r\nGeheimw\xF6rter\r\nListen\r\nMosaik\r\nQuiz\r\nWerBietetMehr"
+  m_text: "<size=25><b><u>1.8c</u></b></size>\n<b><size=19>neue Spiele</size></b>\n-
+    Auktion\r\n- Flaggen\r\n- Geheimw\xF6rter\r\n- Listen\r\n- Mosaik\r\n- Quiz\r\n-
+    WerBietetMehr"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -4969,7 +4971,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\xDCbermitteln von Spielbezogenen Daten"
+  m_text: "\xDCbermitteln von spielbezogenen Daten"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -4996,7 +4998,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 17.2
+  m_fontSize: 17.4
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -5585,7 +5587,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 1920x1080
+  m_text: 1280x720
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -6118,8 +6120,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 200, y: -70.18}
-  m_SizeDelta: {x: 400, y: 140.36}
+  m_AnchoredPosition: {x: 200, y: -214.875}
+  m_SizeDelta: {x: 400, y: 429.75}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7219226238443031669
 CanvasRenderer:
@@ -6149,8 +6151,14 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "<size=25><b><u>1.11c</u></b></size>\n<b><size=19>Einstellungs Men\xFC</size></b>\nLautst\xE4rke\nServer
-    Infos\nContent Creation Terminal Verbindung\nChangelog \xDCbersicht\n<b><size=19>Bugfixes</size></b>"
+  m_text: "<size=25><b><u>1.11c</u></b></size>\n<b><size=19>Einstellungs Men\xFC</size></b>\n-
+    Lautst\xE4rke\n- Server Infos\n- \xDCbermitteln von spielbezogenen Daten\n- Content
+    Creation Terminal Verbindung\n- Changelog \xDCbersicht\n<b><size=19>Content Creation
+    Terminal</size></b>\n(Bietet eine grafische Oberfl\xE4che f\xFCr das Erstellen
+    von Spieldateien)\nBeinhaltet:\n- Quiz\n- Mosaik\n- Listen\n- WerBietetMehr\n-
+    Auktion\n- Sloxikon\n<b><size=19>Lobby</size></b>\n- Join & Leave Sounds\n- zeigt
+    Clients welche Spiele verf\xFCgbar sind \n<b><size=19>Sloxikon</size></b>\n-
+    Zuf\xE4llige Reihnfolge zum Ausw\xE4hlen von Antworten\n<b><size=19>Bugfixes</size></b>"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -7155,7 +7163,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 200, y: -170.185}
+  m_AnchoredPosition: {x: 200, y: -459.575}
   m_SizeDelta: {x: 400, y: 49.65}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3833191593186761210
@@ -8338,7 +8346,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 200, y: -388.12}
+  m_AnchoredPosition: {x: 200, y: -677.51}
   m_SizeDelta: {x: 400, y: 88.62}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2989393693758263223
@@ -8608,7 +8616,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 200, y: -305.36002}
+  m_AnchoredPosition: {x: 200, y: -594.75}
   m_SizeDelta: {x: 400, y: 66.9}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8884966488016875277
@@ -8643,6 +8651,7 @@ MonoBehaviour:
 
     <b><size=19>neues Spiel</size></b>
 
+    -
     Sloxikon'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -9409,15 +9418,11 @@ MonoBehaviour:
   m_Value: 2
   m_Options:
     m_Options:
-    - m_Text: 3840x2160
-      m_Image: {fileID: 0}
     - m_Text: 2560x1440
       m_Image: {fileID: 0}
     - m_Text: 1920x1080
       m_Image: {fileID: 0}
     - m_Text: 1280x720
-      m_Image: {fileID: 0}
-    - m_Text: 1024x576
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
@@ -9484,7 +9489,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.5882353}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.78431374}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -9747,7 +9752,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 200, y: -233.46}
+  m_AnchoredPosition: {x: 200, y: -522.85}
   m_SizeDelta: {x: 400, y: 66.9}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6675834519483303071
@@ -9782,6 +9787,7 @@ MonoBehaviour:
 
     <b><size=19>Sloxikon</size></b>
 
+    -
     Rundentimer'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -11668,7 +11674,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.5882353}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.78431374}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -13387,7 +13393,7 @@ MonoBehaviour:
   m_Elasticity: 0.1
   m_Inertia: 1
   m_DecelerationRate: 0.135
-  m_ScrollSensitivity: 1
+  m_ScrollSensitivity: 100
   m_Viewport: {fileID: 3471820996346051175}
   m_HorizontalScrollbar: {fileID: 0}
   m_VerticalScrollbar: {fileID: 0}
@@ -13433,7 +13439,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 200, y: -546.58}
+  m_AnchoredPosition: {x: 200, y: -835.97003}
   m_SizeDelta: {x: 400, y: 218.3}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6331834520709822051
@@ -13464,10 +13470,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "<size=25><b><u>1.10a</u></b></size>\n<b><size=19>Lobby</size></b>\nSiegeranzeige
-    mit Punkten und Medaillien\r\n<b><size=19>Mosaik</size></b>\nAngezeigte Bilder
-    passen sich den Seitenverh\xE4ltnisse an\r\nBilder werden automatisch heruntergeladen
-    und eingeblendet\r\n<b><size=19>Server</size></b>\nDNS wird beim starten automatisch
+  m_text: "<size=25><b><u>1.10a</u></b></size>\n<b><size=19>Lobby</size></b>\n- Siegeranzeige
+    mit Punkten und Medaillien\r\n<b><size=19>Mosaik</size></b>\n- Angezeigte Bilder
+    passen sich den Seitenverh\xE4ltnisse an\r\n- Bilder werden automatisch heruntergeladen
+    und eingeblendet\r\n<b><size=19>Server</size></b>\n- DNS wird beim starten automatisch
     auf die aktuelle IP-Adresse aktualisiert\r\n<b><size=19>Bugfixes</size></b>"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

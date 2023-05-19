@@ -28,7 +28,7 @@ public class StartupServer : MonoBehaviour
 
     void Start()
     {
-        if (Config.SERVER_STARTED)
+        /*if (Config.SERVER_STARTED)
             SperreGameSelection();
 
         if (!Config.SERVER_STARTED)
@@ -42,12 +42,18 @@ public class StartupServer : MonoBehaviour
         if (ServerControlGameSelection.activeInHierarchy && ServerControlGameSelection.transform.GetChild(1).gameObject.activeInHierarchy)
             DisplayGameFiles();
         UpdateGameVorschau();
-
+        */
         UpdateSpieler();
     }
 
     void OnEnable()
     {
+        if (Config.SERVER_STARTED)
+            SperreGameSelection();
+
+        if (!Config.SERVER_STARTED)
+            StarteServer();
+
         InitPlayerLobby();
 
         Hauptmenue.SetActive(false);
@@ -57,6 +63,7 @@ public class StartupServer : MonoBehaviour
 
         if (ServerControlGameSelection.activeInHierarchy && ServerControlGameSelection.transform.GetChild(1).gameObject.activeInHierarchy)
             DisplayGameFiles();
+        UpdateGameVorschau();
         UpdateSpieler();
         UpdateCrowns();
     }
@@ -142,6 +149,18 @@ public class StartupServer : MonoBehaviour
         StopAllCoroutines();
     }
 
+    public void ZurueckZumHauptmenue()
+    {
+        Logging.log(Logging.LogType.Normal, "StartupServer", "ZurueckZumHauptmenue", "Spieler wird ins Hauptmenü geladen und Server- & Client-Verbindung wird beendet.");
+        if (Config.isServer && Config.SERVER_STARTED)
+        {
+            Broadcast("#ServerClosed");
+            Config.SERVER_TCP.Stop();
+            Config.SERVER_STARTED = false;
+            SceneManager.LoadSceneAsync("Startup");
+            GameObject.Find("ServerController").gameObject.SetActive(false);
+        }
+    }
     #region Verbindungen
     /// <summary>
     /// Startet den Server
@@ -270,7 +289,7 @@ public class StartupServer : MonoBehaviour
         }
         catch (Exception e)
         {
-            Logging.log(Logging.LogType.Warning, "Server", "SendMSG", "Nachricht an Client: " + sc.id + " (" + sc.name + ") konnte nicht gesendet werden." + e);
+            Logging.log(Logging.LogType.Warning, "Server", "SendMSG", "Nachricht an Client: " + sc.id + " (" + sc.name + ") konnte nicht gesendet werden.", e);
             // Verbindung zum Client wird getrennt
             ClientClosed(sc);
         }

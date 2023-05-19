@@ -1,11 +1,14 @@
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using UnityEngine;
 
 public class ConfigFile
 {
     string path;
     string title;
-    Hashtable table;
+    //Hashtable table;
+    Dictionary<string, string> table;
 
     /// <summary>
     /// Erstellt eine Config mit passender Datei.
@@ -18,7 +21,8 @@ public class ConfigFile
     {
         this.path = path;
         this.title = title;
-        table = new Hashtable();
+        //table = new Hashtable();
+        table = new Dictionary<string, string>();
 
         if (File.Exists(path + title))
         {
@@ -54,7 +58,8 @@ public class ConfigFile
     /// </summary>
     public void DeleteAll()
     {
-        table = new Hashtable();
+        //table = new Hashtable();
+        table = new Dictionary<string, string>();
         if (File.Exists(path + title))
         {
             File.WriteAllText(path + title, "");
@@ -83,15 +88,19 @@ public class ConfigFile
     public void Save()
     {
         string lines = "";
-        foreach (DictionaryEntry entry in table)
+        foreach (string key in table.Keys)
+        {
+            lines += key + "=" + table[key] + "\n";
+        }
+        /*foreach (DictionaryEntry entry in table)
         {
             lines += entry.Key + "=" + entry.Value + "\n";
-        }
+        }*/
         if (lines.Length > 2)
             lines = lines.Substring(0, lines.Length - "\n".Length);
 
         File.WriteAllText(path + title, lines);
-        Logging.log(Logging.LogType.Normal, "ConfigFile", "Save", title + " wurde gespeichert.");
+        Logging.log(Logging.LogType.Normal, "ConfigFile", "Save", title + " wurde gespeichert. \n"+lines);
     }
     /// <summary>
     /// Fügt ein neues Key-Value-Paar hinzu.
@@ -100,7 +109,7 @@ public class ConfigFile
     /// </summary>
     /// <param name="key"></param>
     /// <param name="value"></param>
-    private void Set(string key, object value)
+    private void Set(string key, string value)
     {
         if (table.ContainsKey(key))
             table[key] = value;
@@ -133,7 +142,7 @@ public class ConfigFile
     /// <param name="value"></param>
     public void SetFloat(string key, float value)
     {
-        Set(key, value);
+        Set(key, value.ToString());
     }
     /// <summary>
     /// Gibt ein double Value des Key-Value-Paar zurück.
@@ -161,7 +170,7 @@ public class ConfigFile
     /// <param name="value"></param>
     public void SetDouble(string key, double value)
     {
-        Set(key, value);
+        Set(key, value.ToString());
     }
     /// <summary>
     /// Gibt ein int Value des Key-Value-Paar zurück.
@@ -189,7 +198,7 @@ public class ConfigFile
     /// <param name="value"></param>
     public void SetInt(string key, int value)
     {
-        Set(key, value);
+        Set(key, value.ToString());
     }
     /// <summary>
     /// Gibt ein string Value des Key-Value-Paar zurück.
@@ -249,6 +258,6 @@ public class ConfigFile
     /// <param name="value"></param>
     public void SetBool(string key, bool value)
     {
-        Set(key, value);
+        Set(key, value.ToString());
     }
 }

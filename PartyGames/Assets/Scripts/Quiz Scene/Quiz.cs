@@ -79,6 +79,9 @@ public class QuizFragen
     }
 
     public string getFrage() { return this.frage; }
+    public void setFrage(string frage) { this.frage = frage; }
     public string getAntwort() { return this.antwort; }
+    public void setAntwort(string antwort) { this.antwort = antwort; }
     public string getInfo() { return this.info; }
+    public void setInfo(string info) { this.info = info; }
 }

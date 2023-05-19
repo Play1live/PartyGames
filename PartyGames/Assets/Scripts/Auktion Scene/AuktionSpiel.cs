@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class AuktionSpiel
 {
+    public static string path = "/Spiele/Auktion";
     private int minPlayer = 3;
     private int maxPlayer = 9;
     private List<Auktion> elemente;

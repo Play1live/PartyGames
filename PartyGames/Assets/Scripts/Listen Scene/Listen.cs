@@ -291,7 +291,9 @@ public class Element
         display = formattedNumber + nachkommastelle + " "+einheit;
     }
 
+    public void setItem(string item) { this.item = item; }
     public string getItem() { return item; }
+    public void setDisplay(string display) { this.display = display; }
     public string getDisplay() { return display; }
     public string getSortBy() { return sortby; }
     public void setSortBy(string s) { sortby = s; }

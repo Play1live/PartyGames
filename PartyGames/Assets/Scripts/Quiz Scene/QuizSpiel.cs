@@ -34,7 +34,6 @@ public class QuizSpiel
             quizze.Add(new Quiz(sfile));
         }
     }
-
     public int getMinPlayer() { return minPlayer; }
     public int getMaxPlayer() { return maxPlayer; }
     public List<Quiz> getQuizze() { return quizze; }

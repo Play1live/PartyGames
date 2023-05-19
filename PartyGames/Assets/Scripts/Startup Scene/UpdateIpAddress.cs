@@ -16,16 +16,18 @@ public class UpdateIpAddress
     public static bool UpdateNoIP_DNS()
     {
         // Lade aktuelle IP-Adresse
-        string ipaddress = new WebClient().DownloadString("https://api.ipify.org");
+        string ipaddress;
         // Lade DNS-IP-Adresse
         IPAddress[] domainip;
         try
         {
+            ipaddress = new WebClient().DownloadString("https://api.ipify.org");
             domainip = Dns.GetHostAddresses(Config.SERVER_CONNECTION_IP);
         }
         catch (Exception e)
         {
             Logging.log(Logging.LogType.Warning, "UpdateIpAddress", "UpdateNoIP_DNS", "Could not resolve host " + Config.SERVER_CONNECTION_IP);
+            Config.HAUPTMENUE_FEHLERMELDUNG += "\nBitte überprüfe deine Internetverbindung!";
             return false;
         }
         

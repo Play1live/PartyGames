@@ -11,7 +11,7 @@ public class Config
     public static string MedienPath = Application.persistentDataPath + @"\Medien";
     public static bool DEBUG_MODE = false;
     public static bool REMOTECONFIG_FETCHTED = false;
-    public static bool APPLICATION_INIT = false;
+    public static bool APPLICATION_INITED = false;
     // Updater Data
     public static string UPDATER_DOWNLOAD_URL;
     public static string UPDATER_LATEST_VERSION;

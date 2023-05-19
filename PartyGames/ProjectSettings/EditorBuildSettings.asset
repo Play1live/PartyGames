@@ -35,4 +35,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/ContentCreationTerminal.unity
     guid: d35b7b6fb5cd75546b787e28bcf61f9f
+  - enabled: 1
+    path: "Assets/Scenes/Mensch\xC4rgerDichNicht.unity"
+    guid: abc65c988ee069c4eb036727bd596356
   m_configObjects: {}

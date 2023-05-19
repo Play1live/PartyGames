@@ -46,12 +46,12 @@ public class LoadConfigs
     }
     private static void ApplyRemoteSettings()
     {
-        MoveToPrimaryDisplay(); // Schiebt das Programm auf den Primären Monitor
+        MoveToPrimaryDisplayFullscreen(); // Schiebt das Programm auf den Primären Monitor
     }
     /// <summary>
     /// Bewegt das Spiel auf den 1. Bildschirm & legt Vollbild fest
     /// </summary>
-    private static void MoveToPrimaryDisplay()
+    public static void MoveToPrimaryDisplayFullscreen()
     {
         if (Config.FULLSCREEN == true)
         {

@@ -71,10 +71,13 @@ public class AuktionElement
         this.kaeuferId = -1;
     }
 
+    public void setName(string name) { this.name = name; }
     public string getName() { return this.name; }
     public float getPreis() { return this.preis; }
     public void setPreis(float preis) { this.preis = preis; }
+    public void setURL(string url) { this.url = url; }
     public string getURL() { return this.url; }
+    public void setBilderURL(string url, int index) { this.bilderURL[index] = url; }
     public Sprite[] getBilder() { return this.bilder; }
     public string[] getBilderURL() { return this.bilderURL; }
     public bool getWurdeverkauft() { return this.wurdeverkauft; }

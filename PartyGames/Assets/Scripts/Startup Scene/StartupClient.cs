@@ -82,6 +82,18 @@ public class StartupClient : MonoBehaviour
         StopAllCoroutines();
     }
 
+    public void ZurueckZumHauptmenue()
+    {
+        Logging.log(Logging.LogType.Normal, "StartupClient", "ZurueckZumHauptmenue", "Spieler wird ins Hauptmenü geladen und Server- & Client-Verbindung wird beendet.");
+        if (!Config.isServer && Config.CLIENT_STARTED)
+        {
+            SendToServer("#ClientClosed");
+            Config.CLIENT_TCP.Close();
+            Config.CLIENT_STARTED = false;
+            SceneManager.LoadSceneAsync("Startup");
+            GameObject.Find("ClientController").gameObject.SetActive(false);
+        }
+    }
     /// <summary>
     /// Testet nach der Verbindung zum Server, ob die Verbindung erfolgreich und ohne Fehler funktioniert hat. 
     /// Falls die Verbindung fehlerhaft war, wird diese beendet und der Client lädt ins Hauptmenü.
@@ -732,8 +744,11 @@ public class StartupClient : MonoBehaviour
                 SpielVorschauElemente.transform.GetChild(i).GetChild(2).gameObject.SetActive(true);
                 SpielVorschauElemente.transform.GetChild(i).GetChild(2).GetComponentInChildren<TMP_Text>().text = available;
             }
-            //yield return null;
         }
+        yield return null;
+        SpielVorschauElemente.transform.GetChild(0).GetChild(2).gameObject.SetActive(false);
+        yield return null;
+        SpielVorschauElemente.transform.GetChild(0).GetChild(2).gameObject.SetActive(true);
         yield break;
     }
 

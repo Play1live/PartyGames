@@ -21,8 +21,9 @@ public class Sloxikon
         {
             if (zeile.StartsWith("- "))
             {
-                themen.Add(zeile.Replace(" [!#!] ", "|").Split('|')[0]);
-                antwort.Add(zeile.Replace(" [!#!] ", "|").Split('|')[1]);
+                string zeil = zeile.Substring("- ".Length);
+                themen.Add(zeil.Replace(" [!#!] ", "|").Split('|')[0]);
+                antwort.Add(zeil.Replace(" [!#!] ", "|").Split('|')[1]);
             }
             else
             {

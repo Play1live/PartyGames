@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class ListenSpiel
 {
+    public static string path = "/Spiele/Listen";
     private int minPlayer = 3;
     private int maxPlayer = 9;
     private List<Listen> listen;
