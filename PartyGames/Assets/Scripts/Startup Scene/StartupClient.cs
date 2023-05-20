@@ -160,6 +160,7 @@ public class StartupClient : MonoBehaviour
         {
             Config.CLIENT_TCP = new TcpClient("localhost", Config.SERVER_CONNECTION_PORT);
             //Config.CLIENT_TCP = new TcpClient(Config.SERVER_CONNECTION_IP, Config.SERVER_CONNECTION_PORT);
+            Config.CLIENT_TCP.Client.NoDelay = true;
             Config.CLIENT_STARTED = true;
             Logging.log(Logging.LogType.Normal, "StartupClient", "StarteClient", "Verbindung wurde erfolgreich aufgebaut.");
             Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server wurde hergestellt.";

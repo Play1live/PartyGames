@@ -171,6 +171,7 @@ public class StartupServer : MonoBehaviour
         try
         {
             Config.SERVER_TCP = new TcpListener(IPAddress.Any, Config.SERVER_CONNECTION_PORT);
+            Config.SERVER_TCP.Server.NoDelay = true;
             Config.SERVER_TCP.Start();
             startListening();
             Config.SERVER_STARTED = true;
