@@ -21876,6 +21876,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f263f429741c7d498367731e10d7a84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Lobby: {fileID: 1669809579}
+  Games: {fileID: 1404242424}
+  Maps:
+  - {fileID: 24741124}
+  - {fileID: 316235557}
+  - {fileID: 1117971639}
+  - {fileID: 616039721}
+  - {fileID: 1599911297}
+  - {fileID: 856983099}
+  SpielprotokollContent: {fileID: 1771600856}
+  "W\xFCrfel": {fileID: 720974110}
+  InfoBoard: {fileID: 394115240}
+  DisconnectSound: {fileID: 883957237}
 --- !u!1001 &423172699
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -83271,13 +83284,13 @@ MonoBehaviour:
   onValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1742973878}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: 
-        m_Mode: 1
+      - m_Target: {fileID: 310990668}
+        m_TargetAssemblyTypeName: MenschAergerDichNichtServer, Assembly-CSharp
+        m_MethodName: ChangeWatchOnly
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgument: {fileID: 1970491734}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Toggle, UnityEngine.UI
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 

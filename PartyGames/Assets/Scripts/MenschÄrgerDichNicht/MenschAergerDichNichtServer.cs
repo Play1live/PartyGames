@@ -170,10 +170,14 @@ public class MenschAergerDichNichtServer : MonoBehaviour
 
             case "#ClientClosed":
                 ClientClosed(player);
-                //UpdateSpielerBroadcast();
+                //UpdateSpielerBroadcast(); // TODO: lobby Update  oder ingame soll dann bot übernehmen
+                if (Lobby.activeInHierarchy)
+                    UpdateLobby();
                 PlayDisconnectSound();
                 break;
             case "#TestConnection":
+                break;
+            case "#ClientFocusChange":
                 break;
 
             case "#JoinMenschAergerDichNicht":
@@ -268,6 +272,8 @@ public class MenschAergerDichNichtServer : MonoBehaviour
             if (Playerlist[i].activeInHierarchy)
                 msg += "|" + Playerlist[i].GetComponentInChildren<TMP_Text>().text;
         }
+        if (msg.Length > 0)
+            msg = msg.Substring("|".Length);
         Broadcast("#UpdateLobby " + msg);
     }
     public void ChangeBots(TMP_Dropdown drop)
@@ -279,10 +285,20 @@ public class MenschAergerDichNichtServer : MonoBehaviour
     public void ChangeWatchOnly(Toggle toggle)
     {
         MenschAegerDichNichtBoard.watchBots = toggle.isOn;
+        // TODO: nur ohne mitspieler (clients)
     }
     #region GameLogic
     public void StartGame()
     {
+        Logging.log(Logging.LogType.Normal, "MenschAergerDichNichtServer", "StartGame", "Spiel wird gestartet.");
+        if (MenschAegerDichNichtBoard.watchBots)
+        {
+            Logging.log(Logging.LogType.Normal, "MenschAergerDichNichtServer", "StartGame", "Es werden nur Bots spielen, alle Clients werden getrennt.");
+            Broadcast("#ServerClosed");
+            for (int i = 0; i < Config.PLAYERLIST.Length; i++)
+                ClientClosed(Config.PLAYERLIST[i]);
+            UpdateLobby();
+        }
         #region SpielerInit
         List<string> names = new List<string>();
         List<bool> bots = new List<bool>();
@@ -321,6 +337,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
                 }
             }
         }
+        Logging.log(Logging.LogType.Debug, "MenschAergerDichNichtServer", "StartGame", names.Count + " Spieler werden spielen.");
         List<MenschAergerDichNichtPlayer> randomplayer = new List<MenschAergerDichNichtPlayer>();
         while (names.Count > 0)
         {
@@ -334,6 +351,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
         #region InitBoard
         TMP_Dropdown MapDrop = GameObject.Find("ServerSide/MapAuswahl").GetComponent<TMP_Dropdown>();
         int mapInt = Int32.Parse(MapDrop.options[MapDrop.value].text.Replace(" Spieler", ""));
+        Logging.log(Logging.LogType.Debug, "MenschAergerDichNichtServer", "StartGame", "Folgende Map wurde gewählt: " + mapInt + "P");
         Lobby.SetActive(false);
         Games.SetActive(true);
         GameObject selectedMap = null;
@@ -346,12 +364,14 @@ public class MenschAergerDichNichtServer : MonoBehaviour
 
         int RunWaySize = selectedMap.transform.GetChild(0).childCount;
 
-        if ((randomplayer.Count == mapInt && !MenschAegerDichNichtBoard.watchBots) || ((randomplayer.Count - 1) == mapInt && MenschAegerDichNichtBoard.watchBots))
+        if (randomplayer.Count == mapInt)
         {
+            // TODO: Broadcast nur notwendiges, damit clients auch das board aufbauen
             board = new MenschAegerDichNichtBoard(selectedMap, RunWaySize, mapInt, randomplayer);
         }
         else
         {
+            Logging.log(Logging.LogType.Warning, "MenschAergerDichNichtServer", "StartGame", "Die Spieleranzahl stimmt nicht mit der gewählten Map überein.");
             Lobby.SetActive(true);
             Games.SetActive(false);
             foreach (GameObject go in Maps)

@@ -28,21 +28,6 @@ public class StartupServer : MonoBehaviour
 
     void Start()
     {
-        /*if (Config.SERVER_STARTED)
-            SperreGameSelection();
-
-        if (!Config.SERVER_STARTED)
-            StarteServer();
-
-        Hauptmenue.SetActive(false);
-        Lobby.SetActive(true);
-        ServerControl.SetActive(true);
-        SpielerMiniGames[0].transform.parent.gameObject.SetActive(false);
-
-        if (ServerControlGameSelection.activeInHierarchy && ServerControlGameSelection.transform.GetChild(1).gameObject.activeInHierarchy)
-            DisplayGameFiles();
-        UpdateGameVorschau();
-        */
         UpdateSpieler();
     }
 
@@ -194,11 +179,8 @@ public class StartupServer : MonoBehaviour
             SceneManager.LoadSceneAsync("Startup");
             return;
         }
-        // Wenn Server "Henryk" bild legen
-        if (Config.PLAYER_NAME.ToLower().Equals("henryk"))
-        {
-            Config.SERVER_ICON = FindIconByName("Henryk");
-        }
+        // Sucht ein passendes Icon für den Serverhost
+        Config.SERVER_ICON = FindFittingIconByName(Config.PLAYER_NAME);
 
         // Verbindung erfolgreich
         Config.HAUPTMENUE_FEHLERMELDUNG = "";
@@ -952,83 +934,12 @@ public class StartupServer : MonoBehaviour
         if (data.Equals("0")) // Initial Änderung Icon
         {
             Logging.log(Logging.LogType.Normal, "StartupServer", "SpielerIconChange", "Spieler " + p.name + " bekommt sein initial Icon.");
-            if (p.name.ToLower().Contains("spieler"))
-            {
-                neuesIcon = FindIconByName("Discord");
-                IconFestlegen(p, neuesIcon);
+            neuesIcon = FindFittingIconByName(p.name);
+            if (neuesIcon == null)
                 return;
-            }
-            else if (p.name.ToLower().Contains("alan"))
-            {
-                neuesIcon = FindIconByName("Alan");
-                IconFestlegen(p, neuesIcon);
-                return;
-            }
-            else if (p.name.ToLower().Contains("fiona"))
-            {
-                neuesIcon = FindIconByName("Fiona");
-                IconFestlegen(p, neuesIcon);
-                return;
-            }
-            else if (p.name.ToLower().Contains("hannah") 
-                || (p.name.ToLower().StartsWith("ha") && p.name.ToLower().EndsWith("nah")) 
-                || (p.name.ToLower().StartsWith("han") && p.name.ToLower().EndsWith("ah"))
-                || (p.name.ToLower().StartsWith("haa") && p.name.ToLower().EndsWith("aah") && p.name.ToLower().Substring(3, p.name.Length-3).Contains("nn")) )
-            {
-                neuesIcon = FindIconByName("Hannah");
-                IconFestlegen(p, neuesIcon);
-                return;
-            }
-            else if (p.name.ToLower().Contains("henryk") || p.name.ToLower().Contains("play1live"))
-            {
-                neuesIcon = FindIconByName("Henryk");
-                IconFestlegen(p, neuesIcon);
-                return;
-            }
-            else if (p.name.ToLower().Contains("maxe"))
-            {
-                neuesIcon = FindIconByName("Maxe");
-                IconFestlegen(p, neuesIcon);
-                return;
-            }
-            else if (p.name.ToLower().Contains("michi") ||
-                p.name.ToLower().Contains("michelle") )
-            {
-                neuesIcon = FindIconByName("Michi");
-                IconFestlegen(p, neuesIcon);
-                return;
-            }
-            else if (p.name.ToLower().Contains("munk") || 
-                p.name.ToLower().Contains("munck"))
-            {
-                neuesIcon = FindIconByName("Munk");
-                IconFestlegen(p, neuesIcon);
-                return;
-            }
-            else if (p.name.ToLower().Contains("nils")
-                || p.name.ToLower().Contains("nille")
-                || p.name.ToLower().Contains("kater")
-                || p.name.ToLower().Contains("katerjunge"))
-            {
-                neuesIcon = FindIconByName("Nils");
-                IconFestlegen(p, neuesIcon);
-                return;
-            }
-            else if (p.name.ToLower().Contains("ronald")
-                || p.name.ToLower().Contains("ron")
-                || p.name.ToLower().Contains("sterni")
-                || p.name.ToLower().Contains("sternfaust"))
-            {
-                neuesIcon = FindIconByName("Ronald");
-                IconFestlegen(p, neuesIcon);
-                return;
-            }
-            else
-            {
-                Logging.log(Logging.LogType.Warning, "StartupServer", "SpielerIconChange", "Spielername für Icons ist unbekannt: " + p.name);
-            }
+            IconFestlegen(p, neuesIcon);
+            return;
         }
-
         // Spieler gewollte änderung des Icons
         if (!Config.ALLOW_ICON_CHANGE)
             return;
@@ -1036,6 +947,69 @@ public class StartupServer : MonoBehaviour
         neuesIcon = Config.PLAYER_ICONS[(Config.PLAYER_ICONS.IndexOf(p.icon) + 1) % Config.PLAYER_ICONS.Count];
         Logging.log(Logging.LogType.Normal, "StartupServer", "SpielerIconChange", "Spieler " + p.name + " hat nun das Icon: "+ neuesIcon.name);
         IconFestlegen(p, neuesIcon);
+    }
+    /// <summary>
+    /// Sucht passende SpielerIcons nach einem Namen
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns>null wenn kein Name passt</returns>
+    private Sprite FindFittingIconByName(string name)
+    {
+        if (name.ToLower().Contains("spieler"))
+        {
+            return FindIconByName("Discord");
+        }
+        else if (name.ToLower().Contains("alan"))
+        {
+            return FindIconByName("Alan");
+        }
+        else if (name.ToLower().Contains("fiona"))
+        {
+            return FindIconByName("Fiona");
+        }
+        else if (name.ToLower().Contains("hannah")
+            || (name.ToLower().StartsWith("ha") && name.ToLower().EndsWith("nah"))
+            || (name.ToLower().StartsWith("han") && name.ToLower().EndsWith("ah"))
+            || (name.ToLower().StartsWith("haa") && name.ToLower().EndsWith("aah") && name.ToLower().Substring(3, name.Length - 3).Contains("nn")))
+        {
+            return FindIconByName("Hannah");
+        }
+        else if (name.ToLower().Contains("henryk") || name.ToLower().Contains("play1live"))
+        {
+            return FindIconByName("Henryk");
+        }
+        else if (name.ToLower().Contains("maxe"))
+        {
+            return FindIconByName("Maxe");
+        }
+        else if (name.ToLower().Contains("michi") ||
+            name.ToLower().Contains("michelle"))
+        {
+            return  FindIconByName("Michi");
+        }
+        else if (name.ToLower().Contains("munck"))
+        {
+            return FindIconByName("Munk");
+        }
+        else if (name.ToLower().Contains("nils")
+            || name.ToLower().Contains("nille")
+            || name.ToLower().Contains("kater")
+            || name.ToLower().Contains("katerjunge"))
+        {
+            return FindIconByName ("Nils");
+        }
+        else if (name.ToLower().Contains("ronald")
+            || name.ToLower().Contains("ron")
+            || name.ToLower().Contains("sterni")
+            || name.ToLower().Contains("sternfaust"))
+        {
+            return FindIconByName("Ronald");
+        }
+        else
+        {
+            Logging.log(Logging.LogType.Warning, "StartupServer", "SpielerIconChange", "Spielername für Icons ist unbekannt: " + name);
+            return null;
+        }
     }
     /// <summary>
     /// Gibt ein Sprite eines Icons zurück das per Name gesucht wird

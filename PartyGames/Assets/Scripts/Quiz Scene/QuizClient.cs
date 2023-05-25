@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class QuizClient : MonoBehaviour
+public class MenschÄrgerDichNichtClient : MonoBehaviour
 {
     GameObject Frage;
     GameObject SpielerAntwortEingabe;
