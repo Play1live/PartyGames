@@ -425,7 +425,7 @@ public class StartupScene : MonoBehaviour
                 WriteGameVersionFile();
             }
         }
-        Logging.log(Logging.LogType.Debug, "StartupScene", "WriteGameVersionFile", "Spiel Version wurde für den Updater aktualisiert.");
+        Logging.log(Logging.LogType.Debug, "StartupScene", "WriteGameVersionFile", "Spiel Version wurde für den Updater in Datei aktualisiert.");
     }
     /// <summary>
     /// Aktualisiert die Anzeigen in den Einstellungen
@@ -478,6 +478,9 @@ public class StartupScene : MonoBehaviour
         if (Config.CLIENT_STARTED || Config.SERVER_STARTED)
             return;
         Config.isServer = toggle.isOn;
+
+        if (Config.isServer)
+            StartCoroutine(LoadGameFilesAsync());
     }
     /// <summary>
     /// Aktualisiert Username für NoIP

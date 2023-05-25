@@ -738,7 +738,8 @@ public class StartupClient : MonoBehaviour
             else if (available.Equals("-1"))// Anzeigen ohne anzahl
             {
                 SpielVorschauElemente.transform.GetChild(i).GetChild(2).gameObject.SetActive(false);
-                SpielVorschauElemente.transform.GetChild(i).GetChild(2).GetComponentInChildren<TMP_Text>().text = available;
+                SpielVorschauElemente.transform.GetChild(i).GetChild(2).GetComponentInChildren<TMP_Text>().text = "";
+                SpielVorschauElemente.transform.GetChild(i).GetChild(2).gameObject.SetActive(false);
             }
             else
             {
@@ -760,14 +761,26 @@ public class StartupClient : MonoBehaviour
     private void StarteSpiel(string data)
     {
         Logging.log(Logging.LogType.Normal, "StartupClient", "StarteSpiel", "Spiel wird geladen: " + data);
-        Config.GAME_TITLE = data;
-        switch (data)
+        try
+        {
+            Config.GAME_TITLE = data;
+            SceneManager.LoadScene(data);
+        }
+        catch (Exception e)
+        {
+            Logging.log(Logging.LogType.Error, "StartupClient", "StarteSpiel", "Unbekanntes Spiel soll geladen werden. Beende Verbindung. Spiel: " + data);
+            SendToServer("#ClientClosed");
+            CloseSocket();
+            SceneManager.LoadSceneAsync("Startup");
+        }
+        
+        /*switch (data)
         {
             default:
                 Logging.log(Logging.LogType.Error, "StartupClient", "StarteSpiel", "Unbekanntes Spiel sooll geladen werden. Beende Verbindung. Spiel: " + data);
                 SendToServer("#ClientClosed");
                 CloseSocket();
-                SceneManager.LoadSceneAsync("StartUpScene");
+                SceneManager.LoadSceneAsync("Startup");
                 break;
             case "Flaggen":
                 SceneManager.LoadScene(data);
@@ -793,7 +806,7 @@ public class StartupClient : MonoBehaviour
             case "Sloxikon":
                 SceneManager.LoadScene(data);
                 break;
-        }
+        }*/
     }
     #region MiniGames
     #region TickTackToe

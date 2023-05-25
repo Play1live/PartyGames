@@ -1133,9 +1133,10 @@ public class StartupServer : MonoBehaviour
     {
         List<string> gamelist = new List<string>();
         // [SPIELER]<0-9>[SPIELER][TITEL]<..>[TITEL][AVAILABLE]<..>[AVAILABLE]
+        gamelist.Add("[SPIELER-ANZ]0[SPIELER-ANZ][MIN]0[MIN][MAX]0[MAX][TITEL]<b><i>Fehler</i></b>[TITEL][AVAILABLE]-1[AVAILABLE]");
 
         //ModerierteGames
-        //gamelist.Add("[SPIELER]0[SPIELER][TITEL]Moderierte Games[TITEL][AWAILABLE]0[AVAILABLE]");
+        gamelist.Add("[SPIELER-ANZ]0[SPIELER-ANZ][MIN]0[MIN][MAX]" + Config.SERVER_MAX_CONNECTIONS + "[MAX][TITEL]<b><i>Moderierte Spiele</i></b>[TITEL][AVAILABLE]-1[AVAILABLE]");
         //Flaggen
         gamelist.Add("[SPIELER-ANZ]3-9[SPIELER-ANZ][MIN]" + Config.FLAGGEN_SPIEL.getMinPlayer() + "[MIN][MAX]" + Config.FLAGGEN_SPIEL.getMaxPlayer() + "[MAX][TITEL]Flaggen[TITEL][AVAILABLE]" + Config.FLAGGEN_SPIEL.getFlaggen().Count + "[AVAILABLE]");
         //Quiz
@@ -1153,7 +1154,9 @@ public class StartupServer : MonoBehaviour
         //Sloxikon
         gamelist.Add("[SPIELER-ANZ]3-9[SPIELER-ANZ][MIN]" + Config.SLOXIKON_SPIEL.getMinPlayer() + "[MIN][MAX]" + Config.SLOXIKON_SPIEL.getMaxPlayer() + "[MAX][TITEL]Sloxikon[TITEL][AVAILABLE]" + Config.SLOXIKON_SPIEL.getGames().Count + "[AVAILABLE]");
         //Unmoderierte Games
-        //gamelist.Add("[SPIELER]0[SPIELER][TITEL]Unmoderierte Games[TITEL][AWAILABLE]0[AVAILABLE]");
+        gamelist.Add("[SPIELER-ANZ]0[SPIELER-ANZ][MIN]0[MIN][MAX]" + Config.SERVER_MAX_CONNECTIONS + "[MAX][TITEL]<b><i>Unmoderierte Spiele</i></b>[TITEL][AVAILABLE]-1[AVAILABLE]");
+        // MenschÄrgerDichNicht
+        gamelist.Add("[SPIELER-ANZ]1-8[SPIELER-ANZ][MIN]" + MenschAegerDichNichtBoard.minPlayer + "[MIN][MAX]" + MenschAegerDichNichtBoard.maxPlayer + "[MAX][TITEL]MenschÄrgerDichNicht[TITEL][AVAILABLE]-1[AVAILABLE]");
 
 
         string msg = "";
@@ -1456,6 +1459,16 @@ public class StartupServer : MonoBehaviour
         Config.GAME_TITLE = "Sloxikon";
         SceneManager.LoadScene("Sloxikon");
         Broadcast("#StarteSpiel Sloxikon");
+    }
+    /// <summary>
+    /// Starte das MenschÄrgerDichNicht Spiel -> Alle Spieler laden in die neue Scene
+    /// </summary>
+    public void StarteMenschAergerDichNicht()
+    {
+        Logging.log(Logging.LogType.Normal, "StartupServer", "StarteMenschAergerDichNicht", "MenschAergerDichNicht starts.");
+        Config.GAME_TITLE = "MenschAergerDichNicht";
+        SceneManager.LoadScene("MenschAergerDichNicht");
+        Broadcast("#StarteSpiel MenschAergerDichNicht");
     }
     #endregion
 

@@ -49,4 +49,16 @@ public class Player
         }
         return -1;
     }
+
+    public static int getPosByName(string name)
+    {
+        for (int i = 0; i < Config.PLAYERLIST.Length; i++)
+        {
+            if (Config.PLAYERLIST[i].name == name)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
 }
