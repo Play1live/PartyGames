@@ -32,8 +32,11 @@ public class StartupScene : MonoBehaviour
     void Start()
     {
 #if UNITY_EDITOR
-        Config.isServer = true;
-        Config.PLAYER_NAME = "Henryk";
+        if (Config.APPLICATION_INITED != true)
+        {
+            Config.isServer = true;
+            Config.PLAYER_NAME = "Henryk";
+        }
 #endif
         /*Testzwecke*/
         Config.DEBUG_MODE = true;

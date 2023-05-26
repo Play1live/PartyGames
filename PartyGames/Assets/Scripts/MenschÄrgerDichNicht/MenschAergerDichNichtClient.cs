@@ -169,8 +169,17 @@ public class MenschAergerDichNichtClient : MonoBehaviour
             case "#UpdateLobby":
                 UpdateLobby(data);
                 break;
-
+            case "#StartGame":
+                StartGame(data);
+                break;
         }
+    }
+    /// <summary>
+    /// Spielt den Disconnect Sound ab
+    /// </summary>
+    private void PlayDisconnectSound()
+    {
+        DisconnectSound.Play();
     }
     /// <summary>
     /// Initialisiert die Anzeigen der Scene
@@ -208,11 +217,64 @@ public class MenschAergerDichNichtClient : MonoBehaviour
             Playerlist[i].SetActive(true);
         }
     }
-    /// <summary>
-    /// Spielt den Disconnect Sound ab
-    /// </summary>
-    private void PlayDisconnectSound()
+    private void StartGame(string data)
     {
-        DisconnectSound.Play();
+        // PlayerInit
+        List<MenschAergerDichNichtPlayer> randomplayer = new List<MenschAergerDichNichtPlayer>();
+        string[] playerdata = data.Replace("[PLAYER]", "|").Split('|')[1].Replace("[#]", "|").Split('|');
+        for (int i = 0; i < playerdata.Length; i++)
+        {
+            string name = playerdata[i].Split('*')[0];
+            bool isbot = bool.Parse(playerdata[i].Split('*')[1]);
+            Sprite sprite = Resources.Load<Sprite>("Images/Icons/" + playerdata[i].Split('*')[2]);
+
+            randomplayer.Add(new MenschAergerDichNichtPlayer(i, name, isbot, sprite));
+        }
+        // LoadMap
+        GameObject selectedMap = null;
+        string mapstring = data.Replace("[MAP]", "|").Split('|')[1];
+        foreach (GameObject go in Maps)
+        {
+            go.SetActive(false);
+            if (go.name.Equals(mapstring))
+                selectedMap = go;
+        }
+        if (selectedMap == null)
+        {
+            Logging.log(Logging.LogType.Warning, "MenschAergerDichNichtClient", "StartGame", "Ausgewählte Map konnte nicht gefunden werden.");
+            Lobby.SetActive(true);
+            Games.SetActive(false);
+            return;
+        }
+        selectedMap.SetActive(true);
+        int teamsize = Int32.Parse(data.Replace("[TEAMSIZE]", "|").Split('|')[1]);
+        int runwaysize = Int32.Parse(data.Replace("[RUNWAY]", "|").Split('|')[1]); 
+        Lobby.SetActive(false);
+        Games.SetActive(true);
+
+        board = new MenschAegerDichNichtBoard(selectedMap, runwaysize, teamsize, randomplayer);
+
+        // Hide PlayerAnimation
+        selectedMap.transform.GetChild(4).gameObject.SetActive(false);
+
+        AddMSGToProtokoll("Spiel wurde gestartet.");
+        DisplayMSGInfoBoard("Spiel wird geladen.");
+    }
+    public void AddMSGToProtokoll(string msg)
+    {
+        GameObject go = Instantiate(SpielprotokollContent.transform.GetChild(0).gameObject, SpielprotokollContent.transform.GetChild(0).position, SpielprotokollContent.transform.GetChild(0).rotation);
+        go.name = "MSG_" + SpielprotokollContent.transform.childCount;
+        go.transform.SetParent(SpielprotokollContent.transform);
+        go.transform.GetComponentInChildren<TMP_Text>().text = msg;
+        go.transform.localScale = new Vector3(1, 1, 1);
+        go.SetActive(true);
+    }
+    public void DisplayMSGInfoBoard(string msg)
+    {
+        InfoBoard.GetComponentInChildren<TMP_Text>().text = msg;
+    }
+    public void StartWuerfelAnimation()
+    {
+
     }
 }

@@ -37,27 +37,49 @@ public class MenschAegerDichNichtBoard
     private List<MenschAergerDichNichtBase> Starts;
     private List<MenschAergerDichNichtBase> Homes;
     private List<MenschAergerDichNichtPlayer> player;
+    private MenschAergerDichNichtPlayer playersTurn;
     string BoardPrint = "";
 
     public MenschAegerDichNichtBoard(GameObject MapObject, int RunWaySize, int TeamSize, List<MenschAergerDichNichtPlayer> player)
     {
         this.MapObject = MapObject;
         this.player = player;
-        RunWay = new List<MenschAegerDichNichtFeld>();
+        this.RunWay = new List<MenschAegerDichNichtFeld>();
         for (int i = 0; i < RunWaySize; i++)
             RunWay.Add(new MenschAegerDichNichtFeld(MapObject.transform.GetChild(0).GetChild(i).gameObject));
         FillAusfahrten();
-        Starts = new List<MenschAergerDichNichtBase>();
-        Homes = new List<MenschAergerDichNichtBase>();
+        this.Starts = new List<MenschAergerDichNichtBase>();
+        this.Homes = new List<MenschAergerDichNichtBase>();
         for (int i = 0; i < TeamSize; i++)
         {
-            Starts.Add(new MenschAergerDichNichtBase(MapObject.transform.GetChild(1).GetChild(i).gameObject, getTeamByIndex(i), true, this.player[i].PlayerImage, this.player[i].PlayerColor));
-            this.player[i].SetStartPos(Starts[i].GetBases());
-            Homes.Add(new MenschAergerDichNichtBase(MapObject.transform.GetChild(2).GetChild(i).gameObject, getTeamByIndex(i), false, this.player[i].PlayerImage, this.player[i].PlayerColor));        
+            this.Starts.Add(new MenschAergerDichNichtBase(MapObject.transform.GetChild(1).GetChild(i).gameObject, getTeamByIndex(i), true, this.player[i]));
+            this.player[i].SetStartPos(this.Starts[i].GetBases());
+            this.Homes.Add(new MenschAergerDichNichtBase(MapObject.transform.GetChild(2).GetChild(i).gameObject, getTeamByIndex(i), false, this.player[i]));
+            this.player[i].SetpRunWay(this.RunWay, TeamSize);
+            this.player[i].SetStartAndHomeBase(this.Starts[i], this.Homes[i]);
         }
         PrintBoard();
     }
 
+    // Soll bestimmen welcher Spieler dran ist
+    public MenschAergerDichNichtPlayer PlayerTurnSelect()
+    {
+        if (this.playersTurn == null)
+        {
+            this.playersTurn = this.player[0];
+            return playersTurn;
+        }
+        else
+        {
+            int indexNextPlayer = (this.player.IndexOf(this.playersTurn) + 1) % this.player.Count;
+            this.playersTurn = this.player[indexNextPlayer];
+            return this.playersTurn;
+        }
+    }
+    public MenschAergerDichNichtPlayer GetPlayerTurn()
+    {
+        return this.playersTurn;
+    }
     private void FillAusfahrten()
     {
         if (MapObject.name.Equals("3P"))
@@ -111,9 +133,27 @@ public class MenschAegerDichNichtBoard
                 return team;
         return HintergrundFarbe.NULL;
     }
+    public void ClearMarkierungen()
+    {
+        foreach (MenschAegerDichNichtFeld feld in this.RunWay)
+        {
+            feld.GetFeld().transform.GetChild(2).gameObject.SetActive(false);
+        }
+        foreach (MenschAergerDichNichtBase bases in this.Homes)
+        {
+            foreach (MenschAegerDichNichtFeld feld in bases.GetBases())
+            {
+                feld.GetFeld().transform.GetChild(2).gameObject.SetActive(false);
+            }
+        }
+    }
     public string GetBoardString()
     {
         return this.BoardPrint;
+    }
+    public List<MenschAegerDichNichtFeld> GetRunWay()
+    {
+        return this.RunWay;
     }
     public string PrintBoard()
     {
@@ -143,6 +183,7 @@ public class MenschAegerDichNichtFeld
     private HintergrundFarbe hintergrundFarbe;
 
     private bool belegt;
+    private MenschAergerDichNichtPlayer Player;
     private Sprite PlayerImage;
     private Color PlayerTeam;
 
@@ -153,11 +194,13 @@ public class MenschAegerDichNichtFeld
         this.hintergrundFarbe = HintergrundFarbe.NULL;
 
         this.belegt = false;
-        this.PlayerImage = null;
+        this.Player = new MenschAergerDichNichtPlayer(-1, "ERROR", false, Resources.Load<Sprite>("Images/ProfileIcons/empty"));
+        this.PlayerImage = this.Player.PlayerImage;
         this.PlayerTeam = new Color();
 
         UpdateDisplayPlayer();
         SetBackgroundColor();
+        ClearSelected();
     }
     // Home Aufruf
     public MenschAegerDichNichtFeld(GameObject field, HintergrundFarbe hintergrundFarbe)
@@ -166,24 +209,32 @@ public class MenschAegerDichNichtFeld
         this.hintergrundFarbe = hintergrundFarbe;
 
         this.belegt = false;
-        this.PlayerImage = null;
+        this.Player = new MenschAergerDichNichtPlayer(-1, "ERROR", false, Resources.Load<Sprite>("Images/ProfileIcons/empty"));
+        this.PlayerImage = this.Player.PlayerImage;
         this.PlayerTeam = new Color();
 
         SetBackgroundColor();
+        ClearSelected();
     }
     // StartAufruf
-    public MenschAegerDichNichtFeld(GameObject field, HintergrundFarbe hintergrundFarbe, Sprite PlayerImage, Color PlayerTeam)
+    public MenschAegerDichNichtFeld(GameObject field, HintergrundFarbe hintergrundFarbe, MenschAergerDichNichtPlayer player)
     {
         this.field = field;
         this.hintergrundFarbe = hintergrundFarbe;
 
         this.belegt = true;
-        this.PlayerImage = PlayerImage;
-        this.PlayerTeam = PlayerTeam;
+        this.Player = player;
+        this.PlayerImage = player.PlayerImage;
+        this.PlayerTeam = player.PlayerColor;
 
         SetBackgroundColor();
+        ClearSelected();
     }
     
+    public void MarkSelectableField()
+    {
+        this.field.transform.GetChild(2).gameObject.SetActive(true);
+    }
     public void UpdateDisplayPlayer()
     {
         if (this.belegt)
@@ -198,19 +249,28 @@ public class MenschAegerDichNichtFeld
             this.field.transform.GetChild(1).gameObject.SetActive(false);
         }
     }
-    public void DisplayPlayer(Sprite PlayerImage, Color PlayerTeam)
+    public void DisplayPlayer(MenschAergerDichNichtPlayer player)
     {
-        if (PlayerImage == null)
+        if (player == null)
         {
             this.belegt = false;
+            this.Player = player;
             this.PlayerImage = null;
+            this.PlayerTeam = new Color();
+        }
+        else if (player.gamerid == -1)
+        {
+            this.belegt = false;
+            this.Player = player;
+            this.PlayerImage = player.PlayerImage;
             this.PlayerTeam = new Color();
         }
         else
         {
             this.belegt = true;
-            this.PlayerImage = PlayerImage;
-            this.PlayerTeam = PlayerTeam;
+            this.Player = player;
+            this.PlayerImage = player.PlayerImage;
+            this.PlayerTeam = player.PlayerColor;
         }
        UpdateDisplayPlayer();
     }
@@ -248,26 +308,45 @@ public class MenschAegerDichNichtFeld
         else if (this.hintergrundFarbe.Equals(HintergrundFarbe.PURPLE))
             this.field.transform.GetChild(0).GetComponent<Image>().color = new Color(MenschAegerDichNichtBoard.TEAM_PURPLE.r / 255f, MenschAegerDichNichtBoard.TEAM_PURPLE.g / 255f, MenschAegerDichNichtBoard.TEAM_PURPLE.b / 255f);
     }
+    private void ClearSelected()
+    {
+        this.field.transform.GetChild(2).gameObject.SetActive(false);
+    }
     public bool IstBelegt()
     {
         return this.belegt;
     }
+    public bool IstMarkiert()
+    {
+        if (this.field.transform.GetChild(2).gameObject.activeInHierarchy)
+            return true;
+        else
+            return false;
+    }
+    public MenschAergerDichNichtPlayer GetPlayer()
+    {
+        return this.Player;
+    }
+    public GameObject GetFeld()
+    {
+        return this.field;
+    }
     public override string ToString()
     {
-        return hintergrundFarbe + "*" + belegt + "*" + PlayerImage + "*" + PlayerTeam;
+        return hintergrundFarbe + "*" + belegt + "*" + Player;
     }
 }
 
 public class MenschAergerDichNichtBase
 {
     private List<MenschAegerDichNichtFeld> bases;
-    public MenschAergerDichNichtBase(GameObject field, HintergrundFarbe hintergrundFarbe, bool belegt, Sprite PlayerImage, Color PlayerTeam)
+    public MenschAergerDichNichtBase(GameObject field, HintergrundFarbe hintergrundFarbe, bool belegt, MenschAergerDichNichtPlayer player)
     {
         bases = new List<MenschAegerDichNichtFeld>();
         if (belegt == true)
             for (int i = 0; i < 4; i++)
             {
-                bases.Add(new MenschAegerDichNichtFeld(field.transform.GetChild(i).gameObject, hintergrundFarbe, PlayerImage, PlayerTeam));
+                bases.Add(new MenschAegerDichNichtFeld(field.transform.GetChild(i).gameObject, hintergrundFarbe, player));
             }
         else
             for (int i = 0; i < 4; i++)
@@ -289,10 +368,16 @@ public class MenschAergerDichNichtPlayer
     public string name { private set; get; }
     public Sprite PlayerImage { private set; get; }
     public Color PlayerColor { private set; get; }
+    public List<MenschAegerDichNichtFeld> pRunWay { get; set; }
+    public MenschAergerDichNichtBase StartBase { get; set; }
+    public MenschAergerDichNichtBase HomeBase { get; set; }
     public MenschAegerDichNichtFeld FigurPosition_1 { set; get; }
     public MenschAegerDichNichtFeld FigurPosition_2 { set; get; }
     public MenschAegerDichNichtFeld FigurPosition_3 { set; get; }
     public MenschAegerDichNichtFeld FigurPosition_4 { set; get; }
+    public List<MenschAegerDichNichtFeld> Figuren { set; get; }
+    public int availableDices { set; get; }
+    public int wuerfel { set; get; }
 
     public MenschAergerDichNichtPlayer(int gamerid, string name, bool isBot, Sprite PlayerImage)
     {
@@ -301,19 +386,437 @@ public class MenschAergerDichNichtPlayer
         this.name = name;
         this.PlayerImage = PlayerImage;
         this.PlayerColor = getTeamColor(gamerid);
-
+        this.availableDices = 0;
+        this.wuerfel = 0;
+        this.pRunWay = new List<MenschAegerDichNichtFeld>();
     }
 
+    public void Move(MenschAegerDichNichtFeld gewaehltesFeld)
+    {
+        // gewähltes Feld ist die Ausfahrt
+        if (this.pRunWay[0].Equals(gewaehltesFeld))
+        {
+            foreach (MenschAegerDichNichtFeld figur in this.Figuren)
+            {
+                if (this.StartBase.GetBases().Contains(figur))
+                {
+                    // bewegen
+                    MovePlayerToField(this.Figuren.IndexOf(figur), gewaehltesFeld);
+                    return;
+                }
+            }
+        }
+        // gewähltes Feld ist auf dem Runway
+        else if (this.pRunWay.Contains(gewaehltesFeld))
+        {
+            int indexPlayer = this.pRunWay.IndexOf(gewaehltesFeld) - this.wuerfel;
+            foreach (MenschAegerDichNichtFeld figur in this.Figuren)
+            {
+                if (this.pRunWay.Contains(figur))
+                {
+                    if (this.pRunWay.IndexOf(figur) == indexPlayer)
+                    {
+                        // bewegen
+                        MovePlayerToField(this.Figuren.IndexOf(figur), gewaehltesFeld);
+                        return;
+                    }
+                }
+            }
+        }
+        // gewähltes Feld ist im Home
+        else if (this.HomeBase.GetBases().Contains(gewaehltesFeld))
+        {
+            int indexPlayer = this.HomeBase.GetBases().IndexOf(gewaehltesFeld) - wuerfel;
+            // Spieler ist noch nicht im Haus
+            if (indexPlayer < 0)
+            {
+                int indexRunWayPlayer = this.pRunWay.Count + indexPlayer;
+                foreach (MenschAegerDichNichtFeld figur in this.Figuren)
+                {
+                    if (this.pRunWay.Contains(figur))
+                    {
+                        if (this.pRunWay.IndexOf(figur) == indexRunWayPlayer)
+                        {
+                            // bewegen
+                            MovePlayerToField(this.Figuren.IndexOf(figur), gewaehltesFeld);
+                            return;
+                        }
+                    }
+                }
+            }
+            // Spieler ist im Haus
+            else
+            {
+                foreach (MenschAegerDichNichtFeld figur in this.Figuren)
+                {
+                    if (this.HomeBase.GetBases().Contains(figur))
+                    {
+                        if (this.HomeBase.GetBases().IndexOf(figur) == indexPlayer)
+                        {
+                            // bewegen
+                            MovePlayerToField(this.Figuren.IndexOf(figur), gewaehltesFeld);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    private void MovePlayerToField(int figurIndex, MenschAegerDichNichtFeld ziel)
+    {
+        MenschAegerDichNichtFeld figurOld = this.Figuren[figurIndex];
+        figurOld.DisplayPlayer(new MenschAergerDichNichtPlayer(-1, "ERROR", false, Resources.Load<Sprite>("Images/ProfileIcons/empty")));
+        // Schlägt Spieler auf dem ZielFeld
+        if (ziel.IstBelegt())
+        {
+            int geschlagenefigur = ziel.GetPlayer().Figuren.IndexOf(ziel);
+            ziel.GetPlayer().StartBase.GetBases()[geschlagenefigur].DisplayPlayer(ziel.GetPlayer());
+            ziel.GetPlayer().Figuren[geschlagenefigur] = ziel.GetPlayer().StartBase.GetBases()[geschlagenefigur];
+        }
+        // Bewegt Spieler
+        ziel.DisplayPlayer(this);
+        this.Figuren[figurIndex] = ziel;
+    }
+    // bool, sagt ob man laufen kann oder nicht, wenn nicht ist der nächste Spieler dran
+    public bool MarkAvailableMoves(int wuerfel)
+    {
+        this.wuerfel = wuerfel;
+        // Prio 1: Freimachen
+        if (this.pRunWay[0].GetPlayer().gamerid == this.gamerid)
+        {
+            // Ist eine Figur überhaupt im Startbereich?
+            if (this.StartBase.GetBases()[0].IstBelegt() ||
+                this.StartBase.GetBases()[1].IstBelegt() ||
+                this.StartBase.GetBases()[2].IstBelegt() ||
+                this.StartBase.GetBases()[3].IstBelegt())
+            {
+                MenschAegerDichNichtFeld nextfeld = GetNextField(this.pRunWay[0], wuerfel);
+                if (nextfeld != null)
+                {
+                    nextfeld.MarkSelectableField();
+                    return true;
+                }
+            }
+        }
+        // Prio 2: Rausstellen
+        if (wuerfel == 6)
+        {
+            // Ist eine Figur überhaupt im Startbereich?
+            if (this.StartBase.GetBases()[0].IstBelegt() || 
+                this.StartBase.GetBases()[1].IstBelegt() || 
+                this.StartBase.GetBases()[2].IstBelegt() || 
+                this.StartBase.GetBases()[3].IstBelegt())
+            {
+                if (this.pRunWay[0].GetPlayer().gamerid != this.gamerid)
+                {
+                    this.pRunWay[0].MarkSelectableField();
+                    return true;
+                }
+            }
+        }
+        // Prio 3: Schlagen
+        bool kannschlagen = false;
+        for (int i = 0; i < this.Figuren.Count; i++)
+        {
+            if (!this.StartBase.GetBases().Contains(this.Figuren[i]) && !this.HomeBase.GetBases().Contains(this.Figuren[i]))
+            {
+                MenschAegerDichNichtFeld nextfeld_F = GetNextField(this.Figuren[i], wuerfel);
+                if (nextfeld_F != null)
+                {
+                    if (nextfeld_F.IstBelegt()) // Feld ist von gegner belegt
+                    {
+                        nextfeld_F.MarkSelectableField();
+                        kannschlagen = true;
+                    }
+                }
+            }
+        }
+        if (kannschlagen)
+            return true;
+        // Prio 4: Haus
+        bool kanninshaus = false;
+        for (int i = 0; i < this.Figuren.Count; i++)
+        {
+            if (!this.StartBase.GetBases().Contains(this.Figuren[i]) && !this.HomeBase.GetBases().Contains(this.Figuren[i]))
+            {
+                MenschAegerDichNichtFeld nextfeld_F = GetNextField(this.Figuren[i], wuerfel);
+                if (nextfeld_F != null)
+                {
+                    if (this.HomeBase.GetBases().Contains(nextfeld_F))
+                    {
+                        nextfeld_F.MarkSelectableField();
+                        kanninshaus = true;
+                    }
+                }
+            }
+        }
+        if (kanninshaus)
+            return true;
+        // Prio 5: normal laufen
+        bool kannnormallaufen = false;
+        for (int i = 0; i < this.Figuren.Count; i++)
+        {
+            if (!this.StartBase.GetBases().Contains(this.Figuren[i]) && !this.HomeBase.GetBases().Contains(this.Figuren[i]))
+            {
+                MenschAegerDichNichtFeld nextfeld_F = GetNextField(this.Figuren[i], wuerfel);
+                if (nextfeld_F != null)
+                {
+                    nextfeld_F.MarkSelectableField();
+                    kannnormallaufen = true;
+                }
+            }
+        }
+        // Prio 5.1: im haus nach oben laufen
+        for (int i = 0; i < this.Figuren.Count; i++)
+        {
+            if (this.HomeBase.GetBases().Contains(this.Figuren[i]))
+            {
+                MenschAegerDichNichtFeld nextfeld_F = GetNextField(this.Figuren[i], wuerfel);
+                if (nextfeld_F != null)
+                {
+                    nextfeld_F.MarkSelectableField();
+                    kannnormallaufen = true;
+                }
+            }
+        }
+        if (kannnormallaufen)
+            return true;
+        // Keine möglichkeit zu laufen
+        return false;
+    }
+    public List<MenschAegerDichNichtFeld> GetAvailableMoves()
+    {
+        List<MenschAegerDichNichtFeld> moeglicheFelder = new List<MenschAegerDichNichtFeld>();
+        foreach (MenschAegerDichNichtFeld feld in this.pRunWay)
+        {
+            if (feld.IstMarkiert())
+                moeglicheFelder.Add(feld);
+        }
+        foreach (MenschAegerDichNichtFeld feld in this.HomeBase.GetBases())
+        {
+            if (feld.IstMarkiert())
+                moeglicheFelder.Add(feld);
+        }
+        return moeglicheFelder;
+    }
+    public MenschAegerDichNichtFeld GetNextField(MenschAegerDichNichtFeld feld, int wuerfel)
+    {
+        // Figur startet auf dem RunWay
+        if (this.pRunWay.Contains(feld))
+        {
+            int feldindex = this.pRunWay.IndexOf(feld);
+            // Zielfeld befindet sich innerhalb der Runde
+            if ((feldindex + wuerfel) < this.pRunWay.Count)
+            {
+                // Zielfeld ist frei
+                if (!this.pRunWay[feldindex + wuerfel].IstBelegt())
+                    return this.pRunWay[feldindex + wuerfel];
+                // Zielfeld ist belegt
+                else
+                {
+                    // Spieler auf dem Feld ist ein Gegner
+                    if (this.pRunWay[feldindex + wuerfel].GetPlayer() != this)
+                        return this.pRunWay[feldindex + wuerfel];
+                    // Spieler auf dem Feld ist man selber -> figur kann nicht laufen
+                    else
+                        return null;
+                }
+            }
+            // Zielfeld befindet sich außerhalb der Runde (im Haus/Ziel)
+            else
+            {
+                // Haus felder: 0, 1, 2, 3
+                int housefied = (feldindex + wuerfel) % this.pRunWay.Count;
+                // Zielfeld ist das erste Feld im Haus
+                if (housefied == 0)
+                {
+                    return HomeBase.GetBases()[0];
+                }
+                // Zielfeld ist das zweite Feld im Haus
+                else if (housefied == 1)
+                {
+                    // Felder davor dürfen nicht belegt sein
+                    if (HomeBase.GetBases()[0].IstBelegt())
+                        return null;
+                    else
+                        return HomeBase.GetBases()[1];
+                }
+                // Zielfeld ist das dritte Feld im Haus
+                else if (housefied == 2)
+                {
+                    // Felder davor dürfen nicht belegt sein
+                    if (HomeBase.GetBases()[0].IstBelegt() || HomeBase.GetBases()[1].IstBelegt())
+                        return null;
+                    else
+                        return HomeBase.GetBases()[2];
+                }
+                // Zielfeld ist das vierte Feld im Haus
+                else if (housefied == 3)
+                {
+                    // Felder davor dürfen nicht belegt sein
+                    if (HomeBase.GetBases()[0].IstBelegt() || HomeBase.GetBases()[1].IstBelegt() || HomeBase.GetBases()[2].IstBelegt())
+                        return null;
+                    else
+                        return HomeBase.GetBases()[3];
+                }
+                else
+                {
+                    Logging.log(Logging.LogType.Error, "MenschAergerDichNichtPlayer", "GetNextField", "Hausfeld konnte nicht gefunden werden: " + housefied);
+                    return null;
+                }
+            }
+        }
+        // Figur startet im Haus
+        else if (this.HomeBase.GetBases().Contains(feld))
+        {
+            int homeindex = this.HomeBase.GetBases().IndexOf(feld);
+            // Haus felder: 0, 1, 2, 3
+            // Spieler läuft im Haus zuweit
+            if ((homeindex + wuerfel) > this.HomeBase.GetBases().Count)
+                return null;
+            // Spieler will innerhalb des Hauses laufen
+            int housefied = homeindex + wuerfel;
+
+            // Zielfeld ist das erste Feld im Haus // kann eigentlich nie erreicht werden
+            if (housefied == 0)
+            {
+                return HomeBase.GetBases()[0];
+            }
+            // Zielfeld ist das zweite Feld im Haus
+            else if (housefied == 1)
+            {
+                // Felder davor dürfen nicht belegt sein
+                if (HomeBase.GetBases()[0].IstBelegt())
+                    return null;
+                else
+                    return HomeBase.GetBases()[1];
+            }
+            // Zielfeld ist das dritte Feld im Haus
+            else if (housefied == 2)
+            {
+                // Felder davor dürfen nicht belegt sein
+                if (HomeBase.GetBases()[0].IstBelegt() || HomeBase.GetBases()[1].IstBelegt())
+                    return null;
+                else
+                    return HomeBase.GetBases()[2];
+            }
+            // Zielfeld ist das vierte Feld im Haus
+            else if (housefied == 3)
+            {
+                // Felder davor dürfen nicht belegt sein
+                if (HomeBase.GetBases()[0].IstBelegt() || HomeBase.GetBases()[1].IstBelegt() || HomeBase.GetBases()[2].IstBelegt())
+                    return null;
+                else
+                    return HomeBase.GetBases()[3];
+            }
+            else
+            {
+                Logging.log(Logging.LogType.Error, "MenschAergerDichNichtPlayer", "GetNextField", "Hausfeld konnte nicht gefunden werden: " + housefied);
+                return null;
+            }
+        }
+        return null;
+    }
+    public bool HasPlayerWon()
+    {
+        foreach (MenschAegerDichNichtFeld feld in this.HomeBase.GetBases())
+        {
+            if (!feld.IstBelegt())
+                return false;
+        }
+        return true;
+    }
+    public bool GetAllInStartOrHome()
+    {
+        // 3 Mal Würfeln
+        // Fall 1: Alle Figuren sind im Start
+        if (StartBase.GetBases()[0].IstBelegt() &&
+            StartBase.GetBases()[1].IstBelegt() &&
+            StartBase.GetBases()[2].IstBelegt() &&
+            StartBase.GetBases()[3].IstBelegt())
+        {
+            return true;
+        }
+        // TODO diesen Fall testen
+        // Fall 2: Figuren sind nur im Start und im max Home
+        int summeStart = 0;
+        for (int i = 0; i < 4; i++)
+            if (StartBase.GetBases()[i].IstBelegt())
+                summeStart++;
+        int summeHome = 0;
+        for (int i = 0; i < (4 - summeStart); i++)
+            if (HomeBase.GetBases()[3 - i].IstBelegt())
+                summeHome++;
+        if ((summeStart + summeHome) == 4)
+        {
+            Debug.LogWarning("in Start: " + summeStart + " + in Home: " + summeHome);
+            return true;
+        }
+        // Fall 3: Sonst: 1 mal würfeln
+        return false;
+    }
+    public void SetStartAndHomeBase(MenschAergerDichNichtBase Start, MenschAergerDichNichtBase Home)
+    {
+        this.StartBase = Start;
+        this.HomeBase = Home;
+    }
+    public void SetpRunWay(List <MenschAegerDichNichtFeld> RunWay, int map)
+    {
+        #region MapSelect
+        int[] ausfahrten;
+        if (map == 3)
+        {
+            ausfahrten = MenschAegerDichNichtBoard.P3_AUSFAHRT_INDEX;
+        }
+        else if (map == 4)
+        {
+            ausfahrten = MenschAegerDichNichtBoard.P4_AUSFAHRT_INDEX;
+        }
+        else if (map == 5)
+        {
+            ausfahrten = MenschAegerDichNichtBoard.P5_AUSFAHRT_INDEX;
+        }
+        else if (map == 6)
+        {
+            ausfahrten = MenschAegerDichNichtBoard.P6_AUSFAHRT_INDEX;
+        }
+        else if (map == 7)
+        {
+            ausfahrten = MenschAegerDichNichtBoard.P7_AUSFAHRT_INDEX;
+        }
+        else if (map == 8)
+        {
+            ausfahrten = MenschAegerDichNichtBoard.P8_AUSFAHRT_INDEX;
+        }
+        else
+        {
+            Logging.log(Logging.LogType.Error, "MenschAergerDichNichtPlayer", "SetpRunWay", "Map konnte nicht geladen werden.");
+            return;
+        }
+        #endregion
+
+        for (int i = 0; i < RunWay.Count; i++)
+        {
+            int index = (ausfahrten[gamerid] + i) % RunWay.Count;
+            this.pRunWay.Add(RunWay[index]);
+        }
+    }
     public void SetStartPos(List<MenschAegerDichNichtFeld> pos)
     {
         this.FigurPosition_1 = pos[0];
-        this.FigurPosition_1.DisplayPlayer(this.PlayerImage, this.PlayerColor);
+        this.FigurPosition_1.DisplayPlayer(this);
         this.FigurPosition_2 = pos[1];
-        this.FigurPosition_2.DisplayPlayer(this.PlayerImage, this.PlayerColor);
+        this.FigurPosition_2.DisplayPlayer(this);
         this.FigurPosition_3 = pos[2];
-        this.FigurPosition_3.DisplayPlayer(this.PlayerImage, this.PlayerColor);
+        this.FigurPosition_3.DisplayPlayer(this);
         this.FigurPosition_4 = pos[3];
-        this.FigurPosition_4.DisplayPlayer(this.PlayerImage, this.PlayerColor);
+        this.FigurPosition_4.DisplayPlayer(this);
+
+        this.Figuren = new List<MenschAegerDichNichtFeld>();
+        this.Figuren.Add(FigurPosition_1);
+        this.Figuren.Add(FigurPosition_2);
+        this.Figuren.Add(FigurPosition_3);
+        this.Figuren.Add(FigurPosition_4);
     }
     private Color getTeamColor(int index)
     {

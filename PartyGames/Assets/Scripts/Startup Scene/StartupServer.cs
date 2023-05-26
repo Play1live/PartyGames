@@ -1314,7 +1314,7 @@ public class StartupServer : MonoBehaviour
     /// </summary>
     private void DisplayGameFiles()
     {
-        if (!ServerControlGameSelection.activeInHierarchy || !ServerControl.activeInHierarchy)
+        if (!ServerControlGameSelection.activeInHierarchy || !ServerControl.activeInHierarchy || gesperrtfuerSekundenAnzeige.activeInHierarchy)
             return;
         Logging.log(Logging.LogType.Debug, "StartupServer", "DisplayGameFiles", "Verfügbare Spiele werden angezeigt.");
 

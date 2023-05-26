@@ -16,6 +16,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
     [SerializeField] GameObject[] Maps;
     [SerializeField] GameObject SpielprotokollContent;
     [SerializeField] GameObject Würfel;
+    private Coroutine WuerfelCoroutine;
     [SerializeField] GameObject InfoBoard;
     bool[] PlayerConnected;
 
@@ -285,12 +286,12 @@ public class MenschAergerDichNichtServer : MonoBehaviour
     public void ChangeWatchOnly(Toggle toggle)
     {
         MenschAegerDichNichtBoard.watchBots = toggle.isOn;
-        // TODO: nur ohne mitspieler (clients)
     }
     #region GameLogic
     public void StartGame()
     {
         Logging.log(Logging.LogType.Normal, "MenschAergerDichNichtServer", "StartGame", "Spiel wird gestartet.");
+        Würfel.transform.GetChild(0).gameObject.SetActive(false);
         if (MenschAegerDichNichtBoard.watchBots)
         {
             Logging.log(Logging.LogType.Normal, "MenschAergerDichNichtServer", "StartGame", "Es werden nur Bots spielen, alle Clients werden getrennt.");
@@ -329,7 +330,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
                     Sprite botSprite = Resources.LoadAll<Sprite>("Images/Icons")[botIcon];
                     names.Add(Playerlist[i].GetComponentInChildren<TMP_Text>().text);
                     bots.Add(true);
-                    sprites.Add(botSprite);
+                    sprites.Add(botSprite); 
                 }
                 else
                 {
@@ -339,14 +340,18 @@ public class MenschAergerDichNichtServer : MonoBehaviour
         }
         Logging.log(Logging.LogType.Debug, "MenschAergerDichNichtServer", "StartGame", names.Count + " Spieler werden spielen.");
         List<MenschAergerDichNichtPlayer> randomplayer = new List<MenschAergerDichNichtPlayer>();
+        string broadcastPlayer = "";
         while (names.Count > 0)
         {
             int random = UnityEngine.Random.Range(0, names.Count);
             randomplayer.Add(new MenschAergerDichNichtPlayer(randomplayer.Count, names[random], bots[random], sprites[random]));
+            broadcastPlayer += "[#]" + names[random] + "*" + bots[random] + "*" + sprites[random].name;
             names.RemoveAt(random);
             bots.RemoveAt(random);
             sprites.RemoveAt(random);
         }
+        if (broadcastPlayer.Length > 3)
+            broadcastPlayer = broadcastPlayer.Substring("[#]".Length);
         #endregion
         #region InitBoard
         TMP_Dropdown MapDrop = GameObject.Find("ServerSide/MapAuswahl").GetComponent<TMP_Dropdown>();
@@ -366,7 +371,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
 
         if (randomplayer.Count == mapInt)
         {
-            // TODO: Broadcast nur notwendiges, damit clients auch das board aufbauen
+            Broadcast("#StartGame [PLAYER]" + broadcastPlayer + "[PLAYER][MAP]" + selectedMap.name + "[MAP][TEAMSIZE]" + mapInt + "[TEAMSIZE][RUNWAY]" + RunWaySize + "[RUNWAY]");
             board = new MenschAegerDichNichtBoard(selectedMap, RunWaySize, mapInt, randomplayer);
         }
         else
@@ -385,8 +390,15 @@ public class MenschAergerDichNichtServer : MonoBehaviour
         // Hide PlayerAnimation
         selectedMap.transform.GetChild(4).gameObject.SetActive(false);
 
-        AddMSGToProtokoll("Spiel wurde gestartet.");
+        string time = DateTime.Now.Hour + ":";
+        if (DateTime.Now.Minute < 10)
+            time += "0" + DateTime.Now.Minute;
+        else
+            time += DateTime.Now.Minute;
+        AddMSGToProtokoll("Spiel wurde gestartet. " + time);
         DisplayMSGInfoBoard("Spiel wird geladen.");
+
+        StartTurn();
     }
     public void AddMSGToProtokoll(string msg)
     {
@@ -401,11 +413,226 @@ public class MenschAergerDichNichtServer : MonoBehaviour
     {
         InfoBoard.GetComponentInChildren<TMP_Text>().text = msg;
     }
-    public void StartWuerfelAnimation()
+    public void CheckEndOfTurn()
     {
 
     }
-    
+    public void StartTurn()
+    {
+        MenschAergerDichNichtPlayer player = board.PlayerTurnSelect();
+        if (player.GetAllInStartOrHome())
+            player.availableDices = 3;
+        else
+            player.availableDices = 1;
+        AddMSGToProtokoll(player.name + " ist dran.");
+        DisplayMSGInfoBoard(player.name + " ist dran!");
+        StartTurnSelectType(player);
+    }
+    private void StartTurnSelectType(MenschAergerDichNichtPlayer player)
+    {
+        // Spieler
+        if (!player.isBot)
+        {
+            // Server
+            if (player.PlayerImage == Config.SERVER_ICON)
+            {
+                StartTurnServer();
+                return;
+            }
+            // Client
+            else
+            {
+                foreach (Player p in Config.PLAYERLIST)
+                {
+                    if (p.icon == player.PlayerImage)
+                    {
+                        StartTurnClient();
+                        return;
+                    }
+                }
+            }
+        }
+        // Bot
+        else
+        {
+            StartTurnBot();
+            return;
+        }
+    }
+    private void StartTurnServer()
+    {
+        DisplayMSGInfoBoard("Du bist dran!\n Du kannst würfeln.");
+
+        WuerfelAktivieren(true);
+    }
+    private void StartTurnClient()
+    {
+
+    }
+    private void StartTurnBot()
+    {
+        StartCoroutine(StartBotWuerfelVerzoegert());
+    }
+
+    public void LaufenTurnBot()
+    {
+        List<MenschAegerDichNichtFeld> felder = board.GetPlayerTurn().GetAvailableMoves();
+        // kann nicht laufen
+        if (felder.Count == 0)
+        {
+            return;
+        }
+        // kann laufen
+        else
+        {
+            int random = UnityEngine.Random.Range(0, felder.Count);
+            board.GetPlayerTurn().Move(felder[random]);
+        }
+        return;
+    }
+
+    IEnumerator StartBotWuerfelVerzoegert()
+    {
+        yield return new WaitForSeconds(2);
+        WuerfelStarteAnimation();
+        yield break;
+    }
+    private void WuerfelAktivieren(bool aktivieren)
+    {
+        Würfel.transform.GetChild(0).gameObject.SetActive(aktivieren);
+    }
+    public void WuerfelStarteAnimation()
+    {
+        WuerfelAktivieren(false);
+        board.GetPlayerTurn().availableDices--;
+        int result = UnityEngine.Random.Range(1, 7);
+        if (result == 6)
+            board.GetPlayerTurn().availableDices = 1;
+        Debug.LogWarning("Result: " + result);
+
+        if (WuerfelCoroutine != null)
+            StopCoroutine(WuerfelCoroutine);
+        WuerfelCoroutine = StartCoroutine(WuerfelAnimation(result));
+    }
+    IEnumerator WuerfelAnimation(int result)
+    {
+        int count = 0;
+        List<Sprite> wuerfel = new List<Sprite>();
+        for (int i = 1; i <= 6; i++)
+        {
+            wuerfel.Add(Resources.Load<Sprite>("Images/GUI/würfel "+i));
+        }
+        // Roll Time
+        DateTime swtichTime = DateTime.Now.AddSeconds(2);
+        while (DateTime.Compare(DateTime.Now, swtichTime) < 0)
+        {
+            Würfel.GetComponent<Image>().sprite = wuerfel[(count++) % wuerfel.Count];
+            //Debug.LogWarning(0.005f * count);
+            yield return new WaitForSeconds(0.005f*count);
+        }
+        // Roll Random Sec
+        int times = UnityEngine.Random.Range(5, 20);
+        for (int i = 0; i < times; i++)
+        {
+            Würfel.GetComponent<Image>().sprite = wuerfel[(count++) % wuerfel.Count];
+            yield return new WaitForSeconds(0.005f * count);
+        }
+        // Roll to 6
+        while (wuerfel[wuerfel.Count-1] == wuerfel[count % wuerfel.Count])
+        {
+            Würfel.GetComponent<Image>().sprite = wuerfel[(count++) % wuerfel.Count];
+            yield return new WaitForSeconds(0.005f * count);
+        }
+        // Roll Until selected
+        while (!wuerfel[count % wuerfel.Count].name.Equals("würfel " + result))
+        {
+            Würfel.GetComponent<Image>().sprite = wuerfel[(count++) % wuerfel.Count];
+            yield return new WaitForSeconds(0.005f * count);
+        }
+        Würfel.GetComponent<Image>().sprite = wuerfel[(count) % wuerfel.Count];
+        yield return null;
+        StartCoroutine(ParseWuerfelResult(result));
+        yield break;
+    }
+    /// <summary>
+    /// Nutzt das Würfelergebnis.
+    /// - Spieler muss nochmal würfeln, (am start)
+    /// - Spieler darf laufen und dann zug vorbei
+    /// - Spieler darf laufen und nochmal würfeln
+    /// - würfel zuende
+    /// - Sieg prüfen
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator ParseWuerfelResult(int result)
+    {
+        AddMSGToProtokoll(board.GetPlayerTurn().name + " würfelt " + Würfel.GetComponent<Image>().sprite.name.Replace("würfel ", ""));
+        Debug.LogWarning("Wurde gewürfelt...");
+
+        board.GetPlayerTurn().MarkAvailableMoves(result);
+
+        // Spieler ist ein bot
+        if (board.GetPlayerTurn().isBot)
+        {
+            yield return new WaitForSeconds(2);
+            LaufenTurnBot(); // kann laufen
+            board.ClearMarkierungen();
+            if (CheckForEndOfTurn()) // Zug ist vorbei
+            {
+                if (board.GetPlayerTurn().HasPlayerWon()) // Spieler hat gewonnen
+                {
+                    Debug.LogWarning("Spieler hat gewonnen");
+                    yield break;
+                }
+                else // Spieler hat noch nicht gewonnen, Zug zuende
+                {
+                    board.GetPlayerTurn().wuerfel = 0;
+                    StartTurn(); // Starte neuen Zug
+                    yield break;
+                }
+            }
+            else
+            {
+                if (board.GetPlayerTurn().HasPlayerWon()) // Spieler hat gewonnen
+                {
+                    Debug.LogWarning("Spieler hat gewonnen");
+                    yield break;
+                }
+                else // Spieler hat noch nicht gewonnen, nochmal würfeln
+                {
+                    StartTurnSelectType(board.GetPlayerTurn());
+                    yield break;
+                }
+            }
+        }
+        // Spieler ist ein Spieler
+        else
+        {
+            // Ist Server
+            if (Config.SERVER_ICON == board.GetPlayerTurn().PlayerImage)
+            {
+                // kann laufen
+                // Zugvorbei?
+                // Sieg prüfen
+                // wenn nicht wieder würfeln
+            }
+            // Ist Client
+            else 
+            {
+                // kann laufen
+                // Zugvorbei?
+                // Sieg prüfen
+                // wenn nicht wieder würfeln
+            }
+        }
+        yield break;
+    }
+    private bool CheckForEndOfTurn()
+    {
+        if (board.GetPlayerTurn().availableDices == 0)
+            return true;
+        else
+            return false;
+    }
 
     #endregion
 }
