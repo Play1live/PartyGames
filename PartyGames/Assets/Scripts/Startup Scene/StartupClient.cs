@@ -746,6 +746,7 @@ public class StartupClient : MonoBehaviour
                 SpielVorschauElemente.transform.GetChild(i).GetChild(2).gameObject.SetActive(true);
                 SpielVorschauElemente.transform.GetChild(i).GetChild(2).GetComponentInChildren<TMP_Text>().text = available;
             }
+            yield return null;
         }
         yield return null;
         SpielVorschauElemente.transform.GetChild(0).GetChild(2).gameObject.SetActive(false);

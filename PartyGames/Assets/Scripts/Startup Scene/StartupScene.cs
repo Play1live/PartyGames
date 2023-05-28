@@ -386,6 +386,7 @@ public class StartupScene : MonoBehaviour
         Config.SERVER_PLAYER_POINTS = 0;
         Config.SERVER_CROWNS = 0;
 
+        Config.PLAYER_NAME = "";
         Config.PLAYER_NAME = GameObject.Find("ChooseYourName_TXT").gameObject.GetComponent<TMP_InputField>().text;
         Config.APPLICATION_CONFIG.SetString("PLAYER_DISPLAY_NAME", Config.PLAYER_NAME);
         // Game is Player

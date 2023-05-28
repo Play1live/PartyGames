@@ -480,7 +480,9 @@ public class StartupServer : MonoBehaviour
     /// <returns>#UpdateSpieler [ID]<0-8>[ID][NAME]<>[NAME][PUNKTE]<>[PUNKTE][ICON]<>[ICON]</returns>
     private string UpdateSpieler()
     {
-        string msg = "#UpdateSpieler [ID]0[ID][NAME]" + Config.PLAYER_NAME + "[NAME][PUNKTE]" + Config.SERVER_PLAYER_POINTS + "[PUNKTE][ICON]" + Config.SERVER_ICON.name + "[ICON]";
+        string msg = "#UpdateSpieler [ID]0[ID][NAME]" + Config.PLAYER_NAME + "[NAME][PUNKTE]" + 
+            Config.SERVER_PLAYER_POINTS + "[PUNKTE][ICON]" + 
+            Config.SERVER_ICON.name + "[ICON]";
         int connectedplayer = 1;
         List<string> spielerIDNameList = new List<string>();
         spielerIDNameList.Add("");
@@ -1008,7 +1010,15 @@ public class StartupServer : MonoBehaviour
         else
         {
             Logging.log(Logging.LogType.Warning, "StartupServer", "SpielerIconChange", "Spielername für Icons ist unbekannt: " + name);
-            return null;
+            Sprite neuesIcon = Config.PLAYER_ICONS[1];
+            for (int i = 1; i < Config.PLAYER_ICONS.Count; i++)
+            {
+                if (IconWirdGeradeGenutzt(neuesIcon))
+                    neuesIcon = Config.PLAYER_ICONS[(Config.PLAYER_ICONS.IndexOf(neuesIcon) + 1) % Config.PLAYER_ICONS.Count];
+                else
+                    break;
+            }
+            return neuesIcon;
         }
     }
     /// <summary>

@@ -22,6 +22,7 @@ public class MenschAegerDichNichtBoard
     public static Color TEAM_ORANGE = new Color(221f, 131f, 0f);
     public static Color TEAM_BLACK = new Color(0f, 0f, 0f);
     public static Color TEAM_PURPLE = new Color(142f, 0f, 204f);
+    public string[] TEAM_COLORS = new string[] { "<color=blue>", "<color=green>", "<color=red>", "<color=yellow>", "<color=pink>", "<color=orange>", "<color=black>", "<color=purple>" };
 
     public static int[] P3_AUSFAHRT_INDEX = new int[] { 26, 6, 16 };
     public static int[] P4_AUSFAHRT_INDEX = new int[] { 0, 36, 12, 24 };
@@ -42,6 +43,7 @@ public class MenschAegerDichNichtBoard
 
     public MenschAegerDichNichtBoard(GameObject MapObject, int RunWaySize, int TeamSize, List<MenschAergerDichNichtPlayer> player)
     {
+        GenerateHexColorCodes();
         this.MapObject = MapObject;
         this.player = player;
         this.RunWay = new List<MenschAegerDichNichtFeld>();
@@ -146,6 +148,81 @@ public class MenschAegerDichNichtBoard
                 feld.GetFeld().transform.GetChild(2).gameObject.SetActive(false);
             }
         }
+    }
+    public List<MenschAergerDichNichtPlayer> GetPlayerList()
+    {
+        return this.player;
+    }
+    public void SetPlayerTurn(MenschAergerDichNichtPlayer player)
+    {
+        this.playersTurn = player;
+    }
+    private void GenerateHexColorCodes()
+    {
+        // Konvertiere die Dezimalwerte in hexadezimale Werte
+        string hexR = Mathf.RoundToInt(TEAM_BLUE.r).ToString("X2");
+        string hexG = Mathf.RoundToInt(TEAM_BLUE.g).ToString("X2");
+        string hexB = Mathf.RoundToInt(TEAM_BLUE.b).ToString("X2");
+        // Kombiniere die hexadezimalen Werte, um den Farbcode zu erstellen
+        this.TEAM_COLORS[0] = "<b><color=#" + hexR + hexG + hexB + ">";
+
+        // Konvertiere die Dezimalwerte in hexadezimale Werte
+        hexR = Mathf.RoundToInt(TEAM_GREEN.r).ToString("X2");
+        hexG = Mathf.RoundToInt(TEAM_GREEN.g).ToString("X2");
+        hexB = Mathf.RoundToInt(TEAM_GREEN.b).ToString("X2");
+        // Kombiniere die hexadezimalen Werte, um den Farbcode zu erstellen
+        this.TEAM_COLORS[1] = "<b><color=#" + hexR + hexG + hexB + ">";
+
+        // Konvertiere die Dezimalwerte in hexadezimale Werte
+        hexR = Mathf.RoundToInt(TEAM_RED.r).ToString("X2");
+        hexG = Mathf.RoundToInt(TEAM_RED.g).ToString("X2");
+        hexB = Mathf.RoundToInt(TEAM_RED.b).ToString("X2");
+        // Kombiniere die hexadezimalen Werte, um den Farbcode zu erstellen
+        this.TEAM_COLORS[2] = "<b><color=#" + hexR + hexG + hexB + ">";
+
+        // Konvertiere die Dezimalwerte in hexadezimale Werte
+        hexR = Mathf.RoundToInt(TEAM_YELLOW.r).ToString("X2");
+        hexG = Mathf.RoundToInt(TEAM_YELLOW.g).ToString("X2");
+        hexB = Mathf.RoundToInt(TEAM_YELLOW.b).ToString("X2");
+        // Kombiniere die hexadezimalen Werte, um den Farbcode zu erstellen
+        this.TEAM_COLORS[3] = "<b><color=#" + hexR + hexG + hexB + ">";
+
+        // Konvertiere die Dezimalwerte in hexadezimale Werte
+        hexR = Mathf.RoundToInt(TEAM_PINK.r).ToString("X2");
+        hexG = Mathf.RoundToInt(TEAM_PINK.g).ToString("X2");
+        hexB = Mathf.RoundToInt(TEAM_PINK.b).ToString("X2");
+        // Kombiniere die hexadezimalen Werte, um den Farbcode zu erstellen
+        this.TEAM_COLORS[4] = "<b><color=#" + hexR + hexG + hexB + ">";
+
+        // Konvertiere die Dezimalwerte in hexadezimale Werte
+        hexR = Mathf.RoundToInt(TEAM_ORANGE.r).ToString("X2");
+        hexG = Mathf.RoundToInt(TEAM_ORANGE.g).ToString("X2");
+        hexB = Mathf.RoundToInt(TEAM_ORANGE.b).ToString("X2");
+        // Kombiniere die hexadezimalen Werte, um den Farbcode zu erstellen
+        this.TEAM_COLORS[5] = "<b><color=#" + hexR + hexG + hexB + ">";
+
+        // Konvertiere die Dezimalwerte in hexadezimale Werte
+        hexR = Mathf.RoundToInt(TEAM_BLACK.r).ToString("X2");
+        hexG = Mathf.RoundToInt(TEAM_BLACK.g).ToString("X2");
+        hexB = Mathf.RoundToInt(TEAM_BLACK.b).ToString("X2");
+        // Kombiniere die hexadezimalen Werte, um den Farbcode zu erstellen
+        this.TEAM_COLORS[6] = "<b><color=#" + hexR + hexG + hexB + ">";
+
+        // Konvertiere die Dezimalwerte in hexadezimale Werte
+        hexR = Mathf.RoundToInt(TEAM_PURPLE.r).ToString("X2");
+        hexG = Mathf.RoundToInt(TEAM_PURPLE.g).ToString("X2");
+        hexB = Mathf.RoundToInt(TEAM_PURPLE.b).ToString("X2");
+        // Kombiniere die hexadezimalen Werte, um den Farbcode zu erstellen
+        this.TEAM_COLORS[7] = "<b><color=#" + hexR + hexG + hexB + ">";
+    }
+    public int GetPlayerByName(string name)
+    {
+        foreach (MenschAergerDichNichtPlayer p in this.player)
+        {
+            if (p.name == name)
+                return p.gamerid;
+        }
+        return -1;
     }
     public string GetBoardString()
     {
@@ -391,7 +468,7 @@ public class MenschAergerDichNichtPlayer
         this.pRunWay = new List<MenschAegerDichNichtFeld>();
     }
 
-    public void Move(MenschAegerDichNichtFeld gewaehltesFeld)
+    public string Move(MenschAegerDichNichtFeld gewaehltesFeld)
     {
         // gewähltes Feld ist die Ausfahrt
         if (this.pRunWay[0].Equals(gewaehltesFeld))
@@ -401,8 +478,7 @@ public class MenschAergerDichNichtPlayer
                 if (this.StartBase.GetBases().Contains(figur))
                 {
                     // bewegen
-                    MovePlayerToField(this.Figuren.IndexOf(figur), gewaehltesFeld);
-                    return;
+                    return MovePlayerToField(this.Figuren.IndexOf(figur), gewaehltesFeld);
                 }
             }
         }
@@ -417,8 +493,7 @@ public class MenschAergerDichNichtPlayer
                     if (this.pRunWay.IndexOf(figur) == indexPlayer)
                     {
                         // bewegen
-                        MovePlayerToField(this.Figuren.IndexOf(figur), gewaehltesFeld);
-                        return;
+                        return MovePlayerToField(this.Figuren.IndexOf(figur), gewaehltesFeld);
                     }
                 }
             }
@@ -439,7 +514,7 @@ public class MenschAergerDichNichtPlayer
                         {
                             // bewegen
                             MovePlayerToField(this.Figuren.IndexOf(figur), gewaehltesFeld);
-                            return;
+                            return "[C]" + this.gamerid + "[C]" + this.name + "[/COLOR] betritt sein [C]" + this.gamerid + "[C]Haus[/COLOR]![C]"+(this.gamerid+1)%2+"[C][/COLOR]";
                         }
                     }
                 }
@@ -454,16 +529,17 @@ public class MenschAergerDichNichtPlayer
                         if (this.HomeBase.GetBases().IndexOf(figur) == indexPlayer)
                         {
                             // bewegen
-                            MovePlayerToField(this.Figuren.IndexOf(figur), gewaehltesFeld);
-                            return;
+                            return MovePlayerToField(this.Figuren.IndexOf(figur), gewaehltesFeld);
                         }
                     }
                 }
             }
         }
+        return "";
     }
-    private void MovePlayerToField(int figurIndex, MenschAegerDichNichtFeld ziel)
+    private string MovePlayerToField(int figurIndex, MenschAegerDichNichtFeld ziel)
     {
+        string ausgabe = "";
         MenschAegerDichNichtFeld figurOld = this.Figuren[figurIndex];
         figurOld.DisplayPlayer(new MenschAergerDichNichtPlayer(-1, "ERROR", false, Resources.Load<Sprite>("Images/ProfileIcons/empty")));
         // Schlägt Spieler auf dem ZielFeld
@@ -472,10 +548,12 @@ public class MenschAergerDichNichtPlayer
             int geschlagenefigur = ziel.GetPlayer().Figuren.IndexOf(ziel);
             ziel.GetPlayer().StartBase.GetBases()[geschlagenefigur].DisplayPlayer(ziel.GetPlayer());
             ziel.GetPlayer().Figuren[geschlagenefigur] = ziel.GetPlayer().StartBase.GetBases()[geschlagenefigur];
+            ausgabe = "[C]" + this.gamerid + "[C]" + this.name + "[/COLOR] schlägt [C]" + ziel.GetPlayer().gamerid + "[C]" + ziel.GetPlayer().name + "[/COLOR].";
         }
         // Bewegt Spieler
         ziel.DisplayPlayer(this);
         this.Figuren[figurIndex] = ziel;
+        return ausgabe;
     }
     // bool, sagt ob man laufen kann oder nicht, wenn nicht ist der nächste Spieler dran
     public bool MarkAvailableMoves(int wuerfel)
@@ -514,7 +592,7 @@ public class MenschAergerDichNichtPlayer
                 }
             }
         }
-        // Prio 3: Schlagen
+        /**/// Prio 3: Schlagen
         bool kannschlagen = false;
         for (int i = 0; i < this.Figuren.Count; i++)
         {
@@ -532,7 +610,7 @@ public class MenschAergerDichNichtPlayer
             }
         }
         if (kannschlagen)
-            return true;
+            return true; /**/
         // Prio 4: Haus
         bool kanninshaus = false;
         for (int i = 0; i < this.Figuren.Count; i++)
@@ -552,6 +630,23 @@ public class MenschAergerDichNichtPlayer
         }
         if (kanninshaus)
             return true;
+        // Prio 5.1: im haus nach oben laufen
+        bool kannimhauslaufen = false;
+        for (int i = 0; i < this.Figuren.Count; i++)
+        {
+            if (this.HomeBase.GetBases().Contains(this.Figuren[i]))
+            {
+                MenschAegerDichNichtFeld nextfeld_F = GetNextField(this.Figuren[i], wuerfel);
+                if (nextfeld_F != null)
+                {
+                    nextfeld_F.MarkSelectableField();
+                    kannimhauslaufen = true;
+                }
+            }
+        }
+        // Priorisiert das im Hauslaufen nur für Bots, bei spielern bleibt beides möglich
+        if (this.isBot && kannimhauslaufen)
+            return true;
         // Prio 5: normal laufen
         bool kannnormallaufen = false;
         for (int i = 0; i < this.Figuren.Count; i++)
@@ -561,25 +656,15 @@ public class MenschAergerDichNichtPlayer
                 MenschAegerDichNichtFeld nextfeld_F = GetNextField(this.Figuren[i], wuerfel);
                 if (nextfeld_F != null)
                 {
+                    // TODO nur zum testen
+                    //if (nextfeld_F.IstBelegt())
+                      //  continue;
                     nextfeld_F.MarkSelectableField();
                     kannnormallaufen = true;
                 }
             }
         }
-        // Prio 5.1: im haus nach oben laufen
-        for (int i = 0; i < this.Figuren.Count; i++)
-        {
-            if (this.HomeBase.GetBases().Contains(this.Figuren[i]))
-            {
-                MenschAegerDichNichtFeld nextfeld_F = GetNextField(this.Figuren[i], wuerfel);
-                if (nextfeld_F != null)
-                {
-                    nextfeld_F.MarkSelectableField();
-                    kannnormallaufen = true;
-                }
-            }
-        }
-        if (kannnormallaufen)
+        if (kannnormallaufen || kannimhauslaufen)
             return true;
         // Keine möglichkeit zu laufen
         return false;
@@ -628,42 +713,15 @@ public class MenschAergerDichNichtPlayer
                 // Haus felder: 0, 1, 2, 3
                 int housefied = (feldindex + wuerfel) % this.pRunWay.Count;
                 // Zielfeld ist das erste Feld im Haus
-                if (housefied == 0)
-                {
-                    return HomeBase.GetBases()[0];
-                }
-                // Zielfeld ist das zweite Feld im Haus
-                else if (housefied == 1)
-                {
-                    // Felder davor dürfen nicht belegt sein
-                    if (HomeBase.GetBases()[0].IstBelegt())
-                        return null;
-                    else
-                        return HomeBase.GetBases()[1];
-                }
-                // Zielfeld ist das dritte Feld im Haus
-                else if (housefied == 2)
-                {
-                    // Felder davor dürfen nicht belegt sein
-                    if (HomeBase.GetBases()[0].IstBelegt() || HomeBase.GetBases()[1].IstBelegt())
-                        return null;
-                    else
-                        return HomeBase.GetBases()[2];
-                }
-                // Zielfeld ist das vierte Feld im Haus
-                else if (housefied == 3)
-                {
-                    // Felder davor dürfen nicht belegt sein
-                    if (HomeBase.GetBases()[0].IstBelegt() || HomeBase.GetBases()[1].IstBelegt() || HomeBase.GetBases()[2].IstBelegt())
-                        return null;
-                    else
-                        return HomeBase.GetBases()[3];
-                }
-                else
-                {
-                    Logging.log(Logging.LogType.Error, "MenschAergerDichNichtPlayer", "GetNextField", "Hausfeld konnte nicht gefunden werden: " + housefied);
+                if (housefied >= this.HomeBase.GetBases().Count)
                     return null;
+
+                for (int i = 0; i <= housefied; i++)
+                {
+                    if (HomeBase.GetBases()[i].IstBelegt())
+                        return null;
                 }
+                return HomeBase.GetBases()[housefied];
             }
         }
         // Figur startet im Haus
@@ -672,48 +730,17 @@ public class MenschAergerDichNichtPlayer
             int homeindex = this.HomeBase.GetBases().IndexOf(feld);
             // Haus felder: 0, 1, 2, 3
             // Spieler läuft im Haus zuweit
-            if ((homeindex + wuerfel) > this.HomeBase.GetBases().Count)
+            if ((homeindex + wuerfel) >= this.HomeBase.GetBases().Count)
                 return null;
             // Spieler will innerhalb des Hauses laufen
             int housefied = homeindex + wuerfel;
 
-            // Zielfeld ist das erste Feld im Haus // kann eigentlich nie erreicht werden
-            if (housefied == 0)
+            for (int i = homeindex+1; i <= housefied; i++)
             {
-                return HomeBase.GetBases()[0];
-            }
-            // Zielfeld ist das zweite Feld im Haus
-            else if (housefied == 1)
-            {
-                // Felder davor dürfen nicht belegt sein
-                if (HomeBase.GetBases()[0].IstBelegt())
+                if (HomeBase.GetBases()[i].IstBelegt())
                     return null;
-                else
-                    return HomeBase.GetBases()[1];
             }
-            // Zielfeld ist das dritte Feld im Haus
-            else if (housefied == 2)
-            {
-                // Felder davor dürfen nicht belegt sein
-                if (HomeBase.GetBases()[0].IstBelegt() || HomeBase.GetBases()[1].IstBelegt())
-                    return null;
-                else
-                    return HomeBase.GetBases()[2];
-            }
-            // Zielfeld ist das vierte Feld im Haus
-            else if (housefied == 3)
-            {
-                // Felder davor dürfen nicht belegt sein
-                if (HomeBase.GetBases()[0].IstBelegt() || HomeBase.GetBases()[1].IstBelegt() || HomeBase.GetBases()[2].IstBelegt())
-                    return null;
-                else
-                    return HomeBase.GetBases()[3];
-            }
-            else
-            {
-                Logging.log(Logging.LogType.Error, "MenschAergerDichNichtPlayer", "GetNextField", "Hausfeld konnte nicht gefunden werden: " + housefied);
-                return null;
-            }
+            return HomeBase.GetBases()[housefied];
         }
         return null;
     }
@@ -737,7 +764,6 @@ public class MenschAergerDichNichtPlayer
         {
             return true;
         }
-        // TODO diesen Fall testen
         // Fall 2: Figuren sind nur im Start und im max Home
         int summeStart = 0;
         for (int i = 0; i < 4; i++)
@@ -749,7 +775,6 @@ public class MenschAergerDichNichtPlayer
                 summeHome++;
         if ((summeStart + summeHome) == 4)
         {
-            Debug.LogWarning("in Start: " + summeStart + " + in Home: " + summeHome);
             return true;
         }
         // Fall 3: Sonst: 1 mal würfeln
@@ -838,6 +863,10 @@ public class MenschAergerDichNichtPlayer
             return MenschAegerDichNichtBoard.TEAM_PURPLE;
         else
             return MenschAegerDichNichtBoard.TEAM_NULL;
+    }
+    public void SetPlayerIntoBot()
+    {
+        this.isBot = true;
     }
 }
 
