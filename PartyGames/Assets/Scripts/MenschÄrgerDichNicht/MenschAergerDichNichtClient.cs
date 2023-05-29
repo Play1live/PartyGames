@@ -15,6 +15,9 @@ public class MenschAergerDichNichtClient : MonoBehaviour
     [SerializeField] GameObject Games;
     [SerializeField] GameObject[] Maps;
     [SerializeField] GameObject SpielprotokollContent;
+    private GameObject Timer;
+    private DateTime RoundStart;
+    private int protokollmsgs;
     [SerializeField] GameObject Würfel;
     private Coroutine WuerfelCoroutine;
     [SerializeField] GameObject InfoBoard;
@@ -22,6 +25,7 @@ public class MenschAergerDichNichtClient : MonoBehaviour
     [SerializeField] AudioSource DisconnectSound;
 
     MenschAegerDichNichtBoard board;
+    private bool gameIsRunning;
     private bool ClientAllowZugWahl;
 
     void OnEnable()
@@ -190,6 +194,9 @@ public class MenschAergerDichNichtClient : MonoBehaviour
             case "#PlayerMergesBot":
                 SpielerWirdZumBot(data);
                 break;
+            case "#AddMSGProtokoll":
+                AddMSGProtokoll(data);
+                break;
         }
     }
     /// <summary>
@@ -261,6 +268,10 @@ public class MenschAergerDichNichtClient : MonoBehaviour
 
             randomplayer.Add(new MenschAergerDichNichtPlayer(i, name, isbot, sprite));
         }
+        gameIsRunning = true;
+        RoundStart = DateTime.Now;
+        protokollmsgs = 0;
+        Timer = SpielprotokollContent.transform.parent.parent.parent.GetChild(0).gameObject;
         // LoadMap
         GameObject selectedMap = null;
         string mapstring = data.Replace("[MAP]", "|").Split('|')[1];
@@ -297,6 +308,45 @@ public class MenschAergerDichNichtClient : MonoBehaviour
             time += DateTime.Now.Minute;
         AddMSGToProtokoll("Spiel wurde gestartet. " + time);
         DisplayMSGInfoBoard("Spiel wird geladen...");
+        AddMSGToProtokoll("...");
+
+        StartCoroutine(RunVisibleTimer());
+
+
+        WuerfelAktivieren(false);
+        StartTurn(board.PlayerTurnSelect().name);
+    }
+    /// <summary>
+    /// Zeigt die RundenTimer an
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator RunVisibleTimer()
+    {
+        while (gameIsRunning)
+        {
+            yield return new WaitForSeconds(1f);
+            Timer.GetComponent<TMP_Text>().text = GetTimerDiff(RoundStart);
+        }
+        yield break;
+    }
+    /// <summary>
+    /// Gibt die Differenz der Zeit zurück
+    /// </summary>
+    /// <param name="starttime"></param>
+    /// <returns></returns>
+    private string GetTimerDiff(DateTime starttime)
+    {
+        int hour = (DateTime.Now.Day - starttime.Day) * 24 + DateTime.Now.Hour - starttime.Hour;
+        int min = hour * 60 + DateTime.Now.Minute - starttime.Minute;
+        int sec = min * 60 + DateTime.Now.Second - starttime.Second;
+
+        int minutes = (int)(sec / 60);
+        int seconds = sec - (60 * minutes);
+
+        if (seconds < 10)
+            return minutes + ":0" + seconds;
+        else
+            return minutes + ":" + seconds;
     }
     /// <summary>
     /// Fügt eine Nachricht dem Spielprotokoll hinzu
@@ -305,11 +355,28 @@ public class MenschAergerDichNichtClient : MonoBehaviour
     public void AddMSGToProtokoll(string msg)
     {
         GameObject go = Instantiate(SpielprotokollContent.transform.GetChild(0).gameObject, SpielprotokollContent.transform.GetChild(0).position, SpielprotokollContent.transform.GetChild(0).rotation);
-        go.name = "MSG_" + SpielprotokollContent.transform.childCount;
+        go.name = "MSG_" + protokollmsgs++;
         go.transform.SetParent(SpielprotokollContent.transform);
         go.transform.GetComponentInChildren<TMP_Text>().text = msg;
         go.transform.localScale = new Vector3(1, 1, 1);
         go.SetActive(true);
+
+        // Limitiert die Anzahl der Protokoll Nachrichten
+        if (SpielprotokollContent.transform.childCount > 100) // TODO??
+        {
+            Destroy(SpielprotokollContent.transform.GetChild(3).gameObject);
+        }
+    }
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="data"></param>
+    private void AddMSGProtokoll(string data)
+    {
+        foreach (string item in data.Replace("[#]", "|").Split('|'))
+        {
+            AddMSGToProtokoll(item);
+        }
     }
     /// <summary>
     /// Blendet eine Nachricht im InfoBoard ein
@@ -329,7 +396,16 @@ public class MenschAergerDichNichtClient : MonoBehaviour
         board.ClearMarkierungen();
         WuerfelAktivieren(false);
 
-        MenschAergerDichNichtPlayer player = board.PlayerTurnSelect();
+        MenschAergerDichNichtPlayer player;
+        if (board.GetPlayerTurn() != null && board.GetPlayerTurn().name != data)
+        {
+            MenschAergerDichNichtPlayer neuerSpieler = board.GetPlayerList()[board.GetPlayerByName(data)];
+            board.SetPlayerTurn(neuerSpieler);
+            player = neuerSpieler;
+        }
+        else
+            player = board.GetPlayerTurn();
+
         if (player.GetAllInStartOrHome())
             player.availableDices = 3;
         else
@@ -362,6 +438,11 @@ public class MenschAergerDichNichtClient : MonoBehaviour
         if (data.Split('*')[1] == Config.PLAYER_NAME)
             return;
         Logging.log(Logging.LogType.Debug, "MenschAergerDichNichtClient", "Wuerfel", "Startet den Würfel eines anderen Spielers: " + data);
+
+        if (data.Split('*')[1] != board.GetPlayerTurn().name)
+        {
+            StartTurn(data.Split('*')[1]);
+        }
 
         board.GetPlayerTurn().availableDices--;
         int result = Int32.Parse(data.Split('*')[0]);
@@ -455,7 +536,6 @@ public class MenschAergerDichNichtClient : MonoBehaviour
         AddMSGToProtokoll(board.TEAM_COLORS[board.GetPlayerTurn().gamerid] + board.GetPlayerTurn().name + "</color></b> würfelt " + Würfel.GetComponent<Image>().sprite.name.Replace("würfel ", ""));
 
         board.GetPlayerTurn().MarkAvailableMoves(result);
-
         // Spieler kann nicht laufen
         if (board.GetPlayerTurn().GetAvailableMoves().Count == 0)
         {
@@ -464,6 +544,7 @@ public class MenschAergerDichNichtClient : MonoBehaviour
             if (CheckForEndOfTurn())
             {
                 board.GetPlayerTurn().wuerfel = 0;
+                StartTurn(board.PlayerTurnSelect().name);
             }
             // Zug noch nicht vorbei
             else
@@ -514,7 +595,8 @@ public class MenschAergerDichNichtClient : MonoBehaviour
             // Das gewählte Feld
             if (feld.GetFeld().name.Equals(data))
             {
-                Logging.log(Logging.LogType.Debug, "MenschAergerDichNichtClient", "SpielerWähltFeld", "Spieler " + feld.GetPlayer().name + " wählt " + feld.GetFeld().name);
+                Logging.log(Logging.LogType.Debug, "MenschAergerDichNichtClient", "SpielerWähltFeld", "Spieler wählt " + feld.GetFeld().name);
+
                 string ausgabe = board.GetPlayerTurn().Move(feld);
                 board.ClearMarkierungen();
 
@@ -532,7 +614,7 @@ public class MenschAergerDichNichtClient : MonoBehaviour
                 if (CheckForEndOfTurn())
                 {
                     board.GetPlayerTurn().wuerfel = 0;
-                    //StartTurn(); // Starte neuen Zug
+                    StartTurn(board.PlayerTurnSelect().name);
                 }
                 // Zug noch nicht vorbei
                 else
@@ -571,7 +653,7 @@ public class MenschAergerDichNichtClient : MonoBehaviour
     /// <returns></returns>
     private bool CheckForEndOfTurn()
     {
-        if (board.GetPlayerTurn().availableDices == 0)
+        if (board.GetPlayerTurn().availableDices <= 0)
             return true;
         else
             return false;

@@ -19,6 +19,7 @@ public class StartupScene : MonoBehaviour
     [SerializeField] GameObject Hauptmenue;
     [SerializeField] GameObject Lobby;
     [SerializeField] GameObject ServerControl;
+    [SerializeField] GameObject Einzelspieler;
 
     [SerializeField] GameObject LautstärkeEinstellung;
     [SerializeField] GameObject ServerEinstellungen;
@@ -61,6 +62,8 @@ public class StartupScene : MonoBehaviour
                 Hauptmenue.transform.GetChild(3).GetComponent<TMP_InputField>().text = Config.PLAYER_NAME;
         }
 
+
+        GameObject.Find("Version_LBL").gameObject.GetComponent<TMP_Text>().text = "Version: " + Config.APPLICATION_VERSION;
         GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(1).gameObject.SetActive(false);
     }
 
@@ -68,6 +71,7 @@ public class StartupScene : MonoBehaviour
     {
         Hauptmenue.SetActive(true);
         Lobby.SetActive(false);
+        Einzelspieler.SetActive(false);
         ServerControl.SetActive(false);
 
         if (Config.isServer)
@@ -113,11 +117,7 @@ public class StartupScene : MonoBehaviour
                 Lobby.SetActive(false);
                 ServerControl.SetActive(false);
             }
-            if (Config.isServer)
-                GameObject.Find("Version_LBL").gameObject.GetComponent<TMP_Text>().text = "Version: " + Config.APPLICATION_VERSION + "    Medien: " + Config.MedienPath;
-            else
-                GameObject.Find("Version_LBL").gameObject.GetComponent<TMP_Text>().text = "Version: " + Config.APPLICATION_VERSION;
-
+            
             Config.APPLICATION_INITED = true;
 
             SettingsAktualisiereAnzeigen();
@@ -183,7 +183,7 @@ public class StartupScene : MonoBehaviour
         yield return new WaitUntil(() => Config.REMOTECONFIG_FETCHTED == true);
 #if UNITY_EDITOR
         UpdaterIsUpToDate = true;
-        Config.HAUPTMENUE_FEHLERMELDUNG = "";
+        //Config.HAUPTMENUE_FEHLERMELDUNG = "";
         yield break;
 #endif
 #pragma warning disable CS0162 // Unerreichbarer Code wurde entdeckt. (ist aber erreichbar)
@@ -212,7 +212,7 @@ public class StartupScene : MonoBehaviour
             Logging.log(Logging.LogType.Error, "StartupScene", "UpdateGameUpdater", "Updaterversion konnte nicht gefunden werden. Path: " + UpdaterVersionPath + "/Version.txt");
             if (!File.Exists(UpdaterVersionPath + "/PartyGamesUpdater.exe"))
             {
-                Config.HAUPTMENUE_FEHLERMELDUNG = "";
+                //Config.HAUPTMENUE_FEHLERMELDUNG = "";
                 UpdaterIsUpToDate = true;
                 yield break;
             }
@@ -278,7 +278,7 @@ public class StartupScene : MonoBehaviour
         }
         else
         {
-            Config.HAUPTMENUE_FEHLERMELDUNG = "";
+            //Config.HAUPTMENUE_FEHLERMELDUNG = "";
             Logging.log(Logging.LogType.Normal, "StartupScene", "UpdateGameUpdater", "Updater ist bereits aktuell.");
             UpdaterIsUpToDate = true;
             yield break;
@@ -303,13 +303,15 @@ public class StartupScene : MonoBehaviour
     /// <returns></returns>
     IEnumerator EnableConnectionButton()
     {
-        Hauptmenue.transform.GetChild(4).gameObject.SetActive(false);
+        Hauptmenue.transform.GetChild(4).gameObject.SetActive(false);// Server/Client StartButton
+        Hauptmenue.transform.GetChild(5).gameObject.SetActive(false); // Einzelspieler StartButton // TODO: gehts auch ohne internet
         yield return new WaitUntil(() => Config.REMOTECONFIG_FETCHTED == true);
         ServerEinstellungen.transform.GetChild(2).GetChild(1).GetChild(0).GetComponent<TMP_InputField>().text = Config.SERVER_CONNECTION_IP;
         ServerEinstellungen.transform.GetChild(3).GetChild(1).GetChild(0).GetComponent<TMP_InputField>().text = "" + Config.SERVER_CONNECTION_PORT;
         yield return new WaitUntil(() => UpdaterIsUpToDate == true); // Warte bis die Version des Updater aktualisiert wurde
         Logging.log(Logging.LogType.Debug, "StartupScene", "EnableConnectionButton", "Spieler darf sich nun verbinden.");
-        Hauptmenue.transform.GetChild(4).gameObject.SetActive(true);
+        Hauptmenue.transform.GetChild(4).gameObject.SetActive(true); // Server/Client StartButton
+        Hauptmenue.transform.GetChild(5).gameObject.SetActive(true); // Einzelspieler StartButton
     }
     /// <summary>
     /// Lädt die vorbereiteten Spieldateien
@@ -431,6 +433,7 @@ public class StartupScene : MonoBehaviour
         }
         Logging.log(Logging.LogType.Debug, "StartupScene", "WriteGameVersionFile", "Spiel Version wurde für den Updater in Datei aktualisiert.");
     }
+    #region Einstellungs Menü
     /// <summary>
     /// Aktualisiert die Anzeigen in den Einstellungen
     /// </summary>
@@ -596,4 +599,60 @@ public class StartupScene : MonoBehaviour
     {
         Config.APPLICATION_CONFIG.SetBool("GAME_DISPLAY_FULLSCREEN", toggle.isOn);
     }
+    #endregion
+
+    #region Einzelspieler
+    /// <summary>
+    /// Startet die Einzelspielerauswahl
+    /// </summary>
+    public void StartEinzelspieler()
+    {
+        if (Config.CLIENT_STARTED || Config.SERVER_STARTED)
+            return;
+        GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(1).gameObject.SetActive(true);
+        ServerEinstellungen.SetActive(false);
+
+        Config.PLAYER_NAME = "";
+        Config.PLAYER_NAME = GameObject.Find("ChooseYourName_TXT").gameObject.GetComponent<TMP_InputField>().text;
+        Config.APPLICATION_CONFIG.SetString("PLAYER_DISPLAY_NAME", Config.PLAYER_NAME);
+
+        Logging.log(Logging.LogType.Normal, "StartupScene", "StartEinzelspieler", "Einzelspieler wird geladen...");
+        Einzelspieler.SetActive(true);
+        Hauptmenue.SetActive(false);
+    }
+    /// <summary>
+    /// Zurück zum Hauptmenü
+    /// </summary>
+    public void ZurueckZumHauptmenue()
+    {
+        Logging.log(Logging.LogType.Normal, "StartupScene", "ZurueckZumHauptmenue", "Spieler wird ins Hauptmenü geladen.");
+        if (!Config.SERVER_STARTED && !Config.CLIENT_STARTED)
+        {
+            SceneManager.LoadSceneAsync("Startup");
+            GameObject.Find("ServerController").gameObject.SetActive(false);
+        }
+    }
+    /// <summary>
+    /// Startet Einzelspieler Spiele
+    /// </summary>
+    /// <param name="szeneName"></param>
+    public void EinzelspielerStartScene(string szeneName)
+    {
+        Logging.log(Logging.LogType.Normal, "StartupScene", "EinzelspielerStartScene", "Starte das Einzelspieler Spiel: " + szeneName);
+        ServerEinstellungen.SetActive(false);
+        GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(1).gameObject.SetActive(true);
+        switch (szeneName)
+        {
+            default:
+                Logging.log(Logging.LogType.Error, "StartupScene", "EinzelspielerStartScene", "Einzelspielerspiel existiert nicht: " + szeneName);
+                ServerEinstellungen.SetActive(true);
+                break;
+
+            case "CS_StratRoulette":
+                Config.GAME_TITLE = szeneName;
+                SceneManager.LoadScene(szeneName);
+                break;
+        }
+    }
+    #endregion
 }

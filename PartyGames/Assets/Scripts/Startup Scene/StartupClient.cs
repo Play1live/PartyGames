@@ -102,6 +102,12 @@ public class StartupClient : MonoBehaviour
     {
         Logging.log(Logging.LogType.Normal, "StartupClient", "TestIfStartConnectionError", "Testet in 10 Sekunden (oder wenn die Spieleranzeige aktualisiert wird) ob die Verbindung erfolgreich war.");
         DateTime in10sec = DateTime.Now.AddSeconds(10);
+        yield return new WaitForSeconds(1);
+        // Spielerliste nicht aktuell, erfrage update
+        if (!SearchNameInPlayerList(Config.PLAYER_NAME))
+        {
+            SendToServer("#GetSpielerUpdate");
+        }
         yield return new WaitUntil(() => (DateTime.Compare(DateTime.Now, in10sec) > 0 || SearchNameInPlayerList(Config.PLAYER_NAME)));
 
         if (SearchNameInPlayerList(Config.PLAYER_NAME))

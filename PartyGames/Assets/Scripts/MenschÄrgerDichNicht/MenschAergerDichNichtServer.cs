@@ -15,6 +15,9 @@ public class MenschAergerDichNichtServer : MonoBehaviour
     [SerializeField] GameObject Games;
     [SerializeField] GameObject[] Maps;
     [SerializeField] GameObject SpielprotokollContent;
+    private GameObject Timer;
+    private DateTime RoundStart;
+    private int protokollmsgs;
     [SerializeField] GameObject Würfel;
     private Coroutine WuerfelCoroutine;
     private Coroutine BotCoroutine;
@@ -24,6 +27,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
     [SerializeField] AudioSource DisconnectSound;
 
     MenschAegerDichNichtBoard board;
+    private bool gameIsRunning;
     private bool clientCanPickField;
     private bool ServerAllowZugWahl;
 
@@ -116,7 +120,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
                 Broadcast(msg);
                 yield return null;
             }
-            yield return new WaitForSeconds(0.0001f);
+            yield return new WaitForSeconds(0.005f);
         }
         yield break;
     }
@@ -360,6 +364,10 @@ public class MenschAergerDichNichtServer : MonoBehaviour
                 ClientClosed(Config.PLAYERLIST[i]);
             UpdateLobby();
         }
+        gameIsRunning = true;
+        RoundStart = DateTime.Now;
+        protokollmsgs = 0;
+        Timer = SpielprotokollContent.transform.parent.parent.parent.GetChild(0).gameObject;
         #region SpielerInit
         List<string> names = new List<string>();
         List<bool> bots = new List<bool>();
@@ -458,8 +466,43 @@ public class MenschAergerDichNichtServer : MonoBehaviour
             time += DateTime.Now.Minute;
         AddMSGToProtokoll("Spiel wurde gestartet. " + time);
         DisplayMSGInfoBoard("Spiel wird geladen.");
+        AddMSGToProtokoll("...");
+
+        StartCoroutine(RunVisibleTimer());
 
         StartTurn();
+    }
+    /// <summary>
+    /// Zeigt die RundenTimer an
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator RunVisibleTimer()
+    {
+        while (gameIsRunning)
+        {
+            yield return new WaitForSeconds(1f);
+            Timer.GetComponent<TMP_Text>().text = GetTimerDiff(RoundStart);
+        }
+        yield break;
+    }
+    /// <summary>
+    /// Gibt die Differenz der Zeit zurück
+    /// </summary>
+    /// <param name="starttime"></param>
+    /// <returns></returns>
+    private string GetTimerDiff(DateTime starttime)
+    {
+        int hour = (DateTime.Now.Day - starttime.Day) * 24 + DateTime.Now.Hour - starttime.Hour;
+        int min = hour * 60 + DateTime.Now.Minute - starttime.Minute;
+        int sec = min*60 + DateTime.Now.Second - starttime.Second;
+
+        int minutes = (int)(sec / 60);
+        int seconds = sec - (60 * minutes);
+
+        if (seconds < 10)
+            return minutes + ":0" + seconds;
+        else
+            return minutes + ":" + seconds;
     }
     /// <summary>
     /// Fügt eine Nachricht dem Spielprotokoll hinzu
@@ -468,11 +511,17 @@ public class MenschAergerDichNichtServer : MonoBehaviour
     public void AddMSGToProtokoll(string msg)
     {
         GameObject go = Instantiate(SpielprotokollContent.transform.GetChild(0).gameObject, SpielprotokollContent.transform.GetChild(0).position, SpielprotokollContent.transform.GetChild(0).rotation);
-        go.name = "MSG_" + SpielprotokollContent.transform.childCount;
+        go.name = "MSG_" + protokollmsgs++;
         go.transform.SetParent(SpielprotokollContent.transform);
         go.transform.GetComponentInChildren<TMP_Text>().text = msg;
         go.transform.localScale = new Vector3(1, 1, 1);
         go.SetActive(true);
+
+        // Limitiert die Anzahl der Protokoll Nachrichten
+        if (SpielprotokollContent.transform.childCount > 100) // TODO??
+        {
+            Destroy(SpielprotokollContent.transform.GetChild(3).gameObject);
+        }
     }
     /// <summary>
     /// Blendet eine Nachricht im InfoBoard ein
@@ -496,7 +545,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
         AddMSGToProtokoll(board.TEAM_COLORS[player.gamerid] + player.name + "</color></b> ist dran.");
         StartTurnSelectType(player);
 
-        BroadcastNew("#SpielerTurn " + player.name);
+        // TODO test BroadcastNew("#SpielerTurn " + player.name);
     }
     /// <summary>
     /// Startet den Zug eines Spielers, (neu oder bei 6 oder alle im Start...)
@@ -597,7 +646,10 @@ public class MenschAergerDichNichtServer : MonoBehaviour
     /// <returns></returns>
     IEnumerator StartBotWuerfelVerzoegert()
     {
-        yield return new WaitForSeconds(3);
+        if (MenschAegerDichNichtBoard.watchBots)
+            yield return new WaitForSeconds(0.1f);
+        else 
+            yield return new WaitForSeconds(3);
         WuerfelStarteAnimation();
         yield break;
     }
@@ -641,6 +693,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
             result = 6; // TODO nur zum testen
         if (result == 6)
             board.GetPlayerTurn().availableDices = 1;
+        board.GetPlayerTurn().wuerfelCounter++;
         Logging.log(Logging.LogType.Debug, "MenschAergerDichNichtServer", "WuerfelStarteAnimation", "Es wird gewürfelt. Result: " + result);
         BroadcastNew("#Wuerfel " + result + "*" + board.GetPlayerTurn().name);
 
@@ -661,13 +714,17 @@ public class MenschAergerDichNichtServer : MonoBehaviour
         {
             wuerfel.Add(Resources.Load<Sprite>("Images/GUI/würfel "+i));
         }
-        // Roll Time
-        DateTime swtichTime = DateTime.Now.AddSeconds(2);
-        while (DateTime.Compare(DateTime.Now, swtichTime) < 0)
+        // Skippt die WürfelAnimation wenn nur Bots spielen
+        if (!MenschAegerDichNichtBoard.watchBots)
         {
-            Würfel.GetComponent<Image>().sprite = wuerfel[(count++) % wuerfel.Count];
-            //Debug.LogWarning(0.005f * count);
-            yield return new WaitForSeconds(0.005f*count);
+            // Roll Time
+            DateTime swtichTime = DateTime.Now.AddSeconds(2);
+            while (DateTime.Compare(DateTime.Now, swtichTime) < 0)
+            {
+                Würfel.GetComponent<Image>().sprite = wuerfel[(count++) % wuerfel.Count];
+                //Debug.LogWarning(0.005f * count);
+                yield return new WaitForSeconds(0.005f * count);
+            }
         }
         // Roll to 6
         while (wuerfel[wuerfel.Count-1] == wuerfel[count % wuerfel.Count])
@@ -704,13 +761,25 @@ public class MenschAergerDichNichtServer : MonoBehaviour
         // Spieler ist ein bot
         if (board.GetPlayerTurn().isBot)
         {
-            yield return new WaitForSeconds(2);
+            if (MenschAegerDichNichtBoard.watchBots)
+                yield return new WaitForSeconds(0.01f);
+            else
+                yield return new WaitForSeconds(3);
             LaufenTurnBot(); // kann laufen
             board.ClearMarkierungen();
-            // Schaut ob das Spiel zuende ist
+            /*// Schaut ob das Spiel zuende ist
             if (board.GetPlayerTurn().HasPlayerWon()) // Spieler hat gewonnen
             {
-                AddMSGToProtokoll(board.TEAM_COLORS[board.GetPlayerTurn().gamerid] + board.GetPlayerTurn().name + "</color></b> hat gewonnen!");
+                string time = DateTime.Now.Hour + ":";
+                if (DateTime.Now.Minute < 10)
+                    time += "0" + DateTime.Now.Minute;
+                else
+                    time += DateTime.Now.Minute;
+                AddMSGToProtokoll(board.TEAM_COLORS[board.GetPlayerTurn().gamerid] + board.GetPlayerTurn().name + "</color></b> hat gewonnen! ");
+                yield break;
+            }*/
+            if (board.GetPlayerTurn().HasPlayerWon()) // Spieler hat gewonnen
+            {
                 yield break;
             }
             // Schaut ob der Zug des Spielers beendet ist
@@ -870,7 +939,15 @@ public class MenschAergerDichNichtServer : MonoBehaviour
                 // Schaut ob das Spiel zuende ist
                 if (board.GetPlayerTurn().HasPlayerWon()) // Spieler hat gewonnen
                 {
-                    AddMSGToProtokoll(board.TEAM_COLORS[board.GetPlayerTurn().gamerid] + board.GetPlayerTurn().name + "</color></b> hat gewonnen!");
+                    string time = DateTime.Now.Hour + ":";
+                    if (DateTime.Now.Minute < 10)
+                        time += "0" + DateTime.Now.Minute;
+                    else
+                        time += DateTime.Now.Minute;
+                    AddMSGToProtokoll(board.TEAM_COLORS[board.GetPlayerTurn().gamerid] + board.GetPlayerTurn().name + "</color></b> hat gewonnen! " + time);
+                    SendFinishUpdate();
+                    gameIsRunning = false;
+                    Logging.log(Logging.LogType.Normal, "MenschAergerDichNichtServer", "SpielerWähltFeld", board.GetPlayerTurn().name + " hat gewonnen! " + time);
                     return;
                 }
 
@@ -889,6 +966,111 @@ public class MenschAergerDichNichtServer : MonoBehaviour
             }
         }
         return;
+    }
+    private void SendFinishUpdate()
+    {
+        string msg = "";
+        #region Count Würfel würfe
+        // Die meisten Würfel würfe
+        MenschAergerDichNichtPlayer pMW1 = board.GetPlayerList()[0];
+        foreach (MenschAergerDichNichtPlayer pMW2 in board.GetPlayerList())
+        {
+            if (pMW2.wuerfelCounter > pMW1.wuerfelCounter)
+            {
+                pMW1 = pMW2;
+            }
+        }
+        // Die wenigsten Würfel würfe
+        MenschAergerDichNichtPlayer pWW1 = board.GetPlayerList()[0];
+        foreach (MenschAergerDichNichtPlayer pWW2 in board.GetPlayerList())
+        {
+            if (pWW2.wuerfelCounter < pWW1.wuerfelCounter)
+            {
+                pWW1 = pWW2;
+            }
+        }
+        // Alle gleichviel?
+        if (pMW1 == pWW1)
+        {
+            msg += "[#]Alle haben " + pMW1.wuerfelCounter + "x Gewürfelt.";
+        }
+        else
+        {
+            msg += "[#]" + board.TEAM_COLORS[pMW1.gamerid] + pMW1.name + "</color></b> hat am häufigsten Gewürfelt. " + pMW1.wuerfelCounter;
+            msg += "[#]" + board.TEAM_COLORS[pWW1.gamerid] + pWW1.name + "</color></b> hat am wenigsten Gewürfelt. " + pWW1.wuerfelCounter;
+        }
+        #endregion
+
+        #region Count Figuren geschlagen
+        // Die meisten Figuren geschlagen
+        MenschAergerDichNichtPlayer pMF1 = board.GetPlayerList()[0];
+        foreach (MenschAergerDichNichtPlayer pMF2 in board.GetPlayerList())
+        {
+            if (pMF2.schlagCounter > pMF1.schlagCounter)
+            {
+                pMF1 = pMF2;
+            }
+        }
+        // Die wenigsten Figuren geschlagen
+        MenschAergerDichNichtPlayer pWF1 = board.GetPlayerList()[0];
+        foreach (MenschAergerDichNichtPlayer pWF2 in board.GetPlayerList())
+        {
+            if (pWF2.schlagCounter < pWF1.schlagCounter)
+            {
+                pWF1 = pWF2;
+            }
+        }
+        // Alle gleichviel?
+        if (pMF1 == pWF1)
+        {
+            msg += "[#]Alle haben " + pMF1.schlagCounter + " Schläge.";
+        }
+        else
+        {
+            msg += "[#]" + board.TEAM_COLORS[pMF1.gamerid] + pMF1.name + "</color></b> hat die meisten Schläge. " + pMF1.schlagCounter;
+            msg += "[#]" + board.TEAM_COLORS[pWF1.gamerid] + pWF1.name + "</color></b> hat die wenigsten Schläge. " + pWF1.schlagCounter;
+        }
+        #endregion
+
+        #region Count Deaths
+        // Die meisten Deaths
+        MenschAergerDichNichtPlayer pMD1 = board.GetPlayerList()[0];
+        foreach (MenschAergerDichNichtPlayer pMD2 in board.GetPlayerList())
+        {
+            if (pMD2.deathCounter > pMD1.deathCounter)
+            {
+                pMD1 = pMD2;
+            }
+        }
+        // Die wenigsten Deaths
+        MenschAergerDichNichtPlayer pWD1 = board.GetPlayerList()[0];
+        foreach (MenschAergerDichNichtPlayer pWD2 in board.GetPlayerList())
+        {
+            if (pWD2.deathCounter > pWD1.deathCounter)
+            {
+                pWD1 = pWD2;
+            }
+        }
+        // Alle gleichviel?
+        if (pMD1 == pWD1)
+        {
+            msg += "[#]Alle haben " + pMD1.deathCounter + " Tode.";
+        }
+        else
+        {
+            msg += "[#]" + board.TEAM_COLORS[pMD1.gamerid] + pMD1.name + "</color></b> hat die meisten Tode. " + pMD1.deathCounter;
+            msg += "[#]" + board.TEAM_COLORS[pWD1.gamerid] + pWD1.name + "</color></b> hat die wenigsten Tode. " + pWD1.deathCounter;
+        }
+        #endregion
+
+        // Ausgabe
+        if (msg.Length > 3)
+            msg = msg.Substring("[#]".Length);
+        BroadcastNew("#AddMSGProtokoll" + msg);
+        foreach (string item in msg.Replace("[#]", "|").Split('|'))
+        {
+            AddMSGToProtokoll(item);
+        }
     }
     /// <summary>
     /// Wenn ein Spieler verlässt, soll dieser automatisch zu einem Bot werden
@@ -923,8 +1105,8 @@ public class MenschAergerDichNichtServer : MonoBehaviour
             {
                 if (player.name == p.name && player.PlayerImage == p.icon)
                 {
-                    AddMSGToProtokoll(board.TEAM_COLORS[board.GetPlayerTurn().gamerid] + p.name + "</color></b> hat das Spiel verlassen.");
-                    AddMSGToProtokoll(board.TEAM_COLORS[board.GetPlayerTurn().gamerid] + p.name + "</color></b> wird nun von einem <b>Bot</b> übernommen!");
+                    AddMSGToProtokoll(board.TEAM_COLORS[player.gamerid] + p.name + "</color></b> hat das Spiel verlassen.");
+                    AddMSGToProtokoll(board.TEAM_COLORS[player.gamerid] + p.name + "</color></b> wird nun von einem <b>Bot</b> übernommen!");
                     player.SetPlayerIntoBot();
                     break;
                 }
@@ -937,7 +1119,10 @@ public class MenschAergerDichNichtServer : MonoBehaviour
     /// <returns></returns>
     IEnumerator BotLaufenVerzoergert()
     {
-        yield return new WaitForSeconds(2);
+        if (MenschAegerDichNichtBoard.watchBots)
+            yield return new WaitForSeconds(0.1f);
+        else
+            yield return new WaitForSeconds(3);
         LaufenTurnBot(); // kann laufen
         board.ClearMarkierungen();
         // Schaut ob das Spiel zuende ist

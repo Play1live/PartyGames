@@ -17,7 +17,7 @@ public class MenschAegerDichNichtBoard
     public static Color TEAM_BLUE = new Color(0f, 44f, 195f);
     public static Color TEAM_GREEN = new Color(0f, 123f, 7f);
     public static Color TEAM_RED = new Color(156f, 0f, 0f);
-    public static Color TEAM_YELLOW = new Color(236f, 248f, 29f);
+    public static Color TEAM_YELLOW = new Color(219f, 201f, 0f);
     public static Color TEAM_PINK = new Color(204f, 0f, 165f);
     public static Color TEAM_ORANGE = new Color(221f, 131f, 0f);
     public static Color TEAM_BLACK = new Color(0f, 0f, 0f);
@@ -455,6 +455,9 @@ public class MenschAergerDichNichtPlayer
     public List<MenschAegerDichNichtFeld> Figuren { set; get; }
     public int availableDices { set; get; }
     public int wuerfel { set; get; }
+    public int wuerfelCounter { set; get; }
+    public int schlagCounter { set; get; }
+    public int deathCounter { set; get; }
 
     public MenschAergerDichNichtPlayer(int gamerid, string name, bool isBot, Sprite PlayerImage)
     {
@@ -465,6 +468,9 @@ public class MenschAergerDichNichtPlayer
         this.PlayerColor = getTeamColor(gamerid);
         this.availableDices = 0;
         this.wuerfel = 0;
+        this.wuerfelCounter = 0;
+        this.schlagCounter = 0;
+        this.deathCounter = 0;
         this.pRunWay = new List<MenschAegerDichNichtFeld>();
     }
 
@@ -549,6 +555,9 @@ public class MenschAergerDichNichtPlayer
             ziel.GetPlayer().StartBase.GetBases()[geschlagenefigur].DisplayPlayer(ziel.GetPlayer());
             ziel.GetPlayer().Figuren[geschlagenefigur] = ziel.GetPlayer().StartBase.GetBases()[geschlagenefigur];
             ausgabe = "[C]" + this.gamerid + "[C]" + this.name + "[/COLOR] schlägt [C]" + ziel.GetPlayer().gamerid + "[C]" + ziel.GetPlayer().name + "[/COLOR].";
+
+            ziel.GetPlayer().deathCounter++;
+            this.schlagCounter++;
         }
         // Bewegt Spieler
         ziel.DisplayPlayer(this);

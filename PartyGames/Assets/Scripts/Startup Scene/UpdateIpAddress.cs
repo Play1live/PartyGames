@@ -28,6 +28,7 @@ public class UpdateIpAddress
         {
             Logging.log(Logging.LogType.Warning, "UpdateIpAddress", "UpdateNoIP_DNS", "Could not resolve host " + Config.SERVER_CONNECTION_IP);
             Config.HAUPTMENUE_FEHLERMELDUNG += "\nBitte überprüfe deine Internetverbindung!";
+            Config.LOBBY_FEHLERMELDUNG = "Bitte überprüfe deine Internetverbindung!";
             return false;
         }
         
