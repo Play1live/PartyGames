@@ -12,46 +12,46 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 469c24fdb3bd6431b92cc1465bd9166b, type: 3}
   m_Name: RemoteConfigDataStoreAsset
   m_EditorClassIdentifier: 
-  _rsKeyList: "[\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"fcc9e2c5-f8b8-4c1f-8bc8-0f049f356915\"\r\n   
+  _rsKeyList: "[\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"edf29724-8a66-4e2a-80c8-5a5a3c80ef1e\"\r\n   
     },\r\n    \"rs\": {\r\n      \"key\": \"Server_Connection_IP\",\r\n      \"type\":
     \"string\",\r\n      \"value\": \"playgamesip.ddns.net\"\r\n    }\r\n  },\r\n 
-    {\r\n    \"metadata\": {\r\n      \"entityId\": \"2754217c-2980-44ac-a020-6e8625b49caf\"\r\n   
+    {\r\n    \"metadata\": {\r\n      \"entityId\": \"c563e488-3e60-488c-8f8a-2494f8d948ec\"\r\n   
     },\r\n    \"rs\": {\r\n      \"key\": \"Server_Connection_Port\",\r\n      \"type\":
     \"int\",\r\n      \"value\": 11001\r\n    }\r\n  },\r\n  {\r\n    \"metadata\":
-    {\r\n      \"entityId\": \"107b10f9-2fd3-4685-83d9-40c6be78f8ce\"\r\n    },\r\n   
+    {\r\n      \"entityId\": \"0601532d-69e8-443e-85cd-1172bc1e002d\"\r\n    },\r\n   
     \"rs\": {\r\n      \"key\": \"Program_Fullscreen\",\r\n      \"type\": \"bool\",\r\n     
-    \"value\": false\r\n    }\r\n  },\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\":
-    \"8ee6a3fe-5fe8-4d60-a8ce-ceaf4cf02d21\"\r\n    },\r\n    \"rs\": {\r\n     
+    \"value\": true\r\n    }\r\n  },\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\":
+    \"93ebcf27-736e-452a-a7c0-295c9af077ab\"\r\n    },\r\n    \"rs\": {\r\n     
     \"key\": \"Program_Download_Link\",\r\n      \"type\": \"string\",\r\n      \"value\":
     \"https://github.com/Play1live/PartyGames/releases/latest/download/PartyGames.zip\"\r\n   
-    }\r\n  },\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"99356840-0bf5-43ce-a049-9202e97ffc71\"\r\n   
+    }\r\n  },\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"4278e470-167b-49f5-b434-4a5a07cb0007\"\r\n   
     },\r\n    \"rs\": {\r\n      \"key\": \"Program_Download_Version\",\r\n     
-    \"type\": \"string\",\r\n      \"value\": \"1.11b_2\"\r\n    }\r\n  },\r\n  {\r\n   
-    \"metadata\": {\r\n      \"entityId\": \"fd2056ab-5baf-4eb9-9a46-da66f6e2b564\"\r\n   
+    \"type\": \"string\",\r\n      \"value\": \"1.12\"\r\n    }\r\n  },\r\n  {\r\n   
+    \"metadata\": {\r\n      \"entityId\": \"92e28091-6a78-4559-bc17-a4083498df9e\"\r\n   
     },\r\n    \"rs\": {\r\n      \"key\": \"Updater_Download_Link\",\r\n      \"type\":
     \"string\",\r\n      \"value\": \"https://github.com/Play1live/PartyGames/releases/latest/download/Updater.zip\"\r\n   
-    }\r\n  },\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"74776c83-7d1b-4dd7-840c-ecd46b5c322a\"\r\n   
+    }\r\n  },\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"8d8e0ec1-cddf-408a-b049-d456def3790a\"\r\n   
     },\r\n    \"rs\": {\r\n      \"key\": \"Updater_Download_Version\",\r\n     
     \"type\": \"string\",\r\n      \"value\": \"1.2\"\r\n    }\r\n  }\r\n]"
-  _rsLastCachedKeyList: "[\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"fcc9e2c5-f8b8-4c1f-8bc8-0f049f356915\"\r\n   
+  _rsLastCachedKeyList: "[\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"edf29724-8a66-4e2a-80c8-5a5a3c80ef1e\"\r\n   
     },\r\n    \"rs\": {\r\n      \"key\": \"Server_Connection_IP\",\r\n      \"type\":
     \"string\",\r\n      \"value\": \"playgamesip.ddns.net\"\r\n    }\r\n  },\r\n 
-    {\r\n    \"metadata\": {\r\n      \"entityId\": \"2754217c-2980-44ac-a020-6e8625b49caf\"\r\n   
+    {\r\n    \"metadata\": {\r\n      \"entityId\": \"c563e488-3e60-488c-8f8a-2494f8d948ec\"\r\n   
     },\r\n    \"rs\": {\r\n      \"key\": \"Server_Connection_Port\",\r\n      \"type\":
     \"int\",\r\n      \"value\": 11001\r\n    }\r\n  },\r\n  {\r\n    \"metadata\":
-    {\r\n      \"entityId\": \"107b10f9-2fd3-4685-83d9-40c6be78f8ce\"\r\n    },\r\n   
+    {\r\n      \"entityId\": \"0601532d-69e8-443e-85cd-1172bc1e002d\"\r\n    },\r\n   
     \"rs\": {\r\n      \"key\": \"Program_Fullscreen\",\r\n      \"type\": \"bool\",\r\n     
-    \"value\": false\r\n    }\r\n  },\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\":
-    \"8ee6a3fe-5fe8-4d60-a8ce-ceaf4cf02d21\"\r\n    },\r\n    \"rs\": {\r\n     
+    \"value\": true\r\n    }\r\n  },\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\":
+    \"93ebcf27-736e-452a-a7c0-295c9af077ab\"\r\n    },\r\n    \"rs\": {\r\n     
     \"key\": \"Program_Download_Link\",\r\n      \"type\": \"string\",\r\n      \"value\":
     \"https://github.com/Play1live/PartyGames/releases/latest/download/PartyGames.zip\"\r\n   
-    }\r\n  },\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"99356840-0bf5-43ce-a049-9202e97ffc71\"\r\n   
+    }\r\n  },\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"4278e470-167b-49f5-b434-4a5a07cb0007\"\r\n   
     },\r\n    \"rs\": {\r\n      \"key\": \"Program_Download_Version\",\r\n     
-    \"type\": \"string\",\r\n      \"value\": \"1.11b_2\"\r\n    }\r\n  },\r\n  {\r\n   
-    \"metadata\": {\r\n      \"entityId\": \"fd2056ab-5baf-4eb9-9a46-da66f6e2b564\"\r\n   
+    \"type\": \"string\",\r\n      \"value\": \"1.12\"\r\n    }\r\n  },\r\n  {\r\n   
+    \"metadata\": {\r\n      \"entityId\": \"92e28091-6a78-4559-bc17-a4083498df9e\"\r\n   
     },\r\n    \"rs\": {\r\n      \"key\": \"Updater_Download_Link\",\r\n      \"type\":
     \"string\",\r\n      \"value\": \"https://github.com/Play1live/PartyGames/releases/latest/download/Updater.zip\"\r\n   
-    }\r\n  },\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"74776c83-7d1b-4dd7-840c-ecd46b5c322a\"\r\n   
+    }\r\n  },\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"8d8e0ec1-cddf-408a-b049-d456def3790a\"\r\n   
     },\r\n    \"rs\": {\r\n      \"key\": \"Updater_Download_Version\",\r\n     
     \"type\": \"string\",\r\n      \"value\": \"1.2\"\r\n    }\r\n  }\r\n]"
   _environments: "[\r\n  {\r\n    \"projectId\": \"760eff2f-db4d-47b7-8854-a3f5a42b7f80\",\r\n   

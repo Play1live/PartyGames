@@ -164,8 +164,8 @@ public class StartupClient : MonoBehaviour
         Logging.log(Logging.LogType.Normal, "StartupClient", "StarteClient", "Verbindung zwischen Client und Server wird aufgebaut...");
         try
         {
-            Config.CLIENT_TCP = new TcpClient("localhost", Config.SERVER_CONNECTION_PORT);
-            //Config.CLIENT_TCP = new TcpClient(Config.SERVER_CONNECTION_IP, Config.SERVER_CONNECTION_PORT);
+            //Config.CLIENT_TCP = new TcpClient("localhost", Config.SERVER_CONNECTION_PORT);
+            Config.CLIENT_TCP = new TcpClient(Config.SERVER_CONNECTION_IP, Config.SERVER_CONNECTION_PORT);
             Config.CLIENT_TCP.Client.NoDelay = true;
             Config.CLIENT_STARTED = true;
             Logging.log(Logging.LogType.Normal, "StartupClient", "StarteClient", "Verbindung wurde erfolgreich aufgebaut.");
