@@ -1,6 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.Audio;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class MenschAergerDichNichtScene : MonoBehaviour
 {
@@ -9,9 +13,13 @@ public class MenschAergerDichNichtScene : MonoBehaviour
 
     [SerializeField] GameObject Client;
     [SerializeField] GameObject Server;
+
     [SerializeField] GameObject[] ServerSided;
     [SerializeField] GameObject[] DeactivateForServer;
     [SerializeField] GameObject[] DeactivateForClient;
+
+    [SerializeField] GameObject Einstellungen;
+    [SerializeField] AudioMixer audiomixer;
 
     private void Start()
     {
@@ -23,6 +31,14 @@ public class MenschAergerDichNichtScene : MonoBehaviour
 
     void OnEnable()
     {
+        if (!Config.APPLICATION_INITED)
+        {
+            SceneManager.LoadScene("Startup");
+            return;
+        }
+        Utils.EinstellungenStartSzene(Einstellungen, audiomixer, Utils.EinstellungsKategorien.Audio, Utils.EinstellungsKategorien.Grafik);
+        Utils.EinstellungenGrafikApply(false);
+
         if (Config.isServer)
         {
             Client.SetActive(false);
@@ -52,7 +68,6 @@ public class MenschAergerDichNichtScene : MonoBehaviour
             Config.APPLICATION_CONFIG.Save();
     }
 
-
     /// <summary>
     /// Spielt die Introanimation ab
     /// </summary>
@@ -66,5 +81,23 @@ public class MenschAergerDichNichtScene : MonoBehaviour
         yield return new WaitForSeconds(10);
 
         IntroGo.SetActive(false);
+    }
+    /// <summary>
+    /// Aktualisiert die Screen Resolution für den Einzelspieler
+    /// </summary>
+    /// <param name="drop"></param>
+    public void UpdateScreenResolution(TMP_Dropdown drop)
+    {
+        Config.APPLICATION_CONFIG.SetInt("GAME_DISPLAY_RESOLUTION", drop.value);
+        Utils.EinstellungenGrafikApply(false);
+    }
+    /// <summary>
+    /// Aktualisiert die Vollbildeinstellung für den Einzelspieler
+    /// </summary>
+    /// <param name="toggle"></param>
+    public void UpdateFullscreen(Toggle toggle)
+    {
+        Config.APPLICATION_CONFIG.SetBool("GAME_DISPLAY_FULLSCREEN", toggle.isOn);
+        Utils.EinstellungenGrafikApply(false);
     }
 }

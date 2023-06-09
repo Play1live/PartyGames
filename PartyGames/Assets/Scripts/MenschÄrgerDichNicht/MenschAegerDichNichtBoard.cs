@@ -25,11 +25,11 @@ public class MenschAegerDichNichtBoard
     public string[] TEAM_COLORS = new string[] { "<color=blue>", "<color=green>", "<color=red>", "<color=yellow>", "<color=pink>", "<color=orange>", "<color=black>", "<color=purple>" };
 
     public static int[] P3_AUSFAHRT_INDEX = new int[] { 26, 6, 16 };
-    public static int[] P4_AUSFAHRT_INDEX = new int[] { 0, 36, 12, 24 };
-    public static int[] P5_AUSFAHRT_INDEX = new int[] { 0, 20, 40, 30, 10 };
-    public static int[] P6_AUSFAHRT_INDEX = new int[] { 30, 0, 40, 50, 20, 10 };
-    public static int[] P7_AUSFAHRT_INDEX = new int[] { 30, 40, 50, 60, 20, 10, 0};
-    public static int[] P8_AUSFAHRT_INDEX = new int[] { 30, 40, 50, 60, 20, 10, 0, 70};
+    public static int[] P4_AUSFAHRT_INDEX = new int[] { 36, 0, 12, 24 };
+    public static int[] P5_AUSFAHRT_INDEX = new int[] { 0, 10, 20, 30, 40 };
+    public static int[] P6_AUSFAHRT_INDEX = new int[] { 0, 10, 20, 30, 40, 50 };
+    public static int[] P7_AUSFAHRT_INDEX = new int[] { 0, 10, 20, 30, 40, 50, 60};
+    public static int[] P8_AUSFAHRT_INDEX = new int[] { 70, 0, 10, 20, 30, 40, 50, 60 };
 
     // GameVars
     private GameObject MapObject;
@@ -82,6 +82,10 @@ public class MenschAegerDichNichtBoard
     {
         return this.playersTurn;
     }
+    public List<MenschAergerDichNichtBase> GetHomes()
+    {
+        return this.Homes;
+    }
     private void FillAusfahrten()
     {
         if (MapObject.name.Equals("3P"))
@@ -127,13 +131,13 @@ public class MenschAegerDichNichtBoard
             }
         }
     }
-    private HintergrundFarbe getTeamByIndex(int index)
+    private MADNHintergrundFarbe getTeamByIndex(int index)
     {
-        HintergrundFarbe[] enumValues = (HintergrundFarbe[])Enum.GetValues(typeof(HintergrundFarbe));
-        foreach (HintergrundFarbe team in enumValues)
+        MADNHintergrundFarbe[] enumValues = (MADNHintergrundFarbe[])Enum.GetValues(typeof(MADNHintergrundFarbe));
+        foreach (MADNHintergrundFarbe team in enumValues)
             if (((int)team) == index)
                 return team;
-        return HintergrundFarbe.NULL;
+        return MADNHintergrundFarbe.NULL;
     }
     public void ClearMarkierungen()
     {
@@ -228,36 +232,83 @@ public class MenschAegerDichNichtBoard
     {
         return this.BoardPrint;
     }
+    public List<MenschAergerDichNichtBase> GetStarts()
+    {
+        return this.Starts;
+    }
     public List<MenschAegerDichNichtFeld> GetRunWay()
     {
         return this.RunWay;
     }
     public string PrintBoard()
     {
-        string board = "[RUNWAYSIZE]" + RunWay.Count + "[RUNWAYSIZE]";
+        string runway = "";
         for (int i = 0; i < RunWay.Count; i++)
         {
-            board += "[F" + i + "]" + RunWay[i].ToString() + "[F" + i + "]";
+            if (RunWay[i].IstBelegt())
+                runway += "[#]" + i + "*" + RunWay[i].GetPlayer().gamerid;
         }
-        board += "[TEAMSSIZE]" + Starts.Count + "[TEAMSSIZE]";
+        if (runway.Length > 3)
+            runway = runway.Substring("[#]".Length);
+
+        string starts = "";
         for (int i = 0; i < Starts.Count; i++)
         {
-            board += "[T" + i + "]" + Starts[i].GetBases()[0].ToString() + "~" + Homes[i].GetBases()[0].ToString();
-            for (int j = 1; j < 4; j++)
+            for (int j = 0; j < 4; j++)
             {
-                board += "#" + Starts[i].GetBases()[j].ToString() + "~" + Homes[i].GetBases()[j].ToString();
+                if (Starts[i].GetBases()[j].IstBelegt())
+                    starts += "[#]" + i + "*" + j + "*" + Starts[i].GetBases()[j].GetPlayer().gamerid;
             }
-            board += "[T" + i + "]";
         }
-        this.BoardPrint = board;
-        return board;
+        if (starts.Length > 3)
+            starts = starts.Substring("[#]".Length);
+
+        string homes = "";
+        for (int i = 0; i < Homes.Count; i++)
+        {
+            for (int j = 0; j < 4; j++)
+            {
+                if (Homes[i].GetBases()[j].IstBelegt())
+                    homes += "[#]" + i + "*" + j + "*" + Homes[i].GetBases()[j].GetPlayer().gamerid;
+            }
+        }
+        if (homes.Length > 3)
+            homes = homes.Substring("[#]".Length);
+
+        this.BoardPrint = "[RUNWAY]" + runway + "[RUNWAY][STARTS]" + starts + "[STARTS][HOMES]" + homes + "[HOMES]";
+        return this.BoardPrint;
+    }
+    public string PrintMarkierungen()
+    {
+        string runway = "";
+        for (int i = 0; i < RunWay.Count; i++)
+        {
+            if (RunWay[i].IstMarkiert())
+                runway += "[#]" + i;
+        }
+        if (runway.Length > 3)
+            runway = runway.Substring("[#]".Length);
+
+        string homes = "";
+        for (int i = 0; i < Homes.Count; i++)
+        {
+            for (int j = 0; j < 4; j++)
+            {
+                if (Homes[i].GetBases()[j].IstMarkiert())
+                    homes += "[#]" + i + "*" + j;
+            }
+        }
+        if (homes.Length > 3)
+            homes = homes.Substring("[#]".Length);
+
+        return "[RUNWAY]" + runway + "[RUNWAY][HOMES]" + homes + "[HOMES]";
     }
 }
 
 public class MenschAegerDichNichtFeld
 {
     private GameObject field;
-    private HintergrundFarbe hintergrundFarbe;
+    private MADNHintergrundFarbe hintergrundFarbe;
 
     private bool belegt;
     private MenschAergerDichNichtPlayer Player;
@@ -268,7 +319,7 @@ public class MenschAegerDichNichtFeld
     public MenschAegerDichNichtFeld(GameObject field)
     {
         this.field = field;
-        this.hintergrundFarbe = HintergrundFarbe.NULL;
+        this.hintergrundFarbe = MADNHintergrundFarbe.NULL;
 
         this.belegt = false;
         this.Player = new MenschAergerDichNichtPlayer(-1, "ERROR", false, Resources.Load<Sprite>("Images/ProfileIcons/empty"));
@@ -280,7 +331,7 @@ public class MenschAegerDichNichtFeld
         ClearSelected();
     }
     // Home Aufruf
-    public MenschAegerDichNichtFeld(GameObject field, HintergrundFarbe hintergrundFarbe)
+    public MenschAegerDichNichtFeld(GameObject field, MADNHintergrundFarbe hintergrundFarbe)
     {
         this.field = field;
         this.hintergrundFarbe = hintergrundFarbe;
@@ -294,7 +345,7 @@ public class MenschAegerDichNichtFeld
         ClearSelected();
     }
     // StartAufruf
-    public MenschAegerDichNichtFeld(GameObject field, HintergrundFarbe hintergrundFarbe, MenschAergerDichNichtPlayer player)
+    public MenschAegerDichNichtFeld(GameObject field, MADNHintergrundFarbe hintergrundFarbe, MenschAergerDichNichtPlayer player)
     {
         this.field = field;
         this.hintergrundFarbe = hintergrundFarbe;
@@ -308,10 +359,6 @@ public class MenschAegerDichNichtFeld
         ClearSelected();
     }
     
-    public void MarkSelectableField()
-    {
-        this.field.transform.GetChild(2).gameObject.SetActive(true);
-    }
     public void UpdateDisplayPlayer()
     {
         if (this.belegt)
@@ -351,13 +398,13 @@ public class MenschAegerDichNichtFeld
         }
        UpdateDisplayPlayer();
     }
-    private HintergrundFarbe getTeamByIndex(int index)
+    private MADNHintergrundFarbe getTeamByIndex(int index)
     {
-        HintergrundFarbe[] enumValues = (HintergrundFarbe[])Enum.GetValues(typeof(HintergrundFarbe));
-        foreach (HintergrundFarbe team in enumValues)
+        MADNHintergrundFarbe[] enumValues = (MADNHintergrundFarbe[])Enum.GetValues(typeof(MADNHintergrundFarbe));
+        foreach (MADNHintergrundFarbe team in enumValues)
             if (((int)team) == index)
                 return team;
-        return HintergrundFarbe.NULL;
+        return MADNHintergrundFarbe.NULL;
     }
     public void SetColor(int team)
     {
@@ -366,23 +413,23 @@ public class MenschAegerDichNichtFeld
     }
     private void SetBackgroundColor()
     {
-        if (this.hintergrundFarbe.Equals(HintergrundFarbe.NULL))
+        if (this.hintergrundFarbe.Equals(MADNHintergrundFarbe.NULL))
             this.field.transform.GetChild(0).GetComponent<Image>().color = new Color(MenschAegerDichNichtBoard.TEAM_NULL.r / 255f, MenschAegerDichNichtBoard.TEAM_NULL.g / 255f, MenschAegerDichNichtBoard.TEAM_NULL.b / 255f);
-        else if (this.hintergrundFarbe.Equals(HintergrundFarbe.BLUE))
+        else if (this.hintergrundFarbe.Equals(MADNHintergrundFarbe.BLUE))
             this.field.transform.GetChild(0).GetComponent<Image>().color = new Color(MenschAegerDichNichtBoard.TEAM_BLUE.r / 255f, MenschAegerDichNichtBoard.TEAM_BLUE.g / 255f, MenschAegerDichNichtBoard.TEAM_BLUE.b / 255f);
-        else if (this.hintergrundFarbe.Equals(HintergrundFarbe.GREEN))
+        else if (this.hintergrundFarbe.Equals(MADNHintergrundFarbe.GREEN))
             this.field.transform.GetChild(0).GetComponent<Image>().color = new Color(MenschAegerDichNichtBoard.TEAM_GREEN.r / 255f, MenschAegerDichNichtBoard.TEAM_GREEN.g / 255f, MenschAegerDichNichtBoard.TEAM_GREEN.b / 255f);
-        else if (this.hintergrundFarbe.Equals(HintergrundFarbe.RED))
+        else if (this.hintergrundFarbe.Equals(MADNHintergrundFarbe.RED))
             this.field.transform.GetChild(0).GetComponent<Image>().color = new Color(MenschAegerDichNichtBoard.TEAM_RED.r / 255f, MenschAegerDichNichtBoard.TEAM_RED.g / 255f, MenschAegerDichNichtBoard.TEAM_RED.b / 255f);
-        else if (this.hintergrundFarbe.Equals(HintergrundFarbe.YELLOW))
+        else if (this.hintergrundFarbe.Equals(MADNHintergrundFarbe.YELLOW))
             this.field.transform.GetChild(0).GetComponent<Image>().color = new Color(MenschAegerDichNichtBoard.TEAM_YELLOW.r / 255f, MenschAegerDichNichtBoard.TEAM_YELLOW.g / 255f, MenschAegerDichNichtBoard.TEAM_YELLOW.b / 255f);
-        else if (this.hintergrundFarbe.Equals(HintergrundFarbe.PINK))
+        else if (this.hintergrundFarbe.Equals(MADNHintergrundFarbe.PINK))
             this.field.transform.GetChild(0).GetComponent<Image>().color = new Color(MenschAegerDichNichtBoard.TEAM_PINK.r / 255f, MenschAegerDichNichtBoard.TEAM_PINK.g / 255f, MenschAegerDichNichtBoard.TEAM_PINK.b / 255f);
-        else if (this.hintergrundFarbe.Equals(HintergrundFarbe.ORANGE))
+        else if (this.hintergrundFarbe.Equals(MADNHintergrundFarbe.ORANGE))
             this.field.transform.GetChild(0).GetComponent<Image>().color = new Color(MenschAegerDichNichtBoard.TEAM_ORANGE.r / 255f, MenschAegerDichNichtBoard.TEAM_ORANGE.g / 255f, MenschAegerDichNichtBoard.TEAM_ORANGE.b / 255f);
-        else if (this.hintergrundFarbe.Equals(HintergrundFarbe.BLACK))
+        else if (this.hintergrundFarbe.Equals(MADNHintergrundFarbe.BLACK))
             this.field.transform.GetChild(0).GetComponent<Image>().color = new Color(MenschAegerDichNichtBoard.TEAM_BLACK.r / 255f, MenschAegerDichNichtBoard.TEAM_BLACK.g / 255f, MenschAegerDichNichtBoard.TEAM_BLACK.b / 255f);
-        else if (this.hintergrundFarbe.Equals(HintergrundFarbe.PURPLE))
+        else if (this.hintergrundFarbe.Equals(MADNHintergrundFarbe.PURPLE))
             this.field.transform.GetChild(0).GetComponent<Image>().color = new Color(MenschAegerDichNichtBoard.TEAM_PURPLE.r / 255f, MenschAegerDichNichtBoard.TEAM_PURPLE.g / 255f, MenschAegerDichNichtBoard.TEAM_PURPLE.b / 255f);
     }
     private void ClearSelected()
@@ -392,6 +439,10 @@ public class MenschAegerDichNichtFeld
     public bool IstBelegt()
     {
         return this.belegt;
+    }
+    public void MarkSelectableField()
+    {
+        this.field.transform.GetChild(2).gameObject.SetActive(true);
     }
     public bool IstMarkiert()
     {
@@ -417,7 +468,7 @@ public class MenschAegerDichNichtFeld
 public class MenschAergerDichNichtBase
 {
     private List<MenschAegerDichNichtFeld> bases;
-    public MenschAergerDichNichtBase(GameObject field, HintergrundFarbe hintergrundFarbe, bool belegt, MenschAergerDichNichtPlayer player)
+    public MenschAergerDichNichtBase(GameObject field, MADNHintergrundFarbe hintergrundFarbe, bool belegt, MenschAergerDichNichtPlayer player)
     {
         bases = new List<MenschAegerDichNichtFeld>();
         if (belegt == true)
@@ -589,9 +640,9 @@ public class MenschAergerDichNichtPlayer
         if (wuerfel == 6)
         {
             // Ist eine Figur überhaupt im Startbereich?
-            if (this.StartBase.GetBases()[0].IstBelegt() || 
-                this.StartBase.GetBases()[1].IstBelegt() || 
-                this.StartBase.GetBases()[2].IstBelegt() || 
+            if (this.StartBase.GetBases()[0].IstBelegt() ||
+                this.StartBase.GetBases()[1].IstBelegt() ||
+                this.StartBase.GetBases()[2].IstBelegt() ||
                 this.StartBase.GetBases()[3].IstBelegt())
             {
                 if (this.pRunWay[0].GetPlayer().gamerid != this.gamerid)
@@ -602,7 +653,8 @@ public class MenschAergerDichNichtPlayer
             }
         }
         /**/// Prio 3: Schlagen
-        bool kannschlagen = false;
+        if (this.isBot) {   // Schlagen Prio ist nur für Bots aktiv, Spieler können selber entscheiden
+            bool kannschlagen = false;
         for (int i = 0; i < this.Figuren.Count; i++)
         {
             if (!this.StartBase.GetBases().Contains(this.Figuren[i]) && !this.HomeBase.GetBases().Contains(this.Figuren[i]))
@@ -619,7 +671,8 @@ public class MenschAergerDichNichtPlayer
             }
         }
         if (kannschlagen)
-            return true; /**/
+            return true;
+        }
         // Prio 4: Haus
         bool kanninshaus = false;
         for (int i = 0; i < this.Figuren.Count; i++)
@@ -665,9 +718,6 @@ public class MenschAergerDichNichtPlayer
                 MenschAegerDichNichtFeld nextfeld_F = GetNextField(this.Figuren[i], wuerfel);
                 if (nextfeld_F != null)
                 {
-                    // TODO nur zum testen
-                    //if (nextfeld_F.IstBelegt())
-                      //  continue;
                     nextfeld_F.MarkSelectableField();
                     kannnormallaufen = true;
                 }
@@ -879,7 +929,7 @@ public class MenschAergerDichNichtPlayer
     }
 }
 
-public enum HintergrundFarbe
+public enum MADNHintergrundFarbe
 {
     NULL = -1,
     BLUE = 0,

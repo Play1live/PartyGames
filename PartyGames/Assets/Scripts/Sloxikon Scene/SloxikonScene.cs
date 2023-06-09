@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
 
 public class SloxikonScene : MonoBehaviour
@@ -14,6 +15,9 @@ public class SloxikonScene : MonoBehaviour
     [SerializeField] GameObject[] DeactivateForServer;
     [SerializeField] GameObject[] DeactivateForClient;
 
+    [SerializeField] GameObject Einstellungen;
+    [SerializeField] AudioMixer audiomixer;
+
     private void Start()
     {
         Application.targetFrameRate = 120;
@@ -24,6 +28,9 @@ public class SloxikonScene : MonoBehaviour
 
     void OnEnable()
     {
+        Utils.EinstellungenStartSzene(Einstellungen, audiomixer, Utils.EinstellungsKategorien.Audio);
+        Utils.EinstellungenGrafikApply(true);
+
         if (!Config.SERVER_STARTED && !Config.CLIENT_STARTED)
         {
             SceneManager.LoadScene("Startup");

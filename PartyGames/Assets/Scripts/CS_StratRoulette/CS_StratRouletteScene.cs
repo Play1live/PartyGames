@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -25,8 +26,14 @@ public class CS_StratRouletteScene : MonoBehaviour
     private List<CS_StartRouletteDatensatz> MemoryDatensaetze;
     private bool gedaechtnis;
 
+    [SerializeField] GameObject Einstellungen;
+    [SerializeField] AudioMixer audiomixer;
+
     void OnEnable()
     {
+        Utils.EinstellungenStartSzene(Einstellungen, audiomixer, Utils.EinstellungsKategorien.Audio, Utils.EinstellungsKategorien.Grafik);
+        Utils.EinstellungenGrafikApply(false);
+
         AlleDatensaetze = new List<CS_StartRouletteDatensatz>();
         CTDatensaetze = new List<CS_StartRouletteDatensatz>();
         TDatensaetze = new List<CS_StartRouletteDatensatz>();
@@ -62,6 +69,24 @@ public class CS_StratRouletteScene : MonoBehaviour
     }
 
     /// <summary>
+    /// Aktualisiert die Screen Resolution für den Einzelspieler
+    /// </summary>
+    /// <param name="drop"></param>
+    public void UpdateScreenResolution(TMP_Dropdown drop)
+    {
+        Config.APPLICATION_CONFIG.SetInt("GAME_DISPLAY_RESOLUTION", drop.value);
+        Utils.EinstellungenGrafikApply(false);
+    }
+    /// <summary>
+    /// Aktualisiert die Vollbildeinstellung für den Einzelspieler
+    /// </summary>
+    /// <param name="toggle"></param>
+    public void UpdateFullscreen(Toggle toggle)
+    {
+        Config.APPLICATION_CONFIG.SetBool("GAME_DISPLAY_FULLSCREEN", toggle.isOn);
+        Utils.EinstellungenGrafikApply(false);
+    }
+    /// <summary>
     /// Spiel Verlassen & Zurück in die Lobby laden
     /// </summary>
     public void SpielVerlassenButton()
@@ -79,22 +104,6 @@ public class CS_StratRouletteScene : MonoBehaviour
         Anzeige.transform.GetChild(2).GetComponent<TMP_Text>().text = "Loading...";
         yield return null;
 
-
-        /*
-        //string[] inhalt = Resources.Load("Spiele/CS_StratRoulette/CS_StratRoulette").ToString().Split('\n');
-        foreach (string zeile in inhalt)
-        {
-            if (zeile.Length < 2)
-                continue;
-            AlleDatensaetze.Add(new CS_StartRouletteDatensatz(zeile));
-            if (AlleDatensaetze[AlleDatensaetze.Count - 1].GetSeite().Equals("BOTH") || AlleDatensaetze[AlleDatensaetze.Count - 1].GetSeite().Equals("CT"))
-                CTDatensaetze.Add(AlleDatensaetze[AlleDatensaetze.Count - 1]);
-            if (AlleDatensaetze[AlleDatensaetze.Count - 1].GetSeite().Equals("BOTH") || AlleDatensaetze[AlleDatensaetze.Count - 1].GetSeite().Equals("T"))
-                TDatensaetze.Add(AlleDatensaetze[AlleDatensaetze.Count - 1]);
-            
-            SetAvailable(AlleDatensaetze.Count);
-            //yield return null;
-        }*/
         InitDefaultValues();
 
         foreach (CS_StartRouletteDatensatz data in AlleDatensaetze)
@@ -285,6 +294,34 @@ public class CS_StratRouletteScene : MonoBehaviour
         AlleDatensaetze.Add(new CS_StartRouletteDatensatz("[MAP]Alle[MAP][SEITE]T[SEITE][TITEL]Promi[TITEL][BESCHREIBUNG]Wählt einen Promi aus den Mitspielern, der Kevlar braucht und keine Waffen nutzen darf. Er muss ständig in der Nähe seiner Teamkollegen bleiben. Die anderen dürfen sich Waffenkaufen und müssen dafür sorgen, dass der Promi im Team über 70% HP bleibt. Fallen die HP darunter, darf die Runde nicht gewonnen werden.[BESCHREIBUNG][KURZ]- 1 Promi wählen\n- Promi darf nur Kevlar haben und muss immer bei den Kollegen bleiben\n- Der Rest muss diesen beschützen\n- Darf nicht unter 70% fallen[KURZ]"));
         AlleDatensaetze.Add(new CS_StartRouletteDatensatz("[MAP]Alle[MAP][SEITE]T[SEITE][TITEL]Die Klapperschlange[TITEL][BESCHREIBUNG]Reise mit deiner Gruppe um die Map. Wechselt permanent den Modus der Glock.[BESCHREIBUNG][KURZ]- Nur Glocks\n- Permanent Einzel- & Salvenfeuer wechseln[KURZ]"));
         AlleDatensaetze.Add(new CS_StartRouletteDatensatz("[MAP]Alle[MAP][SEITE]T[SEITE][TITEL]Sei ein Anführer.[TITEL][BESCHREIBUNG]Nur der Bombenträger darf laufen. Ihr dürft die Bombe aber weitergeben. Liegt die Bombe außer Reichweite, müssen alle zum Spawn zurück.[BESCHREIBUNG][KURZ]- Nur Bombenträger darf laufen\n- Bombe weitergeben erlaubt\n- Liegt die Bombe außer Reichweite, alle zum Spawn zurück[KURZ]"));
+        AlleDatensaetze.Add(new CS_StartRouletteDatensatz("[MAP]Alle[MAP][SEITE]T[SEITE][TITEL]Der Faker[TITEL][BESCHREIBUNG]Mid -> A -> Fake plant A 4x[BESCHREIBUNG][KURZ][KURZ]"));
+        #region Ancient
+        #endregion
+        #region Anubis
+        #endregion
+        #region Inferno
+        #endregion
+        #region Mirage
+        AlleDatensaetze.Add(new CS_StartRouletteDatensatz("[MAP]Mirage[MAP][SEITE]T[SEITE][TITEL]Mirage: Plan #1[TITEL][BESCHREIBUNG]T Base -> Mid -> Short -> B -> Apartments -> Underpass -> Connector -> A[BESCHREIBUNG][KURZ][KURZ]"));
+        #endregion
+        #region Nuke
+        #endregion
+        #region Overpass
+        #endregion
+        #region Vertigo
+        #endregion
+        #region Tuscan
+        #endregion
+        #region Dust II
+        #endregion
+        #region Train
+        #endregion
+        #region Cache
+        #endregion
+        #region Agency
+        #endregion
+        #region Office
+        #endregion
         #endregion
         #region CT
         AlleDatensaetze.Add(new CS_StartRouletteDatensatz("[MAP]Alle[MAP][SEITE]CT[SEITE][TITEL]KQLY-Style[TITEL][BESCHREIBUNG]Mach den KQLY-Style, ihr dürft nur im Springen mit der USP-S schießen[BESCHREIBUNG][KURZ]- Nur USP-S\n- Springen beim Schießen[KURZ]"));
@@ -300,6 +337,32 @@ public class CS_StratRouletteScene : MonoBehaviour
         AlleDatensaetze.Add(new CS_StartRouletteDatensatz("[MAP]Alle[MAP][SEITE]CT[SEITE][TITEL]Scheiße auf meine Einheit[TITEL][BESCHREIBUNG]1 Person kauft einen M249, alle anderen den M4s und das Team teilt sich auf, wobei eine Person alleine unterwegs ist. Diese Person darf sich die Minikarte nicht ansehen.[BESCHREIBUNG][KURZ]- Ein Einzelgägner mit M249\n- Der Rest mit M4[KURZ]"));
         AlleDatensaetze.Add(new CS_StartRouletteDatensatz("[MAP]Alle[MAP][SEITE]CT[SEITE][TITEL]Bisonherde[TITEL][BESCHREIBUNG]Jeder muss Bizons kaufen. Laufen oder Stillstehen ist nicht erlaubt.[BESCHREIBUNG][KURZ]- Nur PP-Bison\n- Immer leise laufen[KURZ]"));
         AlleDatensaetze.Add(new CS_StartRouletteDatensatz("[MAP]Alle[MAP][SEITE]CT[SEITE][TITEL]Negev 4-Win[TITEL][BESCHREIBUNG]Wählt einen Standort und stellt euch mit Negevs hin. Verteidigt den Ort so gut wie möglich. Keiner darf eine andere Waffe als eine Negev halten.[BESCHREIBUNG][KURZ]- Nur auf Bombspot stehen\n- Nur Negev[KURZ]"));
+        #region Ancient
+        #endregion
+        #region Anubis
+        #endregion
+        #region Inferno
+        #endregion
+        #region Mirage
+        #endregion
+        #region Nuke
+        #endregion
+        #region Overpass
+        #endregion
+        #region Vertigo
+        #endregion
+        #region Tuscan
+        #endregion
+        #region Dust II
+        #endregion
+        #region Train
+        #endregion
+        #region Cache
+        #endregion
+        #region Agency
+        #endregion
+        #region Office
+        #endregion
         #endregion
         #region BOTH
         AlleDatensaetze.Add(new CS_StartRouletteDatensatz("[MAP]Alle[MAP][SEITE]BOTH[SEITE][TITEL]Desert Eagle[TITEL][BESCHREIBUNG]Alle Spielen nur die Desert Eagle, mit Kevler ohne Helm.[BESCHREIBUNG][KURZ][KURZ]"));
@@ -328,8 +391,9 @@ public class CS_StartRouletteDatensatz
 {
     // https://strat-roulette.github.io/
     // https://csgo.stratroulettehub.com/
-    // [MAP]Inferno[MAP][SEITE]T[SEITE][TITEL]Titel[TITEL][BESCHREIBUNG]Beschreibung[BESCHREIBUNG][KURZ]AlleS[KURZ]
-
+    // [MAP][MAP][SEITE]T[SEITE][TITEL][TITEL][BESCHREIBUNG][BESCHREIBUNG][KURZ][KURZ]
+    //AlleDatensaetze.Add(new CS_StartRouletteDatensatz("[MAP][MAP][SEITE]T[SEITE][TITEL][TITEL][BESCHREIBUNG][BESCHREIBUNG][KURZ][KURZ]"));
+        
     private string map;
     private string seite;
     private string titel;

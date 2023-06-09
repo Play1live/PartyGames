@@ -1141,6 +1141,8 @@ public class StartupServer : MonoBehaviour
         gamelist.Add("[SPIELER-ANZ]0[SPIELER-ANZ][MIN]0[MIN][MAX]" + Config.SERVER_MAX_CONNECTIONS + "[MAX][TITEL]<b><i>Unmoderierte Spiele</i></b>[TITEL][AVAILABLE]-1[AVAILABLE]");
         // MenschÄrgerDichNicht
         gamelist.Add("[SPIELER-ANZ]1-8[SPIELER-ANZ][MIN]" + MenschAegerDichNichtBoard.minPlayer + "[MIN][MAX]" + MenschAegerDichNichtBoard.maxPlayer + "[MAX][TITEL]MenschÄrgerDichNicht[TITEL][AVAILABLE]-1[AVAILABLE]");
+        // Kniffel
+        gamelist.Add("[SPIELER-ANZ]1-9[SPIELER-ANZ][MIN]" + KniffelBoard.minPlayer + "[MIN][MAX]" + KniffelBoard.maxPlayer + "[MAX][TITEL]Kniffel[TITEL][AVAILABLE]-1[AVAILABLE]");
 
 
         string msg = "";
@@ -1453,6 +1455,16 @@ public class StartupServer : MonoBehaviour
         Config.GAME_TITLE = "MenschAergerDichNicht";
         SceneManager.LoadScene("MenschAergerDichNicht");
         Broadcast("#StarteSpiel MenschAergerDichNicht");
+    }
+    /// <summary>
+    /// Starte das Kniffel Spiel -> Alle Spieler laden in die neue Scene
+    /// </summary>
+    public void StarteKniffel()
+    {
+        Logging.log(Logging.LogType.Normal, "StartupServer", "StarteKniffel", "Kniffel starts.");
+        Config.GAME_TITLE = "Kniffel";
+        SceneManager.LoadScene("Kniffel");
+        Broadcast("#StarteSpiel Kniffel");
     }
     #endregion
 

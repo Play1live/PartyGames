@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
 
 public class WerBietetMehrScene : MonoBehaviour
@@ -14,8 +15,14 @@ public class WerBietetMehrScene : MonoBehaviour
     [SerializeField] GameObject[] DeactivateForServer;
     [SerializeField] GameObject[] DeactivateForClient;
 
+    [SerializeField] GameObject Einstellungen;
+    [SerializeField] AudioMixer audiomixer;
+
     void OnEnable()
     {
+        Utils.EinstellungenStartSzene(Einstellungen, audiomixer, Utils.EinstellungsKategorien.Audio);
+        Utils.EinstellungenGrafikApply(true);
+
         Application.targetFrameRate = 120;
 #if UNITY_EDITOR
         Application.targetFrameRate = 200;

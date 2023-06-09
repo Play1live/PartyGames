@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -10,8 +12,14 @@ public class ContentCreationTerminalScene : MonoBehaviour
     [SerializeField] GameObject QuizSettings;
     [SerializeField] GameObject SpieleChilds;
 
+    [SerializeField] GameObject Einstellungen;
+    [SerializeField] AudioMixer audiomixer;
+
     void Start()
     {
+        Utils.EinstellungenStartSzene(Einstellungen, audiomixer, Utils.EinstellungsKategorien.Audio, Utils.EinstellungsKategorien.Grafik);
+        Utils.EinstellungenGrafikApply(false);
+
         ResizeScene();
         HideUnselectedChilds();
     }
@@ -61,5 +69,23 @@ public class ContentCreationTerminalScene : MonoBehaviour
         int width = Int32.Parse(res[reso].Split('x')[0]);
         int height = Int32.Parse(res[reso].Split('x')[1]);
         Screen.SetResolution(width, height, mode);
+    }
+    /// <summary>
+    /// Aktualisiert die Screen Resolution für den Einzelspieler
+    /// </summary>
+    /// <param name="drop"></param>
+    public void UpdateScreenResolution(TMP_Dropdown drop)
+    {
+        Config.APPLICATION_CONFIG.SetInt("GAME_DISPLAY_RESOLUTION", drop.value);
+        Utils.EinstellungenGrafikApply(false);
+    }
+    /// <summary>
+    /// Aktualisiert die Vollbildeinstellung für den Einzelspieler
+    /// </summary>
+    /// <param name="toggle"></param>
+    public void UpdateFullscreen(Toggle toggle)
+    {
+        Config.APPLICATION_CONFIG.SetBool("GAME_DISPLAY_FULLSCREEN", toggle.isOn);
+        Utils.EinstellungenGrafikApply(false);
     }
 }

@@ -21,9 +21,7 @@ public class StartupScene : MonoBehaviour
     [SerializeField] GameObject ServerControl;
     [SerializeField] GameObject Einzelspieler;
 
-    [SerializeField] GameObject LautstärkeEinstellung;
-    [SerializeField] GameObject ServerEinstellungen;
-    [SerializeField] GameObject GrafikEinstellungen;
+    [SerializeField] GameObject Einstellungen;
 
     [SerializeField] GameObject ModeratedGamesSFX;
     [SerializeField] AudioMixer audiomixer;
@@ -36,7 +34,7 @@ public class StartupScene : MonoBehaviour
         if (Config.APPLICATION_INITED != true)
         {
             Config.isServer = true;
-            Config.PLAYER_NAME = "Henryk";
+            //Config.PLAYER_NAME = "Henryk";
         }
 #endif
         /*Testzwecke*/
@@ -48,23 +46,25 @@ public class StartupScene : MonoBehaviour
         if (Config.APPLICATION_INITED == true)
         {
             SettingsAktualisiereAnzeigen();
-            LoadConfigs.MoveToPrimaryDisplayFullscreen();
+            //LoadConfigs.MoveToPrimaryDisplayFullscreen();
+            Utils.EinstellungenGrafikApply(true);
 
             if (!Config.CLIENT_STARTED && !Config.SERVER_STARTED)
             {
                 Client.SetActive(false);
                 Server.SetActive(false);
-                ServerEinstellungen.SetActive(true);
-                GrafikEinstellungen.SetActive(true);
+                Utils.EinstellungenStartSzene(Einstellungen, audiomixer, Utils.EinstellungsKategorien.Audio, Utils.EinstellungsKategorien.Grafik, Utils.EinstellungsKategorien.Server, Utils.EinstellungsKategorien.Sonstiges);
+                GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(1).gameObject.SetActive(false);
+            }
+            else
+            {
+                Utils.EinstellungenStartSzene(Einstellungen, audiomixer, Utils.EinstellungsKategorien.Audio);
+                GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(1).gameObject.SetActive(true);
             }
             // Zeigt den temporären Spielernamen an
             if (Hauptmenue.activeInHierarchy)
                 Hauptmenue.transform.GetChild(3).GetComponent<TMP_InputField>().text = Config.PLAYER_NAME;
         }
-
-
-        GameObject.Find("Version_LBL").gameObject.GetComponent<TMP_Text>().text = "Version: " + Config.APPLICATION_VERSION;
-        GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(1).gameObject.SetActive(false);
     }
 
     private void OnEnable()
@@ -101,8 +101,9 @@ public class StartupScene : MonoBehaviour
 
             // Lädt die applicationConfig
             Config.APPLICATION_CONFIG = new ConfigFile(Application.persistentDataPath + "/", "application.config");
+
             Config.PLAYER_NAME = Config.APPLICATION_CONFIG.GetString("PLAYER_DISPLAY_NAME", Config.PLAYER_NAME);
-            UpdateSoundsVolume();
+            Utils.EinstellungenAudioUpdateVolume(Einstellungen, audiomixer);
 
             if (Config.isServer)
                 StartCoroutine(LoadGameFilesAsync());
@@ -117,17 +118,19 @@ public class StartupScene : MonoBehaviour
                 Lobby.SetActive(false);
                 ServerControl.SetActive(false);
             }
-            
+
+            GameObject.Find("Version_LBL").gameObject.GetComponent<TMP_Text>().text = "Version: " + Config.APPLICATION_VERSION;
             Config.APPLICATION_INITED = true;
 
             SettingsAktualisiereAnzeigen();
+            GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(1).gameObject.SetActive(true);
 
             if (!Config.CLIENT_STARTED && !Config.SERVER_STARTED)
             {
                 Client.SetActive(false);
                 Server.SetActive(false);
-                ServerEinstellungen.SetActive(true);
-                GrafikEinstellungen.SetActive(true);
+                Utils.EinstellungenStartSzene(Einstellungen, audiomixer, Utils.EinstellungsKategorien.Audio, Utils.EinstellungsKategorien.Grafik, Utils.EinstellungsKategorien.Server, Utils.EinstellungsKategorien.Sonstiges);
+                GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(1).gameObject.SetActive(false);
             }
             // Zeigt den temporären Spielernamen an
             if (Hauptmenue.activeInHierarchy)
@@ -152,26 +155,6 @@ public class StartupScene : MonoBehaviour
         Config.APPLICATION_CONFIG.Save();
     }
 
-    /// <summary>
-    /// Updates SoundVolume (Master, SFX, BGM)
-    /// </summary>
-    private void UpdateSoundsVolume()
-    {
-        float master = Config.APPLICATION_CONFIG.GetFloat("GAME_MASTER_VOLUME", 0f);
-        audiomixer.SetFloat("MASTER", master);
-        LautstärkeEinstellung.transform.GetChild(1).GetChild(1).GetComponent<Slider>().value = master / 10;
-        LautstärkeEinstellung.transform.GetChild(1).GetChild(1).GetChild(3).GetComponentInChildren<TMP_Text>().text = ((master * 3) + 100) + "%";
-
-        float sfx = Config.APPLICATION_CONFIG.GetFloat("GAME_SFX_VOLUME", 0f);
-        audiomixer.SetFloat("SFX", sfx);
-        LautstärkeEinstellung.transform.GetChild(2).GetChild(1).GetComponent<Slider>().value = sfx / 10;
-        LautstärkeEinstellung.transform.GetChild(2).GetChild(1).GetChild(3).GetComponentInChildren<TMP_Text>().text = ((sfx * 3) + 100) + "%";
-
-        float bgm = Config.APPLICATION_CONFIG.GetFloat("GAME_BGM_VOLUME", 0f);
-        audiomixer.SetFloat("BGM", bgm);
-        LautstärkeEinstellung.transform.GetChild(3).GetChild(1).GetComponent<Slider>().value = bgm / 10;
-        LautstärkeEinstellung.transform.GetChild(3).GetChild(1).GetChild(3).GetComponentInChildren<TMP_Text>().text = ((bgm * 3) + 100) + "%";
-    }
     /// <summary>
     /// Aktualisiert den Updater sofern dieser veraltet ist
     /// </summary>
@@ -304,10 +287,9 @@ public class StartupScene : MonoBehaviour
     IEnumerator EnableConnectionButton()
     {
         Hauptmenue.transform.GetChild(4).gameObject.SetActive(false);// Server/Client StartButton
-        Hauptmenue.transform.GetChild(5).gameObject.SetActive(false); // Einzelspieler StartButton // TODO: gehts auch ohne internet
+        Hauptmenue.transform.GetChild(5).gameObject.SetActive(false); // Einzelspieler StartButton
         yield return new WaitUntil(() => Config.REMOTECONFIG_FETCHTED == true);
-        ServerEinstellungen.transform.GetChild(2).GetChild(1).GetChild(0).GetComponent<TMP_InputField>().text = Config.SERVER_CONNECTION_IP;
-        ServerEinstellungen.transform.GetChild(3).GetChild(1).GetChild(0).GetComponent<TMP_InputField>().text = "" + Config.SERVER_CONNECTION_PORT;
+        Utils.EinstelungenServerUpdatePortIP(Einstellungen, Config.isServer, Config.SERVER_CONNECTION_IP, Config.SERVER_CONNECTION_PORT + "");
         yield return new WaitUntil(() => UpdaterIsUpToDate == true); // Warte bis die Version des Updater aktualisiert wurde
         Logging.log(Logging.LogType.Debug, "StartupScene", "EnableConnectionButton", "Spieler darf sich nun verbinden.");
         Hauptmenue.transform.GetChild(4).gameObject.SetActive(true); // Server/Client StartButton
@@ -370,8 +352,7 @@ public class StartupScene : MonoBehaviour
         if (Config.CLIENT_STARTED || Config.SERVER_STARTED)
             return;
         GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(1).gameObject.SetActive(true);
-        ServerEinstellungen.SetActive(false);
-        GrafikEinstellungen.SetActive(false);
+        Utils.EinstellungenToggle(Einstellungen, Utils.EinstellungsKategorien.Audio);
 
         UpdateIpAddress.UpdateNoIP_DNS();
 
@@ -440,20 +421,15 @@ public class StartupScene : MonoBehaviour
     private void SettingsAktualisiereAnzeigen()
     {
         // Version
-        ServerEinstellungen.transform.parent.parent.parent.parent.GetChild(1).GetComponent<TMP_Text>().text = "v" + Config.APPLICATION_VERSION;
+        Utils.EinstellungenVersionUpdate(Einstellungen);
         // Grafik
-        GrafikEinstellungen.transform.GetChild(2).GetChild(1).GetComponent<TMP_Dropdown>().value = Config.APPLICATION_CONFIG.GetInt("GAME_DISPLAY_RESOLUTION", 2);
-        GrafikEinstellungen.transform.GetChild(3).GetChild(1).GetComponent<Toggle>().isOn = Config.APPLICATION_CONFIG.GetBool("GAME_DISPLAY_FULLSCREEN", true);
+        Utils.EinstellungenGrafikUpdate(Einstellungen);
         // Server
-        ServerEinstellungen.transform.GetChild(1).GetChild(1).GetComponent<Toggle>().isOn = Config.isServer;
-        ServerEinstellungen.transform.GetChild(2).GetChild(1).GetChild(0).GetComponent<TMP_InputField>().text = Config.SERVER_CONNECTION_IP;
-        ServerEinstellungen.transform.GetChild(3).GetChild(1).GetChild(0).GetComponent<TMP_InputField>().text = "" + Config.SERVER_CONNECTION_PORT;
+        Utils.EinstelungenServerUpdatePortIP(Einstellungen, Config.isServer, Config.SERVER_CONNECTION_IP, "" + Config.SERVER_CONNECTION_PORT);
         // NoIP Anzeige
         if (File.Exists(Application.persistentDataPath + @"/No-IP Settings.txt")) {
             string[] noiptemp = File.ReadAllLines(Application.persistentDataPath + @"/No-IP Settings.txt");
-            ServerEinstellungen.transform.GetChild(5).GetChild(1).GetComponentInChildren<TMP_InputField>().text = noiptemp[0].Replace(": ", "|").Split('|')[1];
-            ServerEinstellungen.transform.GetChild(6).GetChild(1).GetComponentInChildren<TMP_InputField>().text = noiptemp[1].Replace(": ", "|").Split('|')[1];
-            ServerEinstellungen.transform.GetChild(7).GetChild(1).GetComponentInChildren<TMP_InputField>().text = noiptemp[2].Replace(": ", "|").Split('|')[1];
+            Utils.EinstellungenServerNoIpUpdate(Einstellungen, noiptemp[0].Replace(": ", "|").Split('|')[1], noiptemp[1].Replace(": ", "|").Split('|')[1], noiptemp[2].Replace(": ", "|").Split('|')[1]);
         }
     }
     /// <summary>
@@ -610,7 +586,7 @@ public class StartupScene : MonoBehaviour
         if (Config.CLIENT_STARTED || Config.SERVER_STARTED)
             return;
         GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(1).gameObject.SetActive(true);
-        ServerEinstellungen.SetActive(false);
+        Utils.EinstellungenToggle(Einstellungen, Utils.EinstellungsKategorien.Audio, Utils.EinstellungsKategorien.Grafik, Utils.EinstellungsKategorien.Sonstiges);
 
         Config.PLAYER_NAME = "";
         Config.PLAYER_NAME = GameObject.Find("ChooseYourName_TXT").gameObject.GetComponent<TMP_InputField>().text;
@@ -629,7 +605,7 @@ public class StartupScene : MonoBehaviour
         if (!Config.SERVER_STARTED && !Config.CLIENT_STARTED)
         {
             SceneManager.LoadSceneAsync("Startup");
-            GameObject.Find("ServerController").gameObject.SetActive(false);
+            Server.SetActive(false);
         }
     }
     /// <summary>
@@ -639,13 +615,13 @@ public class StartupScene : MonoBehaviour
     public void EinzelspielerStartScene(string szeneName)
     {
         Logging.log(Logging.LogType.Normal, "StartupScene", "EinzelspielerStartScene", "Starte das Einzelspieler Spiel: " + szeneName);
-        ServerEinstellungen.SetActive(false);
+        Utils.EinstellungenToggle(Einstellungen, Utils.EinstellungsKategorien.Audio);
         GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(1).gameObject.SetActive(true);
         switch (szeneName)
         {
             default:
                 Logging.log(Logging.LogType.Error, "StartupScene", "EinzelspielerStartScene", "Einzelspielerspiel existiert nicht: " + szeneName);
-                ServerEinstellungen.SetActive(true);
+                Utils.EinstellungenToggle(Einstellungen, Utils.EinstellungsKategorien.Audio, Utils.EinstellungsKategorien.Grafik, Utils.EinstellungsKategorien.Sonstiges);
                 break;
 
             case "CS_StratRoulette":

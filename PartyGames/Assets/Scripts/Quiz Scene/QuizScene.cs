@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
 
 public class QuizScene : MonoBehaviour
@@ -14,6 +15,9 @@ public class QuizScene : MonoBehaviour
     [SerializeField] GameObject[] DeactivateForServer;
     [SerializeField] GameObject[] DeactivateForClient;
 
+    [SerializeField] GameObject Einstellungen;
+    [SerializeField] AudioMixer audiomixer;
+
     private void Start()
     {
         Application.targetFrameRate = 120;
@@ -24,6 +28,9 @@ public class QuizScene : MonoBehaviour
 
     void OnEnable()
     {
+        Utils.EinstellungenStartSzene(Einstellungen, audiomixer, Utils.EinstellungsKategorien.Audio);
+        Utils.EinstellungenGrafikApply(true);
+
         if (Config.isServer)
         {
             Client.SetActive(false);

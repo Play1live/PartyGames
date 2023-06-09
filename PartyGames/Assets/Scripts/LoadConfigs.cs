@@ -64,6 +64,7 @@ public class LoadConfigs
                 Screen.MoveMainWindowTo(displays[0], new Vector2Int(displays[0].width / 2, displays[0].height / 2));
             }
 
+            Screen.SetResolution(Display.displays[0].renderingWidth, Display.displays[0].renderingHeight, true);
             Screen.fullScreenMode = FullScreenMode.ExclusiveFullScreen;
         }
         else

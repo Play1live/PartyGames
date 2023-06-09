@@ -23,6 +23,10 @@ public class MenschAergerDichNichtClient : MonoBehaviour
     [SerializeField] GameObject InfoBoard;
 
     [SerializeField] AudioSource DisconnectSound;
+    [SerializeField] AudioSource SpielerZieht;
+    [SerializeField] AudioSource SpielerIstDran;
+    [SerializeField] AudioSource SpielerWirdGeschlagen;
+    [SerializeField] AudioSource SiegerStehtFest;
 
     MenschAegerDichNichtBoard board;
     private bool gameIsRunning;
@@ -179,11 +183,37 @@ public class MenschAergerDichNichtClient : MonoBehaviour
                 StartGame(data);
                 break;
 
-            case "#SpielerTurn":
+
+            case "#StartTurn":
                 StartTurn(data);
+                break;
+            case "#AddProtokoll":
+                AddMSGToProtokoll(data);
+                break;
+            case "#AktiviereWuerfel":
+                AktiviereWuerfel(data);
                 break;
             case "#Wuerfel":
                 Wuerfel(data);
+                break;
+            case "#UpdateBoard":
+                UpdateBoard(data);
+                break;
+            case "#MarkMarkierungen":
+                MarkMarkierungen(data);
+                break;
+            case "#SpielIstVorbeiMSGs":
+                SpielIstVorbeiMSGs(data);
+                break;
+            case "#PlayWirdGeschlagenSound":
+                SpielerWirdGeschlagen.Play();
+                break;
+            case "#PlaySpielerZieht":
+                SpielerZieht.Play();
+                break;
+                /*
+            case "#SpielerTurn":
+                StartTurn(data);
                 break;
             case "#SpielerWaehltFeld":
                 SpielerWähltFeld(data);
@@ -196,7 +226,7 @@ public class MenschAergerDichNichtClient : MonoBehaviour
                 break;
             case "#AddMSGProtokoll":
                 AddMSGProtokoll(data);
-                break;
+                break;*/
         }
     }
     /// <summary>
@@ -306,15 +336,15 @@ public class MenschAergerDichNichtClient : MonoBehaviour
             time += "0" + DateTime.Now.Minute;
         else
             time += DateTime.Now.Minute;
-        AddMSGToProtokoll("Spiel wurde gestartet. " + time);
+        //AddMSGToProtokoll("Spiel wurde gestartet. " + time);
         DisplayMSGInfoBoard("Spiel wird geladen...");
-        AddMSGToProtokoll("...");
+        //AddMSGToProtokoll("...");
 
         StartCoroutine(RunVisibleTimer());
 
 
         WuerfelAktivieren(false);
-        StartTurn(board.PlayerTurnSelect().name);
+        //StartTurn(board.PlayerTurnSelect().name);
     }
     /// <summary>
     /// Zeigt die RundenTimer an
@@ -352,7 +382,7 @@ public class MenschAergerDichNichtClient : MonoBehaviour
     /// Fügt eine Nachricht dem Spielprotokoll hinzu
     /// </summary>
     /// <param name="msg"></param>
-    public void AddMSGToProtokoll(string msg)
+    private void AddMSGToProtokoll(string msg)
     {
         GameObject go = Instantiate(SpielprotokollContent.transform.GetChild(0).gameObject, SpielprotokollContent.transform.GetChild(0).position, SpielprotokollContent.transform.GetChild(0).rotation);
         go.name = "MSG_" + protokollmsgs++;
@@ -362,18 +392,15 @@ public class MenschAergerDichNichtClient : MonoBehaviour
         go.SetActive(true);
 
         // Limitiert die Anzahl der Protokoll Nachrichten
-        if (SpielprotokollContent.transform.childCount > 100) // TODO??
+        if (SpielprotokollContent.transform.childCount > 100)
         {
             Destroy(SpielprotokollContent.transform.GetChild(3).gameObject);
         }
     }
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="data"></param>
-    private void AddMSGProtokoll(string data)
+    private void SpielIstVorbeiMSGs(string msg)
     {
-        foreach (string item in data.Replace("[#]", "|").Split('|'))
+        SiegerStehtFest.Play();
+        foreach (string item in msg.Replace("[#]", "|").Split('|'))
         {
             AddMSGToProtokoll(item);
         }
@@ -396,22 +423,25 @@ public class MenschAergerDichNichtClient : MonoBehaviour
         board.ClearMarkierungen();
         WuerfelAktivieren(false);
 
-        MenschAergerDichNichtPlayer player;
-        if (board.GetPlayerTurn() != null && board.GetPlayerTurn().name != data)
+        int pid = Int32.Parse(data.Split('*')[0]);
+        int dices = Int32.Parse(data.Split('*')[1]);
+
+        MenschAergerDichNichtPlayer player = board.GetPlayerList()[pid];
+        board.SetPlayerTurn(player);
+        player.availableDices = dices;
+
+        //AddMSGToProtokoll(board.TEAM_COLORS[player.gamerid] + player.name + "</color></b> ist dran.");
+        if (Config.PLAYER_NAME == player.name)
         {
-            MenschAergerDichNichtPlayer neuerSpieler = board.GetPlayerList()[board.GetPlayerByName(data)];
-            board.SetPlayerTurn(neuerSpieler);
-            player = neuerSpieler;
+            DisplayMSGInfoBoard("Du bist dran!\n Du kannst würfeln.");
+            WuerfelAktivieren(true);
+            SpielerIstDran.Play();
         }
         else
-            player = board.GetPlayerTurn();
-
-        if (player.GetAllInStartOrHome())
-            player.availableDices = 3;
-        else
-            player.availableDices = 1;
-        AddMSGToProtokoll(board.TEAM_COLORS[player.gamerid] + player.name + "</color></b> ist dran.");
-        StartTurnSelectType(player);
+        {
+            DisplayMSGInfoBoard(player.name + " ist dran!");
+        }
+        AktiviereWuerfel(player.name);
     }
     /// <summary>
     /// Startet den Zug eines Spielers
@@ -429,6 +459,92 @@ public class MenschAergerDichNichtClient : MonoBehaviour
             WuerfelAktivieren(true);
         }
     }
+    private void UpdateBoard(string data)
+    {
+        board.ClearMarkierungen();
+        // Clear Board
+        foreach (MenschAegerDichNichtFeld feld in board.GetRunWay())
+            feld.DisplayPlayer(new MenschAergerDichNichtPlayer(-1, "ERROR", false, Resources.Load<Sprite>("Images/ProfileIcons/empty")));
+        foreach (MenschAergerDichNichtBase team in board.GetStarts())
+            foreach (MenschAegerDichNichtFeld feld in team.GetBases())
+                feld.DisplayPlayer(new MenschAergerDichNichtPlayer(-1, "ERROR", false, Resources.Load<Sprite>("Images/ProfileIcons/empty")));
+        foreach (MenschAergerDichNichtBase team in board.GetHomes())
+            foreach (MenschAegerDichNichtFeld feld in team.GetBases())
+                feld.DisplayPlayer(new MenschAergerDichNichtPlayer(-1, "ERROR", false, Resources.Load<Sprite>("Images/ProfileIcons/empty")));
+
+        // Display Update
+        string[] runway = data.Replace("[RUNWAY]", "|").Split('|')[1].Replace("[#]", "|").Split('|');
+        if (data.Replace("[RUNWAY]", "|").Split('|')[1].Length > 0)
+        {
+            foreach (string item in runway)
+            {
+                int fieldindex = Int32.Parse(item.Split('*')[0]);
+                int playerid = Int32.Parse(item.Split('*')[1]);
+                board.GetRunWay()[fieldindex].DisplayPlayer(board.GetPlayerList()[playerid]);
+            }
+        }
+        if (data.Replace("[STARTS]", "|").Split('|')[1].Length > 0)
+        {
+            string[] starts = data.Replace("[STARTS]", "|").Split('|')[1].Replace("[#]", "|").Split('|');
+            foreach (string item in starts)
+            {
+                int teamindex = Int32.Parse(item.Split('*')[0]);
+                int fieldindex = Int32.Parse(item.Split('*')[1]);
+                int playerid = Int32.Parse(item.Split('*')[2]); 
+                board.GetStarts()[teamindex].GetBases()[fieldindex].DisplayPlayer(board.GetPlayerList()[playerid]);
+            }
+        }
+        if (data.Replace("[HOMES]", "|").Split('|')[1].Length > 0)
+        {
+            string[] homes = data.Replace("[HOMES]", "|").Split('|')[1].Replace("[#]", "|").Split('|');
+            foreach (string item in homes)
+            {
+                int teamindex = Int32.Parse(item.Split('*')[0]);
+                int fieldindex = Int32.Parse(item.Split('*')[1]);
+                int playerid = Int32.Parse(item.Split('*')[2]);
+                board.GetHomes()[teamindex].GetBases()[fieldindex].DisplayPlayer(board.GetPlayerList()[playerid]);
+            }
+        }
+
+        // Schauen ob der Spieler noch dran ist
+        if (Config.PLAYER_NAME == board.GetPlayerTurn().name && board.GetPlayerTurn().availableDices > 0)
+        {
+            WuerfelAktivieren(true);
+        }
+    }
+    /// <summary>
+    /// Markiert mögliche Felder
+    /// </summary>
+    /// <param name="data"></param>
+    private void MarkMarkierungen(string data)
+    {
+        board.ClearMarkierungen();
+        string[] runway = data.Replace("[RUNWAY]", "|").Split('|')[1].Replace("[#]", "|").Split('|');
+        if (data.Replace("[RUNWAY]", "|").Split('|')[1].Length > 0)
+        {
+            foreach (string item in runway)
+            {
+                int fieldindex = Int32.Parse(item);
+                this.board.GetRunWay()[fieldindex].MarkSelectableField();
+            }
+        }
+        if (data.Replace("[HOMES]", "|").Split('|')[1].Length > 0)
+        {
+            string[] homes = data.Replace("[HOMES]", "|").Split('|')[1].Replace("[#]", "|").Split('|');
+            foreach (string item in homes)
+            {
+                int teamindex = Int32.Parse(item.Split('*')[0]);
+                int fieldindex = Int32.Parse(item.Split('*')[1]);
+                this.board.GetHomes()[teamindex].GetBases()[fieldindex].MarkSelectableField();
+            }
+        }
+
+        // Wenn spieler dran erlaube Ziehen
+        if (board.GetPlayerTurn().name == Config.PLAYER_NAME)
+        {
+            ClientAllowZugWahl = true;
+        }
+    }
     /// <summary>
     /// Startet den Würfel
     /// </summary>
@@ -441,7 +557,8 @@ public class MenschAergerDichNichtClient : MonoBehaviour
 
         if (data.Split('*')[1] != board.GetPlayerTurn().name)
         {
-            StartTurn(data.Split('*')[1]);
+            //StartTurn(data.Split('*')[1]);
+            board.SetPlayerTurn(board.GetPlayerList()[board.GetPlayerByName(data.Split('*')[1])]);
         }
 
         board.GetPlayerTurn().availableDices--;
@@ -452,6 +569,15 @@ public class MenschAergerDichNichtClient : MonoBehaviour
         if (WuerfelCoroutine != null)
             StopCoroutine(WuerfelCoroutine);
         WuerfelCoroutine = StartCoroutine(WuerfelAnimation(result));
+    }    
+    /// <summary>
+    /// Aktiviere den Würfel, falls man der Spieler ist
+    /// </summary>
+    /// <param name="data"></param>
+    private void AktiviereWuerfel(string data)
+    {
+        if (data == Config.PLAYER_NAME)
+            WuerfelAktivieren(true);
     }
     /// <summary>
     /// Aktiviert den Button zum Würfeln
@@ -473,8 +599,6 @@ public class MenschAergerDichNichtClient : MonoBehaviour
         board.GetPlayerTurn().availableDices--;
         int result = UnityEngine.Random.Range(1, 7);
         Logging.log(Logging.LogType.Debug, "MenschAergerDichNichtClient", "WuerfelStarteAnimation", "Client würfelt: " + result);
-        if (board.GetPlayerTurn().GetAllInStartOrHome())
-            result = 6; // TODO nur zum testen
         if (result == 6)
             board.GetPlayerTurn().availableDices = 1;
         SendToServer("#Wuerfel " + result);
@@ -496,75 +620,39 @@ public class MenschAergerDichNichtClient : MonoBehaviour
         {
             wuerfel.Add(Resources.Load<Sprite>("Images/GUI/würfel " + i));
         }
-        // Roll Time
-        DateTime swtichTime = DateTime.Now.AddSeconds(2);
-        while (DateTime.Compare(DateTime.Now, swtichTime) < 0)
+        // Roll to 6
+        Würfel.GetComponent<Image>().sprite = wuerfel[(count++)];
+        yield return new WaitForSeconds(0.05f);
+        Würfel.GetComponent<Image>().sprite = wuerfel[(count++)];
+        yield return new WaitForSeconds(0.05f);
+        while (wuerfel[wuerfel.Count - 1] == wuerfel[count % wuerfel.Count])
         {
             Würfel.GetComponent<Image>().sprite = wuerfel[(count++) % wuerfel.Count];
-            //Debug.LogWarning(0.005f * count);
-            yield return new WaitForSeconds(0.005f * count);
+            yield return new WaitForSeconds(0.05f);
         }
         // Roll to 6
         while (wuerfel[wuerfel.Count - 1] == wuerfel[count % wuerfel.Count])
         {
             Würfel.GetComponent<Image>().sprite = wuerfel[(count++) % wuerfel.Count];
-            yield return new WaitForSeconds(0.005f * count);
+            yield return new WaitForSeconds(0.05f);
         }
         // Roll Until selected
         while (!wuerfel[count % wuerfel.Count].name.Equals("würfel " + result))
         {
             Würfel.GetComponent<Image>().sprite = wuerfel[(count++) % wuerfel.Count];
-            yield return new WaitForSeconds(0.005f * count);
+            yield return new WaitForSeconds(0.05f);
         }
         Würfel.GetComponent<Image>().sprite = wuerfel[(count) % wuerfel.Count];
         yield return null;
-        StartCoroutine(ParseWuerfelResult(result));
-        yield break;
-    }
-    /// <summary>
-    /// Nutzt das Würfelergebnis.
-    /// - Spieler muss nochmal würfeln, (am start)
-    /// - Spieler darf laufen und dann zug vorbei
-    /// - Spieler darf laufen und nochmal würfeln
-    /// - würfel zuende
-    /// - Sieg prüfen
-    /// </summary>
-    /// <returns></returns>
-    IEnumerator ParseWuerfelResult(int result)
-    {
-        Logging.log(Logging.LogType.Debug, "MenschAergerDichNichtClient", "ParseWuerfelResult", "Ergebnis wird verarbeitet");
-        AddMSGToProtokoll(board.TEAM_COLORS[board.GetPlayerTurn().gamerid] + board.GetPlayerTurn().name + "</color></b> würfelt " + Würfel.GetComponent<Image>().sprite.name.Replace("würfel ", ""));
+        //StartCoroutine(ParseWuerfelResult(result));
 
-        board.GetPlayerTurn().MarkAvailableMoves(result);
-        // Spieler kann nicht laufen
-        if (board.GetPlayerTurn().GetAvailableMoves().Count == 0)
+        // aktiviere würfel falls keine reaktivierung kam
+        yield return new WaitForSeconds(5);
+        if (board.GetPlayerTurn().name == Config.PLAYER_NAME && board.GetPlayerTurn().availableDices > 0 && !Würfel.transform.GetChild(0).gameObject.activeInHierarchy)
         {
-            board.ClearMarkierungen();
-            // Schaut ob der Zug des Spielers beendet ist
-            if (CheckForEndOfTurn())
-            {
-                board.GetPlayerTurn().wuerfel = 0;
-                StartTurn(board.PlayerTurnSelect().name);
-            }
-            // Zug noch nicht vorbei
-            else
-            {
-                StartTurnSelectType(board.GetPlayerTurn());
-            }
-            yield break;
+            Debug.LogWarning("AktiviereNachZeit");
+            SendToServer("#AktiviereNachZeit");
         }
-        StartCoroutine(BlockZugWahlFuer2Sek());
-        yield break;
-    }
-    /// <summary>
-    /// Sperrt die Wahl eines Zuges für X Sekunden, um Fehler beim Senden zu vermeiden
-    /// </summary>
-    /// <returns></returns>
-    IEnumerator BlockZugWahlFuer2Sek()
-    {
-        ClientAllowZugWahl = false;
-        yield return new WaitForSeconds(2);
-        ClientAllowZugWahl = true;
         yield break;
     }
     /// <summary>
@@ -584,49 +672,6 @@ public class MenschAergerDichNichtClient : MonoBehaviour
         return message;
     }
     /// <summary>
-    /// Ein anderer Spieler wahlt ein Feld zum laufen
-    /// </summary>
-    /// <param name="data"></param>
-    private void SpielerWähltFeld(string data)
-    {
-        // Wenn der Server dran ist, schauen ob das Feld markiert ist
-        foreach (MenschAegerDichNichtFeld feld in board.GetPlayerTurn().GetAvailableMoves())
-        {
-            // Das gewählte Feld
-            if (feld.GetFeld().name.Equals(data))
-            {
-                Logging.log(Logging.LogType.Debug, "MenschAergerDichNichtClient", "SpielerWähltFeld", "Spieler wählt " + feld.GetFeld().name);
-
-                string ausgabe = board.GetPlayerTurn().Move(feld);
-                board.ClearMarkierungen();
-
-                if (ausgabe.Length > 2)
-                    AddMSGToProtokoll(GenerateColorsIntoMultipleNames(ausgabe));
-
-                // Schaut ob das Spiel zuende ist
-                if (board.GetPlayerTurn().HasPlayerWon()) // Spieler hat gewonnen
-                {
-                    AddMSGToProtokoll(board.TEAM_COLORS[board.GetPlayerTurn().gamerid] + board.GetPlayerTurn().name + "</color></b> hat gewonnen!");
-                    return;
-                }
-
-                // Schaut ob der Zug des Spielers beendet ist
-                if (CheckForEndOfTurn())
-                {
-                    board.GetPlayerTurn().wuerfel = 0;
-                    StartTurn(board.PlayerTurnSelect().name);
-                }
-                // Zug noch nicht vorbei
-                else
-                {
-                    StartTurnSelectType(board.GetPlayerTurn());
-                }
-                return;
-            }
-        }
-        return;
-    }
-    /// <summary>
     /// Client wählt ein Feld zum Laufen, sendet Anfrage an den Server
     /// </summary>
     /// <param name="FeldName"></param>
@@ -644,46 +689,9 @@ public class MenschAergerDichNichtClient : MonoBehaviour
         if (!FeldName.transform.GetChild(2).gameObject.activeInHierarchy)
             return;
         Logging.log(Logging.LogType.Debug, "MenschAergerDichNichtClient", "ClientWähltFeld", "Client wählt ein Feld zum Laufen: " + FeldName.name);
+        ClientAllowZugWahl = false;
 
         SendToServer("#ClientWaehltFeld " + FeldName.name);
-    }
-    /// <summary>
-    /// Prüft ob der Zug des Spielers vorbei ist
-    /// </summary>
-    /// <returns></returns>
-    private bool CheckForEndOfTurn()
-    {
-        if (board.GetPlayerTurn().availableDices <= 0)
-            return true;
-        else
-            return false;
-    }
-    /// <summary>
-    /// Wenn ein Spieler verlässt, soll dieser automatisch zu einem Bot werden
-    /// </summary>
-    private void SpielerWirdZumBot(string data)
-    {
-        // Der Spieler ist gerade dran
-        if (board.GetPlayerTurn().name == data)
-        {
-            AddMSGToProtokoll(board.TEAM_COLORS[board.GetPlayerTurn().gamerid] + data + "</color></b> hat das Spiel verlassen.");
-            AddMSGToProtokoll(board.TEAM_COLORS[board.GetPlayerTurn().gamerid] + data + "</color></b> wird nun von einem <b>Bot</b> übernommen!");
-            board.GetPlayerTurn().SetPlayerIntoBot();
-        }
-        // Der Spieler ist nicht dran
-        else
-        {
-            foreach (MenschAergerDichNichtPlayer player in board.GetPlayerList())
-            {
-                if (player.name == data)
-                {
-                    AddMSGToProtokoll(board.TEAM_COLORS[board.GetPlayerTurn().gamerid] + data + "</color></b> hat das Spiel verlassen.");
-                    AddMSGToProtokoll(board.TEAM_COLORS[board.GetPlayerTurn().gamerid] + data + "</color></b> wird nun von einem <b>Bot</b> übernommen!");
-                    player.SetPlayerIntoBot();
-                    break;
-                }
-            }
-        }
     }
     #endregion
 }
