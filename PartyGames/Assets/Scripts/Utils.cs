@@ -12,7 +12,6 @@ public class Utils
     #region Allgemeine Kategorie Einstellungen
     public enum EinstellungsKategorien
     {
-        Alle,
         ContentObject,
         Audio,
         Grafik,

@@ -130,6 +130,7 @@ public class StartupScene : MonoBehaviour
                 Client.SetActive(false);
                 Server.SetActive(false);
                 Utils.EinstellungenStartSzene(Einstellungen, audiomixer, Utils.EinstellungsKategorien.Audio, Utils.EinstellungsKategorien.Grafik, Utils.EinstellungsKategorien.Server, Utils.EinstellungsKategorien.Sonstiges);
+                Utils.EinstellungenGrafikApply(true);
                 GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(1).gameObject.SetActive(false);
             }
             // Zeigt den temporären Spielernamen an
@@ -566,6 +567,7 @@ public class StartupScene : MonoBehaviour
     public void UpdateScreenResolution(TMP_Dropdown drop)
     {
         Config.APPLICATION_CONFIG.SetInt("GAME_DISPLAY_RESOLUTION", drop.value);
+        Utils.EinstellungenGrafikApply(true);
     }
     /// <summary>
     /// Aktualisiert die Vollbildeinstellung für den Einzelspieler
@@ -574,6 +576,7 @@ public class StartupScene : MonoBehaviour
     public void UpdateFullscreen(Toggle toggle)
     {
         Config.APPLICATION_CONFIG.SetBool("GAME_DISPLAY_FULLSCREEN", toggle.isOn);
+        Utils.EinstellungenGrafikApply(true);
     }
     #endregion
 

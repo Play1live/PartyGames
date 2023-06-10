@@ -71,7 +71,7 @@ public class KniffelServer : MonoBehaviour
                     if (Config.PLAYERLIST[i].isDisconnected == true)
                     {
                         Logging.log(Logging.LogType.Normal, "MenschƒrgerDichNichtServer", "Update", "Spieler hat die Verbindung getrennt. ID: " + Config.PLAYERLIST[i].id);
-                        Broadcast(Config.PLAYERLIST[i].name + " has disconnected", Config.PLAYERLIST);
+                        //Broadcast(Config.PLAYERLIST[i].name + " has disconnected", Config.PLAYERLIST);
                         Config.PLAYERLIST[i].isConnected = false;
                         Config.PLAYERLIST[i].isDisconnected = false;
                         Config.SERVER_ALL_CONNECTED = false;
@@ -195,7 +195,18 @@ public class KniffelServer : MonoBehaviour
                 break;
 
             case "#ClientClosed":
-                // TODO;: SpielerWirdZumBot(player);
+                foreach (KniffelPlayer item in board.GetPlayerList())
+                {
+                    if (item.name == player.name)
+                    {
+                        item.Punkteliste.SetActive(false);
+                        Punkteliste.transform.GetChild(2 + item.gamerid).gameObject.SetActive(false);
+                        board.GetPlayerList().Remove(item);
+                        BroadcastNew("#DeleteClient " + item.name);
+                        break;
+                    }
+                }
+
                 PlayDisconnectSound();
                 ClientClosed(player);
                 break;
@@ -204,9 +215,23 @@ public class KniffelServer : MonoBehaviour
             case "#ClientFocusChange":
                 break;
 
-            case "#JoinMenschAergerDichNicht":
+            case "#JoinKniffel":
                 PlayerConnected[player.id - 1] = true;
-                // TODO: UpdateLobby();
+
+                if (board == null)
+                    return;
+                foreach (Player p in Config.PLAYERLIST)
+                    if (p.isConnected && p.name.Length > 0 && !PlayerConnected[p.id - 1])
+                        return;
+                string plist = "";
+                foreach (KniffelPlayer item in board.GetPlayerList())
+                {
+                    plist += "[#]" + item.gamerid + "*" + item.name + "*" + item.PlayerImage.name;
+                }
+                if (plist.Length > 3)
+                    plist = plist.Substring("[#]".Length);
+
+                BroadcastNew("#InitGame " + plist);
                 break;
 
             case "#ClickPlayerKategorie":
@@ -215,7 +240,7 @@ public class KniffelServer : MonoBehaviour
             case "#WuerfelnClient":
                 WuerfelnClient(player, data);
                 break;
-            case "#ClientSafeUnsafeWuerfel":
+            case "#SafeUnsafe":
                 ClientSafeUnsafeWuerfel(player, data);
                 break;
         }
@@ -250,16 +275,16 @@ public class KniffelServer : MonoBehaviour
         DisconnectSound.Play();
     }
     #region GameLogic
-    private void InitGame() // TODO send p list mit namen bildern und id
+    private void InitGame()
     {
         List<KniffelPlayer> player = new List<KniffelPlayer>();
         int playercounter = 0;
-        player.Add(new KniffelPlayer(playercounter++, Config.PLAYER_NAME, Config.SERVER_ICON, Punkteliste.transform.GetChild(1 + playercounter++).gameObject));
+        player.Add(new KniffelPlayer(playercounter++, Config.PLAYER_NAME, Config.SERVER_ICON, Punkteliste.transform.GetChild(2 + player.Count).gameObject));
         foreach (Player p in Config.PLAYERLIST)
         {
             if (p.isConnected && p.name.Length > 0)
             {
-                player.Add(new KniffelPlayer(playercounter++, p.name, p.icon, Punkteliste.transform.GetChild(1 + player.Count).gameObject));
+                player.Add(new KniffelPlayer(playercounter++, p.name, p.icon, Punkteliste.transform.GetChild(2 + player.Count).gameObject));
             }
         }
         string plist = "";
@@ -308,12 +333,20 @@ public class KniffelServer : MonoBehaviour
         }
         if (gameend)
         {
-            BroadcastNew("#GameEnded");
-            SpielIstVorbei.Play();
             foreach (KniffelPlayer player in board.GetPlayerList())
             {
-                player.Punkteliste.transform.GetChild(0).GetComponent<Outline>().enabled = false;
+                player.Punkteliste.transform.GetChild(0).GetComponent<Image>().enabled = false;
             }
+            int siegerpunkte = 0;
+            foreach (KniffelPlayer item in board.GetPlayerList())
+                if (siegerpunkte < item.EndSumme.getDisplay())
+                    siegerpunkte = item.EndSumme.getDisplay();
+            foreach (KniffelPlayer item in board.GetPlayerList())
+                if (item.EndSumme.getDisplay() == siegerpunkte)
+                    item.Punkteliste.transform.GetChild(0).GetComponent<Image>().enabled = true;
+
+            BroadcastNew("#GameEnded " + siegerpunkte);
+            SpielIstVorbei.Play();
             return;
         }
 
@@ -324,13 +357,23 @@ public class KniffelServer : MonoBehaviour
     }
     IEnumerator StartTurnDelayed()
     {
+        // Deaktiviere buttons
+        if (board.GetPlayerTurn() != null)
+            for (int i = 1; i < board.GetPlayerTurn().Punkteliste.transform.childCount; i++)
+            {
+                GameObject btn = board.GetPlayerTurn().Punkteliste.transform.GetChild(i).gameObject;
+                if (btn.name.Equals("Spacer"))
+                    continue;
+                btn.GetComponent<Button>().interactable = false;
+            }
+
         yield return new WaitForSeconds(1f);
 
         KniffelPlayer player = board.PlayerTurnSelect();
         Logging.log(Logging.LogType.Debug, "KniffelServer", "StartTurn", "Der Spieler " + player.name + " ist dran.");
         player.safewuerfel = new List<int>();
         player.unsafewuerfe = new List<int>();
-
+        player.availablewuerfe = 3;
         BroadcastNew("#StartTurn " + player.gamerid);
 
         // wenn Server dran ist, dann w¸rfel aktivieren
@@ -339,6 +382,18 @@ public class KniffelServer : MonoBehaviour
             SpielerIstDran.Play();
 
             WuerfelBoard.transform.GetChild(6).gameObject.SetActive(true);
+
+            // Aktiviere Buttons
+            for (int i = 1; i < board.GetPlayerTurn().Punkteliste.transform.childCount; i++)
+            {
+                GameObject btn = board.GetPlayerTurn().Punkteliste.transform.GetChild(i).gameObject;
+                if (btn.name.Equals("Spacer"))
+                    continue;
+                KniffelKategorie kategorie = player.GetKategorie(btn.gameObject.name);
+                if (kategorie != null)
+                    if (!kategorie.used && kategorie.clickable)
+                        btn.GetComponent<Button>().interactable = true;
+            }
         }
         else
         {
@@ -348,6 +403,14 @@ public class KniffelServer : MonoBehaviour
     }
     public void WuerfelnServer()
     {
+        if (!Config.SERVER_STARTED)
+            return;
+        if (board.GetPlayerTurn().name != Config.PLAYER_NAME)
+            return;
+        if (board.GetPlayerTurn().availablewuerfe <= 0)
+            return;
+        board.GetPlayerTurn().availablewuerfe--;
+
         // Generiere Ergebnis
         string msgZahlenUnsafe = "";
         board.GetPlayerTurn().unsafewuerfe.Clear();
@@ -378,18 +441,25 @@ public class KniffelServer : MonoBehaviour
     {
         if (board.GetPlayerTurn().name != p.name)
             return;
+        if (board.GetPlayerTurn().availablewuerfe <= 0)
+            return;
+        board.GetPlayerTurn().availablewuerfe--;
+        if (board.GetPlayerTurn().availablewuerfe <= 0)
+            WuerfelBoard.transform.GetChild(6).gameObject.SetActive(false);
+
         // Generiere Ergebnis
         board.GetPlayerTurn().unsafewuerfe.Clear();
         board.GetPlayerTurn().safewuerfel.Clear();
-        string[] unsafeZ = data.Replace("[#]", "|").Split('|')[0].Split('+');
-        for (int i = 0; i < unsafeZ.Length; i++)
-            board.GetPlayerTurn().unsafewuerfe.Add(Int32.Parse(unsafeZ[i]));
-        string[] safeZ = data.Replace("[#]", "|").Split('|')[1].Split('+');
-        for (int i = 0; i < safeZ.Length; i++)
-            board.GetPlayerTurn().safewuerfel.Add(Int32.Parse(unsafeZ[i]));
+        data = data.Split('*')[1];
+        string unsafeZ = data.Replace("[#]", "|").Split('|')[0];
+        if (unsafeZ.Length != 0)
+            for (int i = 0; i < unsafeZ.Split('+').Length; i++)
+                board.GetPlayerTurn().unsafewuerfe.Add(Int32.Parse(unsafeZ.Split('+')[i]));
+        string safeZ = data.Replace("[#]", "|").Split('|')[1];
+        if (safeZ.Length != 0)
+            for (int i = 0; i < safeZ.Split('+').Length; i++)
+                board.GetPlayerTurn().safewuerfel.Add(Int32.Parse(safeZ.Split('+')[i]));
 
-        //old
-        // Generiere Ergebnis
         BroadcastNew("#PlayerWuerfel " + board.GetPlayerTurn().gamerid + "*" + data);
 
         // Starte Animation
@@ -442,7 +512,8 @@ public class KniffelServer : MonoBehaviour
                 if (item == 1)
                     temp += item;
             p.Einsen.DisplayTest(temp);
-            p.Einsen.button.GetComponent<Button>().interactable = true;
+            if (board.GetPlayerTurn().name == Config.PLAYER_NAME)
+                p.Einsen.button.GetComponent<Button>().interactable = true;
         }
         if (!p.Zweien.used)
         {
@@ -451,7 +522,8 @@ public class KniffelServer : MonoBehaviour
                 if (item == 2)
                     temp += item;
             p.Zweien.DisplayTest(temp);
-            p.Zweien.button.GetComponent<Button>().interactable = true;
+            if (board.GetPlayerTurn().name == Config.PLAYER_NAME)
+                p.Zweien.button.GetComponent<Button>().interactable = true;
         }
         if (!p.Dreien.used)
         {
@@ -460,7 +532,8 @@ public class KniffelServer : MonoBehaviour
                 if (item == 3)
                     temp += item;
             p.Dreien.DisplayTest(temp);
-            p.Dreien.button.GetComponent<Button>().interactable = true;
+            if (board.GetPlayerTurn().name == Config.PLAYER_NAME)
+                p.Dreien.button.GetComponent<Button>().interactable = true;
         }
         if (!p.Vieren.used)
         {
@@ -469,7 +542,8 @@ public class KniffelServer : MonoBehaviour
                 if (item == 4)
                     temp += item;
             p.Vieren.DisplayTest(temp);
-            p.Vieren.button.GetComponent<Button>().interactable = true;
+            if (board.GetPlayerTurn().name == Config.PLAYER_NAME)
+                p.Vieren.button.GetComponent<Button>().interactable = true;
         }
         if (!p.Fuenfen.used)
         {
@@ -478,7 +552,8 @@ public class KniffelServer : MonoBehaviour
                 if (item == 5)
                     temp += item;
             p.Fuenfen.DisplayTest(temp);
-            p.Fuenfen.button.GetComponent<Button>().interactable = true;
+            if (board.GetPlayerTurn().name == Config.PLAYER_NAME)
+                p.Fuenfen.button.GetComponent<Button>().interactable = true;
         }
         if (!p.Sechsen.used)
         {
@@ -487,7 +562,8 @@ public class KniffelServer : MonoBehaviour
                 if (item == 6)
                     temp += item;
             p.Sechsen.DisplayTest(temp);
-            p.Sechsen.button.GetComponent<Button>().interactable = true;
+            if (board.GetPlayerTurn().name == Config.PLAYER_NAME)
+                p.Sechsen.button.GetComponent<Button>().interactable = true;
         }
         if (!p.Dreierpasch.used)
         {
@@ -509,7 +585,8 @@ public class KniffelServer : MonoBehaviour
             }
             if (temp != 0)
                 p.Dreierpasch.DisplayTest(0);
-            p.Dreierpasch.button.GetComponent<Button>().interactable = true;
+            if (board.GetPlayerTurn().name == Config.PLAYER_NAME)
+                p.Dreierpasch.button.GetComponent<Button>().interactable = true;
         }
         if (!p.Viererpasch.used)
         {
@@ -531,7 +608,8 @@ public class KniffelServer : MonoBehaviour
             }
             if (temp != 0)
                 p.Viererpasch.DisplayTest(0);
-            p.Viererpasch.button.GetComponent<Button>().interactable = true;
+            if (board.GetPlayerTurn().name == Config.PLAYER_NAME)
+                p.Viererpasch.button.GetComponent<Button>().interactable = true;
         }
         if (!p.FullHouse.used)
         {
@@ -561,7 +639,8 @@ public class KniffelServer : MonoBehaviour
                 p.FullHouse.DisplayTest(25);
             else
                 p.FullHouse.DisplayTest(0);
-            p.FullHouse.button.GetComponent<Button>().interactable = true;
+            if (board.GetPlayerTurn().name == Config.PLAYER_NAME)
+                p.FullHouse.button.GetComponent<Button>().interactable = true;
         }
         if (!p.KleineStraﬂe.used)
         {
@@ -571,7 +650,8 @@ public class KniffelServer : MonoBehaviour
                 p.KleineStraﬂe.DisplayTest(30);
             else
                 p.KleineStraﬂe.DisplayTest(0);
-            p.KleineStraﬂe.button.GetComponent<Button>().interactable = true;
+            if (board.GetPlayerTurn().name == Config.PLAYER_NAME)
+                p.KleineStraﬂe.button.GetComponent<Button>().interactable = true;
         }
         if (!p.GroﬂeStraﬂe.used)
         {
@@ -580,7 +660,8 @@ public class KniffelServer : MonoBehaviour
                 p.GroﬂeStraﬂe.DisplayTest(40);
             else
                 p.GroﬂeStraﬂe.DisplayTest(0);
-            p.GroﬂeStraﬂe.button.GetComponent<Button>().interactable = true;
+            if (board.GetPlayerTurn().name == Config.PLAYER_NAME)
+                p.GroﬂeStraﬂe.button.GetComponent<Button>().interactable = true;
         }
         if (!p.Kniffel.used)
         {
@@ -588,7 +669,8 @@ public class KniffelServer : MonoBehaviour
                 p.Kniffel.DisplayTest(50);
             else
                 p.Kniffel.DisplayTest(0);
-            p.Kniffel.button.GetComponent<Button>().interactable = true;
+            if (board.GetPlayerTurn().name == Config.PLAYER_NAME)
+                p.Kniffel.button.GetComponent<Button>().interactable = true;
         }
         if (!p.Chance.used)
         {
@@ -596,7 +678,8 @@ public class KniffelServer : MonoBehaviour
             foreach (int item in zahlen)
                 temp += item;
             p.Chance.DisplayTest(temp);
-            p.Chance.button.GetComponent<Button>().interactable = true;
+            if (board.GetPlayerTurn().name == Config.PLAYER_NAME)
+                p.Chance.button.GetComponent<Button>().interactable = true;
         }
     }
     private void SafeUnsafeWuerfel(string type, KniffelPlayer p, int zahl)
@@ -654,6 +737,8 @@ public class KniffelServer : MonoBehaviour
     }
     public void ServerSafeUnsafeWuerfel(GameObject wuerfel)
     {
+        if (!Config.SERVER_STARTED)
+            return;
         if (board.GetPlayerTurn().name != Config.PLAYER_NAME)
             return;
         string spritename = wuerfel.GetComponent<Image>().sprite.name.Replace("w¸rfel", "");
@@ -670,7 +755,7 @@ public class KniffelServer : MonoBehaviour
     {
         if (board.GetPlayerTurn().name != p.name)
             return;
-        SafeUnsafeWuerfel(data.Split('|')[0], KniffelPlayer.GetPlayerByName(board.GetPlayerList(), data.Split('|')[1]), Int32.Parse(data.Split('|')[2]));
+        SafeUnsafeWuerfel(data.Split('|')[0], KniffelPlayer.GetPlayerById(board.GetPlayerList(), Int32.Parse(data.Split('|')[1])), Int32.Parse(data.Split('|')[2]));
     }
     private void ClickKategorie(KniffelPlayer player, KniffelKategorie kategorie)
     {
@@ -678,18 +763,20 @@ public class KniffelServer : MonoBehaviour
             return;
         if ((player.safewuerfel.Count + player.unsafewuerfe.Count) == 0)
             return;
+        if (player != board.GetPlayerTurn())
+            return;
 
         WuerfelBoard.transform.GetChild(6).gameObject.SetActive(false);
 
         string safewuerfel = "";
         foreach (int item in player.safewuerfel)
             safewuerfel += "+" + item;
-        if (safewuerfel.Length > 1)
+        if (safewuerfel.Length > 0)
             safewuerfel = safewuerfel.Substring("+".Length);
         string unsafewuerfel = "";
         foreach (int item in player.unsafewuerfe)
             unsafewuerfel += "+" + item;
-        if (unsafewuerfel.Length > 1)
+        if (unsafewuerfel.Length > 0)
             unsafewuerfel = unsafewuerfel.Substring("+".Length);
 
         BroadcastNew("#ClickKategorie " + player.gamerid + "|" + kategorie.name + "|" + safewuerfel + "|" + unsafewuerfel);
@@ -844,7 +931,7 @@ public class KniffelServer : MonoBehaviour
     }
     private void AktualisierePointsKategorien(KniffelPlayer p)
     {
-        // TODO lˆsche test vorschau und zug changen
+        // lˆsche test vorschau und zug changen
         if (!p.Einsen.used)
             p.Einsen.button.GetComponentInChildren<TMP_Text>().text = "";
         if (!p.Zweien.used)
@@ -900,14 +987,17 @@ public class KniffelServer : MonoBehaviour
     {
         KniffelPlayer kp = KniffelPlayer.GetPlayerByName(board.GetPlayerList(), p.name);
         KniffelKategorie kk = kp.GetKategorie(data.Split("*")[0]);
-        string[] safew = data.Split("|")[1].Split("-")[0].Split('+');
+        data = data.Split('*')[1];
+        string safew = data.Split("-")[1];
         List<int> safewlist = new List<int>();
-        foreach (string ww in safew)
-            safewlist.Add(Int32.Parse(ww));
-        string[] unsafew = data.Split("|")[1].Split("-")[0].Split('+');
+        if (safew.Length != 0)
+            foreach (string ww in safew.Split('+'))
+                safewlist.Add(Int32.Parse(ww));
+        string unsafew = data.Split("-")[0];
         List<int> unsafewlist = new List<int>();
-        foreach (string ww in unsafew)
-            unsafewlist.Add(Int32.Parse(ww));
+        if (unsafew.Length != 0)
+            foreach (string ww in unsafew.Split('+'))
+                unsafewlist.Add(Int32.Parse(ww));
 
         kp.safewuerfel = safewlist;
         kp.unsafewuerfe = unsafewlist;

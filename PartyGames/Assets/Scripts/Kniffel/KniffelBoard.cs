@@ -26,7 +26,7 @@ public class KniffelBoard
     private GameObject Punkteliste;
     private GameObject WuerfelBoard;
     private List<KniffelPlayer> player;
-    private KniffelPlayer playersTurn;
+    public KniffelPlayer playersTurn;
     string BoardPrint = "";
 
     public KniffelBoard(GameObject Punkteliste, GameObject WuerfelBoard, List<KniffelPlayer> player)
@@ -44,7 +44,6 @@ public class KniffelBoard
             p.SummeObererTeil.SetPoints(0, p.PlayerColor);
             p.EndSumme.SetPoints(0, p.PlayerColor);
         }
-        PrintBoard();
     }
 
     // Soll bestimmen welcher Spieler dran ist
@@ -64,11 +63,11 @@ public class KniffelBoard
             return this.playersTurn;
         }
     }
-    private void BlendeIstDranOutlineEin(KniffelPlayer p)
+    public void BlendeIstDranOutlineEin(KniffelPlayer p)
     {
         foreach (KniffelPlayer player in this.GetPlayerList())
-            player.Punkteliste.transform.GetChild(0).GetComponent<Outline>().enabled = false; // Blendet ist dran outline aus
-        p.Punkteliste.transform.GetChild(0).GetComponent<Outline>().enabled = true; // Blendet ist dran outline ein
+            player.Punkteliste.transform.GetChild(0).GetComponent<Image>().enabled = false; // Blendet ist dran outline aus
+        p.Punkteliste.transform.GetChild(0).GetComponent<Image>().enabled = true; // Blendet ist dran outline ein
     }
     public KniffelPlayer GetPlayerTurn()
     {
@@ -148,35 +147,15 @@ public class KniffelBoard
         // Kombiniere die hexadezimalen Werte, um den Farbcode zu erstellen
         this.TEAM_COLORS[7] = "<b><color=#" + hexR + hexG + hexB + ">";
     }
-    public int GetPlayerByName(string name)
-    {
-        foreach (KniffelPlayer p in this.player)
-        {
-            if (p.name == name)
-                return p.gamerid;
-        }
-        return -1;
-    }
-    public string GetBoardString()
-    {
-        return this.BoardPrint;
-    }
-    
-    public string PrintBoard()
-    {
-        string runway = "";
-        // TODO
-        return this.BoardPrint;
-    }
 }
 
 public class KniffelPlayer
 {
-    public int gamerid { private set; get; }
-    public string name { private set; get; }
+    public int gamerid { set; get; }
+    public string name { set; get; }
     public int availablewuerfe { get; set; }
-    public Sprite PlayerImage { private set; get; }
-    public Color PlayerColor { private set; get; }
+    public Sprite PlayerImage { set; get; }
+    public Color PlayerColor { set; get; }
 
     public GameObject Punkteliste;
 
@@ -209,10 +188,12 @@ public class KniffelPlayer
         this.name = name;
         this.PlayerImage = PlayerImage;
         this.Punkteliste = Punkteliste;
-        this.Punkteliste.transform.GetChild(0).GetComponent<Image>().sprite = this.PlayerImage;
-        this.Punkteliste.transform.GetChild(0).GetComponent<Outline>().enabled = false; // Blendet ist dran outline aus
+        this.Punkteliste.transform.GetChild(0).GetChild(0).GetComponent<Image>().sprite = this.PlayerImage;
+        this.Punkteliste.transform.GetChild(0).GetComponent<Image>().enabled = false; // Blendet ist dran outline aus
         this.Punkteliste.SetActive(true);
         this.PlayerColor = getTeamColor(gamerid);
+        this.PlayerColor = new Color(this.PlayerColor.r / 255f, this.PlayerColor.g / 255f, this.PlayerColor.b / 255f);
+        this.availablewuerfe = 0;
 
         for (int i = 1; i < this.Punkteliste.transform.childCount; i++)
         {

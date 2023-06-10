@@ -100,13 +100,15 @@ public class StartupClient : MonoBehaviour
     /// </summary>
     IEnumerator TestIfStartConnectionError()
     {
+        Debug.LogWarning(Config.PLAYER_NAME);
+        string safename = Config.PLAYER_NAME;
         Logging.log(Logging.LogType.Normal, "StartupClient", "TestIfStartConnectionError", "Testet in 10 Sekunden (oder wenn die Spieleranzeige aktualisiert wird) ob die Verbindung erfolgreich war.");
-        DateTime in10sec = DateTime.Now.AddSeconds(10);
+        DateTime in10sec = DateTime.Now.AddSeconds(5);
         yield return new WaitForSeconds(1);
         // Spielerliste nicht aktuell, erfrage update
         if (!SearchNameInPlayerList(Config.PLAYER_NAME))
         {
-            SendToServer("#GetSpielerUpdate");
+            SendToServer("#GetSpielerUpdate"); // TODO geht nicht
         }
         yield return new WaitUntil(() => (DateTime.Compare(DateTime.Now, in10sec) > 0 || SearchNameInPlayerList(Config.PLAYER_NAME)));
 
@@ -116,10 +118,11 @@ public class StartupClient : MonoBehaviour
             yield break;
         }
 
+        Config.PLAYER_NAME = safename;
         CloseSocket();
         Logging.log(Logging.LogType.Warning, "StartupClient", "TestIfStartConnectionError", "Verbindung zum Server war fehlerhaft.");
         Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server war fehlerhaft. Bitte versuche es erneut.\nWenn dieser Fehler erneut auftritt, starte das Programm bitte neu!";
-        SceneManager.LoadSceneAsync("StartUp");
+        SceneManager.LoadSceneAsync("Startup");
     }
     /// <summary>
     /// Durchsucht die Spielerliste nach einem Namen

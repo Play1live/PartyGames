@@ -1190,7 +1190,6 @@ public class MenschAergerDichNichtServer : MonoBehaviour
                     AddMSGToProtokoll(board.TEAM_COLORS[player.gamerid] + p.name + "</color></b> hat das Spiel verlassen.");
                     AddMSGToProtokoll(board.TEAM_COLORS[player.gamerid] + p.name + "</color></b> wird nun von einem <b>Bot</b> übernommen!");
                     player.SetPlayerIntoBot();
-                    // TODO Disconnect sound?
                     break;
                 }
             }
