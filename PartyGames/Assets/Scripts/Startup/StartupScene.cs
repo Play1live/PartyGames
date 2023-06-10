@@ -34,7 +34,6 @@ public class StartupScene : MonoBehaviour
         if (Config.APPLICATION_INITED != true)
         {
             Config.isServer = true;
-            //Config.PLAYER_NAME = "Henryk";
         }
 #endif
         /*Testzwecke*/

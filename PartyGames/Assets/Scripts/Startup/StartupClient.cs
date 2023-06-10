@@ -22,6 +22,7 @@ public class StartupClient : MonoBehaviour
     private bool PingWarteAufAntwort = false;
     private string UpdateClientGameVorschau = "";
     Coroutine UpdateClientGameVorschauCoroutine;
+    private int connectedPlayer;
 
     [SerializeField] GameObject UmbenennenFeld;
 
@@ -441,7 +442,7 @@ public class StartupClient : MonoBehaviour
         SpielerAnzeigeLobby[0].transform.GetChild(4).gameObject.SetActive(false);
         SpielerAnzeigeLobby[0].transform.GetChild(5).GetComponent<TMP_Text>().text = "";
         SpielerAnzeigeLobby[0].transform.GetChild(6).gameObject.SetActive(false);
-
+        connectedPlayer = 0;
         // Blendet Leere Spieler aus
         for (int i = 0; i < Config.PLAYERLIST.Length; i++)
         {
@@ -522,12 +523,14 @@ public class StartupClient : MonoBehaviour
                 GameObject.Find("Lobby/Title_LBL/Spieleranzahl").GetComponent<TMP_Text>().text = spieleranzahl + "/" + (Config.PLAYERLIST.Length + 1);
         }
 
-        if (UpdateClientGameVorschauCoroutine != null)
+        if (spieleranzahl != connectedPlayer)
         {
-            StopCoroutine(UpdateClientGameVorschauCoroutine);
-            UpdateClientGameVorschauCoroutine = null;
+            connectedPlayer = spieleranzahl;
+
+            if (UpdateClientGameVorschauCoroutine != null)
+                StopCoroutine(UpdateClientGameVorschauCoroutine);
+            UpdateClientGameVorschauCoroutine = StartCoroutine(ShowGameVorschauElemente());
         }
-        UpdateClientGameVorschauCoroutine = StartCoroutine(ShowGameVorschauElemente());
     }
     /// <summary>
     /// Aktualisiert die Pinganzeige der Spieler
@@ -709,6 +712,12 @@ public class StartupClient : MonoBehaviour
         }
         // Blendet neue Infos ein
         int anz = Int32.Parse(data.Replace("[ANZ]", "|").Split('|')[1]);
+        // Falls Anzahl größer als das was eingeblendet werden kann
+        if (SpielVorschauElemente.transform.childCount < anz)
+        {
+            SendToServer("#ZuViele Spiele maximal einzublendende: " + anz + " Möglichkeiten: " + SpielVorschauElemente.transform.childCount);
+            anz = SpielVorschauElemente.transform.childCount;
+        }
         for (int i = 0; i < anz; i++)
         {
             //yield return null;

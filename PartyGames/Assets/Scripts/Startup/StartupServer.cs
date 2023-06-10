@@ -1143,6 +1143,8 @@ public class StartupServer : MonoBehaviour
         gamelist.Add("[SPIELER-ANZ]1-8[SPIELER-ANZ][MIN]" + MenschAegerDichNichtBoard.minPlayer + "[MIN][MAX]" + MenschAegerDichNichtBoard.maxPlayer + "[MAX][TITEL]MenschÄrgerDichNicht[TITEL][AVAILABLE]-1[AVAILABLE]");
         // Kniffel
         gamelist.Add("[SPIELER-ANZ]1-9[SPIELER-ANZ][MIN]" + KniffelBoard.minPlayer + "[MIN][MAX]" + KniffelBoard.maxPlayer + "[MAX][TITEL]Kniffel[TITEL][AVAILABLE]-1[AVAILABLE]");
+        // Tabu
+        gamelist.Add("[SPIELER-ANZ]4-8[SPIELER-ANZ][MIN]" + TabuBoard.minPlayer + "[MIN][MAX]" + TabuBoard.maxPlayer + "[MAX][TITEL]Tabu[TITEL][AVAILABLE]-1[AVAILABLE]");
 
 
         string msg = "";
@@ -1465,6 +1467,16 @@ public class StartupServer : MonoBehaviour
         Config.GAME_TITLE = "Kniffel";
         SceneManager.LoadScene("Kniffel");
         Broadcast("#StarteSpiel Kniffel");
+    }
+    /// <summary>
+    /// Starte das Tabu Spiel -> Alle Spieler laden in die neue Scene
+    /// </summary>
+    public void StarteTabu()
+    {
+        Logging.log(Logging.LogType.Normal, "StartupServer", "StarteTabu", "Tabu starts.");
+        Config.GAME_TITLE = "Tabu";
+        SceneManager.LoadScene("Tabu");
+        Broadcast("#StarteSpiel Tabu");
     }
     #endregion
 
