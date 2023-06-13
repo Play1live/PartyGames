@@ -101,7 +101,6 @@ public class StartupClient : MonoBehaviour
     /// </summary>
     IEnumerator TestIfStartConnectionError()
     {
-        Debug.LogWarning(Config.PLAYER_NAME);
         string safename = Config.PLAYER_NAME;
         Logging.log(Logging.LogType.Normal, "StartupClient", "TestIfStartConnectionError", "Testet in 10 Sekunden (oder wenn die Spieleranzeige aktualisiert wird) ob die Verbindung erfolgreich war.");
         DateTime in10sec = DateTime.Now.AddSeconds(5);
@@ -484,6 +483,7 @@ public class StartupClient : MonoBehaviour
             // Display ServerInfos
             if (id == 0)
             {
+                Config.SERVER_ICON = Resources.Load<Sprite>("Images/ProfileIcons/" + sp.Replace("[ICON]", "|").Split('|')[1]);
                 SpielerAnzeigeLobby[0].SetActive(true);
                 SpielerAnzeigeLobby[0].GetComponentsInChildren<Image>()[1].sprite = Resources.Load<Sprite>("Images/ProfileIcons/" + sp.Replace("[ICON]", "|").Split('|')[1]);
                 SpielerAnzeigeLobby[0].GetComponentsInChildren<TMP_Text>()[0].text = sp.Replace("[NAME]", "|").Split('|')[1];

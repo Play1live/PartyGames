@@ -61,4 +61,16 @@ public class Player
         }
         return -1;
     }
+    
+    public static Sprite getSpriteByPlayerName(string name)
+    {
+        for (int i = 0; i < Config.PLAYERLIST.Length; i++)
+        {
+            if (Config.PLAYERLIST[i].name == name)
+            {
+                return Config.PLAYERLIST[i].icon;
+            }
+        }
+        return Resources.Load<Sprite>("Images/ProfileIcons/empty");
+    }
 }
