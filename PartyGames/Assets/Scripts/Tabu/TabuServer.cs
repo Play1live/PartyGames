@@ -302,6 +302,7 @@ public class TabuServer : MonoBehaviour
                 teamblauList.Add(item.name);
 
         TeamTurn = "ROT";
+        // TODO Packauswahl & anzeige wie viele Items enthalten sind
         NormalPack = new TabuGamePacks("Normal", "Spiele/Tabu/Normal");
     }
     private void StartTimer()

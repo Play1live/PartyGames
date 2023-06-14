@@ -32,7 +32,16 @@ public class TabuGamePacks
 
         foreach (string item in Resources.Load<TextAsset>(path).text.Split('\n'))
         {
-            items.Add(new TabuItem(item.Split('|')[0], item.Split('|')[1]));
+            string temp = item.Replace("#ue#", "ü").Replace("#oe#", "ö").Replace("#ae#", "ä").Replace("#ss#", "ß");
+            temp = temp.Replace("#UE#", "Ü").Replace("#OE#", "Ö").Replace("#AE#", "Ä");
+            try
+            {
+                items.Add(new TabuItem(temp.Split('|')[0], temp.Split('|')[1]));
+            }
+            catch (Exception e)
+            {
+                Logging.log(Logging.LogType.Error, "TabuBoard", "TabuGamePacks", "Fehler beim einlesen: " + temp, e);
+            }
         }
     }
 
