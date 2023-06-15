@@ -53,6 +53,7 @@ public class LoadConfigs
     /// </summary>
     public static void MoveToPrimaryDisplayFullscreen()
     {
+        /*
         if (Config.FULLSCREEN == true)
         {
             Logging.log(Logging.LogType.Debug, "LoadConfigs", "MoveToPrimaryDisplay", "Bewege Programm auf den primären Bildschirm.");
@@ -70,7 +71,9 @@ public class LoadConfigs
         else
         {
             Screen.fullScreenMode = FullScreenMode.Windowed;
-        }
+        }*/
+
+        Utils.EinstellungenGrafikApply(true);
     }
     #endregion
 }

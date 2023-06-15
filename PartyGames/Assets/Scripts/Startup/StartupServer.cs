@@ -166,7 +166,7 @@ public class StartupServer : MonoBehaviour
         catch (Exception e)
         {
             Logging.log(Logging.LogType.Warning, "StartupServer", "Start", "Server kann nicht gestartet werden", e);
-            Config.HAUPTMENUE_FEHLERMELDUNG = "Server kann nicht gestartet werden.\n" + e;
+            Config.HAUPTMENUE_FEHLERMELDUNG = "Ein Server läuft bereits unter diesem Port.";
             Config.SERVER_STARTED = false;
             try
             {
@@ -1142,9 +1142,9 @@ public class StartupServer : MonoBehaviour
         // MenschÄrgerDichNicht
         gamelist.Add("[SPIELER-ANZ]1-8[SPIELER-ANZ][MIN]" + MenschAegerDichNichtBoard.minPlayer + "[MIN][MAX]" + MenschAegerDichNichtBoard.maxPlayer + "[MAX][TITEL]MenschÄrgerDichNicht[TITEL][AVAILABLE]-1[AVAILABLE]");
         // Kniffel
-        //gamelist.Add("[SPIELER-ANZ]1-9[SPIELER-ANZ][MIN]" + KniffelBoard.minPlayer + "[MIN][MAX]" + KniffelBoard.maxPlayer + "[MAX][TITEL]Kniffel[TITEL][AVAILABLE]-1[AVAILABLE]");
+        gamelist.Add("[SPIELER-ANZ]1-9[SPIELER-ANZ][MIN]" + KniffelBoard.minPlayer + "[MIN][MAX]" + KniffelBoard.maxPlayer + "[MAX][TITEL]Kniffel[TITEL][AVAILABLE]-1[AVAILABLE]");
         // Tabu
-        //gamelist.Add("[SPIELER-ANZ]4-8[SPIELER-ANZ][MIN]" + TabuBoard.minPlayer + "[MIN][MAX]" + TabuBoard.maxPlayer + "[MAX][TITEL]Tabu[TITEL][AVAILABLE]-1[AVAILABLE]");
+        gamelist.Add("[SPIELER-ANZ]4-8[SPIELER-ANZ][MIN]" + TabuBoard.minPlayer + "[MIN][MAX]" + TabuBoard.maxPlayer + "[MAX][TITEL]Tabu[TITEL][AVAILABLE]-1[AVAILABLE]");
 
 
         string msg = "";

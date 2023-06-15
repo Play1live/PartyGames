@@ -241,7 +241,7 @@ Kr#ae#henf#ue##ss#e|Augen-Falten-lachen-Vogel-laufen
 Nerd|Typ-Computer-schlau-Brille-Au#ss#enseiter
 Form|Art-Aussehen-Gestalt-backen-gie#ss#en
 Stammbaum|Ahnen-Familie-Herkunft-Zweig-Pflanze
-Pudding-Desert-kochen-Vanille-weich-wackeln
+Pudding|Desert-kochen-Vanille-weich-wackeln
 Nachos|Chips-Tortilla-dreieckig-So#ss#e-Kino
 Stubenhocker|Zimmer-sitzen-drinnen-rausgehen-langweilig
 Handtuch|Bad-nass-Wasser-trocken-Dusche

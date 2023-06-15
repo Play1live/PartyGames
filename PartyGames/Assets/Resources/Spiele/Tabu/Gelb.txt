@@ -223,7 +223,7 @@ Nebensache|Hauptsache-wichtig-egal-Ding-sch#oe#n
 Schallmauer|Ton-h#oe#ren-durchbrechen-fliegen-Haus
 Metzger|Beruf-Handwerk-Fleisch-Messer-schneiden
 Braut|Hochzeit-Trauung-Schleier-wei#ss#-Kleid
-Regenschirm-Wetter-nass-Wolke-Sonne-trocken
+Regenschirm|Wetter-nass-Wolke-Sonne-trocken
 Tor|T#ue#r-Durchgang-Pforte-Fu#ss#ball-Netz
 Pille|Tablette-Apotheke-krank-schlucken-bitter
 Fr#ue#hling|Jahr-Zeit-Winter-Sommer-gr#ue#n

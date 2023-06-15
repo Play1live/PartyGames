@@ -40,7 +40,7 @@ public class TabuServer : MonoBehaviour
     private bool started;
 
     private Coroutine TimerCoroutine;
-    private TabuGamePacks NormalPack;
+    private TabuGamePacks selectedPack;
     private TabuItem selectedItem;
 
     void OnEnable()
@@ -302,8 +302,12 @@ public class TabuServer : MonoBehaviour
                 teamblauList.Add(item.name);
 
         TeamTurn = "ROT";
-        // TODO Packauswahl & anzeige wie viele Items enthalten sind
-        NormalPack = new TabuGamePacks("Normal", "Spiele/Tabu/Normal");
+
+        // Random Pack select
+        string[] packs = new string[] { "Blau", "Gelb", "Lila", "Rot" };
+        int random = UnityEngine.Random.Range(0, packs.Length);
+        selectedPack = new TabuGamePacks(packs[random], "Spiele/Tabu/" + packs[random]);
+        GameObject.Find("ServerSide/PackTitle").GetComponent<TMP_Text>().text = selectedPack.titel;
     }
     private void StartTimer()
     {
@@ -686,8 +690,6 @@ public class TabuServer : MonoBehaviour
     }
     private void ParseAlleKreuzeAn(string name)
     {
-        // TODO: wenn timer noch läuft beenden und falsch
-
         RundeEnde(-1, name);
     }
     private void DisplayKarte(bool show, string Titel, string verboteneWorte)
@@ -807,7 +809,7 @@ public class TabuServer : MonoBehaviour
     private void StartRunde(string name)
     {
         started = true;
-        selectedItem = NormalPack.GetRandomItem();
+        selectedItem = selectedPack.GetRandomItem();
 
         BroadcastNew("#StartRunde " + name + "|" + TeamTurn + "|" + selectedItem.geheimwort + "|" + selectedItem.verboteneWorte);
         RundeStarten.SetActive(false);

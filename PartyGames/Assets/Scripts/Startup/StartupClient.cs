@@ -177,7 +177,7 @@ public class StartupClient : MonoBehaviour
         catch (Exception e)
         {
             Logging.log(Logging.LogType.Warning, "StartupClient", "StarteClient", "Verbindung zum Server nicht möglich.", e);
-            Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server nicht möglich. \n" + e;
+            Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server nicht möglich.\nStelle sicher das Daten zum Server richtig eingegeben sind.";
             Config.CLIENT_STARTED = false;
             try
             {

@@ -15,11 +15,9 @@ public class TabuBoard
 
     public TabuBoard()
     {
-        // TODO: gamepacks einlesen
     }
 }
 
-// TODO: auswahl in der Lobby oder vor erstem Rundenstart?
 public class TabuGamePacks
 {
     public string titel;
@@ -40,7 +38,7 @@ public class TabuGamePacks
             }
             catch (Exception e)
             {
-                Logging.log(Logging.LogType.Error, "TabuBoard", "TabuGamePacks", "Fehler beim einlesen: " + temp, e);
+                Logging.log(Logging.LogType.Warning, "TabuBoard", "TabuGamePacks", "Fehler beim einlesen. Titel: " + titel + " Zeile: " + temp, e);
             }
         }
     }

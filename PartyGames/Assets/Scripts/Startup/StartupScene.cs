@@ -94,15 +94,17 @@ public class StartupScene : MonoBehaviour
             Logging.log(Logging.LogType.Normal, "StartupScene", "Start", "Application Version: " + Config.APPLICATION_VERSION);
             Logging.log(Logging.LogType.Normal, "StartupScene", "Start", "Debugmode: " + Config.DEBUG_MODE);
             WriteGameVersionFile();
-            LoadConfigs.FetchRemoteConfig();    // Lädt Config
-            MedienUtil.CreateMediaDirectory();
-            StartCoroutine(UpdateGameUpdater());
 
             // Lädt die applicationConfig
             Config.APPLICATION_CONFIG = new ConfigFile(Application.persistentDataPath + "/", "application.config");
 
             Config.PLAYER_NAME = Config.APPLICATION_CONFIG.GetString("PLAYER_DISPLAY_NAME", Config.PLAYER_NAME);
             Utils.EinstellungenAudioUpdateVolume(Einstellungen, audiomixer);
+
+            LoadConfigs.FetchRemoteConfig();    // Lädt Config
+            MedienUtil.CreateMediaDirectory();
+            StartCoroutine(UpdateGameUpdater());
+
 
             if (Config.isServer)
                 StartCoroutine(LoadGameFilesAsync());
