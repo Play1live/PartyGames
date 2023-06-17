@@ -247,7 +247,7 @@ public class GeheimwörterServer : MonoBehaviour
     /// <returns></returns>
     private string UpdateSpieler()
     {
-        string msg = "#UpdateSpieler [ID]0[ID][PUNKTE]" + Config.SERVER_PLAYER_POINTS + "[PUNKTE]";
+        string msg = "#UpdateSpieler [ID]0[ID][PUNKTE]" + Config.SERVER_PLAYER.points + "[PUNKTE]";
         for (int i = 0; i < Config.PLAYERLIST.Length; i++)
         {
             Player p = Config.PLAYERLIST[i];
@@ -461,7 +461,7 @@ public class GeheimwörterServer : MonoBehaviour
             if (pId != p.id && p.isConnected)
                 p.points += PunkteProFalsche;
         }
-        Config.SERVER_PLAYER_POINTS += PunkteProFalsche;
+        Config.SERVER_PLAYER.points += PunkteProFalsche;
         UpdateSpielerBroadcast();
     }
     /// <summary>

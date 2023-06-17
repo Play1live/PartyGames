@@ -5,8 +5,8 @@ using UnityEngine;
 public class ListenSpiel
 {
     public static string path = "/Spiele/Listen";
-    private int minPlayer = 3;
-    private int maxPlayer = 9;
+    public static int minPlayer = 3;
+    public static int maxPlayer = 9;
     private List<Listen> listen;
     private Listen selected;
 
@@ -32,6 +32,9 @@ public class ListenSpiel
             // Lädt alle Flaggen und speichert diese ab
             listen.Add(new Listen(sfile));
         }
+
+        if (listen.Count > 0)
+            setSelected(listen[0]);
     }
 
     public int getMinPlayer() { return minPlayer; }

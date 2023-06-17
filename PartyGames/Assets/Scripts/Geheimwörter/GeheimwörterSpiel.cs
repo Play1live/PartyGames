@@ -5,8 +5,8 @@ using UnityEngine;
 
 public class GeheimwörterSpiel
 {
-    private int minPlayer = 3;
-    private int maxPlayer = 9;
+    public static int minPlayer = 3;
+    public static int maxPlayer = 9;
     private List<Geheimwörter> geheimwoerter;
     private Geheimwörter selected;
 
@@ -34,6 +34,9 @@ public class GeheimwörterSpiel
             // Lädt alle Flaggen und speichert diese ab
             geheimwoerter.Add(new Geheimwörter(sfile));
         }
+
+        if (geheimwoerter.Count > 0)
+            setSelected(geheimwoerter[0]);
     }
 
     public int getMinPlayer() { return minPlayer; }

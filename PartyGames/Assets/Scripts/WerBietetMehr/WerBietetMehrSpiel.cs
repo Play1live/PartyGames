@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class WerBietetMehrSpiel
 {
-    private int minPlayer = 3;
-    private int maxPlayer = 9;
+    public static int minPlayer = 3;
+    public static int maxPlayer = 9;
     public static string path = "/Spiele/WerBietetMehr";
     private List<WerBietetMehr> liste;
     private WerBietetMehr selected;
@@ -31,6 +31,11 @@ public class WerBietetMehrSpiel
 
             // Lädt alle Flaggen und speichert diese ab
             liste.Add(new WerBietetMehr(sfile));
+        }
+
+        if (liste.Count > 0)
+        {
+            setSelected(liste[0]);
         }
     }
 

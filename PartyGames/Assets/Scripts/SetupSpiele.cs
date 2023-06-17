@@ -4,18 +4,26 @@ using UnityEngine;
 
 public class SetupSpiele
 {
-    public static void LoadGameFiles()
+    public static IEnumerator LoadGameFiles()
     {
         Logging.log(Logging.LogType.Normal, "SetupSpiele", "LoadGameFiles", "Loading Games...");
         reloadQuiz();
+        yield return null;
         reloadFlaggen();
+        yield return null;
         reloadListen();
+        yield return null;
         reloadMosaik();
+        yield return null;
         reloadGeheimwoerter();
+        yield return null;
         reloadWerBietetMehr();
+        yield return null;
         reloadAuktion();
+        yield return null;
         reloadSloxikon();
         Logging.log(Logging.LogType.Normal, "SetupSpiele", "LoadGameFiles", "Games are ready!");
+        yield break;
     }
 
     public static void reloadQuiz()

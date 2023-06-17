@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class QuizSpiel
 {
-    private int minPlayer = 3;
-    private int maxPlayer = 9;
+    public static int minPlayer = 3;
+    public static int maxPlayer = 9;
     public static string path = "/Spiele/Quiz";
     private List<Quiz> quizze;
     private Quiz selectedQuiz;
@@ -33,6 +33,9 @@ public class QuizSpiel
             // Lädt alle Flaggen und speichert diese ab
             quizze.Add(new Quiz(sfile));
         }
+
+        if (quizze.Count > 0)
+            setSelected(quizze[0]);
     }
     public int getMinPlayer() { return minPlayer; }
     public int getMaxPlayer() { return maxPlayer; }

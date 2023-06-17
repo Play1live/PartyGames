@@ -5,8 +5,8 @@ using UnityEngine;
 
 public class MosaikSpiel
 {
-    private int minPlayer = 3;
-    private int maxPlayer = 9;
+    public static int minPlayer = 3;
+    public static int maxPlayer = 9;
     public static string path = "/Spiele/Mosaik";
     private List<Mosaik> mosaike;
     private Mosaik selected;
@@ -35,6 +35,9 @@ public class MosaikSpiel
             // Lädt alle Flaggen und speichert diese ab
             mosaike.Add(new Mosaik(sfile));
         }
+
+        if (mosaike.Count > 0)
+            setSelected(mosaike[0]);
     }
 
     public int getMinPlayer() { return minPlayer; }

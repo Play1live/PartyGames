@@ -227,5 +227,19 @@ public class Utils
         }
     }
     #endregion
+    #region Sonstige Einstellungen
+    /// <summary>
+    /// Aktualisiert die Anzeige für die Grafikeinstellungs
+    /// </summary>
+    /// <param name="EinstellungsParent"></param>
+    public static void EinstellungenSonstigeUpdate(GameObject EinstellungsParent)
+    {
+        Transform GrafikContent = EinstellungenGetKategorie(EinstellungsParent, EinstellungsKategorien.Sonstiges).transform;
+
+        EinstellungsmenueUtils.blockDebugMode = true;
+        GrafikContent.GetChild(3).GetChild(1).GetComponent<Toggle>().isOn = Config.APPLICATION_CONFIG.GetBool("APPLICATION_DEBUGMODE", true);
+        EinstellungsmenueUtils.blockDebugMode = false;
+    }
+    #endregion
     #endregion
 }

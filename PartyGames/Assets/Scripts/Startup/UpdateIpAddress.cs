@@ -13,7 +13,7 @@ public class UpdateIpAddress
     /// Falls die Game-DNS-Adresse != der des Servers ist, wird diese bei No-IP.com aktualisiert. Wenn die dazu notwendigen Daten eingegeben wurden. 
     /// </summary>
     /// <returns>Ergebnis der Aktualisierung der DNS-Adresse</returns>
-    public static bool UpdateNoIP_DNS()
+    public static IEnumerator UpdateNoIP_DNS()
     {
         // Lade aktuelle IP-Adresse
         string ipaddress;
@@ -21,24 +21,25 @@ public class UpdateIpAddress
         IPAddress[] domainip;
         try
         {
-            ipaddress = new WebClient().DownloadString("https://api.ipify.org");
+            Uri uri = new Uri("https://api.ipify.org");
+            ipaddress = new WebClient().DownloadString(uri);
             domainip = Dns.GetHostAddresses(Config.SERVER_CONNECTION_IP);
         }
         catch (Exception e)
         {
-            Logging.log(Logging.LogType.Warning, "UpdateIpAddress", "UpdateNoIP_DNS", "Could not resolve host " + Config.SERVER_CONNECTION_IP);
+            Logging.log(Logging.LogType.Warning, "UpdateIpAddress", "UpdateNoIP_DNS", "Could not resolve host " + Config.SERVER_CONNECTION_IP, e);
             Config.HAUPTMENUE_FEHLERMELDUNG += "\nBitte überprüfe deine Internetverbindung!";
             Config.LOBBY_FEHLERMELDUNG = "Bitte überprüfe deine Internetverbindung!";
-            return false;
+            yield break;
         }
-        
+        yield return null;
 
         Logging.log(Logging.LogType.Normal, "UpdateIpAddress", "UpdateNoIP_DNS", "Aktuelle IP: " + ipaddress + "  DNS-IP: " + domainip[0].ToString());
         // Wenn die DNS-IP gleich der aktuellen des Servers ist, dann muss kein IP Update durchgeführt werden
         if (ipaddress == domainip[0].ToString())
         {
             Logging.log(Logging.LogType.Normal, "UpdateIpAddress", "UpdateNoIP_DNS", "DNS - IP ist aktuell.");
-            return true;
+            yield break;
         }
 
         // Noch keine Kontodaten vorhanden
@@ -56,7 +57,7 @@ public class UpdateIpAddress
                 }
             }
             Logging.log(Logging.LogType.Warning, "UpdateIpAddress", "UpdateNoIP_DNS", "Autostart wurde abgebrochen, keine Kontodaten zum Aktualisieren der DNS-IP vorhanden.");
-            return false;
+            yield break;
         }
 
         // Lade daten
@@ -80,11 +81,12 @@ public class UpdateIpAddress
             else
             {
                 Logging.log(Logging.LogType.Warning, "UpdateIpAddress", "UpdateNoIP_DNS", "Dateiinhalt ist fehlerhaft: Datei: No - IP Settings.txt-- Zeile: "+zeile);
-                return false;
+                yield break;
             }
         }
         if (username.Length == 0 || password.Length == 0 || hostname.Length == 0)
-            return false;
+            yield break;
+        yield return null;
 
         // No-IP-Update-URL erstellen
         string url = $"https://dynupdate.no-ip.com/nic/update?hostname={hostname}&myip={ipaddress}";
@@ -104,9 +106,9 @@ public class UpdateIpAddress
         {
             Config.LOBBY_FEHLERMELDUNG = "IP konnte nicht aktualisiert werden. Überprüfe deine NoIP Eingabe.";
             Logging.log(Logging.LogType.Warning, "UpdateIpAddress", "UpdateNoIP_DNS", "Konnte keine Webanfrage senden! IP wurde nicht aktualisiert!", e);
-            return false;
+            yield break;
         }
-        
+        yield return null;
 
         // Serverantwort lesen
         string result = new StreamReader(response.GetResponseStream()).ReadToEnd();
@@ -115,13 +117,13 @@ public class UpdateIpAddress
         if (result.Contains("good") || result.Contains("nochg"))
         {
             Logging.log(Logging.LogType.Normal, "UpdateIpAddress", "UpdateNoIP_DNS", "IP-Adresse erfolgreich aktualisiert.");
-            return true;
+            yield break;
         }
         else
         {
             Config.LOBBY_FEHLERMELDUNG = "NoIP hat die Updateanfrage abgelehnt. IP Adresse wurde nicht aktualisiert.";
             Logging.log(Logging.LogType.Warning, "UpdateIpAddress", "UpdateNoIP_DNS", "Fehler beim Aktualisieren der IP - Adresse. AktuelleIP: "+ ipaddress +" HTTP - Result: "+ result);
-            return false;
+            yield break;
         }
     }
 }

@@ -25,7 +25,7 @@ public class StartupScene : MonoBehaviour
 
     [SerializeField] GameObject ModeratedGamesSFX;
     [SerializeField] AudioMixer audiomixer;
-
+    private Coroutine UpdateIPCoroutine;
     private bool UpdaterIsUpToDate = false;
 
     void Start()
@@ -37,15 +37,12 @@ public class StartupScene : MonoBehaviour
         }
 #endif
         /*Testzwecke*/
-        Config.DEBUG_MODE = true;
-        //Config.isServer = !Config.isServer;
         //Config.isServer = true;
-
+        
         Config.GAME_TITLE = "Startup";
         if (Config.APPLICATION_INITED == true)
         {
             SettingsAktualisiereAnzeigen();
-            //LoadConfigs.MoveToPrimaryDisplayFullscreen();
             Utils.EinstellungenGrafikApply(true);
 
             if (!Config.CLIENT_STARTED && !Config.SERVER_STARTED)
@@ -91,25 +88,30 @@ public class StartupScene : MonoBehaviour
     {
         if (!Config.APPLICATION_INITED)
         {
-            Logging.log(Logging.LogType.Normal, "StartupScene", "Start", "Application Version: " + Config.APPLICATION_VERSION);
-            Logging.log(Logging.LogType.Normal, "StartupScene", "Start", "Debugmode: " + Config.DEBUG_MODE);
-            WriteGameVersionFile();
-
             // Lädt die applicationConfig
             Config.APPLICATION_CONFIG = new ConfigFile(Application.persistentDataPath + "/", "application.config");
-
+            Config.DEBUG_MODE = Config.APPLICATION_CONFIG.GetBool("APPLICATION_DEBUGMODE", false);
             Config.PLAYER_NAME = Config.APPLICATION_CONFIG.GetString("PLAYER_DISPLAY_NAME", Config.PLAYER_NAME);
-            Utils.EinstellungenAudioUpdateVolume(Einstellungen, audiomixer);
 
+            Logging.log(Logging.LogType.Normal, "StartupScene", "Start", "Application Version: " + Config.APPLICATION_VERSION);
+            Logging.log(Logging.LogType.Normal, "StartupScene", "Start", "Debugmode: " + Config.DEBUG_MODE);
+            Logging.log(Logging.LogType.Debug, "StartupScene", "Start", "PersistentDataPath: " + Application.persistentDataPath);
+            Logging.log(Logging.LogType.Debug, "StartupScene", "Start", "Datapath: " + Application.dataPath);
+
+            WriteGameVersionFile();
+
+            Utils.EinstellungenAudioUpdateVolume(Einstellungen, audiomixer);
             LoadConfigs.FetchRemoteConfig();    // Lädt Config
             MedienUtil.CreateMediaDirectory();
             StartCoroutine(UpdateGameUpdater());
 
 
             if (Config.isServer)
-                StartCoroutine(LoadGameFilesAsync());
+            {
+                StartCoroutine(SetupSpiele.LoadGameFiles());
+                UpdateIPCoroutine = StartCoroutine(UpdateIpAddress.UpdateNoIP_DNS());
+            }
             StartCoroutine(EnableConnectionButton());
-            StartCoroutine(UpdateNoIP_DNSAsync());
 
             // Init PlayerlistZeigt die geladenen Spiele in der GameÜbersicht an
             if (Config.PLAYERLIST == null)
@@ -271,16 +273,9 @@ public class StartupScene : MonoBehaviour
     }
     public void UpdateNoIPOnButton()
     {
-        StartCoroutine(UpdateNoIP_DNSAsync());
-    }
-    /// <summary>
-    /// Aktualisiert die NoIP Adresse
-    /// </summary>
-    /// <returns></returns>
-    IEnumerator UpdateNoIP_DNSAsync()
-    {
-        UpdateIpAddress.UpdateNoIP_DNS();
-        yield break;
+        if (UpdateIPCoroutine != null)
+            StopCoroutine(UpdateIPCoroutine);
+        UpdateIPCoroutine = StartCoroutine(UpdateIpAddress.UpdateNoIP_DNS());
     }
     /// <summary>
     /// Aktiviert den Verbinden Button, nachdem die RemoteConfig erfolgreich geladen wurde, damit die Spieler nicht 
@@ -295,15 +290,8 @@ public class StartupScene : MonoBehaviour
         yield return new WaitUntil(() => UpdaterIsUpToDate == true); // Warte bis die Version des Updater aktualisiert wurde
         Logging.log(Logging.LogType.Debug, "StartupScene", "EnableConnectionButton", "Spieler darf sich nun verbinden.");
         Hauptmenue.transform.GetChild(4).gameObject.SetActive(true); // Server/Client StartButton
+        Hauptmenue.transform.GetChild(4).gameObject.GetComponent<Button>().interactable = true;
         Hauptmenue.transform.GetChild(5).gameObject.SetActive(true); // Einzelspieler StartButton
-    }
-    /// <summary>
-    /// Lädt die vorbereiteten Spieldateien
-    /// </summary>
-    IEnumerator LoadGameFilesAsync()
-    {
-        SetupSpiele.LoadGameFiles();
-        yield break;
     }
     /// <summary>
     /// Initialisiert die Config.PLAYERLIST
@@ -312,6 +300,7 @@ public class StartupScene : MonoBehaviour
     {
         Logging.log(Logging.LogType.Debug, "StartupScene", "Start", "Initialisiert Spieler & Icons");
         Config.PLAYERLIST = new Player[] { new Player(1), new Player(2), new Player(3), new Player(4), new Player(5), new Player(6), new Player(7), new Player(8) };
+        Config.SERVER_PLAYER = new Player(0);
         Config.SERVER_MAX_CONNECTIONS = Config.PLAYERLIST.Length;
         Config.PLAYER_ICONS = new List<Sprite>();
         foreach (Sprite sprite in Resources.LoadAll<Sprite>("Images/ProfileIcons/"))
@@ -353,10 +342,11 @@ public class StartupScene : MonoBehaviour
     {
         if (Config.CLIENT_STARTED || Config.SERVER_STARTED)
             return;
+        Hauptmenue.transform.GetChild(4).gameObject.GetComponent<Button>().interactable = false; // Server/Client StartButton
         GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(1).gameObject.SetActive(true);
         Utils.EinstellungenToggle(Einstellungen, Utils.EinstellungsKategorien.Audio);
 
-        UpdateIpAddress.UpdateNoIP_DNS();
+        //UpdateIpAddress.UpdateNoIP_DNS();
 
         foreach (Player p in Config.PLAYERLIST)
         {
@@ -368,8 +358,8 @@ public class StartupScene : MonoBehaviour
             p.tcp = null;
             p.icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
         }
-        Config.SERVER_PLAYER_POINTS = 0;
-        Config.SERVER_CROWNS = 0;
+        Config.SERVER_PLAYER.points = 0;
+        Config.SERVER_PLAYER.crowns = 0;
 
         Config.PLAYER_NAME = "";
         Config.PLAYER_NAME = GameObject.Find("ChooseYourName_TXT").gameObject.GetComponent<TMP_InputField>().text;
@@ -433,6 +423,9 @@ public class StartupScene : MonoBehaviour
             string[] noiptemp = File.ReadAllLines(Application.persistentDataPath + @"/No-IP Settings.txt");
             Utils.EinstellungenServerNoIpUpdate(Einstellungen, noiptemp[0].Replace(": ", "|").Split('|')[1], noiptemp[1].Replace(": ", "|").Split('|')[1], noiptemp[2].Replace(": ", "|").Split('|')[1]);
         }
+        // Sonstige
+        Utils.EinstellungenSonstigeUpdate(Einstellungen);
+
     }
     /// <summary>
     /// Aktualisiert die IP zum Server
@@ -443,6 +436,12 @@ public class StartupScene : MonoBehaviour
         if (Config.CLIENT_STARTED || Config.SERVER_STARTED)
             return;
         Config.SERVER_CONNECTION_IP = input.text;
+        if (Config.isServer)
+        {
+            if (UpdateIPCoroutine != null)
+                StopCoroutine(UpdateIPCoroutine);
+            UpdateIPCoroutine = StartCoroutine(UpdateIpAddress.UpdateNoIP_DNS());
+        }
     }
     /// <summary>
     /// Aktualisiert den Port zum Server
@@ -464,8 +463,15 @@ public class StartupScene : MonoBehaviour
             return;
         Config.isServer = toggle.isOn;
 
+        // Lädt nur die Spiele wenn diese noch nicht initialisiert wurden
+        if (Config.isServer && Config.QUIZ_SPIEL == null)
+            StartCoroutine(SetupSpiele.LoadGameFiles());
         if (Config.isServer)
-            StartCoroutine(LoadGameFilesAsync());
+        {
+            if (UpdateIPCoroutine != null)
+                StopCoroutine(UpdateIPCoroutine);
+            UpdateIPCoroutine = StartCoroutine(UpdateIpAddress.UpdateNoIP_DNS());
+        }
     }
     /// <summary>
     /// Aktualisiert Username für NoIP

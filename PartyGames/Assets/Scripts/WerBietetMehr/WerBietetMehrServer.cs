@@ -282,7 +282,7 @@ public class WerBietetMehrServer : MonoBehaviour
     /// <returns>#Update Spieler ...</returns>
     private string UpdateSpieler()
     {
-        string msg = "#UpdateSpieler [ID]0[ID][PUNKTE]" + Config.SERVER_PLAYER_POINTS + "[PUNKTE]";
+        string msg = "#UpdateSpieler [ID]0[ID][PUNKTE]" + Config.SERVER_PLAYER.points + "[PUNKTE]";
         int connectedplayer = 0;
         for (int i = 0; i < Config.PLAYERLIST.Length; i++)
         {
@@ -503,7 +503,7 @@ public class WerBietetMehrServer : MonoBehaviour
             if (pId != p.id && p.isConnected)
                 p.points += PunkteProFalsche;
         }
-        Config.SERVER_PLAYER_POINTS += PunkteProFalsche;
+        Config.SERVER_PLAYER.points += PunkteProFalsche;
         UpdateSpielerBroadcast();
     }
     /// <summary>

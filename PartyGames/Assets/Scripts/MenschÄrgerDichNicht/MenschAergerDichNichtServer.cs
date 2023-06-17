@@ -126,7 +126,6 @@ public class MenschAergerDichNichtServer : MonoBehaviour
                 Broadcast(msg);
                 yield return null;
             }
-            //yield return new WaitForSeconds(0.005f);
             yield return new WaitForSeconds(0.01f);
         }
         yield break;
@@ -389,7 +388,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
                     {
                         names.Add(Playerlist[i].GetComponentInChildren<TMP_Text>().text);
                         bots.Add(false);
-                        sprites.Add(Config.SERVER_ICON);
+                        sprites.Add(Config.SERVER_PLAYER.icon);
                     }
                 }
                 else if (Playerlist[i].name.StartsWith("P "))
@@ -610,7 +609,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
         if (!player.isBot)
         {
             // Server
-            if (player.PlayerImage == Config.SERVER_ICON)
+            if (player.PlayerImage == Config.SERVER_PLAYER.icon)
             {
                 StartTurnServer();
                 TurnSelectbelegt = false;
@@ -842,7 +841,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
         else
         {
             // Ist Server
-            if (Config.SERVER_ICON == board.GetPlayerTurn().PlayerImage)
+            if (Config.SERVER_PLAYER.icon == board.GetPlayerTurn().PlayerImage)
             {
                 // Spieler kann nicht laufen
                 if (board.GetPlayerTurn().GetAvailableMoves().Count == 0)
@@ -935,7 +934,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
         if (!ServerAllowZugWahl)
             return;
         // Server ist aktuell nicht dran
-        if (board.GetPlayerTurn().isBot || Config.SERVER_ICON != board.GetPlayerTurn().PlayerImage)
+        if (board.GetPlayerTurn().isBot || Config.SERVER_PLAYER.icon != board.GetPlayerTurn().PlayerImage)
             return;
         Logging.log(Logging.LogType.Debug, "MenschAergerDichNicht", "ServerWähltFeld", "Server wählt: " + FeldName.name);
         

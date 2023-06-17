@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class FlaggenSpiel
 {
-    private int minPlayer = 3;
-    private int maxPlayer = 9;
+    public static int minPlayer = 3;
+    public static int maxPlayer = 9;
     private List<Flagge> flaggen;
     private Sprite fragezeichen;
     public FlaggenSpiel()

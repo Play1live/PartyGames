@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class SloxikonSpiel
 {
-    private int minPlayer = 3;
-    private int maxPlayer = 9;
+    public static int minPlayer = 3;
+    public static int maxPlayer = 9;
     public static string path = "/Spiele/Sloxikon";
     private List<Sloxikon> games;
     private Sloxikon selected;
@@ -32,6 +32,9 @@ public class SloxikonSpiel
             // Lädt alle Flaggen und speichert diese ab
             games.Add(new Sloxikon(sfile));
         }
+
+        if (games.Count > 0)
+            setSelected(games[0]);
     }
 
     public int getMinPlayer() { return minPlayer; }

@@ -22,6 +22,7 @@ public class StartupServer : MonoBehaviour
     [SerializeField] GameObject gesperrtfuerSekundenAnzeige;
     DateTime allowedStartTime;
     string UpdateClientGameVorschau = "";
+    private int connectedPlayer;
 
     [SerializeField] AudioSource ConnectSound;
     [SerializeField] AudioSource DisconnectSound;
@@ -29,6 +30,7 @@ public class StartupServer : MonoBehaviour
     void Start()
     {
         UpdateSpieler();
+        StartCoroutine(ServerUtils.Broadcast());
     }
 
     void OnEnable()
@@ -123,7 +125,7 @@ public class StartupServer : MonoBehaviour
 
     void OnApplicationQuit()
     {
-        Broadcast("#ServerClosed", Config.PLAYERLIST);
+        ServerUtils.BroadcastImmediate("#ServerClosed");
         Logging.log(Logging.LogType.Normal, "StartupServer", "OnApplicationQuit", "Server wird geschlossen.");
         //Config.SERVER_TCP.Server.Close();
         Config.SERVER_TCP.Stop();
@@ -139,7 +141,7 @@ public class StartupServer : MonoBehaviour
         Logging.log(Logging.LogType.Normal, "StartupServer", "ZurueckZumHauptmenue", "Spieler wird ins Hauptmenü geladen und Server- & Client-Verbindung wird beendet.");
         if (Config.isServer && Config.SERVER_STARTED)
         {
-            Broadcast("#ServerClosed");
+            ServerUtils.AddBroadcast("#ServerClosed");
             Config.SERVER_TCP.Stop();
             Config.SERVER_STARTED = false;
             SceneManager.LoadSceneAsync("Startup");
@@ -162,6 +164,7 @@ public class StartupServer : MonoBehaviour
             Config.SERVER_STARTED = true;
             Logging.log(Logging.LogType.Normal, "StartupServer", "Start", "Server gestartet. Port: " + Config.SERVER_CONNECTION_PORT);
             Config.HAUPTMENUE_FEHLERMELDUNG = "Server wurde gestartet.";
+            connectedPlayer = 0;
         }
         catch (Exception e)
         {
@@ -180,7 +183,7 @@ public class StartupServer : MonoBehaviour
             return;
         }
         // Sucht ein passendes Icon für den Serverhost
-        Config.SERVER_ICON = FindFittingIconByName(Config.PLAYER_NAME);
+        Config.SERVER_PLAYER.icon = FindFittingIconByName(Config.PLAYER_NAME);
 
         // Verbindung erfolgreich
         Config.HAUPTMENUE_FEHLERMELDUNG = "";
@@ -234,6 +237,7 @@ public class StartupServer : MonoBehaviour
         TcpListener listener = (TcpListener)ar.AsyncState;
         freierS.isConnected = true;
         freierS.tcp = listener.EndAcceptTcpClient(ar);
+        connectedPlayer++;
         Logging.log(Logging.LogType.Debug, "StartupServer", "AcceptTcpClient", "Ein neuer Spieler verbindet sich: "+ freierS.id);
         // Prüft ob der Server voll ist
         bool tempAllConnected = true;
@@ -350,6 +354,7 @@ public class StartupServer : MonoBehaviour
                 break;
 
             case "#ClientClosed":
+                connectedPlayer--;
                 ClientClosed(player);
                 UpdateSpielerBroadcast();
                 PlayDisconnectSound();
@@ -394,7 +399,7 @@ public class StartupServer : MonoBehaviour
     /// </summary>
     public void UpdateRemoteConfig()
     {
-        Broadcast("#UpdateRemoteConfig");
+        ServerUtils.AddBroadcast("#UpdateRemoteConfig");
         LoadConfigs.FetchRemoteConfig();
         StartCoroutine(LoadGameFilesAsync());
         UpdateGameVorschau();
@@ -415,7 +420,7 @@ public class StartupServer : MonoBehaviour
     /// </summary>
     private void SperreGameSelection()
     {
-        allowedStartTime = DateTime.Now.AddSeconds(5);
+        allowedStartTime = DateTime.Now.AddSeconds(2);
         for (int i = 0; i < ServerControlGameSelection.transform.childCount; i++)
         {
             ServerControlGameSelection.transform.GetChild(i).gameObject.SetActive(false);
@@ -481,8 +486,8 @@ public class StartupServer : MonoBehaviour
     private string UpdateSpieler()
     {
         string msg = "#UpdateSpieler [ID]0[ID][NAME]" + Config.PLAYER_NAME + "[NAME][PUNKTE]" + 
-            Config.SERVER_PLAYER_POINTS + "[PUNKTE][ICON]" + 
-            Config.SERVER_ICON.name + "[ICON]";
+            Config.SERVER_PLAYER.points + "[PUNKTE][ICON]" + 
+            Config.SERVER_PLAYER.icon.name + "[ICON]";
         int connectedplayer = 1;
         List<string> spielerIDNameList = new List<string>();
         spielerIDNameList.Add("");
@@ -504,7 +509,7 @@ public class StartupServer : MonoBehaviour
 
         GameObject.Find("Lobby/Title_LBL/Spieleranzahl").GetComponent<TMP_Text>().text = connectedplayer + "/" + (Config.PLAYERLIST.Length + 1);
         SpielerAnzeigeLobby[0].SetActive(true);
-        SpielerAnzeigeLobby[0].GetComponentsInChildren<Image>()[1].sprite = Config.SERVER_ICON;
+        SpielerAnzeigeLobby[0].GetComponentsInChildren<Image>()[1].sprite = Config.SERVER_PLAYER.icon;
         SpielerAnzeigeLobby[0].GetComponentsInChildren<TMP_Text>()[0].text = Config.PLAYER_NAME;
 
         if (ServerControlControlField.activeInHierarchy)
@@ -545,7 +550,8 @@ public class StartupServer : MonoBehaviour
         while (Config.SERVER_STARTED)
         {
             yield return new WaitForSeconds(5);
-            UpdatePing();
+            if (connectedPlayer > 0)
+                UpdatePing();
         }
     }
     /// <summary>
@@ -588,20 +594,20 @@ public class StartupServer : MonoBehaviour
             }
         }
         // Server
-        if (Config.SERVER_CROWNS > top1)
+        if (Config.SERVER_PLAYER.crowns > top1)
         {
             top3 = top2;
             top2 = top1;
-            top1 = Config.SERVER_CROWNS;
+            top1 = Config.SERVER_PLAYER.crowns;
         }
-        else if (Config.SERVER_CROWNS > top2)
+        else if (Config.SERVER_PLAYER.crowns > top2)
         {
             top3 = top2;
-            top2 = Config.SERVER_CROWNS;
+            top2 = Config.SERVER_PLAYER.crowns;
         }
-        else if (Config.SERVER_CROWNS > top3)
+        else if (Config.SERVER_PLAYER.crowns > top3)
         {
-            top3 = Config.SERVER_CROWNS;
+            top3 = Config.SERVER_PLAYER.crowns;
         }
         if (top2 == top1)
         {
@@ -647,13 +653,13 @@ public class StartupServer : MonoBehaviour
                 SpielerAnzeigeLobby[i + 1].transform.GetChild(4).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Top4");
         }
         // Server
-        SpielerAnzeigeLobby[0].transform.GetChild(5).GetComponent<TMP_Text>().text = "" + Config.SERVER_CROWNS;
+        SpielerAnzeigeLobby[0].transform.GetChild(5).GetComponent<TMP_Text>().text = "" + Config.SERVER_PLAYER.crowns;
 
-        if (Config.SERVER_CROWNS == top1)
+        if (Config.SERVER_PLAYER.crowns == top1)
             SpielerAnzeigeLobby[0].transform.GetChild(4).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Top1");
-        else if (Config.SERVER_CROWNS == top2)
+        else if (Config.SERVER_PLAYER.crowns == top2)
             SpielerAnzeigeLobby[0].transform.GetChild(4).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Top2");
-        else if (Config.SERVER_CROWNS == top3)
+        else if (Config.SERVER_PLAYER.crowns == top3)
             SpielerAnzeigeLobby[0].transform.GetChild(4).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Top3");
         else
             SpielerAnzeigeLobby[0].transform.GetChild(4).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Top4");
@@ -668,7 +674,7 @@ public class StartupServer : MonoBehaviour
                 SpielerAnzeigeLobby[i].transform.GetChild(4).gameObject.SetActive(false);
         }
         // Server
-        if (Config.SERVER_CROWNS > 0)
+        if (Config.SERVER_PLAYER.crowns > 0)
             SpielerAnzeigeLobby[0].transform.GetChild(4).gameObject.SetActive(true);
         else
         {
@@ -679,7 +685,7 @@ public class StartupServer : MonoBehaviour
 
         #endregion
 
-        string msg = "#UpdateCrowns [0]" + Config.SERVER_CROWNS + "[0]";
+        string msg = "#UpdateCrowns [0]" + Config.SERVER_PLAYER.crowns + "[0]";
         foreach (Player player in Config.PLAYERLIST)
         {
             msg += "[" + player.id + "]" + player.crowns + "[" + player.id + "]";
@@ -768,7 +774,7 @@ public class StartupServer : MonoBehaviour
     {
         Logging.log(Logging.LogType.Normal, "StartupServer", "SpielerUmbenennenToggle", "Spieler dürfen sich umbenennen: "+ toggle.isOn);
         Config.ALLOW_PLAYERNAME_CHANGE = toggle.isOn;
-        Broadcast("#AllowNameChange " + toggle.isOn);
+        ServerUtils.AddBroadcast("#AllowNameChange " + toggle.isOn);
     }
     /// <summary>
     /// Spieler ändert Namen
@@ -915,8 +921,8 @@ public class StartupServer : MonoBehaviour
         TMP_Dropdown drop = GameObject.Find("ServerControl/ControlField/SpielerIconWechseln/Dropdown").GetComponent<TMP_Dropdown>();
         if (drop.options[drop.value].text == "")
         {
-            Config.SERVER_ICON = Resources.Load<Sprite>("Images/ProfileIcons/" + Icon.options[Icon.value].text);
-            Logging.log(Logging.LogType.Normal, "StartupServer", "SpielerIconWechsel", "Server hat nun das Icon: "+ Config.SERVER_ICON.name);
+            Config.SERVER_PLAYER.icon = Resources.Load<Sprite>("Images/ProfileIcons/" + Icon.options[Icon.value].text);
+            Logging.log(Logging.LogType.Normal, "StartupServer", "SpielerIconWechsel", "Server hat nun das Icon: "+ Config.SERVER_PLAYER.icon.name);
             UpdateSpielerBroadcast();
             return;
         }
@@ -1065,7 +1071,7 @@ public class StartupServer : MonoBehaviour
     /// <returns>true, false</returns>
     private bool IconWirdGeradeGenutzt(Sprite icon)
     {
-        if (Config.SERVER_ICON == icon)
+        if (Config.SERVER_PLAYER.icon == icon)
             return true;
         for (int i = 0; i < Config.PLAYERLIST.Length; i++)
             if (icon == Config.PLAYERLIST[i].icon || icon.name == "empty")
@@ -1079,8 +1085,8 @@ public class StartupServer : MonoBehaviour
     {
         if (!Config.isServer)
             return;
-        Config.SERVER_ICON = Config.PLAYER_ICONS[(Config.PLAYER_ICONS.IndexOf(Config.SERVER_ICON) + 1) % Config.PLAYER_ICONS.Count];
-        Logging.log(Logging.LogType.Normal, "StartupServer", "ServerIconChange", "Server hat nun das Icon: " + Config.SERVER_ICON.name);
+        Config.SERVER_PLAYER.icon = Config.PLAYER_ICONS[(Config.PLAYER_ICONS.IndexOf(Config.SERVER_PLAYER.icon) + 1) % Config.PLAYER_ICONS.Count];
+        Logging.log(Logging.LogType.Normal, "StartupServer", "ServerIconChange", "Server hat nun das Icon: " + Config.SERVER_PLAYER.icon.name);
         UpdateSpielerBroadcast();
     }
     #endregion
@@ -1093,15 +1099,15 @@ public class StartupServer : MonoBehaviour
     {
         Logging.log(Logging.LogType.Normal, "StartupServer", "PlayerPing", "PlayerPing: " + p.name + " -> " + data);
         int ping = Int32.Parse(data);
-        if (ping <= 15)
+        if (ping <= 10)
         {
             SpielerAnzeigeLobby[p.id].transform.GetChild(3).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Ping/Ping 3");
         }
-        else if (ping > 15 && ping <= 50)
+        else if (ping > 10 && ping <= 30)
         {
             SpielerAnzeigeLobby[p.id].transform.GetChild(3).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Ping/Ping 2");
         }
-        else if (ping > 50 && ping <= 100)
+        else if (ping > 30 && ping <= 100)
         {
             SpielerAnzeigeLobby[p.id].transform.GetChild(3).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Ping/Ping 1");
         }
@@ -1116,35 +1122,32 @@ public class StartupServer : MonoBehaviour
     private void UpdateGameVorschau()
     {
         List<string> gamelist = new List<string>();
-        // [SPIELER]<0-9>[SPIELER][TITEL]<..>[TITEL][AVAILABLE]<..>[AVAILABLE]
-        gamelist.Add("[SPIELER-ANZ]0[SPIELER-ANZ][MIN]0[MIN][MAX]0[MAX][TITEL]<b><i>Fehler</i></b>[TITEL][AVAILABLE]-1[AVAILABLE]");
-
-        //ModerierteGames
+        // Moderierte Games
         gamelist.Add("[SPIELER-ANZ]0[SPIELER-ANZ][MIN]0[MIN][MAX]" + Config.SERVER_MAX_CONNECTIONS + "[MAX][TITEL]<b><i>Moderierte Spiele</i></b>[TITEL][AVAILABLE]-1[AVAILABLE]");
-        //Flaggen
-        gamelist.Add("[SPIELER-ANZ]3-9[SPIELER-ANZ][MIN]" + Config.FLAGGEN_SPIEL.getMinPlayer() + "[MIN][MAX]" + Config.FLAGGEN_SPIEL.getMaxPlayer() + "[MAX][TITEL]Flaggen[TITEL][AVAILABLE]" + Config.FLAGGEN_SPIEL.getFlaggen().Count + "[AVAILABLE]");
-        //Quiz
-        gamelist.Add("[SPIELER-ANZ]3-9[SPIELER-ANZ][MIN]" + Config.QUIZ_SPIEL.getMinPlayer() + "[MIN][MAX]" + Config.QUIZ_SPIEL.getMaxPlayer() + "[MAX][TITEL]Quiz[TITEL][AVAILABLE]" + Config.QUIZ_SPIEL.getQuizze().Count + "[AVAILABLE]");
-        //Listen
-        gamelist.Add("[SPIELER-ANZ]3-9[SPIELER-ANZ][MIN]" + Config.LISTEN_SPIEL.getMinPlayer() + "[MIN][MAX]" + Config.LISTEN_SPIEL.getMaxPlayer() + "[MAX][TITEL]Listen[TITEL][AVAILABLE]" + Config.LISTEN_SPIEL.getListen().Count + "[AVAILABLE]");
-        //Mosaik
-        gamelist.Add("[SPIELER-ANZ]3-9[SPIELER-ANZ][MIN]" + Config.MOSAIK_SPIEL.getMinPlayer() + "[MIN][MAX]" + Config.MOSAIK_SPIEL.getMaxPlayer() + "[MAX][TITEL]Mosaik[TITEL][AVAILABLE]" + Config.MOSAIK_SPIEL.getMosaike().Count + "[AVAILABLE]");
-        //WerBietetMehr
-        gamelist.Add("[SPIELER-ANZ]3-9[SPIELER-ANZ][MIN]" + Config.WERBIETETMEHR_SPIEL.getMinPlayer() + "[MIN][MAX]" + Config.WERBIETETMEHR_SPIEL.getMaxPlayer() + "[MAX][TITEL]WerBietetMehr[TITEL][AVAILABLE]" + Config.WERBIETETMEHR_SPIEL.getSpiele().Count + "[AVAILABLE]");
-        //Geheimwörter
-        gamelist.Add("[SPIELER-ANZ]3-9[SPIELER-ANZ][MIN]" + Config.GEHEIMWOERTER_SPIEL.getMinPlayer() + "[MIN][MAX]" + Config.GEHEIMWOERTER_SPIEL.getMaxPlayer() + "[MAX][TITEL]Geheimwörter[TITEL][AVAILABLE]" + Config.GEHEIMWOERTER_SPIEL.getListen().Count + "[AVAILABLE]");
-        //Auktion
-        gamelist.Add("[SPIELER-ANZ]3-9[SPIELER-ANZ][MIN]" + Config.AUKTION_SPIEL.getMinPlayer() + "[MIN][MAX]" + Config.AUKTION_SPIEL.getMaxPlayer() + "[MAX][TITEL]Auktion[TITEL][AVAILABLE]" + Config.AUKTION_SPIEL.getAuktionen().Count + "[AVAILABLE]");
-        //Sloxikon
-        gamelist.Add("[SPIELER-ANZ]3-9[SPIELER-ANZ][MIN]" + Config.SLOXIKON_SPIEL.getMinPlayer() + "[MIN][MAX]" + Config.SLOXIKON_SPIEL.getMaxPlayer() + "[MAX][TITEL]Sloxikon[TITEL][AVAILABLE]" + Config.SLOXIKON_SPIEL.getGames().Count + "[AVAILABLE]");
-        //Unmoderierte Games
+        // Flaggen
+        gamelist.Add("[SPIELER-ANZ]" + FlaggenSpiel.minPlayer + "-" + FlaggenSpiel.maxPlayer + "[SPIELER-ANZ][MIN]" + FlaggenSpiel.minPlayer + "[MIN][MAX]" + FlaggenSpiel.maxPlayer + "[MAX][TITEL]Flaggen[TITEL][AVAILABLE]" + Config.FLAGGEN_SPIEL.getFlaggen().Count + "[AVAILABLE]");
+        // Quiz
+        gamelist.Add("[SPIELER-ANZ]" + QuizSpiel.minPlayer + "-" + QuizSpiel.maxPlayer + "[SPIELER-ANZ][MIN]" + QuizSpiel.minPlayer + "[MIN][MAX]" + QuizSpiel.maxPlayer + "[MAX][TITEL]Quiz[TITEL][AVAILABLE]" + Config.QUIZ_SPIEL.getQuizze().Count + "[AVAILABLE]");
+        // Listen
+        gamelist.Add("[SPIELER-ANZ]" + ListenSpiel.minPlayer + "-" + ListenSpiel.maxPlayer + "[SPIELER-ANZ][MIN]" + ListenSpiel.minPlayer + "[MIN][MAX]" + ListenSpiel.maxPlayer + "[MAX][TITEL]Listen[TITEL][AVAILABLE]" + Config.LISTEN_SPIEL.getListen().Count + "[AVAILABLE]");
+        // Mosaik
+        gamelist.Add("[SPIELER-ANZ]" + MosaikSpiel.minPlayer + "-" + MosaikSpiel.maxPlayer + "[SPIELER-ANZ][MIN]" + MosaikSpiel.minPlayer + "[MIN][MAX]" + MosaikSpiel.maxPlayer + "[MAX][TITEL]Mosaik[TITEL][AVAILABLE]" + Config.MOSAIK_SPIEL.getMosaike().Count + "[AVAILABLE]");
+        // WerBietetMehr
+        gamelist.Add("[SPIELER-ANZ]" + WerBietetMehrSpiel.minPlayer + "-" + WerBietetMehrSpiel.maxPlayer + "[SPIELER-ANZ][MIN]" + WerBietetMehrSpiel.minPlayer + "[MIN][MAX]" + WerBietetMehrSpiel.maxPlayer + "[MAX][TITEL]WerBietetMehr[TITEL][AVAILABLE]" + Config.WERBIETETMEHR_SPIEL.getSpiele().Count + "[AVAILABLE]");
+        // Geheimwörter
+        gamelist.Add("[SPIELER-ANZ]" + GeheimwörterSpiel.minPlayer + "-" + GeheimwörterSpiel.maxPlayer + "[SPIELER-ANZ][MIN]" + GeheimwörterSpiel.minPlayer + "[MIN][MAX]" + GeheimwörterSpiel.maxPlayer + "[MAX][TITEL]Geheimwörter[TITEL][AVAILABLE]" + Config.GEHEIMWOERTER_SPIEL.getListen().Count + "[AVAILABLE]");
+        // Auktion
+        gamelist.Add("[SPIELER-ANZ]" + AuktionSpiel.minPlayer + "-" + AuktionSpiel.maxPlayer + "[SPIELER-ANZ][MIN]" + AuktionSpiel.minPlayer + "[MIN][MAX]" + AuktionSpiel.maxPlayer + "[MAX][TITEL]Auktion[TITEL][AVAILABLE]" + Config.AUKTION_SPIEL.getAuktionen().Count + "[AVAILABLE]");
+        // Sloxikon
+        gamelist.Add("[SPIELER-ANZ]" + SloxikonSpiel.minPlayer + "-" + SloxikonSpiel.maxPlayer + "[SPIELER-ANZ][MIN]" + SloxikonSpiel.minPlayer + "[MIN][MAX]" + SloxikonSpiel.maxPlayer + "[MAX][TITEL]Sloxikon[TITEL][AVAILABLE]" + Config.SLOXIKON_SPIEL.getGames().Count + "[AVAILABLE]");
+        // Unmoderierte Games
         gamelist.Add("[SPIELER-ANZ]0[SPIELER-ANZ][MIN]0[MIN][MAX]" + Config.SERVER_MAX_CONNECTIONS + "[MAX][TITEL]<b><i>Unmoderierte Spiele</i></b>[TITEL][AVAILABLE]-1[AVAILABLE]");
         // MenschÄrgerDichNicht
-        gamelist.Add("[SPIELER-ANZ]1-8[SPIELER-ANZ][MIN]" + MenschAegerDichNichtBoard.minPlayer + "[MIN][MAX]" + MenschAegerDichNichtBoard.maxPlayer + "[MAX][TITEL]MenschÄrgerDichNicht[TITEL][AVAILABLE]-1[AVAILABLE]");
+        gamelist.Add("[SPIELER-ANZ]" + MenschAegerDichNichtBoard.minPlayer + "-" + MenschAegerDichNichtBoard.maxPlayer + "[SPIELER-ANZ][MIN]" + MenschAegerDichNichtBoard.minPlayer + "[MIN][MAX]" + MenschAegerDichNichtBoard.maxPlayer + "[MAX][TITEL]MenschÄrgerDichNicht[TITEL][AVAILABLE]-1[AVAILABLE]");
         // Kniffel
-        gamelist.Add("[SPIELER-ANZ]1-9[SPIELER-ANZ][MIN]" + KniffelBoard.minPlayer + "[MIN][MAX]" + KniffelBoard.maxPlayer + "[MAX][TITEL]Kniffel[TITEL][AVAILABLE]-1[AVAILABLE]");
+        gamelist.Add("[SPIELER-ANZ]" + KniffelBoard.minPlayer + "-" + KniffelBoard.maxPlayer + "[SPIELER-ANZ][MIN]" + KniffelBoard.minPlayer + "[MIN][MAX]" + KniffelBoard.maxPlayer + "[MAX][TITEL]Kniffel[TITEL][AVAILABLE]-1[AVAILABLE]");
         // Tabu
-        gamelist.Add("[SPIELER-ANZ]4-8[SPIELER-ANZ][MIN]" + TabuBoard.minPlayer + "[MIN][MAX]" + TabuBoard.maxPlayer + "[MAX][TITEL]Tabu[TITEL][AVAILABLE]-1[AVAILABLE]");
+        gamelist.Add("[SPIELER-ANZ]" + TabuBoard.minPlayer + "-" + TabuBoard.maxPlayer + "[SPIELER-ANZ][MIN]" + TabuBoard.minPlayer + "[MIN][MAX]" + TabuBoard.maxPlayer + "[MAX][TITEL]Tabu[TITEL][AVAILABLE]-1[AVAILABLE]");
 
 
         string msg = "";
@@ -1152,7 +1155,6 @@ public class StartupServer : MonoBehaviour
         {
             msg += "[" + i + "]" + gamelist[i] + "[" + i + "]";
         }
-
         UpdateClientGameVorschau = "[ANZ]" + gamelist.Count + "[ANZ]" + msg;
         Logging.log(Logging.LogType.Normal, "StartupServer", "UpdateGameVorschau", "Gamevorschau: " + UpdateClientGameVorschau);
     }
@@ -1184,7 +1186,7 @@ public class StartupServer : MonoBehaviour
     private void SwitchToTickTackToe()
     {
         SpielerMiniGames[0].SetActive(true);
-        Broadcast("#SwitchToTickTackToe");
+        ServerUtils.AddBroadcast("#SwitchToTickTackToe");
     }
     /// <summary>
     /// Bestimmt den ersten Zug gegen einen Spieler
@@ -1270,12 +1272,12 @@ public class StartupServer : MonoBehaviour
         if (pos == -1)
         {
             if (button.name.Equals("+1"))
-                Config.SERVER_CROWNS++;
+                Config.SERVER_PLAYER.crowns++;
             else if (button.name.Equals("-1"))
-                Config.SERVER_CROWNS--;
+                Config.SERVER_PLAYER.crowns--;
 
-            if (Config.SERVER_CROWNS < 0)
-                Config.SERVER_CROWNS = 0;
+            if (Config.SERVER_PLAYER.crowns < 0)
+                Config.SERVER_PLAYER.crowns = 0;
         }
         // Clients
         else
@@ -1312,7 +1314,7 @@ public class StartupServer : MonoBehaviour
         // Server
         if (pos == -1)
         {
-            Config.SERVER_CROWNS += punkte;
+            Config.SERVER_PLAYER.crowns += punkte;
         }
         // Clients
         else
@@ -1332,151 +1334,105 @@ public class StartupServer : MonoBehaviour
             return;
         Logging.log(Logging.LogType.Debug, "StartupServer", "DisplayGameFiles", "Verfügbare Spiele werden angezeigt.");
 
-        TMP_Dropdown QuizDropdown = GameObject.Find("Quiz/QuizAuswahl").GetComponent<TMP_Dropdown>();
+        TMP_Dropdown QuizDropdown = GameObject.Find("Quiz/Quiz").GetComponent<TMP_Dropdown>();
         QuizDropdown.ClearOptions();
         QuizDropdown.AddOptions(Config.QUIZ_SPIEL.getGamesAsStringList());
 
-        TMP_Dropdown ListenDropdown = GameObject.Find("Listen/ListenAuswahl").GetComponent<TMP_Dropdown>();
+        TMP_Dropdown ListenDropdown = GameObject.Find("Listen/Listen").GetComponent<TMP_Dropdown>();
         ListenDropdown.ClearOptions();
         ListenDropdown.AddOptions(Config.LISTEN_SPIEL.getGamesAsStringList());
 
-        TMP_Dropdown MosaikDropdown = GameObject.Find("Mosaik/Auswahl").GetComponent<TMP_Dropdown>();
+        TMP_Dropdown MosaikDropdown = GameObject.Find("Mosaik/Mosaik").GetComponent<TMP_Dropdown>();
         MosaikDropdown.ClearOptions();
         MosaikDropdown.AddOptions(Config.MOSAIK_SPIEL.getGamesAsStringList());
 
-        TMP_Dropdown GeheimwoerterDropdown = GameObject.Find("Geheimwörter/Auswahl").GetComponent<TMP_Dropdown>();
+        TMP_Dropdown GeheimwoerterDropdown = GameObject.Find("Geheimwörter/Geheimwörter").GetComponent<TMP_Dropdown>();
         GeheimwoerterDropdown.ClearOptions();
         GeheimwoerterDropdown.AddOptions(Config.GEHEIMWOERTER_SPIEL.getGamesAsStringList());
 
-        TMP_Dropdown WerBietetMehrDropdown = GameObject.Find("WerBietetMehr/Auswahl").GetComponent<TMP_Dropdown>();
+        TMP_Dropdown WerBietetMehrDropdown = GameObject.Find("WerBietetMehr/WerBietetMehr").GetComponent<TMP_Dropdown>();
         WerBietetMehrDropdown.ClearOptions();
         WerBietetMehrDropdown.AddOptions(Config.WERBIETETMEHR_SPIEL.getGamesAsList());
 
-        TMP_Dropdown AuktionDropdown = GameObject.Find("Auktion/Auswahl").GetComponent<TMP_Dropdown>();
+        TMP_Dropdown AuktionDropdown = GameObject.Find("Auktion/Auktion").GetComponent<TMP_Dropdown>();
         AuktionDropdown.ClearOptions();
         AuktionDropdown.AddOptions(Config.AUKTION_SPIEL.getGamesAsStringList());
 
-        TMP_Dropdown SloxikonDropdown = GameObject.Find("Sloxikon/Auswahl").GetComponent<TMP_Dropdown>();
+        TMP_Dropdown SloxikonDropdown = GameObject.Find("Sloxikon/Sloxikon").GetComponent<TMP_Dropdown>();
         SloxikonDropdown.ClearOptions();
         SloxikonDropdown.AddOptions(Config.SLOXIKON_SPIEL.getGamesAsStringList());
     }
     #region Starte Spiele
     /// <summary>
-    /// Startet das Flaggen Spiel
+    /// Startet das Spiel mit dem angegebenen Titel, falls dieses nicht existiert, wird der Server beendet
     /// </summary>
-    public void StarteFlaggen()
+    /// <param name="spieltitel"></param>
+    public void StarteSpiel(string spieltitel)
     {
-        Logging.log(Logging.LogType.Normal, "StartupServer", "StarteFlaggen", "Flaggen starts");
-        Config.GAME_TITLE = "Flaggen";
-        SceneManager.LoadScene("Flaggen");
-        Broadcast("#StarteSpiel Flaggen");
+        Logging.log(Logging.LogType.Normal, "StartupServer", "StarteSpiel", "Spiel wird geladen: " + spieltitel);
+        Config.GAME_TITLE = spieltitel;
+
+        if (spieltitel == "Quiz" && Config.QUIZ_SPIEL.getSelected() == null)
+            return;
+        else if (spieltitel == "Listen" && Config.LISTEN_SPIEL.getSelected() == null)
+            return;
+        else if (spieltitel == "Mosaik" && Config.MOSAIK_SPIEL.getSelected() == null)
+            return;
+        else if (spieltitel == "Geheimwörter" && Config.GEHEIMWOERTER_SPIEL.getSelected() == null)
+            return;
+        else if (spieltitel == "WerBietetMehr" && Config.WERBIETETMEHR_SPIEL.getSelected() == null)
+            return;
+        else if (spieltitel == "Auktion" && Config.AUKTION_SPIEL.getSelected() == null)
+            return;
+        else if (spieltitel == "Sloxikon" && Config.SLOXIKON_SPIEL.getSelected() == null)
+            return;
+
+        // Lädt Spiel & Senden an Clients, falls das Spiel nicht existiert, wird der Server geschlossen
+        try
+        {
+            SceneManager.LoadScene(spieltitel);
+            ServerUtils.AddBroadcast("#StarteSpiel " + spieltitel);
+        }
+        catch
+        {
+            Logging.log(Logging.LogType.Error, "StartupServer", "StarteSpiel", "Unbekanntes Spiel soll geladen werden. Server wird geschlossen. Spiel: " + spieltitel);
+            ServerUtils.AddBroadcast("#ServerClosed");
+            Logging.log(Logging.LogType.Normal, "StartupServer", "StarteSpiel", "Server wird geschlossen.");
+            Config.SERVER_TCP.Stop();
+            SceneManager.LoadSceneAsync("Startup");
+            return;
+        }
     }
     /// <summary>
-    /// Startet das Quiz Spiel -> Alle Spieler laden in die neue Scene
+    /// Wählt eine Spieldatei für das gewählte Spiel aus
     /// </summary>
-    public void StarteQuiz(TMP_Dropdown drop)
+    /// <param name="drop"></param>
+    public void SelectGameStat(TMP_Dropdown drop)
     {
-        Config.QUIZ_SPIEL.setSelected(Config.QUIZ_SPIEL.getQuizByIndex(drop.value));
-        Logging.log(Logging.LogType.Normal, "StartupServer", "StarteQuiz", "Quiz starts: " + Config.QUIZ_SPIEL.getSelected().getTitel());
-        Config.GAME_TITLE = "Quiz";
-        SceneManager.LoadScene("Quiz");
-        Broadcast("#StarteSpiel Quiz");
-    }
-    /// <summary>
-    /// Startet das Listen Spiel -> Alle Spieler laden in die neue Scene
-    /// </summary>
-    public void StarteListen(TMP_Dropdown drop)
-    {
-        Config.LISTEN_SPIEL.setSelected(Config.LISTEN_SPIEL.getListe(drop.value));
-        Logging.log(Logging.LogType.Normal, "StartupServer", "StarteListen", "Listen starts: " + Config.LISTEN_SPIEL.getSelected().getTitel());
-        Config.GAME_TITLE = "Listen";
-        SceneManager.LoadScene("Listen");
-        Broadcast("#StarteSpiel Listen");
-    }
-    /// <summary>
-    /// Starte das Mosaik Spiel -> Alle Spieler laden in die neue Scene
-    /// </summary>
-    public void StarteMosaik(TMP_Dropdown drop)
-    {
-        Config.MOSAIK_SPIEL.setSelected(Config.MOSAIK_SPIEL.getMosaik(drop.value));
-        Logging.log(Logging.LogType.Normal, "StartupServer", "StarteMosaik", "Mosaik starts: " + Config.MOSAIK_SPIEL.getSelected().getTitel());
-        Config.GAME_TITLE = "Mosaik";
-        SceneManager.LoadScene("Mosaik");
-        Broadcast("#StarteSpiel Mosaik");
-    }
-    /// <summary>
-    /// Starte das Geheimwörter Spiel -> Alle Spieler laden in die neue Scene
-    /// </summary>
-    public void StarteGeheimwörter(TMP_Dropdown drop)
-    {
-        Config.GEHEIMWOERTER_SPIEL.setSelected(Config.GEHEIMWOERTER_SPIEL.getListe(drop.value));
-        Logging.log(Logging.LogType.Normal, "StartupServer", "StarteGeheimwörter", "Geheimwörter starts: " + Config.GEHEIMWOERTER_SPIEL.getSelected().getTitel());
-        Config.GAME_TITLE = "Geheimwörter";
-        SceneManager.LoadScene("Geheimwörter");
-        Broadcast("#StarteSpiel Geheimwörter");
-    }
-    /// <summary>
-    /// Starte das WerBietetMehr Spiel -> Alle Spieler laden in die neue Scene
-    /// </summary>
-    public void StarteWerBietetMehr(TMP_Dropdown drop)
-    {
-        Config.WERBIETETMEHR_SPIEL.setSelected(Config.WERBIETETMEHR_SPIEL.getQuizByIndex(drop.value));
-        Logging.log(Logging.LogType.Normal, "StartupServer", "StarteWerBietetMehr", "WerBietetMehr starts: " + Config.WERBIETETMEHR_SPIEL.getSelected().getTitel());
-        Config.GAME_TITLE = "WerBietetMehr";
-        SceneManager.LoadScene("WerBietetMehr");
-        Broadcast("#StarteSpiel WerBietetMehr");
-    }
-    /// <summary>
-    /// Starte das Auktion Spiel -> Alle Spieler laden in die neue Scene
-    /// </summary>
-    public void StarteAuktion(TMP_Dropdown drop)
-    {
-        Config.AUKTION_SPIEL.setSelected(Config.AUKTION_SPIEL.getAuktion(drop.value));
-        Logging.log(Logging.LogType.Normal, "StartupServer", "StarteAuktion", "Auktion starts: " + Config.AUKTION_SPIEL.getSelected().getTitel());
-        Config.GAME_TITLE = "Auktion";
-        SceneManager.LoadScene("Auktion");
-        Broadcast("#StarteSpiel Auktion");
-    }
-    /// <summary>
-    /// Starte das Sloxikon Spiel -> Alle Spieler laden in die neue Scene
-    /// </summary>
-    public void StarteSloxikon(TMP_Dropdown drop)
-    {
-        Config.SLOXIKON_SPIEL.setSelected(Config.SLOXIKON_SPIEL.getQuizByIndex(drop.value));
-        Logging.log(Logging.LogType.Normal, "StartupServer", "StarteSloxikon", "Sloxikon starts: " + Config.SLOXIKON_SPIEL.getSelected().getTitel());
-        Config.GAME_TITLE = "Sloxikon";
-        SceneManager.LoadScene("Sloxikon");
-        Broadcast("#StarteSpiel Sloxikon");
-    }
-    /// <summary>
-    /// Starte das MenschÄrgerDichNicht Spiel -> Alle Spieler laden in die neue Scene
-    /// </summary>
-    public void StarteMenschAergerDichNicht()
-    {
-        Logging.log(Logging.LogType.Normal, "StartupServer", "StarteMenschAergerDichNicht", "MenschAergerDichNicht starts.");
-        Config.GAME_TITLE = "MenschAergerDichNicht";
-        SceneManager.LoadScene("MenschAergerDichNicht");
-        Broadcast("#StarteSpiel MenschAergerDichNicht");
-    }
-    /// <summary>
-    /// Starte das Kniffel Spiel -> Alle Spieler laden in die neue Scene
-    /// </summary>
-    public void StarteKniffel()
-    {
-        Logging.log(Logging.LogType.Normal, "StartupServer", "StarteKniffel", "Kniffel starts.");
-        Config.GAME_TITLE = "Kniffel";
-        SceneManager.LoadScene("Kniffel");
-        Broadcast("#StarteSpiel Kniffel");
-    }
-    /// <summary>
-    /// Starte das Tabu Spiel -> Alle Spieler laden in die neue Scene
-    /// </summary>
-    public void StarteTabu()
-    {
-        Logging.log(Logging.LogType.Normal, "StartupServer", "StarteTabu", "Tabu starts.");
-        Config.GAME_TITLE = "Tabu";
-        SceneManager.LoadScene("Tabu");
-        Broadcast("#StarteSpiel Tabu");
+        switch (drop.name)
+        {
+            case "Quiz":
+                Config.QUIZ_SPIEL.setSelected(Config.QUIZ_SPIEL.getQuizByIndex(drop.value));
+                break;
+            case "Listen":
+                Config.LISTEN_SPIEL.setSelected(Config.LISTEN_SPIEL.getListe(drop.value));
+                break;
+            case "Mosaik":
+                Config.MOSAIK_SPIEL.setSelected(Config.MOSAIK_SPIEL.getMosaik(drop.value));
+                break;
+            case "Geheimwörter":
+                Config.GEHEIMWOERTER_SPIEL.setSelected(Config.GEHEIMWOERTER_SPIEL.getListe(drop.value));
+                break;
+            case "WerBietetMehr":
+                Config.WERBIETETMEHR_SPIEL.setSelected(Config.WERBIETETMEHR_SPIEL.getQuizByIndex(drop.value));
+                break;
+            case "Auktion":
+                Config.AUKTION_SPIEL.setSelected(Config.AUKTION_SPIEL.getAuktion(drop.value));
+                break;
+            case "Sloxikon":
+                Config.SLOXIKON_SPIEL.setSelected(Config.SLOXIKON_SPIEL.getQuizByIndex(drop.value));
+                break;
+        }
     }
     #endregion
 

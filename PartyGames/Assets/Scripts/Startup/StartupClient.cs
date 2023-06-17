@@ -33,12 +33,11 @@ public class StartupClient : MonoBehaviour
     {
         InitPlayerLobby();
 
-        MiniGames[0].transform.parent.parent.gameObject.SetActive(true);
-        MiniGames[0].SetActive(true);
         #region Client Verbindungsaufbau zum Server
         if (!Config.CLIENT_STARTED)
         {
-            StarteClient();
+            //StarteClient();
+            StartCoroutine(StarteClient());
         }
         else
         {
@@ -162,13 +161,30 @@ public class StartupClient : MonoBehaviour
     /// <summary>
     /// Startet den Client mit der Verbindung zum Server
     /// </summary>
-    private void StarteClient()
+    private IEnumerator StarteClient()
     {
         Logging.log(Logging.LogType.Normal, "StartupClient", "StarteClient", "Verbindung zwischen Client und Server wird aufgebaut...");
+
+        Config.CLIENT_TCP = new TcpClient();
+        for (int i = 1; i <= 4; i++)
+        {
+            Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindungsversuch: " + i + "/4";
+            yield return new WaitForSeconds(0.001f);
+            if (!Config.CLIENT_TCP.ConnectAsync(Config.SERVER_CONNECTION_IP, Config.SERVER_CONNECTION_PORT).Wait(1000 * i))
+            {
+                // connection failure
+                Logging.log(Logging.LogType.Warning, "StartupClient", "StarteClient", "Verbindung konnte nicht aufgebaut werden. " + i);
+                yield return null;
+                continue;
+            }
+            break;
+        }
+        yield return null;
         try
         {
             //Config.CLIENT_TCP = new TcpClient("localhost", Config.SERVER_CONNECTION_PORT);
-            Config.CLIENT_TCP = new TcpClient(Config.SERVER_CONNECTION_IP, Config.SERVER_CONNECTION_PORT);
+            //Config.CLIENT_TCP = new TcpClient(Config.SERVER_CONNECTION_IP, Config.SERVER_CONNECTION_PORT);
+            
             Config.CLIENT_TCP.Client.NoDelay = true;
             Config.CLIENT_STARTED = true;
             Logging.log(Logging.LogType.Normal, "StartupClient", "StarteClient", "Verbindung wurde erfolgreich aufgebaut.");
@@ -190,10 +206,14 @@ public class StartupClient : MonoBehaviour
             transform.gameObject.SetActive(false);
             Logging.log(Logging.LogType.Normal, "StartupClient", "StarteClient", "Client wird ins Hauptmenü geladen.");
             SceneManager.LoadSceneAsync("Startup");
-            return;
+            yield break;
         }
         // Verbindung erfolgreich
         Config.HAUPTMENUE_FEHLERMELDUNG = "";
+
+
+        MiniGames[0].transform.parent.parent.gameObject.SetActive(true);
+        MiniGames[0].SetActive(true);
     }
     /// <summary>
     /// Trennt die Verbindung zum Server
@@ -363,7 +383,6 @@ public class StartupClient : MonoBehaviour
         Hauptmenue.SetActive(false);
         Lobby.SetActive(true);
 
-        //StopCoroutine(TestIfStartConnectionError());
         StartCoroutine(TestIfStartConnectionError());
     }
     /// <summary>
@@ -377,7 +396,6 @@ public class StartupClient : MonoBehaviour
 
         SendToServer("#SpielerIconChange 0"); // Für namentliches Icon
 
-        //StopCoroutine(TestConnectionToServer());
         StartCoroutine(TestConnectionToServer());
     }
     /// <summary>
@@ -483,7 +501,7 @@ public class StartupClient : MonoBehaviour
             // Display ServerInfos
             if (id == 0)
             {
-                Config.SERVER_ICON = Resources.Load<Sprite>("Images/ProfileIcons/" + sp.Replace("[ICON]", "|").Split('|')[1]);
+                Config.SERVER_PLAYER.icon = Resources.Load<Sprite>("Images/ProfileIcons/" + sp.Replace("[ICON]", "|").Split('|')[1]);
                 SpielerAnzeigeLobby[0].SetActive(true);
                 SpielerAnzeigeLobby[0].GetComponentsInChildren<Image>()[1].sprite = Resources.Load<Sprite>("Images/ProfileIcons/" + sp.Replace("[ICON]", "|").Split('|')[1]);
                 SpielerAnzeigeLobby[0].GetComponentsInChildren<TMP_Text>()[0].text = sp.Replace("[NAME]", "|").Split('|')[1];
@@ -568,7 +586,7 @@ public class StartupClient : MonoBehaviour
         Logging.log(Logging.LogType.Debug, "StartupClient", "UpdateCrowns", "Kronenanzeige wird aktualisiert. " + data);
         #region Speichert Zahlen
         // Server
-        Config.SERVER_CROWNS = Int32.Parse(data.Replace("[0]","|").Split('|')[1]);
+        Config.SERVER_PLAYER.crowns = Int32.Parse(data.Replace("[0]","|").Split('|')[1]);
         foreach (Player p in Config.PLAYERLIST)
         {
             p.crowns = Int32.Parse(data.Replace("[" + p.id + "]", "|").Split('|')[1]);
@@ -601,20 +619,20 @@ public class StartupClient : MonoBehaviour
             }
         }
         // Server
-        if (Config.SERVER_CROWNS > top1)
+        if (Config.SERVER_PLAYER.crowns > top1)
         {
             top3 = top2;
             top2 = top1;
-            top1 = Config.SERVER_CROWNS;
+            top1 = Config.SERVER_PLAYER.crowns;
         }
-        else if (Config.SERVER_CROWNS > top2)
+        else if (Config.SERVER_PLAYER.crowns > top2)
         {
             top3 = top2;
-            top2 = Config.SERVER_CROWNS;
+            top2 = Config.SERVER_PLAYER.crowns;
         }
-        else if (Config.SERVER_CROWNS > top3)
+        else if (Config.SERVER_PLAYER.crowns > top3)
         {
-            top3 = Config.SERVER_CROWNS;
+            top3 = Config.SERVER_PLAYER.crowns;
         }
         #endregion
 
@@ -651,13 +669,13 @@ public class StartupClient : MonoBehaviour
                 SpielerAnzeigeLobby[i + 1].transform.GetChild(4).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Top4");
         }
         // Server
-        SpielerAnzeigeLobby[0].transform.GetChild(5).GetComponent<TMP_Text>().text = "" + Config.SERVER_CROWNS;
+        SpielerAnzeigeLobby[0].transform.GetChild(5).GetComponent<TMP_Text>().text = "" + Config.SERVER_PLAYER.crowns;
 
-        if (Config.SERVER_CROWNS == top1)
+        if (Config.SERVER_PLAYER.crowns == top1)
             SpielerAnzeigeLobby[0].transform.GetChild(4).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Top1");
-        else if (Config.SERVER_CROWNS == top2)
+        else if (Config.SERVER_PLAYER.crowns == top2)
             SpielerAnzeigeLobby[0].transform.GetChild(4).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Top2");
-        else if (Config.SERVER_CROWNS == top3)
+        else if (Config.SERVER_PLAYER.crowns == top3)
             SpielerAnzeigeLobby[0].transform.GetChild(4).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Top3");
         else
             SpielerAnzeigeLobby[0].transform.GetChild(4).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Top4");
@@ -672,7 +690,7 @@ public class StartupClient : MonoBehaviour
                 SpielerAnzeigeLobby[i].transform.GetChild(4).gameObject.SetActive(false);
         }
         // Server
-        if (Config.SERVER_CROWNS > 0)
+        if (Config.SERVER_PLAYER.crowns > 0)
             SpielerAnzeigeLobby[0].transform.GetChild(4).gameObject.SetActive(true);
         else
         {
@@ -767,9 +785,12 @@ public class StartupClient : MonoBehaviour
             yield return null;
         }
         yield return null;
-        SpielVorschauElemente.transform.GetChild(0).GetChild(2).gameObject.SetActive(false);
+        bool state = SpielVorschauElemente.transform.GetChild(0).GetChild(2).gameObject.activeInHierarchy;
+        SpielVorschauElemente.transform.GetChild(0).GetChild(2).gameObject.SetActive(!state);
         yield return null;
-        SpielVorschauElemente.transform.GetChild(0).GetChild(2).gameObject.SetActive(true);
+        SpielVorschauElemente.transform.GetChild(0).GetChild(2).gameObject.SetActive(state);
+        yield return null;
+        SpielVorschauElemente.transform.GetChild(0).GetChild(1).GetComponent<TMP_Text>().text = SpielVorschauElemente.transform.GetChild(0).GetChild(1).GetComponent<TMP_Text>().text + " ";
         yield break;
     }
 

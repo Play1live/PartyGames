@@ -252,7 +252,7 @@ public class SloxikonServer : MonoBehaviour
     /// <returns></returns>
     private string UpdateSpieler()
     {
-        string msg = "#UpdateSpieler [ID]0[ID][PUNKTE]" + Config.SERVER_PLAYER_POINTS + "[PUNKTE]";
+        string msg = "#UpdateSpieler [ID]0[ID][PUNKTE]" + Config.SERVER_PLAYER.points + "[PUNKTE]";
         int connectedplayer = 0;
         for (int i = 0; i < Config.PLAYERLIST.Length; i++)
         {

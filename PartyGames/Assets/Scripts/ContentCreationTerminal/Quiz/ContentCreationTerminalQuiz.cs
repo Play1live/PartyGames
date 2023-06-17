@@ -317,9 +317,9 @@ public class ContentCreationTerminalQuiz : MonoBehaviour
         if (AusgewaehlterTitel.transform.GetChild(1).GetComponentInChildren<TMP_InputField>().text.Length == 0)
             return;
         Logging.log(Logging.LogType.Normal, "ContentCreationTerminalQuiz", "AddFrage", "Neue Frage wird hinzugefügt.");
-        string frage = FrageHinzufügen.transform.GetChild(1).GetComponent<TMP_InputField>().text;
-        string antwort = FrageHinzufügen.transform.GetChild(2).GetComponent<TMP_InputField>().text;
-        string info = FrageHinzufügen.transform.GetChild(3).GetComponent<TMP_InputField>().text;
+        string frage = FrageHinzufügen.transform.GetChild(1).GetComponent<TMP_InputField>().text.Replace("\n", "\\n");
+        string antwort = FrageHinzufügen.transform.GetChild(2).GetComponent<TMP_InputField>().text.Replace("\n", "\\n");
+        string info = FrageHinzufügen.transform.GetChild(3).GetComponent<TMP_InputField>().text.Replace("\n", "\\n");
 
         FrageHinzufügen.transform.GetChild(1).GetComponent<TMP_InputField>().text = "";
         FrageHinzufügen.transform.GetChild(2).GetComponent<TMP_InputField>().text = "";

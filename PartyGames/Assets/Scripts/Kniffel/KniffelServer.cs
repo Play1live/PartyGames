@@ -279,7 +279,7 @@ public class KniffelServer : MonoBehaviour
     {
         List<KniffelPlayer> player = new List<KniffelPlayer>();
         int playercounter = 0;
-        player.Add(new KniffelPlayer(playercounter++, Config.PLAYER_NAME, Config.SERVER_ICON, Punkteliste.transform.GetChild(2 + player.Count).gameObject));
+        player.Add(new KniffelPlayer(playercounter++, Config.PLAYER_NAME, Config.SERVER_PLAYER.icon, Punkteliste.transform.GetChild(2 + player.Count).gameObject));
         foreach (Player p in Config.PLAYERLIST)
         {
             if (p.isConnected && p.name.Length > 0)

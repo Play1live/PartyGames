@@ -290,11 +290,13 @@ public class ContentCreationTerminalSloxikon : MonoBehaviour
         if (ElementHinzufuegen.transform.GetChild(0).GetComponent<TMP_InputField>().text.Length == 0 ||
             ElementHinzufuegen.transform.GetChild(1).GetComponent<TMP_InputField>().text.Length == 0)
             return;
+        if (sloxikongame == null)
+            return;
         if (sloxikongame.getThemen().Count >= 30)
             return;
 
-        sloxikongame.getThemen().Add(ElementHinzufuegen.transform.GetChild(0).GetComponent<TMP_InputField>().text);
-        sloxikongame.getAntwort().Add(ElementHinzufuegen.transform.GetChild(1).GetComponent<TMP_InputField>().text);
+        sloxikongame.getThemen().Add(ElementHinzufuegen.transform.GetChild(0).GetComponent<TMP_InputField>().text.Replace("\n", "\\n"));
+        sloxikongame.getAntwort().Add(ElementHinzufuegen.transform.GetChild(1).GetComponent<TMP_InputField>().text.Replace("\n", "\\n"));
 
         ElementHinzufuegen.transform.GetChild(0).GetComponent<TMP_InputField>().text = "";
         ElementHinzufuegen.transform.GetChild(1).GetComponent<TMP_InputField>().text = "";

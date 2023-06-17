@@ -6,8 +6,8 @@ using UnityEngine;
 public class AuktionSpiel
 {
     public static string path = "/Spiele/Auktion";
-    private int minPlayer = 3;
-    private int maxPlayer = 9;
+    public static int minPlayer = 3;
+    public static int maxPlayer = 9;
     private List<Auktion> elemente;
     private Auktion selected;
 
@@ -33,6 +33,9 @@ public class AuktionSpiel
             // Lädt alle Flaggen und speichert diese ab
             elemente.Add(new Auktion(sfile));
         }
+
+        if (elemente.Count > 0)
+            setSelected(elemente[0]);
     }
 
     public int getMinPlayer() { return minPlayer; }

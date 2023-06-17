@@ -395,8 +395,8 @@ public class TabuServer : MonoBehaviour
                     // Server
                     if (teamrotList[index] == Config.PLAYER_NAME)
                     {
-                        PlayerObject.GetChild(0).GetComponent<Image>().sprite = Config.SERVER_ICON;
-                        teamrot1 += "[#]" + teamrotList[index] + "~" + Config.SERVER_ICON.name;
+                        PlayerObject.GetChild(0).GetComponent<Image>().sprite = Config.SERVER_PLAYER.icon;
+                        teamrot1 += "[#]" + teamrotList[index] + "~" + Config.SERVER_PLAYER.icon.name;
                     }
                     // Client
                     else
@@ -421,8 +421,8 @@ public class TabuServer : MonoBehaviour
                     // Server
                     if (teamblauList[index] == Config.PLAYER_NAME)
                     {
-                        PlayerObject.GetChild(0).GetComponent<Image>().sprite = Config.SERVER_ICON;
-                        teamblau1 += "[#]" + teamblauList[index] + "~" + Config.SERVER_ICON.name;
+                        PlayerObject.GetChild(0).GetComponent<Image>().sprite = Config.SERVER_PLAYER.icon;
+                        teamblau1 += "[#]" + teamblauList[index] + "~" + Config.SERVER_PLAYER.icon.name;
                     }
                     // Client
                     else
@@ -467,8 +467,8 @@ public class TabuServer : MonoBehaviour
                 // Server
                 if (teamrotList[index] == Config.PLAYER_NAME)
                 {
-                    PlayerObject.GetChild(0).GetComponent<Image>().sprite = Config.SERVER_ICON;
-                    teamrot += "[#]" + teamrotList[index] + "~" + Config.SERVER_ICON.name;
+                    PlayerObject.GetChild(0).GetComponent<Image>().sprite = Config.SERVER_PLAYER.icon;
+                    teamrot += "[#]" + teamrotList[index] + "~" + Config.SERVER_PLAYER.icon.name;
                 }
                 // Client
                 else 
@@ -493,8 +493,8 @@ public class TabuServer : MonoBehaviour
                 // Server
                 if (teamblauList[index] == Config.PLAYER_NAME)
                 {
-                    PlayerObject.GetChild(0).GetComponent<Image>().sprite = Config.SERVER_ICON;
-                    teamblau += "[#]" + teamblauList[index] + "~" + Config.SERVER_ICON.name;
+                    PlayerObject.GetChild(0).GetComponent<Image>().sprite = Config.SERVER_PLAYER.icon;
+                    teamblau += "[#]" + teamblauList[index] + "~" + Config.SERVER_PLAYER.icon.name;
                 }
                 // Client
                 else

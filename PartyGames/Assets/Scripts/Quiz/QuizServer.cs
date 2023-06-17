@@ -245,7 +245,7 @@ public class QuizServer : MonoBehaviour
     /// <returns>#UpdateSpieler ...</returns>
     private string UpdateSpieler()
     {
-        string msg = "#UpdateSpieler [ID]0[ID][PUNKTE]" + Config.SERVER_PLAYER_POINTS + "[PUNKTE]";
+        string msg = "#UpdateSpieler [ID]0[ID][PUNKTE]" + Config.SERVER_PLAYER.points + "[PUNKTE]";
         int connectedplayer = 0;
         for (int i = 0; i < Config.PLAYERLIST.Length; i++)
         {
@@ -263,7 +263,7 @@ public class QuizServer : MonoBehaviour
                 SpielerAnzeige[i, 0].SetActive(false);
         }
         // Server 
-        FalscheAntworten.GetComponent<TMP_Text>().text = "Falsche Antworten: "+Config.SERVER_PLAYER_POINTS;
+        FalscheAntworten.GetComponent<TMP_Text>().text = "Falsche Antworten: "+Config.SERVER_PLAYER.points;
         Logging.log(Logging.LogType.Debug, "QuizServer", "UpdateSpieler", msg);
         return msg;
     }
@@ -286,8 +286,8 @@ public class QuizServer : MonoBehaviour
         FragenIndex2 = GameObject.Find("QuizAnzeigen/FragenIndex2");
         FragenIndex2.GetComponentInChildren<TMP_Text>().text = "";
         FalscheAntworten = GameObject.Find("QuizAnzeigen/FalscheAntwortenCounter");
-        Config.SERVER_PLAYER_POINTS = 0;
-        FalscheAntworten.GetComponent<TMP_Text>().text = "Falsche Antworten: "+Config.SERVER_PLAYER_POINTS;
+        Config.SERVER_PLAYER.points = 0;
+        FalscheAntworten.GetComponent<TMP_Text>().text = "Falsche Antworten: "+Config.SERVER_PLAYER.points;
         // Buzzer Deaktivieren
         GameObject.Find("ServerSide/BuzzerAktivierenToggle").GetComponent<Toggle>().isOn = false;
         BuzzerAnzeige = GameObject.Find("ServerSide/BuzzerIstAktiviert");
@@ -685,7 +685,7 @@ public class QuizServer : MonoBehaviour
             if (pId != p.id && p.isConnected)
                 p.points += PunkteProFalsche;
         }
-        Config.SERVER_PLAYER_POINTS += PunkteProFalsche;
+        Config.SERVER_PLAYER.points += PunkteProFalsche;
         UpdateSpielerBroadcast();
     }
     /// <summary>
