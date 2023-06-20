@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using TMPro;
@@ -20,7 +21,6 @@ public class StartupClient : MonoBehaviour
     private string ticktacktoe = "";
     private string ticktacktoeRes = "W0WL0LD0D";
     private bool PingWarteAufAntwort = false;
-    private string UpdateClientGameVorschau = "";
     Coroutine UpdateClientGameVorschauCoroutine;
     private int connectedPlayer;
 
@@ -43,9 +43,23 @@ public class StartupClient : MonoBehaviour
         {
             Hauptmenue.SetActive(false);
             Lobby.SetActive(true);
+            MiniGames[0].transform.parent.parent.gameObject.SetActive(true);
+            MiniGames[0].SetActive(true);
+
+            if (Config.CLIENT_STARTED && Config.PLAYER_UpdateClientGameVorschau.Length > 0)
+            {
+                if (UpdateClientGameVorschauCoroutine != null)
+                {
+                    StopCoroutine(UpdateClientGameVorschauCoroutine);
+                    UpdateClientGameVorschauCoroutine = null;
+                }
+                UpdateClientGameVorschauCoroutine = StartCoroutine(ShowGameVorschauElemente());
+            }
+
             SendToServer("#GetSpielerUpdate");
         }
         #endregion
+
     }
 
     void Update()
@@ -166,10 +180,18 @@ public class StartupClient : MonoBehaviour
         Logging.log(Logging.LogType.Normal, "StartupClient", "StarteClient", "Verbindung zwischen Client und Server wird aufgebaut...");
 
         Config.CLIENT_TCP = new TcpClient();
+        yield return new WaitForSeconds(0.001f);
+        try
+        {
+            Dns.GetHostAddresses(Config.SERVER_CONNECTION_IP);
+        }
+        catch
+        {
+            Logging.log(Logging.LogType.Warning, "StartupClient", "StarteClient", "Verbindung konnte nicht aufgebaut werden. Keine Verbindung zum Internet?");
+        }
         for (int i = 1; i <= 4; i++)
         {
             Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindungsversuch: " + i + "/4";
-            yield return new WaitForSeconds(0.001f);
             if (!Config.CLIENT_TCP.ConnectAsync(Config.SERVER_CONNECTION_IP, Config.SERVER_CONNECTION_PORT).Wait(1000 * i))
             {
                 // connection failure
@@ -370,7 +392,7 @@ public class StartupClient : MonoBehaviour
         }
         Config.PLAYER_ID = idparse;
 
-        UpdateClientGameVorschau = data.Replace("[GAMEFILES]", "|").Split('|')[1];
+        Config.PLAYER_UpdateClientGameVorschau = data.Replace("[GAMEFILES]", "|").Split('|')[1];
         if (UpdateClientGameVorschauCoroutine != null)
         {
             StopCoroutine(UpdateClientGameVorschauCoroutine);
@@ -711,8 +733,8 @@ public class StartupClient : MonoBehaviour
     /// <summary>
     IEnumerator ShowGameVorschauElemente()
     {
-        Logging.log(Logging.LogType.Normal, "StartupClient", "ShowGameVorschauElemente", "Aktualisiere Gamevorschau Anzeigen \n" + UpdateClientGameVorschau);
-        string data = UpdateClientGameVorschau;
+        Logging.log(Logging.LogType.Normal, "StartupClient", "ShowGameVorschauElemente", "Aktualisiere Gamevorschau Anzeigen \n" + Config.PLAYER_UpdateClientGameVorschau);
+        string data = Config.PLAYER_UpdateClientGameVorschau;
         if (data.Length == 0)
             yield break;
         

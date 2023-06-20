@@ -41,6 +41,7 @@ public class SloxikonServer : MonoBehaviour
 
     void OnEnable()
     {
+        StartCoroutine(ServerUtils.Broadcast());
         PlayerConnected = new bool[Config.SERVER_MAX_CONNECTIONS];
         if (!Config.SERVER_STARTED)
             return;
@@ -59,7 +60,6 @@ public class SloxikonServer : MonoBehaviour
 
         foreach (Player spieler in Config.PLAYERLIST)
         {
-
             if (spieler.isConnected == false)
                 continue;
 
@@ -78,37 +78,20 @@ public class SloxikonServer : MonoBehaviour
                 }
             }
             #endregion
-            #region Spieler Disconnected Message
-            for (int i = 0; i < Config.PLAYERLIST.Length; i++)
-            {
-                if (Config.PLAYERLIST[i].isConnected == false)
-                {
-                    if (Config.PLAYERLIST[i].isDisconnected == true)
-                    {
-                        Logging.log(Logging.LogType.Normal, "QuizServer", "Update", "Spieler hat die Verbindung getrennt. ID: " + Config.PLAYERLIST[i].id);
-                        Broadcast(Config.PLAYERLIST[i].name + " has disconnected", Config.PLAYERLIST);
-                        Config.PLAYERLIST[i].isConnected = false;
-                        Config.PLAYERLIST[i].isDisconnected = false;
-                        Config.SERVER_ALL_CONNECTED = false;
-                        Config.PLAYERLIST[i].name = "";
-                    }
-                }
-            }
-            #endregion
         }
         #endregion
     }
 
     private void OnApplicationQuit()
     {
-        Broadcast("#ServerClosed", Config.PLAYERLIST);
+        ServerUtils.BroadcastImmediate("#ServerClosed");
         Logging.log(Logging.LogType.Normal, "Server", "OnApplicationQuit", "Server wird geschlossen");
         Config.SERVER_TCP.Server.Close();
     }
 
     #region Server Stuff
     #region Kommunikation
-    /// <summary>
+    /*/// <summary>
     /// Sendet eine Nachricht an den übergebenen Spieler
     /// </summary>
     /// <param name="data"></param>
@@ -154,6 +137,18 @@ public class SloxikonServer : MonoBehaviour
         }
     }
     /// <summary>
+    /// Spieler beendet das Spiel
+    /// </summary>
+    /// <param name="player"></param>
+    private void ClientClosed(Player player)
+    {
+        player.icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
+        player.name = "";
+        player.points = 0;
+        player.isConnected = false;
+        player.isDisconnected = true;
+    }*/
+    /// <summary>
     /// Einkommende Nachrichten die von Spielern an den Server gesendet werden.
     /// </summary>
     /// <param name="spieler"></param>
@@ -188,7 +183,7 @@ public class SloxikonServer : MonoBehaviour
                 break;
 
             case "#ClientClosed":
-                ClientClosed(player);
+                ServerUtils.ClientClosed(player);
                 UpdateSpielerBroadcast();
                 PlayDisconnectSound();
                 break;
@@ -212,39 +207,18 @@ public class SloxikonServer : MonoBehaviour
     }
     #endregion
     /// <summary>
-    /// Fordert alle Clients auf die RemoteConfig neuzuladen
-    /// </summary>
-    public void UpdateRemoteConfig()
-    {
-        Broadcast("#UpdateRemoteConfig");
-        LoadConfigs.FetchRemoteConfig();
-    }
-    /// <summary>
-    /// Spieler beendet das Spiel
-    /// </summary>
-    /// <param name="player"></param>
-    private void ClientClosed(Player player)
-    {
-        player.icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
-        player.name = "";
-        player.points = 0;
-        player.isConnected = false;
-        player.isDisconnected = true;
-    }
-    /// <summary>
     /// Spiel Verlassen & Zurück in die Lobby laden
     /// </summary>
     public void SpielVerlassenButton()
     {
-        SceneManager.LoadScene("Startup");
-        Broadcast("#ZurueckInsHauptmenue");
+        ServerUtils.AddBroadcast("#ZurueckInsHauptmenue");
     }
     /// <summary>
     /// Sendet aktualisierte Spielerinfos an alle Spieler
     /// </summary>
     private void UpdateSpielerBroadcast()
     {
-        Broadcast(UpdateSpieler(), Config.PLAYERLIST);
+        ServerUtils.AddBroadcast(UpdateSpieler());
     }
     /// <summary>
     /// Aktualisiert die Spieler Anzeige Informationen & gibt diese als Text zurück
@@ -383,7 +357,7 @@ public class SloxikonServer : MonoBehaviour
     public void ShowTitel()
     {
         Logging.log(Logging.LogType.Debug, "SloxikonServer", "ShowTitel", "Zeige Titel des Games an. " + Config.SLOXIKON_SPIEL.getSelected().getTitel());
-        Broadcast("#SloxikonShowTitel " + Config.SLOXIKON_SPIEL.getSelected().getTitel());
+        ServerUtils.AddBroadcast("#SloxikonShowTitel " + Config.SLOXIKON_SPIEL.getSelected().getTitel());
         GameObject.Find("Sloxikon/Titel").GetComponent<TMP_Text>().text = Config.SLOXIKON_SPIEL.getSelected().getTitel();
     }
     /// <summary>
@@ -392,7 +366,7 @@ public class SloxikonServer : MonoBehaviour
     public void HideAll()
     {
         Logging.log(Logging.LogType.Debug, "SloxikonServer", "HideAll", "Blendet Anzeigen aus");
-        Broadcast("#SloxikonHideAll");
+        ServerUtils.AddBroadcast("#SloxikonHideAll");
         Thema.SetActive(false);
         // Falls jemand disconnected alle Anzeigen ausblenden
         for (int i = 0; i < Config.PLAYERLIST.Length + 1; i++)
@@ -417,7 +391,7 @@ public class SloxikonServer : MonoBehaviour
         List<int> positionList = new List<int>();
         positionList.AddRange(playerList);
 
-        Broadcast("#SloxikonShowThema " + Config.SLOXIKON_SPIEL.getSelected().getThemen()[aktuellesThema] + "|" + playerList.Count);
+        ServerUtils.AddBroadcast("#SloxikonShowThema " + Config.SLOXIKON_SPIEL.getSelected().getThemen()[aktuellesThema] + "|" + playerList.Count);
         Thema.SetActive(true);
         Thema.GetComponentInChildren<TMP_InputField>().text = Config.SLOXIKON_SPIEL.getSelected().getThemen()[aktuellesThema];
 
@@ -515,7 +489,7 @@ public class SloxikonServer : MonoBehaviour
         {
             if (sprite == p.icon)
             {
-                Broadcast("#SpielersTurn " + p.id);
+                ServerUtils.AddBroadcast("#SpielersTurn " + p.id);
                 for (int i = 0; i < Config.SERVER_MAX_CONNECTIONS; i++)
                     SpielerAnzeige[i, 1].SetActive(false);
                 SpielerAnzeige[(p.id - 1), 1].SetActive(true);
@@ -544,7 +518,7 @@ public class SloxikonServer : MonoBehaviour
             // Blendet ShowTXT button aus
             Antworten[i].transform.GetChild(0).GetChild(0).GetComponent<Button>().interactable = false;
         }
-        Broadcast("#SloxikonShowAllAntworten " + anz + "|" + msg);
+        ServerUtils.AddBroadcast("#SloxikonShowAllAntworten " + anz + "|" + msg);
     }
     /// <summary>
     /// Blendet bestimmte Antwort ein
@@ -557,7 +531,7 @@ public class SloxikonServer : MonoBehaviour
         string msg = antwortindex + "| " + Antworten[antwortindex].transform.GetChild(2).GetComponentInChildren<TMP_InputField>().text;
         // Blendet ShowTXT button aus
         Antworten[antwortindex].transform.GetChild(0).GetChild(0).GetComponent<Button>().interactable = false;
-        Broadcast("#SloxikonShowAntwort " + msg);       
+        ServerUtils.AddBroadcast("#SloxikonShowAntwort " + msg);       
     }
     /// <summary>
     /// Blendet den Autor der Antwortmöglichkeit ein
@@ -570,7 +544,7 @@ public class SloxikonServer : MonoBehaviour
         Antworten[ownerindex].transform.GetChild(1).GetComponent<Image>().color = new Color(255, 255, 255, 1f);
         // Blendet ShowTXT button aus
         Antworten[ownerindex].transform.GetChild(0).GetChild(1).GetComponent<Button>().interactable = false;
-        Broadcast("#SloxikonShowOwner " + ownerindex + "|" + Antworten[ownerindex].transform.GetChild(1).GetComponent<Image>().sprite.name);
+        ServerUtils.AddBroadcast("#SloxikonShowOwner " + ownerindex + "|" + Antworten[ownerindex].transform.GetChild(1).GetComponent<Image>().sprite.name);
     }
     /// <summary>
     /// Wählt für Spieler eine Antwortmöglichkeit aus
@@ -582,7 +556,7 @@ public class SloxikonServer : MonoBehaviour
         int pid = Int32.Parse(Player.name.Replace("P (", "").Replace(")", "")) - 1;
         int answer = Int32.Parse(Player.transform.parent.parent.name.Replace("Answer (", "").Replace(")", "")) - 1;
 
-        Broadcast("#SloxikonPlayerSelectedAnswer " + answer + "|" + pid);
+        ServerUtils.AddBroadcast("#SloxikonPlayerSelectedAnswer " + answer + "|" + pid);
 
         for (int i = 0; i < Config.PLAYERLIST.Length + 1; i++)
         {
@@ -643,7 +617,7 @@ public class SloxikonServer : MonoBehaviour
             TimerCoroutine = null;
         }
         int sekunden = Int32.Parse(TimerSekunden.text);
-        Broadcast("#SloxikonTimerStarten " + (sekunden));
+        ServerUtils.AddBroadcast("#SloxikonTimerStarten " + (sekunden));
         TimerCoroutine = StartCoroutine(RunTimer(sekunden));
     }
     /// <summary>
@@ -654,7 +628,7 @@ public class SloxikonServer : MonoBehaviour
         Logging.log(Logging.LogType.Debug, "SloxikonServer", "TimerStop", "Beendet den Timer");
         if (TimerSekunden.text.Length == 0)
             return;
-        Broadcast("#SloxikonTimerStop");
+        ServerUtils.AddBroadcast("#SloxikonTimerStop");
         Timer.SetActive(false);
         StopCoroutine(TimerCoroutine);
     }
@@ -710,7 +684,7 @@ public class SloxikonServer : MonoBehaviour
         }
         Logging.log(Logging.LogType.Warning, "SloxikonServer", "SpielerBuzzered", "B: " + p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
         buzzerIsOn = false;
-        Broadcast("#AudioBuzzerPressed " + p.id);
+        ServerUtils.AddBroadcast("#AudioBuzzerPressed " + p.id);
         BuzzerSound.Play();
         SpielerAnzeige[p.id - 1, 1].SetActive(true);
     }
@@ -723,7 +697,7 @@ public class SloxikonServer : MonoBehaviour
             SpielerAnzeige[i, 1].SetActive(false);
         buzzerIsOn = BuzzerAnzeige.activeInHierarchy;
         Logging.log(Logging.LogType.Warning, "SloxikonServer", "SpielerBuzzerFreigeben", "Buzzer wurde freigegeben.");
-        Broadcast("#BuzzerFreigeben");
+        ServerUtils.AddBroadcast("#BuzzerFreigeben");
     }
     #endregion
     #region Spieler Ausgetabt Anzeige
@@ -735,7 +709,7 @@ public class SloxikonServer : MonoBehaviour
     {
         AustabbenAnzeigen.SetActive(toggle.isOn);
         if (toggle.isOn == false)
-            Broadcast("#SpielerAusgetabt 0");
+            ServerUtils.AddBroadcast("#SpielerAusgetabt 0");
     }
     /// <summary>
     /// Spieler Tabt aus, wird ggf allen gezeigt
@@ -747,7 +721,7 @@ public class SloxikonServer : MonoBehaviour
         bool ausgetabt = !Boolean.Parse(data);
         SpielerAnzeige[(player.id - 1), 3].SetActive(ausgetabt); // Ausgetabt Einblednung
         if (AustabbenAnzeigen.activeInHierarchy)
-            Broadcast("#SpielerAusgetabt " + player.id + " " + ausgetabt);
+            ServerUtils.AddBroadcast("#SpielerAusgetabt " + player.id + " " + ausgetabt);
     }
     #endregion
     #region Textantworten der Spieler
@@ -758,7 +732,7 @@ public class SloxikonServer : MonoBehaviour
     public void TexteingabeAnzeigenToggle(Toggle toggle)
     {
         TextEingabeAnzeige.SetActive(toggle.isOn);
-        Broadcast("#TexteingabeAnzeigen "+ toggle.isOn);
+        ServerUtils.AddBroadcast("#TexteingabeAnzeigen "+ toggle.isOn);
     }
     /// <summary>
     /// Aktualisiert die Antwort die der Spieler eingibt
@@ -781,7 +755,7 @@ public class SloxikonServer : MonoBehaviour
         TextAntwortenAnzeige.SetActive(toggle.isOn);
         if (!toggle.isOn)
         {
-            Broadcast("#TextantwortenAnzeigen [BOOL]" + toggle.isOn + "[BOOL]");
+            ServerUtils.AddBroadcast("#TextantwortenAnzeigen [BOOL]" + toggle.isOn + "[BOOL]");
             return;
         }
         string msg = "";
@@ -789,7 +763,7 @@ public class SloxikonServer : MonoBehaviour
         {
             msg = msg + "[ID" + (i + 1) + "]" + SpielerAnzeige[i, 6].GetComponentInChildren<TMP_InputField>().text + "[ID" + (i + 1) + "]";
         }
-        Broadcast("#TextantwortenAnzeigen [BOOL]"+toggle.isOn+"[BOOL][TEXT]"+ msg);
+        ServerUtils.AddBroadcast("#TextantwortenAnzeigen [BOOL]"+toggle.isOn+"[BOOL][TEXT]"+ msg);
     }
     #endregion
     #region Punkte
@@ -855,7 +829,7 @@ public class SloxikonServer : MonoBehaviour
             SpielerAnzeige[(pId - 1), 1].SetActive(false);
         SpielerAnzeige[(pId - 1), 1].SetActive(true);
         buzzerIsOn = false;
-        Broadcast("#SpielerIstDran "+pId);
+        ServerUtils.AddBroadcast("#SpielerIstDran "+pId);
     }
     /// <summary>
     /// Versteckt den Icon Rand beim Spieler
@@ -870,7 +844,7 @@ public class SloxikonServer : MonoBehaviour
             if (SpielerAnzeige[i, 1].activeInHierarchy)
                 return;
         buzzerIsOn = BuzzerAnzeige.activeInHierarchy; // Buzzer wird erst aktiviert wenn keiner mehr dran ist
-        Broadcast("#SpielerIstNichtDran " + pId);
+        ServerUtils.AddBroadcast("#SpielerIstNichtDran " + pId);
     }
     #endregion
 }

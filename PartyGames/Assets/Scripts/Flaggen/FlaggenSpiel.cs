@@ -21,7 +21,8 @@ public class FlaggenSpiel
             if (sprite.name == "#Fragezeichen")
                 continue;
             // Lädt alle Flaggen und speichert diese ab
-            flaggen.Add(new Flagge(sprite, Config.isServer));
+            //flaggen.Add(new Flagge(sprite, Config.isServer));
+            flaggen.Add(new Flagge(sprite, true));
         }
     }
 

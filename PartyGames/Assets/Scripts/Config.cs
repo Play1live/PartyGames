@@ -53,6 +53,7 @@ public class Config
     public static string GAME_TITLE = "Startup";
     // Hauptmenue
     public static string HAUPTMENUE_FEHLERMELDUNG = "";
+    public static string PLAYER_UpdateClientGameVorschau = "";
     // Lobby
     public static string LOBBY_FEHLERMELDUNG = "";
     public static bool ALLOW_PLAYERNAME_CHANGE = false;

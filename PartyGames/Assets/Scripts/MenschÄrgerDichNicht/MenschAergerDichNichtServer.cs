@@ -37,17 +37,17 @@ public class MenschAergerDichNichtServer : MonoBehaviour
     private bool ServerAllowZugWahl;
     private bool BotWillReplaceServer;
 
-    private List<string> broadcastmsgs;
+    //private List<string> broadcastmsgs;
 
     void OnEnable()
     {
-        broadcastmsgs = new List<string>();
+        StartCoroutine(ServerUtils.Broadcast());
+        //broadcastmsgs = new List<string>();
+        //StartCoroutine(NewBroadcast());
         PlayerConnected = new bool[Config.SERVER_MAX_CONNECTIONS];
         Lobby.SetActive(true);
         Games.SetActive(false);
         InitLobby();
-
-        StartCoroutine(NewBroadcast());
     }
 
     void Update()
@@ -58,19 +58,12 @@ public class MenschAergerDichNichtServer : MonoBehaviour
             SceneManager.LoadSceneAsync("Startup");
             return;
         }
-        /*
-        // Broadcastet alle MSGs nacheinander
-        if (broadcastmsgs.Count != 0)
-        {
-            string msg = broadcastmsgs[0];
-            broadcastmsgs.RemoveAt(0);
-            Broadcast(msg);
-        }*/
 
         foreach (Player spieler in Config.PLAYERLIST)
         {
             if (spieler.isConnected == false)
                 continue;
+
             #region Sucht nach neuen Nachrichten
             if (spieler.isConnected == true)
             {
@@ -85,35 +78,20 @@ public class MenschAergerDichNichtServer : MonoBehaviour
                 }
             }
             #endregion
-
-            #region Spieler Disconnected Message
-            for (int i = 0; i < Config.PLAYERLIST.Length; i++)
-            {
-                if (Config.PLAYERLIST[i].isConnected == false)
-                {
-                    if (Config.PLAYERLIST[i].isDisconnected == true)
-                    {
-                        Logging.log(Logging.LogType.Normal, "MenschÄrgerDichNichtServer", "Update", "Spieler hat die Verbindung getrennt. ID: " + Config.PLAYERLIST[i].id);
-                        Broadcast(Config.PLAYERLIST[i].name + " has disconnected", Config.PLAYERLIST);
-                        Config.PLAYERLIST[i].isConnected = false;
-                        Config.PLAYERLIST[i].isDisconnected = false;
-                        Config.SERVER_ALL_CONNECTED = false;
-                        Config.PLAYERLIST[i].name = "";
-                    }
-                }
-            }
-            #endregion
         }
         #endregion
     }
 
     private void OnApplicationQuit()
     {
-        Broadcast("#ServerClosed", Config.PLAYERLIST);
+        ServerUtils.BroadcastImmediate("#ServerClosed");
         Logging.log(Logging.LogType.Normal, "MenschÄrgerDichNichtServer", "OnApplicationQuit", "Server wird geschlossen.");
         Config.SERVER_TCP.Server.Close();
     }
 
+    #region Server Stuff  
+    #region Kommunikation
+    /*
     IEnumerator NewBroadcast()
     {
         while (true)
@@ -130,9 +108,6 @@ public class MenschAergerDichNichtServer : MonoBehaviour
         }
         yield break;
     }
-
-    #region Server Stuff  
-    #region Kommunikation
     /// <summary>
     /// Sendet eine Nachricht an den übergebenen Spieler
     /// </summary>
@@ -183,6 +158,18 @@ public class MenschAergerDichNichtServer : MonoBehaviour
         broadcastmsgs.Add(data);
     }
     /// <summary>
+    /// Spieler beendet das Spiel
+    /// </summary>
+    /// <param name="player">Spieler</param>
+    private void ClientClosed(Player player)
+    {
+        player.icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
+        player.name = "";
+        player.points = 0;
+        player.isConnected = false;
+        player.isDisconnected = true;
+    }*/
+    /// <summary>
     /// Einkommende Nachrichten die von Spielern an den Server gesendet werden
     /// </summary>
     /// <param name="spieler">Spieler</param>
@@ -222,7 +209,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
                 if (Games.activeInHierarchy)
                     SpielerWirdZumBot(player);
                 PlayDisconnectSound();
-                ClientClosed(player);
+                ServerUtils.ClientClosed(player);
                 break;
             case "#TestConnection":
                 break;
@@ -244,25 +231,13 @@ public class MenschAergerDichNichtServer : MonoBehaviour
     }
     #endregion
     /// <summary>
-    /// Spieler beendet das Spiel
-    /// </summary>
-    /// <param name="player">Spieler</param>
-    private void ClientClosed(Player player)
-    {
-        player.icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
-        player.name = "";
-        player.points = 0;
-        player.isConnected = false;
-        player.isDisconnected = true;
-    }
-    /// <summary>
     /// Spiel Verlassen & Zurück in die Lobby laden
     /// </summary>
     public void SpielVerlassenButton()
     {
         Logging.log(Logging.LogType.Debug, "MenschÄrgerDichNichtServer", "SpielVerlassenButton", "Spiel wird beendet. Lädt ins Hauptmenü.");
-        SceneManager.LoadScene("Startup");
-        BroadcastNew("#ZurueckInsHauptmenue");
+        //SceneManager.LoadScene("Startup");
+        ServerUtils.AddBroadcast("#ZurueckInsHauptmenue");
     }
     /// <summary>
     /// Spielt den Disconnect Sound ab
@@ -334,7 +309,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
         }
         if (msg.Length > 0)
             msg = msg.Substring("|".Length);
-        BroadcastNew("#UpdateLobby " + msg);
+        ServerUtils.AddBroadcast("#UpdateLobby " + msg);
     }
     /// <summary>
     /// Ändert die Anzahl der Bots
@@ -365,9 +340,9 @@ public class MenschAergerDichNichtServer : MonoBehaviour
         if (MenschAegerDichNichtBoard.watchBots)
         {
             Logging.log(Logging.LogType.Normal, "MenschAergerDichNichtServer", "StartGame", "Es werden nur Bots spielen, alle Clients werden getrennt.");
-            BroadcastNew("#ServerClosed");
+            ServerUtils.AddBroadcast("#ServerClosed");
             for (int i = 0; i < Config.PLAYERLIST.Length; i++)
-                ClientClosed(Config.PLAYERLIST[i]);
+                ServerUtils.ClientClosed(Config.PLAYERLIST[i]);
             UpdateLobby();
         }
         gameIsRunning = true;
@@ -445,7 +420,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
 
         if (randomplayer.Count == mapInt)
         {
-            BroadcastNew("#StartGame [PLAYER]" + broadcastPlayer + "[PLAYER][MAP]" + selectedMap.name + "[MAP][TEAMSIZE]" + mapInt + "[TEAMSIZE][RUNWAY]" + RunWaySize + "[RUNWAY]");
+            ServerUtils.AddBroadcast("#StartGame [PLAYER]" + broadcastPlayer + "[PLAYER][MAP]" + selectedMap.name + "[MAP][TEAMSIZE]" + mapInt + "[TEAMSIZE][RUNWAY]" + RunWaySize + "[RUNWAY]");
             board = new MenschAegerDichNichtBoard(selectedMap, RunWaySize, mapInt, randomplayer);
         }
         else
@@ -528,7 +503,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
         {
             Destroy(SpielprotokollContent.transform.GetChild(3).gameObject);
         }
-        BroadcastNew("#AddProtokoll " + msg);
+        ServerUtils.AddBroadcast("#AddProtokoll " + msg);
     }
     /// <summary>
     /// Blendet eine Nachricht im InfoBoard ein
@@ -540,8 +515,8 @@ public class MenschAergerDichNichtServer : MonoBehaviour
     }
     private void SendBoardUpdate()
     {
-        BroadcastNew("#UpdateBoard " + board.GetBoardString());
-        BroadcastNew("#UpdateBoard " + board.GetBoardString());
+        ServerUtils.AddBroadcast("#UpdateBoard " + board.GetBoardString());
+        ServerUtils.AddBroadcast("#UpdateBoard " + board.GetBoardString());
     }
     public void BotReplaceServer(Toggle toggle)
     {
@@ -559,7 +534,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
         DisplayMSGInfoBoard(player.name + " ist dran!");
         StartTurnSelectType(player);
 
-        BroadcastNew("#StartTurn " + player.gamerid + "*" + player.availableDices);
+        ServerUtils.AddBroadcast("#StartTurn " + player.gamerid + "*" + player.availableDices);
         if (player.name == Config.PLAYER_NAME)
             SpielerIstDran.Play();
     }
@@ -591,7 +566,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
         if (player.name == Config.PLAYER_NAME)
             SpielerIstDran.Play();
 
-        BroadcastNew("#StartTurn " + player.gamerid + "*" + player.availableDices);
+        ServerUtils.AddBroadcast("#StartTurn " + player.gamerid + "*" + player.availableDices);
         yield break;
     }
     /// <summary>
@@ -727,7 +702,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
         if (result == 6)
             board.GetPlayerTurn().availableDices = 1;
         Logging.log(Logging.LogType.Debug, "MenschAergerDichNichtServer", "Wuerfel", "Client würfelt. Result: " + result);
-        BroadcastNew("#Wuerfel " + result + "*" + board.GetPlayerTurn().name);
+        ServerUtils.AddBroadcast("#Wuerfel " + result + "*" + board.GetPlayerTurn().name);
 
         if (WuerfelCoroutine != null)
             StopCoroutine(WuerfelCoroutine);
@@ -748,7 +723,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
             board.GetPlayerTurn().availableDices = 1;
         board.GetPlayerTurn().wuerfelCounter++;
         Logging.log(Logging.LogType.Debug, "MenschAergerDichNichtServer", "WuerfelStarteAnimation", "Es wird gewürfelt. Result: " + result);
-        BroadcastNew("#Wuerfel " + result + "*" + board.GetPlayerTurn().name);
+        ServerUtils.AddBroadcast("#Wuerfel " + result + "*" + board.GetPlayerTurn().name);
 
         if (WuerfelCoroutine != null)
             StopCoroutine(WuerfelCoroutine);
@@ -809,7 +784,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
         AddMSGToProtokoll(board.TEAM_COLORS[board.GetPlayerTurn().gamerid] + board.GetPlayerTurn().name + "</color></b> würfelt " + Würfel.GetComponent<Image>().sprite.name.Replace("würfel ", ""));
         board.GetPlayerTurn().MarkAvailableMoves(result);
 
-        BroadcastNew("#MarkMarkierungen " + board.PrintMarkierungen());
+        ServerUtils.AddBroadcast("#MarkMarkierungen " + board.PrintMarkierungen());
 
         // Spieler ist ein bot
         if (board.GetPlayerTurn().isBot)
@@ -902,7 +877,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
                     else
                     {
                         StartTurnSelectType(board.GetPlayerTurn());
-                        BroadcastNew("#AktiviereWuerfel " + board.GetPlayerTurn().name);
+                        ServerUtils.AddBroadcast("#AktiviereWuerfel " + board.GetPlayerTurn().name);
                     }
                     yield break;
                 }
@@ -1021,12 +996,12 @@ public class MenschAergerDichNichtServer : MonoBehaviour
                 // Move / schlag sounds falls spiel noch nicht vorbei ist
                 if (ausgabe.Contains(" schlägt "))
                 {
-                    BroadcastNew("#PlayWirdGeschlagenSound");
+                    ServerUtils.AddBroadcast("#PlayWirdGeschlagenSound");
                     SpielerWirdGeschlagen.Play();
                 }
                 else
                 {
-                    BroadcastNew("#PlaySpielerZieht");
+                    ServerUtils.AddBroadcast("#PlaySpielerZieht");
                     SpielerZieht.Play();
                 }
 
@@ -1146,7 +1121,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
         // Ausgabe
         if (msg.Length > 3)
             msg = msg.Substring("[#]".Length);
-        BroadcastNew("#SpielIstVorbeiMSGs " + msg);
+        ServerUtils.AddBroadcast("#SpielIstVorbeiMSGs " + msg);
         SiegerStehtFest.Play();
         foreach (string item in msg.Replace("[#]", "|").Split('|'))
         {
@@ -1158,7 +1133,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
     /// </summary>
     private void SpielerWirdZumBot(Player p)
     {
-        BroadcastNew("#PlayerMergesBot " + p.name);
+        ServerUtils.AddBroadcast("#PlayerMergesBot " + p.name);
         // Der Spieler ist gerade dran
         if (board.GetPlayerTurn().name == p.name && board.GetPlayerTurn().PlayerImage == p.icon)
         {

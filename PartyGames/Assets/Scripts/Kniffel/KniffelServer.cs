@@ -26,14 +26,15 @@ public class KniffelServer : MonoBehaviour
     Coroutine StartWuerfelAnimationCoroutine;
 
 
-    private List<string> broadcastmsgs;
+    //private List<string> broadcastmsgs;
 
     void OnEnable()
     {
-        broadcastmsgs = new List<string>();
+        StartCoroutine(ServerUtils.Broadcast());
+        //broadcastmsgs = new List<string>();
+        //StartCoroutine(NewBroadcast());
         PlayerConnected = new bool[Config.SERVER_MAX_CONNECTIONS];
         InitGame();
-        StartCoroutine(NewBroadcast());
     }
 
     void Update()
@@ -48,6 +49,7 @@ public class KniffelServer : MonoBehaviour
         {
             if (spieler.isConnected == false)
                 continue;
+
             #region Sucht nach neuen Nachrichten
             if (spieler.isConnected == true)
             {
@@ -62,35 +64,20 @@ public class KniffelServer : MonoBehaviour
                 }
             }
             #endregion
-
-            #region Spieler Disconnected Message
-            for (int i = 0; i < Config.PLAYERLIST.Length; i++)
-            {
-                if (Config.PLAYERLIST[i].isConnected == false)
-                {
-                    if (Config.PLAYERLIST[i].isDisconnected == true)
-                    {
-                        Logging.log(Logging.LogType.Normal, "MenschÄrgerDichNichtServer", "Update", "Spieler hat die Verbindung getrennt. ID: " + Config.PLAYERLIST[i].id);
-                        //Broadcast(Config.PLAYERLIST[i].name + " has disconnected", Config.PLAYERLIST);
-                        Config.PLAYERLIST[i].isConnected = false;
-                        Config.PLAYERLIST[i].isDisconnected = false;
-                        Config.SERVER_ALL_CONNECTED = false;
-                        Config.PLAYERLIST[i].name = "";
-                    }
-                }
-            }
-            #endregion
         }
         #endregion
     }
 
     private void OnApplicationQuit()
     {
-        Broadcast("#ServerClosed", Config.PLAYERLIST);
+        ServerUtils.BroadcastImmediate("#ServerClosed");
         Logging.log(Logging.LogType.Normal, "MenschÄrgerDichNichtServer", "OnApplicationQuit", "Server wird geschlossen.");
         Config.SERVER_TCP.Server.Close();
     }
 
+    #region Server Stuff  
+    #region Kommunikation
+    /*
     IEnumerator NewBroadcast()
     {
         while (true)
@@ -108,9 +95,6 @@ public class KniffelServer : MonoBehaviour
         }
         yield break;
     }
-
-    #region Server Stuff  
-    #region Kommunikation
     /// <summary>
     /// Sendet eine Nachricht an den übergebenen Spieler
     /// </summary>
@@ -159,7 +143,7 @@ public class KniffelServer : MonoBehaviour
     private void BroadcastNew(string data)
     {
         broadcastmsgs.Add(data);
-    }
+    }*/
     /// <summary>
     /// Einkommende Nachrichten die von Spielern an den Server gesendet werden
     /// </summary>
@@ -195,20 +179,11 @@ public class KniffelServer : MonoBehaviour
                 break;
 
             case "#ClientClosed":
-                foreach (KniffelPlayer item in board.GetPlayerList())
-                {
-                    if (item.name == player.name)
-                    {
-                        item.Punkteliste.SetActive(false);
-                        Punkteliste.transform.GetChild(2 + item.gamerid).gameObject.SetActive(false);
-                        board.GetPlayerList().Remove(item);
-                        BroadcastNew("#DeleteClient " + item.name);
-                        break;
-                    }
-                }
-
+                if (board.GetPlayerTurn().name == player.name)
+                    StartTurn();
                 PlayDisconnectSound();
-                ClientClosed(player);
+                StartCoroutine(ClientClosedDelayed(player, 2));
+                ServerUtils.ClientClosed(player);
                 break;
             case "#TestConnection":
                 break;
@@ -231,7 +206,7 @@ public class KniffelServer : MonoBehaviour
                 if (plist.Length > 3)
                     plist = plist.Substring("[#]".Length);
 
-                BroadcastNew("#InitGame " + plist);
+                ServerUtils.AddBroadcast("#InitGame " + plist);
                 break;
 
             case "#ClickPlayerKategorie":
@@ -252,11 +227,34 @@ public class KniffelServer : MonoBehaviour
     /// <param name="player">Spieler</param>
     private void ClientClosed(Player player)
     {
+        string playername = player.name;
+
         player.icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
         player.name = "";
         player.points = 0;
         player.isConnected = false;
         player.isDisconnected = true;
+
+        if (board != null)
+        {
+            ServerUtils.AddBroadcast("#DeleteClient " + playername);
+            foreach (KniffelPlayer item in board.GetPlayerList())
+            {
+                if (item.name == playername)
+                {
+                    item.Punkteliste.SetActive(false);
+                    Punkteliste.transform.GetChild(2 + item.gamerid).gameObject.SetActive(false);
+                    board.GetPlayerList().Remove(item);
+                    break;
+                }
+            }
+        }
+    }
+    private IEnumerator ClientClosedDelayed(Player player, int seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+        ClientClosed(player);
+        yield break;
     }
     /// <summary>
     /// Spiel Verlassen & Zurück in die Lobby laden
@@ -264,8 +262,8 @@ public class KniffelServer : MonoBehaviour
     public void SpielVerlassenButton()
     {
         Logging.log(Logging.LogType.Debug, "MenschÄrgerDichNichtServer", "SpielVerlassenButton", "Spiel wird beendet. Lädt ins Hauptmenü.");
-        SceneManager.LoadScene("Startup");
-        BroadcastNew("#ZurueckInsHauptmenue");
+        //SceneManager.LoadScene("Startup");
+        ServerUtils.AddBroadcast("#ZurueckInsHauptmenue");
     }
     /// <summary>
     /// Spielt den Disconnect Sound ab
@@ -294,7 +292,7 @@ public class KniffelServer : MonoBehaviour
         }
         if (plist.Length > 3)
             plist = plist.Substring("[#]".Length);
-        BroadcastNew("#InitGame " + plist);
+        ServerUtils.AddBroadcast("#InitGame " + plist);
 
         SafeWuerfel = new List<Image>();
         SafeWuerfel.Add(WuerfelBoard.transform.GetChild(1).GetComponent<Image>());
@@ -317,7 +315,7 @@ public class KniffelServer : MonoBehaviour
         if (msg.Length > 3)
             msg = msg.Substring("[#]".Length);
 
-        BroadcastNew("#UpdatePunkteliste " + msg);
+        ServerUtils.AddBroadcast("#UpdatePunkteliste " + msg);
     }
     private void StartTurn()
     {
@@ -345,11 +343,10 @@ public class KniffelServer : MonoBehaviour
                 if (item.EndSumme.getDisplay() == siegerpunkte)
                     item.Punkteliste.transform.GetChild(0).GetComponent<Image>().enabled = true;
 
-            BroadcastNew("#GameEnded " + siegerpunkte);
+            ServerUtils.AddBroadcast("#GameEnded " + siegerpunkte);
             SpielIstVorbei.Play();
             return;
         }
-
 
         if (StartTurnDelayedCoroutine != null)
             StopCoroutine(StartTurnDelayedCoroutine);
@@ -374,7 +371,7 @@ public class KniffelServer : MonoBehaviour
         player.safewuerfel = new List<int>();
         player.unsafewuerfe = new List<int>();
         player.availablewuerfe = 3;
-        BroadcastNew("#StartTurn " + player.gamerid);
+        ServerUtils.AddBroadcast("#StartTurn " + player.gamerid);
 
         // wenn Server dran ist, dann würfel aktivieren
         if (player.name == Config.PLAYER_NAME)
@@ -410,6 +407,8 @@ public class KniffelServer : MonoBehaviour
         if (board.GetPlayerTurn().availablewuerfe <= 0)
             return;
         board.GetPlayerTurn().availablewuerfe--;
+        if (board.GetPlayerTurn().availablewuerfe <= 0)
+            WuerfelBoard.transform.GetChild(6).gameObject.SetActive(false);
 
         // Generiere Ergebnis
         string msgZahlenUnsafe = "";
@@ -430,7 +429,7 @@ public class KniffelServer : MonoBehaviour
         }
         if (msgZahlenSafe.Length > 1)
             msgZahlenSafe = msgZahlenSafe.Substring("+".Length);
-        BroadcastNew("#PlayerWuerfel " + board.GetPlayerTurn().gamerid + "*" + msgZahlenUnsafe + "[#]" + msgZahlenSafe);
+        ServerUtils.AddBroadcast("#PlayerWuerfel " + board.GetPlayerTurn().gamerid + "*" + msgZahlenUnsafe + "[#]" + msgZahlenSafe);
 
         // Starte Animation
         if (StartWuerfelAnimationCoroutine != null)
@@ -460,7 +459,7 @@ public class KniffelServer : MonoBehaviour
             for (int i = 0; i < safeZ.Split('+').Length; i++)
                 board.GetPlayerTurn().safewuerfel.Add(Int32.Parse(safeZ.Split('+')[i]));
 
-        BroadcastNew("#PlayerWuerfel " + board.GetPlayerTurn().gamerid + "*" + data);
+        ServerUtils.AddBroadcast("#PlayerWuerfel " + board.GetPlayerTurn().gamerid + "*" + data);
 
         // Starte Animation
         if (StartWuerfelAnimationCoroutine != null)
@@ -684,7 +683,7 @@ public class KniffelServer : MonoBehaviour
     }
     private void SafeUnsafeWuerfel(string type, KniffelPlayer p, int zahl)
     {
-        BroadcastNew("#SafeUnsafe " + type + "|" + p.gamerid + "|" + zahl);
+        ServerUtils.AddBroadcast("#SafeUnsafe " + type + "|" + p.gamerid + "|" + zahl);
         if (type == "Safe")
         {
             for (int i = 0; i < WuerfelBoard.transform.GetChild(0).GetChild(0).childCount; i++)
@@ -779,7 +778,7 @@ public class KniffelServer : MonoBehaviour
         if (unsafewuerfel.Length > 0)
             unsafewuerfel = unsafewuerfel.Substring("+".Length);
 
-        BroadcastNew("#ClickKategorie " + player.gamerid + "|" + kategorie.name + "|" + safewuerfel + "|" + unsafewuerfel);
+        ServerUtils.AddBroadcast("#ClickKategorie " + player.gamerid + "|" + kategorie.name + "|" + safewuerfel + "|" + unsafewuerfel);
 
         List<int> zahlen = new List<int>();
         zahlen.AddRange(player.safewuerfel);

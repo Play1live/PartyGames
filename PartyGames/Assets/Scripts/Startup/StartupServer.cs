@@ -53,6 +53,16 @@ public class StartupServer : MonoBehaviour
         UpdateGameVorschau();
         UpdateSpieler();
         UpdateCrowns();
+
+        if (Config.SERVER_STARTED)
+        {
+            foreach (Player p in Config.PLAYERLIST)
+                if (p.isConnected && p.name.Length > 0)
+                    connectedPlayer++;
+
+            // Sendet PingUpdate alle paar sekunden
+            StartCoroutine(UpdatePingOnTime());
+        }
     }
 
     void Update()
@@ -104,6 +114,7 @@ public class StartupServer : MonoBehaviour
             #endregion
         }
         #region Spieler Disconnected Message
+        /*
         for (int i = 0; i < Config.PLAYERLIST.Length; i++)
         {
             if (Config.PLAYERLIST[i].isConnected == false)
@@ -118,7 +129,7 @@ public class StartupServer : MonoBehaviour
                     Config.PLAYERLIST[i].name = "";
                 }
             }
-        }
+        }*/
         #endregion
         #endregion
     }
@@ -141,7 +152,7 @@ public class StartupServer : MonoBehaviour
         Logging.log(Logging.LogType.Normal, "StartupServer", "ZurueckZumHauptmenue", "Spieler wird ins Hauptmenü geladen und Server- & Client-Verbindung wird beendet.");
         if (Config.isServer && Config.SERVER_STARTED)
         {
-            ServerUtils.AddBroadcast("#ServerClosed");
+            ServerUtils.BroadcastImmediate("#ServerClosed");
             Config.SERVER_TCP.Stop();
             Config.SERVER_STARTED = false;
             SceneManager.LoadSceneAsync("Startup");
@@ -205,10 +216,6 @@ public class StartupServer : MonoBehaviour
     /// <param name="ar"></param>
     private void AcceptTcpClient(IAsyncResult ar)
     {
-        // Spieler sind voll
-        // if (Config.SERVER_ALL_CONNECTED)
-        // return;
-
         Logging.log(Logging.LogType.Debug, "StartupServer", "AcceptTcpClient", "Ein neuer Spieler verbindet sich...");
         // Sucht freien Spieler Platz
         Player freierS = null;
@@ -229,7 +236,7 @@ public class StartupServer : MonoBehaviour
             TcpListener ll = (TcpListener)ar.AsyncState;
             temp.tcp = ll.EndAcceptTcpClient(ar);
             // Log ausgabe und Clientseite testen weil es nicht geht
-            SendMSG("#ServerFull", temp);
+            ServerUtils.SendMSG("#ServerFull", temp);
             startListening();
             return;
         }
@@ -255,13 +262,13 @@ public class StartupServer : MonoBehaviour
         startListening();
 
         // Sendet neuem Spieler zugehörige ID
-        SendMSG("#SetID [ID]" + freierS.id + "[ID][GAMEFILES]" + UpdateClientGameVorschau, freierS);
+        ServerUtils.SendMSG("#SetID [ID]" + freierS.id + "[ID][GAMEFILES]" + UpdateClientGameVorschau, freierS);
         // Dazu die GameFiles
         Logging.log(Logging.LogType.Normal, "StartupServer", "AcceptTcpClient", "Spieler: " + freierS.id + " ist jetzt verbunden. IP:" + freierS.tcp.Client.RemoteEndPoint);
     }
     #endregion
     #region Kommunikation
-    /// <summary>
+    /*/// <summary>
     /// Sendet eine Nachricht an den angegebenen Spieler.
     /// </summary>
     /// <param name="data">Nachricht</param>
@@ -318,7 +325,7 @@ public class StartupServer : MonoBehaviour
         player.crowns = 0;
         player.isConnected = false;
         player.isDisconnected = true;
-    }
+    }*/
     /// <summary>
     /// Einkommende Nachrichten die von Spielern an den Server gesendet werden. 
     /// Extrahiert die Commands und gibt die in Commands() weiter
@@ -355,12 +362,12 @@ public class StartupServer : MonoBehaviour
 
             case "#ClientClosed":
                 connectedPlayer--;
-                ClientClosed(player);
+                ServerUtils.ClientClosed(player);
                 UpdateSpielerBroadcast();
                 PlayDisconnectSound();
                 break;
             case "#TestConnection":
-                SendMSG("#ConnectionEstablished", player);
+                ServerUtils.SendMSG("#ConnectionEstablished", player);
                 break;
             case "#ClientFocusChange":
                 break;
@@ -477,7 +484,7 @@ public class StartupServer : MonoBehaviour
     /// </summary>
     private void UpdateSpielerBroadcast()
     {
-        Broadcast(UpdateSpieler(), Config.PLAYERLIST);
+        ServerUtils.AddBroadcast(UpdateSpieler());
     }
     /// <summary>
     /// Updatet die Spieler Informationsanzeigen und gibt diese als String zurück
@@ -543,7 +550,7 @@ public class StartupServer : MonoBehaviour
             msg += "[" + player.id + "]" + SpielerAnzeigeLobby[player.id].transform.GetChild(3).GetComponent<Image>().sprite.name + "[" + player.id + "]";
         }
         Logging.log(Logging.LogType.Debug, "StartupServer", "UpdatePing", msg);
-        Broadcast(msg);
+        ServerUtils.AddBroadcast(msg);
     }
     IEnumerator UpdatePingOnTime()
     {
@@ -691,7 +698,7 @@ public class StartupServer : MonoBehaviour
             msg += "[" + player.id + "]" + player.crowns + "[" + player.id + "]";
         }
         Logging.log(Logging.LogType.Debug, "StartupServer", "UpdateCrowns", msg);
-        Broadcast(msg);
+        ServerUtils.AddBroadcast(msg);
     }
     #region Spieler Namen Ändern
     /// <summary>
@@ -735,8 +742,8 @@ public class StartupServer : MonoBehaviour
         if (version != Config.APPLICATION_VERSION)
         {
             Logging.log(Logging.LogType.Warning, "StartupServer", "ClientSetName", "Spieler ID: " + player.id + " versucht mit einer falschen Version beizutreten.Spieler Version: " + version + " | Server Version: " + Config.APPLICATION_VERSION);
-            SendMSG("#WrongVersion " + Application.version, player);
-            ClientClosed(player);
+            ServerUtils.SendMSG("#WrongVersion " + Application.version, player);
+            ServerUtils.ClientClosed(player);
             return;
         }
         // Legt Spielernamen fest
@@ -747,7 +754,7 @@ public class StartupServer : MonoBehaviour
         {
             Logging.log(Logging.LogType.Normal, "StartupServer", "ClientSetName", "Spieler " + player.name + " heißt jetzt " + name);
             player.name = name;
-            SendMSG("#SpielerChangeName " + name, player);
+            ServerUtils.SendMSG("#SpielerChangeName " + name, player);
             UpdateSpielerBroadcast();
             return;
         }
@@ -762,7 +769,7 @@ public class StartupServer : MonoBehaviour
         }
         Logging.log(Logging.LogType.Normal, "StartupServer", "ClientSetName", "Spieler " + player.name + "heißt jetzt " + name);
         player.name = name;
-        SendMSG("#SpielerChangeName " + name, player);
+        ServerUtils.SendMSG("#SpielerChangeName " + name, player);
         // Sendet Update an alle Spieler & Updatet Spieler Anzeigen
         UpdateSpielerBroadcast();
     }
@@ -897,9 +904,9 @@ public class StartupServer : MonoBehaviour
             return;
         int playerid = Int32.Parse(dropdown.options[dropdown.value].text.Split('|')[0]);
         
-        SendMSG("#ServerClosed", Config.PLAYERLIST[playerid - 1]);
+        ServerUtils.SendMSG("#ServerClosed", Config.PLAYERLIST[playerid - 1]);
         Logging.log(Logging.LogType.Normal, "StartupServer", "SpielerRauswerfen", "Spieler " + Config.PLAYERLIST[playerid - 1].name + " wird gekickt.");
-        ClientClosed(Config.PLAYERLIST[playerid - 1]);
+        ServerUtils.ClientClosed(Config.PLAYERLIST[playerid - 1]);
         UpdateSpielerBroadcast();
     }
     #region Spieler Icon Ändern
@@ -1123,7 +1130,7 @@ public class StartupServer : MonoBehaviour
     {
         List<string> gamelist = new List<string>();
         // Moderierte Games
-        gamelist.Add("[SPIELER-ANZ]0[SPIELER-ANZ][MIN]0[MIN][MAX]" + Config.SERVER_MAX_CONNECTIONS + "[MAX][TITEL]<b><i>Moderierte Spiele</i></b>[TITEL][AVAILABLE]-1[AVAILABLE]");
+        gamelist.Add("[SPIELER-ANZ]0[SPIELER-ANZ][MIN]0[MIN][MAX]" + (Config.SERVER_MAX_CONNECTIONS+1) + "[MAX][TITEL]<b><i>Moderierte Spiele</i></b>[TITEL][AVAILABLE]-1[AVAILABLE]");
         // Flaggen
         gamelist.Add("[SPIELER-ANZ]" + FlaggenSpiel.minPlayer + "-" + FlaggenSpiel.maxPlayer + "[SPIELER-ANZ][MIN]" + FlaggenSpiel.minPlayer + "[MIN][MAX]" + FlaggenSpiel.maxPlayer + "[MAX][TITEL]Flaggen[TITEL][AVAILABLE]" + Config.FLAGGEN_SPIEL.getFlaggen().Count + "[AVAILABLE]");
         // Quiz
@@ -1141,7 +1148,7 @@ public class StartupServer : MonoBehaviour
         // Sloxikon
         gamelist.Add("[SPIELER-ANZ]" + SloxikonSpiel.minPlayer + "-" + SloxikonSpiel.maxPlayer + "[SPIELER-ANZ][MIN]" + SloxikonSpiel.minPlayer + "[MIN][MAX]" + SloxikonSpiel.maxPlayer + "[MAX][TITEL]Sloxikon[TITEL][AVAILABLE]" + Config.SLOXIKON_SPIEL.getGames().Count + "[AVAILABLE]");
         // Unmoderierte Games
-        gamelist.Add("[SPIELER-ANZ]0[SPIELER-ANZ][MIN]0[MIN][MAX]" + Config.SERVER_MAX_CONNECTIONS + "[MAX][TITEL]<b><i>Unmoderierte Spiele</i></b>[TITEL][AVAILABLE]-1[AVAILABLE]");
+        gamelist.Add("[SPIELER-ANZ]0[SPIELER-ANZ][MIN]0[MIN][MAX]" + (Config.SERVER_MAX_CONNECTIONS + 1) + "[MAX][TITEL]<b><i>Unmoderierte Spiele</i></b>[TITEL][AVAILABLE]-1[AVAILABLE]");
         // MenschÄrgerDichNicht
         gamelist.Add("[SPIELER-ANZ]" + MenschAegerDichNichtBoard.minPlayer + "-" + MenschAegerDichNichtBoard.maxPlayer + "[SPIELER-ANZ][MIN]" + MenschAegerDichNichtBoard.minPlayer + "[MIN][MAX]" + MenschAegerDichNichtBoard.maxPlayer + "[MAX][TITEL]MenschÄrgerDichNicht[TITEL][AVAILABLE]-1[AVAILABLE]");
         // Kniffel
@@ -1207,7 +1214,7 @@ public class StartupServer : MonoBehaviour
             else
                 msg = msg + "[" + i + "][" + i + "]";
         }
-        SendMSG("#TickTackToeZug " + msg, player);
+        ServerUtils.SendMSG("#TickTackToeZug " + msg, player);
     }
     /// <summary>
     /// Lässt den Server einen Zug machen & prüft ob das Spiel beendet ist
@@ -1222,7 +1229,7 @@ public class StartupServer : MonoBehaviour
         // CheckForWin
         if (TickTackToe.CheckForEnd(freieFelder, belegteFelder))
         {
-            SendMSG("#TickTackToeZugEnde |" + TickTackToe.getResult(belegteFelder) + "| " + data, player);
+            ServerUtils.SendMSG("#TickTackToeZugEnde |" + TickTackToe.getResult(belegteFelder) + "| " + data, player);
             return;
         }
         // Ziehen
@@ -1230,9 +1237,9 @@ public class StartupServer : MonoBehaviour
         freieFelder = TickTackToe.GetFreieFelder(belegteFelder);
         //Check for End
         if (TickTackToe.CheckForEnd(freieFelder, belegteFelder))
-            SendMSG("#TickTackToeZugEnde |" + TickTackToe.getResult(belegteFelder) + "|" + TickTackToe.PrintBelegteFelder(belegteFelder), player);
+            ServerUtils.SendMSG("#TickTackToeZugEnde |" + TickTackToe.getResult(belegteFelder) + "|" + TickTackToe.PrintBelegteFelder(belegteFelder), player);
         else
-            SendMSG("#TickTackToeZug " + TickTackToe.PrintBelegteFelder(belegteFelder), player);
+            ServerUtils.SendMSG("#TickTackToeZug " + TickTackToe.PrintBelegteFelder(belegteFelder), player);
     }
     #endregion
     #endregion

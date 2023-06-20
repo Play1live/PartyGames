@@ -57,7 +57,7 @@ public class KniffelClient : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        Logging.log(Logging.LogType.Normal, "MenschÄrgerDichNichtClient", "OnApplicationQuit", "Client wird geschlossen.");
+        Logging.log(Logging.LogType.Normal, "KniffelClient", "OnApplicationQuit", "Client wird geschlossen.");
         SendToServer("#ClientClosed");
         CloseSocket();
     }
@@ -72,7 +72,7 @@ public class KniffelClient : MonoBehaviour
     /// </summary>
     IEnumerator TestConnectionToServer()
     {
-        Logging.log(Logging.LogType.Debug, "MenschÄrgerDichNichtClient", "TestConnectionToServer", "Testet die Verbindumg zum Server.");
+        Logging.log(Logging.LogType.Debug, "KniffelClient", "TestConnectionToServer", "Testet die Verbindumg zum Server.");
         while (Config.CLIENT_STARTED)
         {
             SendToServer("#TestConnection");
@@ -112,7 +112,7 @@ public class KniffelClient : MonoBehaviour
         }
         catch (Exception e)
         {
-            Logging.log(Logging.LogType.Warning, "MenschÄrgerDichNichtClient", "SendToServer", "Nachricht an Server konnte nicht gesendet werden.", e);
+            Logging.log(Logging.LogType.Warning, "KniffelClient", "SendToServer", "Nachricht an Server konnte nicht gesendet werden.", e);
             Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server wurde verloren.";
             CloseSocket();
             SceneManager.LoadSceneAsync("StartUp");
@@ -141,25 +141,25 @@ public class KniffelClient : MonoBehaviour
     /// <param name="cmd">Befehl</param>
     private void Commands(string data, string cmd)
     {
-        Logging.log(Logging.LogType.Debug, "MenschÄrgerDichNichtClient", "Commands", "Eingehende Nachricht: " + cmd + " -> " + data);
+        Logging.log(Logging.LogType.Debug, "KniffelClient", "Commands", "Eingehende Nachricht: " + cmd + " -> " + data);
         switch (cmd)
         {
             default:
-                Logging.log(Logging.LogType.Warning, "MenschÄrgerDichNichtClient", "Commands", "Unkown Command: " + cmd + " -> " + data);
+                Logging.log(Logging.LogType.Warning, "KniffelClient", "Commands", "Unkown Command: " + cmd + " -> " + data);
                 break;
 
             #region Universal Commands
             case "#ServerClosed":
-                Logging.log(Logging.LogType.Normal, "MenschÄrgerDichNichtClient", "Commands", "Verbindumg zum Server wurde beendet. Lade ins Hauptmenü.");
+                Logging.log(Logging.LogType.Normal, "KniffelClient", "Commands", "Verbindumg zum Server wurde beendet. Lade ins Hauptmenü.");
                 CloseSocket();
                 SceneManager.LoadSceneAsync("Startup");
                 break;
             case "#UpdateRemoteConfig":
-                Logging.log(Logging.LogType.Normal, "MenschÄrgerDichNichtClient", "Commands", "RemoteConfig wird neugeladen");
+                Logging.log(Logging.LogType.Normal, "KniffelClient", "Commands", "RemoteConfig wird neugeladen");
                 LoadConfigs.FetchRemoteConfig();
                 break;
             case "#ZurueckInsHauptmenue":
-                Logging.log(Logging.LogType.Normal, "MenschÄrgerDichNichtClient", "Commands", "Spiel wird beendet. Lade ins Hauptmenü");
+                Logging.log(Logging.LogType.Normal, "KniffelClient", "Commands", "Spiel wird beendet. Lade ins Hauptmenü");
                 SceneManager.LoadSceneAsync("Startup");
                 break;
             #endregion

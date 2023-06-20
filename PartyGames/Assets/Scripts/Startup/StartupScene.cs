@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
@@ -38,7 +39,7 @@ public class StartupScene : MonoBehaviour
 #endif
         /*Testzwecke*/
         //Config.isServer = true;
-        
+
         Config.GAME_TITLE = "Startup";
         if (Config.APPLICATION_INITED == true)
         {
@@ -54,7 +55,7 @@ public class StartupScene : MonoBehaviour
             }
             else
             {
-                Utils.EinstellungenStartSzene(Einstellungen, audiomixer, Utils.EinstellungsKategorien.Audio);
+                Utils.EinstellungenStartSzene(Einstellungen, audiomixer, Utils.EinstellungsKategorien.Audio, Utils.EinstellungsKategorien.Grafik);
                 GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(1).gameObject.SetActive(true);
             }
             // Zeigt den temporären Spielernamen an
@@ -108,9 +109,10 @@ public class StartupScene : MonoBehaviour
 
             if (Config.isServer)
             {
-                StartCoroutine(SetupSpiele.LoadGameFiles());
-                UpdateIPCoroutine = StartCoroutine(UpdateIpAddress.UpdateNoIP_DNS());
+                //StartCoroutine(SetupSpiele.LoadGameFiles());
+                //UpdateIPCoroutine = StartCoroutine(UpdateIpAddress.UpdateNoIP_DNS());
             }
+            StartCoroutine(SetupSpiele.LoadGameFiles());
             StartCoroutine(EnableConnectionButton());
 
             // Init PlayerlistZeigt die geladenen Spiele in der GameÜbersicht an
@@ -176,6 +178,8 @@ public class StartupScene : MonoBehaviour
 #pragma warning disable CS0162 // Unerreichbarer Code wurde entdeckt. (ist aber erreichbar)
         yield return null;
 #pragma warning restore CS0162 // Unerreichbarer Code wurde entdeckt. (ist aber erreichbar)
+        if (Application.dataPath.EndsWith("Builds/PartyGames_Data"))
+            yield break;
         // Erstelle den Path zur Versionsdatei des Updaters
         Logging.log(Logging.LogType.Debug, "StartupScene", "UpdateGameUpdater", "Starte die Aktualisierung des Updaters.");
         string datapath = Application.dataPath;
@@ -286,6 +290,8 @@ public class StartupScene : MonoBehaviour
         Hauptmenue.transform.GetChild(4).gameObject.SetActive(false);// Server/Client StartButton
         Hauptmenue.transform.GetChild(5).gameObject.SetActive(false); // Einzelspieler StartButton
         yield return new WaitUntil(() => Config.REMOTECONFIG_FETCHTED == true);
+        if (Config.isServer)
+            UpdateIPCoroutine = StartCoroutine(UpdateIpAddress.UpdateNoIP_DNS());
         Utils.EinstelungenServerUpdatePortIP(Einstellungen, Config.isServer, Config.SERVER_CONNECTION_IP, Config.SERVER_CONNECTION_PORT + "");
         yield return new WaitUntil(() => UpdaterIsUpToDate == true); // Warte bis die Version des Updater aktualisiert wurde
         Logging.log(Logging.LogType.Debug, "StartupScene", "EnableConnectionButton", "Spieler darf sich nun verbinden.");
@@ -344,9 +350,10 @@ public class StartupScene : MonoBehaviour
             return;
         Hauptmenue.transform.GetChild(4).gameObject.GetComponent<Button>().interactable = false; // Server/Client StartButton
         GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(1).gameObject.SetActive(true);
-        Utils.EinstellungenToggle(Einstellungen, Utils.EinstellungsKategorien.Audio);
+        Utils.EinstellungenToggle(Einstellungen, Utils.EinstellungsKategorien.Audio, Utils.EinstellungsKategorien.Grafik);
 
-        //UpdateIpAddress.UpdateNoIP_DNS();
+        if (Config.isServer)
+            UpdateIPCoroutine = StartCoroutine(UpdateIpAddress.UpdateNoIP_DNS());
 
         foreach (Player p in Config.PLAYERLIST)
         {
@@ -419,7 +426,8 @@ public class StartupScene : MonoBehaviour
         // Server
         Utils.EinstelungenServerUpdatePortIP(Einstellungen, Config.isServer, Config.SERVER_CONNECTION_IP, "" + Config.SERVER_CONNECTION_PORT);
         // NoIP Anzeige
-        if (File.Exists(Application.persistentDataPath + @"/No-IP Settings.txt")) {
+        if (File.Exists(Application.persistentDataPath + @"/No-IP Settings.txt"))
+        {
             string[] noiptemp = File.ReadAllLines(Application.persistentDataPath + @"/No-IP Settings.txt");
             Utils.EinstellungenServerNoIpUpdate(Einstellungen, noiptemp[0].Replace(": ", "|").Split('|')[1], noiptemp[1].Replace(": ", "|").Split('|')[1], noiptemp[2].Replace(": ", "|").Split('|')[1]);
         }
@@ -436,7 +444,7 @@ public class StartupScene : MonoBehaviour
         if (Config.CLIENT_STARTED || Config.SERVER_STARTED)
             return;
         Config.SERVER_CONNECTION_IP = input.text;
-        if (Config.isServer)
+        if (Config.isServer && Config.REMOTECONFIG_FETCHTED)
         {
             if (UpdateIPCoroutine != null)
                 StopCoroutine(UpdateIPCoroutine);
@@ -464,9 +472,9 @@ public class StartupScene : MonoBehaviour
         Config.isServer = toggle.isOn;
 
         // Lädt nur die Spiele wenn diese noch nicht initialisiert wurden
-        if (Config.isServer && Config.QUIZ_SPIEL == null)
-            StartCoroutine(SetupSpiele.LoadGameFiles());
-        if (Config.isServer)
+        //if (Config.isServer && Config.QUIZ_SPIEL == null)
+            //StartCoroutine(SetupSpiele.LoadGameFiles());
+        if (Config.isServer && Config.REMOTECONFIG_FETCHTED)
         {
             if (UpdateIPCoroutine != null)
                 StopCoroutine(UpdateIPCoroutine);
@@ -625,7 +633,7 @@ public class StartupScene : MonoBehaviour
     public void EinzelspielerStartScene(string szeneName)
     {
         Logging.log(Logging.LogType.Normal, "StartupScene", "EinzelspielerStartScene", "Starte das Einzelspieler Spiel: " + szeneName);
-        Utils.EinstellungenToggle(Einstellungen, Utils.EinstellungsKategorien.Audio);
+        Utils.EinstellungenToggle(Einstellungen, Utils.EinstellungsKategorien.Audio, Utils.EinstellungsKategorien.Grafik);
         GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(1).gameObject.SetActive(true);
         switch (szeneName)
         {

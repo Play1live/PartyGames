@@ -18,7 +18,7 @@ public class TabuServer : MonoBehaviour
     [SerializeField] AudioSource Erraten;
     [SerializeField] AudioSource Beeep;
     [SerializeField] AudioSource Moeoop;
-    private List<string> broadcastmsgs;
+    //private List<string> broadcastmsgs;
 
     private GameObject BackgroundColor;
     private GameObject TeamRot;
@@ -45,10 +45,11 @@ public class TabuServer : MonoBehaviour
 
     void OnEnable()
     {
-        broadcastmsgs = new List<string>();
+        //broadcastmsgs = new List<string>();
+        //StartCoroutine(NewBroadcast());
+        StartCoroutine(ServerUtils.Broadcast());
         PlayerConnected = new bool[Config.SERVER_MAX_CONNECTIONS];
         InitGame();
-        StartCoroutine(NewBroadcast());
     }
 
     void Update()
@@ -63,6 +64,7 @@ public class TabuServer : MonoBehaviour
         {
             if (spieler.isConnected == false)
                 continue;
+
             #region Sucht nach neuen Nachrichten
             if (spieler.isConnected == true)
             {
@@ -77,56 +79,20 @@ public class TabuServer : MonoBehaviour
                 }
             }
             #endregion
-
-            #region Spieler Disconnected Message
-            for (int i = 0; i < Config.PLAYERLIST.Length; i++)
-            {
-                if (Config.PLAYERLIST[i].isConnected == false)
-                {
-                    if (Config.PLAYERLIST[i].isDisconnected == true)
-                    {
-                        Logging.log(Logging.LogType.Normal, "TabuServer", "Update", "Spieler hat die Verbindung getrennt. ID: " + Config.PLAYERLIST[i].id);
-                        //Broadcast(Config.PLAYERLIST[i].name + " has disconnected", Config.PLAYERLIST);
-                        Config.PLAYERLIST[i].isConnected = false;
-                        Config.PLAYERLIST[i].isDisconnected = false;
-                        Config.SERVER_ALL_CONNECTED = false;
-                        Config.PLAYERLIST[i].name = "";
-                    }
-                }
-            }
-            #endregion
         }
         #endregion
     }
 
     private void OnApplicationQuit()
     {
-        Broadcast("#ServerClosed", Config.PLAYERLIST);
+        ServerUtils.BroadcastImmediate("#ServerClosed");
         Logging.log(Logging.LogType.Normal, "TabuServer", "OnApplicationQuit", "Server wird geschlossen.");
         Config.SERVER_TCP.Server.Close();
     }
 
-    IEnumerator NewBroadcast()
-    {
-        while (true)
-        {
-            // Broadcastet alle MSGs nacheinander
-            if (broadcastmsgs.Count != 0)
-            {
-                string msg = broadcastmsgs[0];
-                broadcastmsgs.RemoveAt(0);
-                Broadcast(msg);
-                yield return null;
-            }
-            //yield return new WaitForSeconds(0.005f);
-            yield return new WaitForSeconds(0.01f);
-        }
-        yield break;
-    }
-
     #region Server Stuff  
     #region Kommunikation
-    /// <summary>
+    /*/// <summary>
     /// Sendet eine Nachricht an den übergebenen Spieler
     /// </summary>
     /// <param name="data">Nachricht</param>
@@ -159,6 +125,35 @@ public class TabuServer : MonoBehaviour
                 SendMSG(data, sc);
         }
     }
+    IEnumerator NewBroadcast()
+    {
+        while (true)
+        {
+            // Broadcastet alle MSGs nacheinander
+            if (broadcastmsgs.Count != 0)
+            {
+                string msg = broadcastmsgs[0];
+                broadcastmsgs.RemoveAt(0);
+                Broadcast(msg);
+                yield return null;
+            }
+            //yield return new WaitForSeconds(0.005f);
+            yield return new WaitForSeconds(0.01f);
+        }
+        yield break;
+    }
+    /// <summary>
+    /// Spieler beendet das Spiel
+    /// </summary>
+    /// <param name="player">Spieler</param>
+    private void ClientClosed(Player player)
+    {
+        player.icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
+        player.name = "";
+        player.points = 0;
+        player.isConnected = false;
+        player.isDisconnected = true;
+    }
     /// <summary>
     /// Sendet eine Nachricht an alle verbundenen Spieler
     /// </summary>
@@ -174,7 +169,7 @@ public class TabuServer : MonoBehaviour
     private void BroadcastNew(string data)
     {
         broadcastmsgs.Add(data);
-    }
+    }*/
     /// <summary>
     /// Einkommende Nachrichten die von Spielern an den Server gesendet werden
     /// </summary>
@@ -213,7 +208,7 @@ public class TabuServer : MonoBehaviour
                 PlayDisconnectSound();
                 teamrotList.Remove(player.name);
                 teamblauList.Remove(player.name);
-                ClientClosed(player);
+                ServerUtils.ClientClosed(player);
                 JoinTeam("", "");
                 break;
             case "#TestConnection":
@@ -240,25 +235,13 @@ public class TabuServer : MonoBehaviour
     }
     #endregion
     /// <summary>
-    /// Spieler beendet das Spiel
-    /// </summary>
-    /// <param name="player">Spieler</param>
-    private void ClientClosed(Player player)
-    {
-        player.icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
-        player.name = "";
-        player.points = 0;
-        player.isConnected = false;
-        player.isDisconnected = true;
-    }
-    /// <summary>
     /// Spiel Verlassen & Zurück in die Lobby laden
     /// </summary>
     public void SpielVerlassenButton()
     {
         Logging.log(Logging.LogType.Debug, "TabuServer", "SpielVerlassenButton", "Spiel wird beendet. Lädt ins Hauptmenü.");
-        SceneManager.LoadScene("Startup");
-        BroadcastNew("#ZurueckInsHauptmenue");
+        //SceneManager.LoadScene("Startup");
+        ServerUtils.AddBroadcast("#ZurueckInsHauptmenue");
     }
     /// <summary>
     /// Spielt den Disconnect Sound ab
@@ -436,7 +419,7 @@ public class TabuServer : MonoBehaviour
             if (teamblau1.Length > 3)
                 teamblau1 = teamblau1.Substring("[#]".Length);
             // Listen Broadcast
-            BroadcastNew("#TeamUpdate " + teamrot1 + "|" + teamblau1);
+            ServerUtils.AddBroadcast("#TeamUpdate " + teamrot1 + "|" + teamblau1);
             return;
         }
 
@@ -508,7 +491,7 @@ public class TabuServer : MonoBehaviour
         if (teamblau.Length > 3)
             teamblau = teamblau.Substring("[#]".Length);
         // Listen Broadcast
-        BroadcastNew("#TeamUpdate " + teamrot + "|" + teamblau);
+        ServerUtils.AddBroadcast("#TeamUpdate " + teamrot + "|" + teamblau);
     }
     private void SetKreuzClient(Player p, string data)
     {
@@ -540,7 +523,7 @@ public class TabuServer : MonoBehaviour
                     if (!Kreuze.transform.GetChild(2).gameObject.activeInHierarchy)
                     {
                         Kreuze.transform.GetChild(2).gameObject.SetActive(true);
-                        BroadcastNew("#KreuzAn 2");
+                        ServerUtils.AddBroadcast("#KreuzAn 2");
                         ParseAlleKreuzeAn(player);
                     }
                     else
@@ -555,13 +538,13 @@ public class TabuServer : MonoBehaviour
                     if (!Kreuze.transform.GetChild(0).gameObject.activeInHierarchy)
                     {
                         Kreuze.transform.GetChild(0).gameObject.SetActive(true);
-                        BroadcastNew("#KreuzAn 0");
+                        ServerUtils.AddBroadcast("#KreuzAn 0");
                         DisplayX.Play();
                     }
                     else if (!Kreuze.transform.GetChild(2).gameObject.activeInHierarchy)
                     {
                         Kreuze.transform.GetChild(2).gameObject.SetActive(true);
-                        BroadcastNew("#KreuzAn 2");
+                        ServerUtils.AddBroadcast("#KreuzAn 2");
                         ParseAlleKreuzeAn(player);
                     }
                     else
@@ -578,19 +561,19 @@ public class TabuServer : MonoBehaviour
                         if (!Kreuze.transform.GetChild(0).gameObject.activeInHierarchy)
                         {
                             Kreuze.transform.GetChild(0).gameObject.SetActive(true);
-                            BroadcastNew("#KreuzAn 0");
+                            ServerUtils.AddBroadcast("#KreuzAn 0");
                             DisplayX.Play();
                         }
                         else if (!Kreuze.transform.GetChild(1).gameObject.activeInHierarchy)
                         {
                             Kreuze.transform.GetChild(1).gameObject.SetActive(true);
-                            BroadcastNew("#KreuzAn 1");
+                            ServerUtils.AddBroadcast("#KreuzAn 1");
                             DisplayX.Play();
                         }
                         else if (!Kreuze.transform.GetChild(2).gameObject.activeInHierarchy)
                         {
                             Kreuze.transform.GetChild(2).gameObject.SetActive(true);
-                            BroadcastNew("#KreuzAn 2");
+                            ServerUtils.AddBroadcast("#KreuzAn 2");
                             ParseAlleKreuzeAn(player);
                         }
                         else
@@ -612,7 +595,7 @@ public class TabuServer : MonoBehaviour
                     if (!Kreuze.transform.GetChild(2).gameObject.activeInHierarchy)
                     {
                         Kreuze.transform.GetChild(2).gameObject.SetActive(true);
-                        BroadcastNew("#KreuzAn 2");
+                        ServerUtils.AddBroadcast("#KreuzAn 2");
                         ParseAlleKreuzeAn(player);
                     }
                     else
@@ -627,13 +610,13 @@ public class TabuServer : MonoBehaviour
                     if (!Kreuze.transform.GetChild(1).gameObject.activeInHierarchy)
                     {
                         Kreuze.transform.GetChild(1).gameObject.SetActive(true);
-                        BroadcastNew("#KreuzAn 1");
+                        ServerUtils.AddBroadcast("#KreuzAn 1");
                         DisplayX.Play();
                     }
                     else if (!Kreuze.transform.GetChild(2).gameObject.activeInHierarchy)
                     {
                         Kreuze.transform.GetChild(2).gameObject.SetActive(true);
-                        BroadcastNew("#KreuzAn 2");
+                        ServerUtils.AddBroadcast("#KreuzAn 2");
                         ParseAlleKreuzeAn(player);
                     }
                     else
@@ -648,19 +631,19 @@ public class TabuServer : MonoBehaviour
                     if (!Kreuze.transform.GetChild(0).gameObject.activeInHierarchy)
                     {
                         Kreuze.transform.GetChild(0).gameObject.SetActive(true);
-                        BroadcastNew("#KreuzAn 0");
+                        ServerUtils.AddBroadcast("#KreuzAn 0");
                         DisplayX.Play();
                     }
                     else if (!Kreuze.transform.GetChild(1).gameObject.activeInHierarchy)
                     {
                         Kreuze.transform.GetChild(1).gameObject.SetActive(true);
-                        BroadcastNew("#KreuzAn 1");
+                        ServerUtils.AddBroadcast("#KreuzAn 1");
                         DisplayX.Play();
                     }
                     else if (!Kreuze.transform.GetChild(2).gameObject.activeInHierarchy)
                     {
                         Kreuze.transform.GetChild(2).gameObject.SetActive(true);
-                        BroadcastNew("#KreuzAn 2");
+                        ServerUtils.AddBroadcast("#KreuzAn 2");
                         ParseAlleKreuzeAn(player);
                     }
                     else
@@ -746,7 +729,7 @@ public class TabuServer : MonoBehaviour
         StopCoroutine(TimerCoroutine);
         Timer.SetActive(false);
 
-        BroadcastNew("#RundeEnde " + TeamTurn + "|" + points + "|" + playername);
+        ServerUtils.AddBroadcast("#RundeEnde " + TeamTurn + "|" + points + "|" + playername);
         DisplayKarte(true, selectedItem.geheimwort, selectedItem.verboteneWorte);
 
         if (points == +1)
@@ -811,7 +794,7 @@ public class TabuServer : MonoBehaviour
         started = true;
         selectedItem = selectedPack.GetRandomItem();
 
-        BroadcastNew("#StartRunde " + name + "|" + TeamTurn + "|" + selectedItem.geheimwort + "|" + selectedItem.verboteneWorte);
+        ServerUtils.AddBroadcast("#StartRunde " + name + "|" + TeamTurn + "|" + selectedItem.geheimwort + "|" + selectedItem.verboteneWorte);
         RundeStarten.SetActive(false);
         JoinTeamRot.SetActive(false);
         JoinTeamBlau.SetActive(false);

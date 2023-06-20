@@ -37,6 +37,7 @@ public class MosaikServer : MonoBehaviour
 
     void OnEnable()
     {
+        StartCoroutine(ServerUtils.Broadcast());
         PlayerConnected = new bool[Config.SERVER_MAX_CONNECTIONS];
         InitAnzeigen();
         InitMosaik();
@@ -53,7 +54,6 @@ public class MosaikServer : MonoBehaviour
 
         foreach (Player spieler in Config.PLAYERLIST)
         {
-
             if (spieler.isConnected == false)
                 continue;
 
@@ -73,31 +73,13 @@ public class MosaikServer : MonoBehaviour
                 }
             }
             #endregion
-
-            #region Spieler Disconnected Message
-            for (int i = 0; i < Config.PLAYERLIST.Length; i++)
-            {
-                if (Config.PLAYERLIST[i].isConnected == false)
-                {
-                    if (Config.PLAYERLIST[i].isDisconnected == true)
-                    {
-                        Logging.log(Logging.LogType.Normal, "MosaikServer", "Update", "Spieler hat die Verbindung getrennt. ID: " + Config.PLAYERLIST[i].id);
-                        Broadcast(Config.PLAYERLIST[i].name + " has disconnected", Config.PLAYERLIST);
-                        Config.PLAYERLIST[i].isConnected = false;
-                        Config.PLAYERLIST[i].isDisconnected = false;
-                        Config.SERVER_ALL_CONNECTED = false;
-                        Config.PLAYERLIST[i].name = "";
-                    }
-                }
-            }
-            #endregion
         }
         #endregion
     }
 
     private void OnApplicationQuit()
     {
-        Broadcast("#ServerClosed", Config.PLAYERLIST);
+        ServerUtils.BroadcastImmediate("#ServerClosed");
         Logging.log(Logging.LogType.Normal, "Server", "OnApplicationQuit", "Server wird geschlossen");
         Config.SERVER_TCP.Server.Close();
     }
@@ -109,6 +91,18 @@ public class MosaikServer : MonoBehaviour
 
     #region Server Stuff
     #region Kommunikation
+    /*/// <summary>
+    /// Spieler beendet das Spiel
+    /// </summary>
+    /// <param name="player">Spieler</param>
+    private void ClientClosed(Player player)
+    {
+        player.icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
+        player.name = "";
+        player.points = 0;
+        player.isConnected = false;
+        player.isDisconnected = true;
+    }
     /// <summary>
     /// Sendet eine Nachricht an den übergebenen Spieler
     /// </summary>
@@ -153,7 +147,7 @@ public class MosaikServer : MonoBehaviour
             if (sc.isConnected)
                 SendMSG(data, sc);
         }
-    }
+    }*/
     /// <summary>
     /// Einkommende Nachrichten die von Spielern an den Server gesendet werden.
     /// </summary>
@@ -189,7 +183,7 @@ public class MosaikServer : MonoBehaviour
                 break;
 
             case "#ClientClosed":
-                ClientClosed(player);
+                ServerUtils.ClientClosed(player);
                 UpdateSpielerBroadcast();
                 PlayDisconnectSound();
                 break;
@@ -213,39 +207,19 @@ public class MosaikServer : MonoBehaviour
     }
     #endregion
     /// <summary>
-    /// Fordert alle Clients auf die RemoteConfig neuzuladen
-    /// </summary>
-    public void UpdateRemoteConfig()
-    {
-        Broadcast("#UpdateRemoteConfig");
-        LoadConfigs.FetchRemoteConfig();
-    }
-    /// <summary>
-    /// Spieler beendet das Spiel
-    /// </summary>
-    /// <param name="player">Spieler</param>
-    private void ClientClosed(Player player)
-    {
-        player.icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
-        player.name = "";
-        player.points = 0;
-        player.isConnected = false;
-        player.isDisconnected = true;
-    }
-    /// <summary>
     /// Spiel Verlassen & Zurück in die Lobby laden
     /// </summary>
     public void SpielVerlassenButton()
     {
-        SceneManager.LoadScene("Startup");
-        Broadcast("#ZurueckInsHauptmenue");
+        //SceneManager.LoadScene("Startup");
+        ServerUtils.AddBroadcast("#ZurueckInsHauptmenue");
     }
     /// <summary>
     /// Sendet aktualisierte Spielerinfos an alle Spieler
     /// </summary>
     private void UpdateSpielerBroadcast()
     {
-        Broadcast(UpdateSpieler(), Config.PLAYERLIST);
+        ServerUtils.AddBroadcast(UpdateSpieler());
     }
     /// <summary>
     /// Aktualisiert die Spieler Anzeige Informationen & gibt diese als Text zurück
@@ -343,7 +317,7 @@ public class MosaikServer : MonoBehaviour
         }
         Logging.log(Logging.LogType.Warning, "MosaikServer", "SpielerBuzzered", "B: " + p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
         buzzerIsOn = false;
-        Broadcast("#AudioBuzzerPressed " + p.id);
+        ServerUtils.AddBroadcast("#AudioBuzzerPressed " + p.id);
         BuzzerSound.Play();
         SpielerAnzeige[p.id - 1, 1].SetActive(true);
     }
@@ -356,7 +330,7 @@ public class MosaikServer : MonoBehaviour
             SpielerAnzeige[i, 1].SetActive(false);
         buzzerIsOn = BuzzerAnzeige.activeInHierarchy;
         Logging.log(Logging.LogType.Warning, "MosaikServer", "SpielerBuzzerFreigeben", "Buzzer wird freigegeben");
-        Broadcast("#BuzzerFreigeben");
+        ServerUtils.AddBroadcast("#BuzzerFreigeben");
     }
     #endregion
     #region Spieler Ausgetabt Anzeige
@@ -368,7 +342,7 @@ public class MosaikServer : MonoBehaviour
     {
         AustabbenAnzeigen.SetActive(toggle.isOn);
         if (toggle.isOn == false)
-            Broadcast("#SpielerAusgetabt 0");
+            ServerUtils.AddBroadcast("#SpielerAusgetabt 0");
     }
     /// <summary>
     /// Spieler Tabt aus, wird ggf allen gezeigt
@@ -380,7 +354,7 @@ public class MosaikServer : MonoBehaviour
         bool ausgetabt = !Boolean.Parse(data);
         SpielerAnzeige[(player.id - 1), 3].SetActive(ausgetabt); // Ausgetabt Einblednung
         if (AustabbenAnzeigen.activeInHierarchy)
-            Broadcast("#SpielerAusgetabt " + player.id + " " + ausgetabt);
+            ServerUtils.AddBroadcast("#SpielerAusgetabt " + player.id + " " + ausgetabt);
     }
     #endregion
     #region Punkte
@@ -406,7 +380,7 @@ public class MosaikServer : MonoBehaviour
     /// <param name="player">Spieler</param>
     public void PunkteRichtigeAntwort(GameObject player)
     {
-        Broadcast("#AudioRichtigeAntwort");
+        ServerUtils.AddBroadcast("#AudioRichtigeAntwort");
         RichtigeAntwortSound.Play();
         int pId = Int32.Parse(player.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
         int pIndex = Player.getPosInLists(pId);
@@ -419,7 +393,7 @@ public class MosaikServer : MonoBehaviour
     /// <param name="player">Spieler</param>
     public void PunkteFalscheAntwort(GameObject player)
     {
-        Broadcast("#AudioFalscheAntwort");
+        ServerUtils.AddBroadcast("#AudioFalscheAntwort");
         FalscheAntwortSound.Play();
         int pId = Int32.Parse(player.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
         foreach (Player p in Config.PLAYERLIST)
@@ -474,7 +448,7 @@ public class MosaikServer : MonoBehaviour
         int pId = Int32.Parse(button.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
         SpielerAnzeige[(pId - 1), 1].SetActive(true);
         buzzerIsOn = false;
-        Broadcast("#SpielerIstDran " + pId);
+        ServerUtils.AddBroadcast("#SpielerIstDran " + pId);
     }
     /// <summary>
     /// Versteckt den Icon Rand beim Spieler
@@ -489,7 +463,7 @@ public class MosaikServer : MonoBehaviour
             if (SpielerAnzeige[i, 1].activeInHierarchy)
                 return;
         buzzerIsOn = BuzzerAnzeige.activeInHierarchy; // Buzzer wird erst aktiviert wenn keiner mehr dran ist
-        Broadcast("#SpielerIstNichtDran " + pId);
+        ServerUtils.AddBroadcast("#SpielerIstNichtDran " + pId);
     }
     #endregion
     #region Mosaik Anzeige
@@ -623,9 +597,9 @@ public class MosaikServer : MonoBehaviour
             return;
 
         if (bildIndex == 0)
-            Broadcast("#MosaikEinblendenAusblenden " + einblenden + "[!#!]Beispiel");
+            ServerUtils.AddBroadcast("#MosaikEinblendenAusblenden " + einblenden + "[!#!]Beispiel");
         else
-            Broadcast("#MosaikEinblendenAusblenden " + einblenden + "[!#!]" + Config.MOSAIK_SPIEL.getSelected().getURLs()[bildIndex - 1]);
+            ServerUtils.AddBroadcast("#MosaikEinblendenAusblenden " + einblenden + "[!#!]" + Config.MOSAIK_SPIEL.getSelected().getURLs()[bildIndex - 1]);
 
         if (einblenden == true)
         {
@@ -725,7 +699,7 @@ public class MosaikServer : MonoBehaviour
         int random = coverlist[UnityEngine.Random.Range(0, coverlist.Count)];
         coverlist.Remove(random);
 
-        Broadcast("#MosaikCoverAuflösen " + random);
+        ServerUtils.AddBroadcast("#MosaikCoverAuflösen " + random);
 
         Bild[random].SetActive(false);
         Bild[random].GetComponent<Animator>().enabled = false;
@@ -740,7 +714,7 @@ public class MosaikServer : MonoBehaviour
     public void MosaikBestimmtesAuflösen(Button go)
     {
         int index = Int32.Parse(go.gameObject.name.Replace("Cover (", "").Replace(")", ""));
-        Broadcast("#MosaikCoverAuflösen " + index);
+        ServerUtils.AddBroadcast("#MosaikCoverAuflösen " + index);
 
         Bild[index].SetActive(false);
         Bild[index].GetComponent<Animator>().enabled = false;
@@ -756,7 +730,7 @@ public class MosaikServer : MonoBehaviour
     {
         if (coverlist.Count == 0)
             return;
-        Broadcast("#MosaikAllesAuflösen");
+        ServerUtils.AddBroadcast("#MosaikAllesAuflösen");
 
         while (coverlist.Count > 0)
         {
@@ -843,7 +817,7 @@ public class MosaikServer : MonoBehaviour
     {
         if (input.text.Length == 0)
             return;
-        Broadcast("#DownloadCustom "+ input.text);
+        ServerUtils.AddBroadcast("#DownloadCustom "+ input.text);
 
         // Setzt SpielerGeladenAnzeige zurück
         GameObject SpielerGeladenAnzeige = GameObject.Find("SpielerGeladenAnzeige");

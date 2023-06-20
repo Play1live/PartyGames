@@ -38,6 +38,7 @@ public class GeheimwörterServer : MonoBehaviour
 
     void OnEnable()
     {
+        StartCoroutine(ServerUtils.Broadcast());
         PlayerConnected = new bool[Config.SERVER_MAX_CONNECTIONS];
         InitAnzeigen();
         InitGeheimwörter();
@@ -53,7 +54,6 @@ public class GeheimwörterServer : MonoBehaviour
 
         foreach (Player spieler in Config.PLAYERLIST)
         {
-
             if (spieler.isConnected == false)
                 continue;
 
@@ -72,37 +72,31 @@ public class GeheimwörterServer : MonoBehaviour
                 }
             }
             #endregion
-
-            #region Spieler Disconnected Message
-            for (int i = 0; i < Config.PLAYERLIST.Length; i++)
-            {
-                if (Config.PLAYERLIST[i].isConnected == false)
-                {
-                    if (Config.PLAYERLIST[i].isDisconnected == true)
-                    {
-                        Logging.log(Logging.LogType.Normal, "GeheimwörterServer", "Update", "Spieler hat die Verbindung getrennt. ID: " + Config.PLAYERLIST[i].id);
-                        Broadcast(Config.PLAYERLIST[i].name + " has disconnected", Config.PLAYERLIST);
-                        Config.PLAYERLIST[i].isConnected = false;
-                        Config.PLAYERLIST[i].isDisconnected = false;
-                        Config.SERVER_ALL_CONNECTED = false;
-                        Config.PLAYERLIST[i].name = "";
-                    }
-                }
-            }
-            #endregion
         }
         #endregion
     }
 
     private void OnApplicationQuit()
     {
-        Broadcast("#ServerClosed", Config.PLAYERLIST);
+        ServerUtils.BroadcastImmediate("#ServerClosed");
         Logging.log(Logging.LogType.Normal, "GeheimwörterServer", "OnApplicationQuit", "Server wird geschlossen");
         Config.SERVER_TCP.Server.Close();
     }
 
     #region Server Stuff
     #region Kommunikation
+    /*/// <summary>
+    /// Spieler beendet das Spiel
+    /// </summary>
+    /// <param name="player"></param>
+    private void ClientClosed(Player player)
+    {
+        player.icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
+        player.name = "";
+        player.points = 0;
+        player.isConnected = false;
+        player.isDisconnected = true;
+    }
     /// <summary>
     /// Sendet eine Nachricht an den übergebenen Spieler
     /// </summary>
@@ -147,7 +141,7 @@ public class GeheimwörterServer : MonoBehaviour
             if (sc.isConnected)
                 SendMSG(data, sc);
         }
-    }
+    }*/
     /// <summary>
     /// Einkommende Nachrichten die von Spielern an den Server gesendet werden.
     /// </summary>
@@ -183,7 +177,7 @@ public class GeheimwörterServer : MonoBehaviour
                 break;
 
             case "#ClientClosed":
-                ClientClosed(player);
+                ServerUtils.ClientClosed(player);
                 UpdateSpielerBroadcast();
                 PlayDisconnectSound();
                 break;
@@ -207,39 +201,19 @@ public class GeheimwörterServer : MonoBehaviour
     }
     #endregion
     /// <summary>
-    /// Fordert alle Clients auf die RemoteConfig neuzuladen
-    /// </summary>
-    public void UpdateRemoteConfig()
-    {
-        Broadcast("#UpdateRemoteConfig");
-        LoadConfigs.FetchRemoteConfig();
-    }
-    /// <summary>
-    /// Spieler beendet das Spiel
-    /// </summary>
-    /// <param name="player"></param>
-    private void ClientClosed(Player player)
-    {
-        player.icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
-        player.name = "";
-        player.points = 0;
-        player.isConnected = false;
-        player.isDisconnected = true;
-    }
-    /// <summary>
     /// Spiel Verlassen & Zurück in die Lobby laden
     /// </summary>
     public void SpielVerlassenButton()
     {
-        SceneManager.LoadScene("Startup");
-        Broadcast("#ZurueckInsHauptmenue");
+        //SceneManager.LoadScene("Startup");
+        ServerUtils.AddBroadcast("#ZurueckInsHauptmenue");
     }
     /// <summary>
     /// Sendet aktualisierte Spielerinfos an alle Spieler
     /// </summary>
     private void UpdateSpielerBroadcast()
     {
-        Broadcast(UpdateSpieler(), Config.PLAYERLIST);
+        ServerUtils.AddBroadcast(UpdateSpieler());
     }
     /// <summary>
     /// Aktualisiert die Spieler Anzeige Informationen & gibt diese als Text zurück
@@ -338,7 +312,7 @@ public class GeheimwörterServer : MonoBehaviour
         }
         Logging.log(Logging.LogType.Warning, "GeheimwörterServer", "SpielerBuzzered", "B: " + p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
         buzzerIsOn = false;
-        Broadcast("#AudioBuzzerPressed " + p.id);
+        ServerUtils.AddBroadcast("#AudioBuzzerPressed " + p.id);
         BuzzerSound.Play();
         SpielerAnzeige[p.id - 1, 1].SetActive(true);
     }
@@ -351,7 +325,7 @@ public class GeheimwörterServer : MonoBehaviour
             SpielerAnzeige[i, 1].SetActive(false);
         buzzerIsOn = BuzzerAnzeige.activeInHierarchy;
         Logging.log(Logging.LogType.Warning, "GeheimwörterServer", "SpielerBuzzerFreigeben", "Buzzer wurde freigegeben.");
-        Broadcast("#BuzzerFreigeben");
+        ServerUtils.AddBroadcast("#BuzzerFreigeben");
     }
     #endregion
     #region Textantworten der Spieler
@@ -362,7 +336,7 @@ public class GeheimwörterServer : MonoBehaviour
     public void TexteingabeAnzeigenToggle(Toggle toggle)
     {
         TextEingabeAnzeige.SetActive(toggle.isOn);
-        Broadcast("#TexteingabeAnzeigen " + toggle.isOn);
+        ServerUtils.AddBroadcast("#TexteingabeAnzeigen " + toggle.isOn);
     }
     /// <summary>
     /// Aktualisiert die Antwort die der Spieler eingibt
@@ -382,7 +356,7 @@ public class GeheimwörterServer : MonoBehaviour
         TextAntwortenAnzeige.SetActive(toggle.isOn);
         if (!toggle.isOn)
         {
-            Broadcast("#TextantwortenAnzeigen [BOOL]" + toggle.isOn + "[BOOL]");
+            ServerUtils.AddBroadcast("#TextantwortenAnzeigen [BOOL]" + toggle.isOn + "[BOOL]");
             return;
         }
         string msg = "";
@@ -390,7 +364,7 @@ public class GeheimwörterServer : MonoBehaviour
         {
             msg = msg + "[ID" + (i + 1) + "]" + SpielerAnzeige[i, 6].GetComponentInChildren<TMP_InputField>().text + "[ID" + (i + 1) + "]";
         }
-        Broadcast("#TextantwortenAnzeigen [BOOL]" + toggle.isOn + "[BOOL][TEXT]" + msg);
+        ServerUtils.AddBroadcast("#TextantwortenAnzeigen [BOOL]" + toggle.isOn + "[BOOL][TEXT]" + msg);
     }
     #endregion
     #region Spieler Ausgetabt Anzeige
@@ -402,7 +376,7 @@ public class GeheimwörterServer : MonoBehaviour
     {
         AustabbenAnzeigen.SetActive(toggle.isOn);
         if (toggle.isOn == false)
-            Broadcast("#SpielerAusgetabt 0");
+            ServerUtils.AddBroadcast("#SpielerAusgetabt 0");
     }
     /// <summary>
     /// Spieler Tabt aus, wird ggf allen gezeigt
@@ -414,7 +388,7 @@ public class GeheimwörterServer : MonoBehaviour
         bool ausgetabt = !Boolean.Parse(data);
         SpielerAnzeige[(player.id - 1), 3].SetActive(ausgetabt); // Ausgetabt Einblednung
         if (AustabbenAnzeigen.activeInHierarchy)
-            Broadcast("#SpielerAusgetabt " + player.id + " " + ausgetabt);
+            ServerUtils.AddBroadcast("#SpielerAusgetabt " + player.id + " " + ausgetabt);
     }
     #endregion
     #region Punkte
@@ -440,7 +414,7 @@ public class GeheimwörterServer : MonoBehaviour
     /// <param name="player"></param>
     public void PunkteRichtigeAntwort(GameObject player)
     {
-        Broadcast("#AudioRichtigeAntwort");
+        ServerUtils.AddBroadcast("#AudioRichtigeAntwort");
         RichtigeAntwortSound.Play();
         int pId = Int32.Parse(player.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
         int pIndex = Player.getPosInLists(pId);
@@ -453,7 +427,7 @@ public class GeheimwörterServer : MonoBehaviour
     /// <param name="player"></param>
     public void PunkteFalscheAntwort(GameObject player)
     {
-        Broadcast("#AudioFalscheAntwort");
+        ServerUtils.AddBroadcast("#AudioFalscheAntwort");
         FalscheAntwortSound.Play();
         int pId = Int32.Parse(player.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
         foreach (Player p in Config.PLAYERLIST)
@@ -508,7 +482,7 @@ public class GeheimwörterServer : MonoBehaviour
         int pId = Int32.Parse(button.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
         SpielerAnzeige[(pId - 1), 1].SetActive(true);
         buzzerIsOn = false;
-        Broadcast("#SpielerIstDran " + pId);
+        ServerUtils.AddBroadcast("#SpielerIstDran " + pId);
     }
     /// <summary>
     /// Versteckt den Icon Rand beim Spieler
@@ -523,7 +497,7 @@ public class GeheimwörterServer : MonoBehaviour
             if (SpielerAnzeige[i, 1].activeInHierarchy)
                 return;
         buzzerIsOn = BuzzerAnzeige.activeInHierarchy; // Buzzer wird erst aktiviert wenn keiner mehr dran ist
-        Broadcast("#SpielerIstNichtDran " + pId);
+        ServerUtils.AddBroadcast("#SpielerIstNichtDran " + pId);
     }
     #endregion
     #region Geheimwörter Anzeige
@@ -579,7 +553,7 @@ public class GeheimwörterServer : MonoBehaviour
         {
             Liste[i].SetActive(false);
         }
-        Broadcast("#GeheimwoerterHide");
+        ServerUtils.AddBroadcast("#GeheimwoerterHide");
     }
     /// <summary>
     /// Blendet den Lösungscode ein
@@ -593,7 +567,7 @@ public class GeheimwörterServer : MonoBehaviour
         }
         if (msg.Length > 3)
             msg = msg.Substring("<#>".Length);
-        Broadcast("#GeheimwoerterCode " + msg);
+        ServerUtils.AddBroadcast("#GeheimwoerterCode " + msg);
 
         for (int i = 0; i < Config.GEHEIMWOERTER_SPIEL.getSelected().getCode().Count; i++)
         {
@@ -612,7 +586,7 @@ public class GeheimwörterServer : MonoBehaviour
             return;
         GeheimIndexInt += bewegen;
 
-        Broadcast("#GeheimwoerterNeue");
+        ServerUtils.AddBroadcast("#GeheimwoerterNeue");
 
         WoerterAnzeige.text = "";
         KategorieAnzeige.text = "";
@@ -630,7 +604,7 @@ public class GeheimwörterServer : MonoBehaviour
         WoerterAnzeige.text = Config.GEHEIMWOERTER_SPIEL.getSelected().getGeheimwörter()[GeheimIndexInt].getWorte();
         KategorieAnzeige.text = Config.GEHEIMWOERTER_SPIEL.getSelected().getGeheimwörter()[GeheimIndexInt].getKategorien();
 
-        Broadcast("#GeheimwoerterWorteZeigen " + WoerterAnzeige.text.Replace("\n", "<>"));
+        ServerUtils.AddBroadcast("#GeheimwoerterWorteZeigen " + WoerterAnzeige.text.Replace("\n", "<>"));
     }
     /// <summary>
     /// Blendet die Lösung der Runde ein
@@ -640,7 +614,7 @@ public class GeheimwörterServer : MonoBehaviour
         LoesungsWortAnzeige.text = Config.GEHEIMWOERTER_SPIEL.getSelected().getGeheimwörter()[GeheimIndexInt].getLoesung();
         LoesungsWortAnzeige.transform.parent.gameObject.SetActive(true);
 
-        Broadcast("#GeheimwoerterLoesung " + LoesungsWortAnzeige.text + "[TRENNER]" + KategorieAnzeige.text.Replace("\n", "<>"));
+        ServerUtils.AddBroadcast("#GeheimwoerterLoesung " + LoesungsWortAnzeige.text + "[TRENNER]" + KategorieAnzeige.text.Replace("\n", "<>"));
     }
     #endregion
 }

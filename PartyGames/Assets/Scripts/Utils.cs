@@ -1,8 +1,10 @@
-
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using TMPro;
+using System.IO;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using TMPro;
 using UnityEngine.Audio;
 using UnityEngine.UI;
 
@@ -242,4 +244,108 @@ public class Utils
     }
     #endregion
     #endregion
+    /// <summary>
+    /// Generiert einen String mit allen Elementen der Liste
+    /// </summary>
+    /// <param name="list"></param>
+    /// <returns></returns>
+    public static string ListToString(List<string> list)
+    {
+        string output = "";
+        foreach (string item in list)
+            output += "," + item;
+        if (output.Length > 0)
+            output = output.Substring(1);
+        return "[" + output + "]";
+    }
 }
+public class ServerUtils
+{
+    #region Kommunikation
+    /// Liste mit zusendenden Nachrichten an die Clients
+    public static List<string> broadcastmsgs;
+    public static bool blockBroadcastMsgs;
+    /// <summary>
+    /// Fügt eine Nachricht auf die Broadcast liste hinzu
+    /// </summary>
+    /// <param name="msg"></param>
+    public static void AddBroadcast(string msg)
+    {
+        broadcastmsgs.Add(msg);
+        if (broadcastmsgs.Count >= 10)
+            Logging.log(Logging.LogType.Warning, "ServerUtils", "AddBroadcast", "Zu viele MSGs im Puffer: " + broadcastmsgs.Count + " \n" + Utils.ListToString(broadcastmsgs).Replace(",", "\n"));
+    }
+    /// <summary>
+    /// Sendet eine Nachticht an alle verbundenen Spieler. (Config.PLAYLIST)
+    /// </summary>
+    /// <param name="data">Nachricht</param>
+    public static IEnumerator Broadcast()
+    {
+        broadcastmsgs = new List<string>();
+        while (true)
+        {
+            // Broadcastet alle MSGs nacheinander
+            if (broadcastmsgs.Count != 0 && !blockBroadcastMsgs)
+            {
+                blockBroadcastMsgs = true;
+                string msg = broadcastmsgs[0];
+                broadcastmsgs.RemoveAt(0);
+                BroadcastImmediate(msg);
+
+                // Lädt zurück ins Hauptmenü
+                if (msg.Equals("#ZurueckInsHauptmenue"))
+                    SceneManager.LoadScene("Startup");
+                blockBroadcastMsgs = false;
+                yield return null;
+            }
+            yield return new WaitForSeconds(0.001f);
+        }
+    }
+    /// <summary>
+    /// Sendet eine Nachticht an alle verbundenen Spieler. (Config.PLAYLIST)
+    /// </summary>
+    /// <param name="data">Nachricht</param>
+    public static void BroadcastImmediate(string msg)
+    {
+        blockBroadcastMsgs = true;
+        foreach (Player sc in Config.PLAYERLIST)
+            if (sc.isConnected)
+                SendMSG(msg, sc);
+        blockBroadcastMsgs = false;
+    }
+    /// <summary>
+    /// Sendet eine Nachricht an den angegebenen Spieler.
+    /// </summary>
+    /// <param name="data">Nachricht</param>
+    /// <param name="sc">Spieler</param>
+    public static void SendMSG(string data, Player sc)
+    {
+        try
+        {
+            StreamWriter writer = new StreamWriter(sc.tcp.GetStream());
+            writer.WriteLine(data);
+            writer.Flush();
+        }
+        catch (Exception e)
+        {
+            Logging.log(Logging.LogType.Warning, "Server", "SendMSG", "Nachricht an Client: " + sc.id + " (" + sc.name + ") konnte nicht gesendet werden.", e);
+            // Verbindung zum Client wird getrennt
+            ClientClosed(sc);
+        }
+    }
+    #endregion
+    /// <summary>
+    /// Löscht Daten des Spielers von dem die Verbindung getrennt wurde
+    /// </summary>
+    /// <param name="player">Spieler</param>
+    public static void ClientClosed(Player player)
+    {
+        player.icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
+        player.name = "";
+        player.points = 0;
+        player.crowns = 0;
+        player.isConnected = false;
+        player.isDisconnected = true;
+    }
+}
+
