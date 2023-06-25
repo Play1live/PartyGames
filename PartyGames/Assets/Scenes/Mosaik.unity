@@ -4546,6 +4546,10 @@ PrefabInstance:
       propertyPath: m_AnchorMin.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2956615201577605991, guid: 1904c289c8597a0438ce6da9e6405b1d, type: 3}
+      propertyPath: ForceFullscreen
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3109440942216904664, guid: 1904c289c8597a0438ce6da9e6405b1d, type: 3}
       propertyPath: m_SizeDelta.y
       value: 121.3786

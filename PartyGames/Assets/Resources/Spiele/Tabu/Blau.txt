@@ -15,7 +15,7 @@ Mumie|Leiche-K#oe#rper-tot-einbalsamieren-Grab-#ae#gypten
 Neugier|Interesse-erfahren-fliegen-fragen-herausfinden-spannend
 Festhalten|Hand-Griff-verlieren-fallen-umarmen
 K#ae#mmen|Haare-B#ue#rste-ordnen-Finger-Kopf
-Kuss|Mund-Lippen-Wange-Liebe-knutschen
+Kuss|Mund-Lippen-Wange-Liebe-knutschen-Paar
 Stress|#ae#rger-Arbeiten-viel-anstrengend-Nerven
 Windpocken|krank-Kind-anstecken-Pusteln-Virus
 Nadel|n#ae#hen-Faden-stecken-spitzen-Heuhaufen
@@ -48,7 +48,7 @@ Sattel|Pferd-reiten-Fahrrad-sitzen-Leder
 Fallschirm|fliegen-springen-Flugzeug-Rei#ss#leine-#oe#ffnen
 Slum|Stadt-Viertel-arm-leben-Elend
 Gitarre|Musik-Instrument-spielen-Saiten-Bass-stimmen
-Schneebesen|Winter-Eis-K#ue#che-r#ue#hren-kehren
+Schneebesen|Winter-Eis-K#ue#che-r#ue#hren-kehren-backen
 Dudelsack|Musik-Instrument-Pfeifen-blasen-Schottland
 Boxer|Sport-Kampf-Ring-Handschuhe-Hund
 Mais|Feld-Korn-gelb-essen-Kolben
@@ -74,7 +74,7 @@ Erdm#ae#nnchen|Tier-klein-W#ue#ste-stehen-gucken
 Rippen|K#oe#rper-Wirbel-Knochen-Brust-Schutz
 Valentinstag|Februar-14-Liebe-Blumen-Karte
 Lampenfieber|B#ue#hne-Auftritt-vorher-nerv#oe#s-aufgeregt
-Luftkissenboot|F#ae#hre-Wasser-schweben-Propeller-Hovercraft
+Luftkissenboot|F#ae#hre-Wasser-schweben-Propeller-Hovercraft-schlafen-Bett
 Pfandhaus|Schmuck-Wert-verleihen-Geld-versetzen
 K#ue#hlschrank|K#ue#che-Ger#ae#t-Eis-kalt-Essen
 Verstecken|weg-heimlich-Spiel-suchen-finden
@@ -82,7 +82,7 @@ Strohhalm|trinken-lang-Glas-Heu-klammern
 Streichholz|Feuer-brennen-anz#ue#nden-reiben-Schachtel
 Drau#ss#en|drinnen-Natur-Haus-frei-Ausflug
 Sch#ue#chtern|scheu-zur#ue#ckhalten-Scham-Angst-verlegen
-Mayonnaise|Sauce-Ei-#oe#l-Salat-Ketchup
+Mayonnaise|Sauce-Ei-#oe#l-Salat-Ketchup-weiß-Pommes
 Hering|Fisch-Meer-Schwarm-Dose-ger#ae#uchert
 Quartett|vier-Karten-sammeln-Instrument-Musik
 R#ue#ssel|Nase-lang-Elefant-Schwein-saugen
@@ -148,11 +148,11 @@ Gewitter|Donner-Blitz-Regen-Wind
 Gedicht|Reim-Vers-Literatur-schreiben-Liebe
 Mensa|Kantine-Schule-Universit#ae#t-essen-Cafeteria
 Golfstrom|Wetter-Wind-Sport-Auto-Steckdose
-Einrand|fahren-zwei-Lenker-Pedal-Balance
+Einrad|fahren-zwei-Lenker-Pedal-Balance
 Maulesel|Pferd-reiten-Sattel-Kreuzung-Mund
 Postkarte|Brief-Urlaub-Ferien-Bild-Marke
 Minigolf|Platz-Schl#ae#ger-Loch-klein-spielen
-Markt|Stand-kaufen-H#ae#ndler-frisch-schreien
+Markt|Stand-kaufen-H#ae#ndler-frisch-schreien-super
 Torte|Kuchen-Obst-Schokolade-Sahne-Geburtstag
 Doping|Sport-Mittel-verboten-besser-Kontrolle
 Avatar|Internet-Person-virtuell-k#ue#nstlich-Film
@@ -160,7 +160,7 @@ DSDS|Castring-Show-Fernsehen-singen-Bohlen
 Err#oe#ten|Gesicht-Wange-peinlich-sch#ae#men-Aufregung
 Gold|Metall-Silber-wertvoll-Ring-Medallie
 Blog|Internet-Web-online-schreiben-lesen
-Mikofon|sprechen-singen-laut-aufnehmen-Radio
+Mikrofon|sprechen-singen-laut-aufnehmen-Radio
 Lamm|Schaf-jung-klein-Tier-s#ue##ss#
 Shoppingkanal|Fernsehen-Sender-Programm-kaufen-QVC
 Zitteraal|Fisch-Wasser-Strom-lang-Schlange
@@ -211,7 +211,7 @@ Snowboard|Schnee-Winter-Ski-Berg-fahren
 Eifersucht|Neid-haben-Gef#ue#hl-Partner-krank
 Cham#ae#leon|Tier-Reptil-Tarnung-Haut-Farbe
 Ipad|Tablet-Computer-klein-#ue#berall-Apple
-Schwammkopf|SpongeBob-Zeichentrick-Fernsehen-Meer-gelb
+Schwammkopf|SpongeBob-Zeichentrick-Fernsehen-Meer-gelb-Lied
 Downloaden|Datei-Internet-online-speichern-Computer
 Transformers|Film-Kino-verwandeln-Shia LeBeouf-Optimus Prime
 B#ue#gel|Kleider-aufh#ae#ngen-Schrank-Eisen-Brille

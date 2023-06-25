@@ -82,22 +82,4 @@ public class TabuScene : MonoBehaviour
 
         IntroGo.SetActive(false);
     }
-    /// <summary>
-    /// Aktualisiert die Screen Resolution für den Einzelspieler
-    /// </summary>
-    /// <param name="drop"></param>
-    public void UpdateScreenResolution(TMP_Dropdown drop)
-    {
-        Config.APPLICATION_CONFIG.SetInt("GAME_DISPLAY_RESOLUTION", drop.value);
-        Utils.EinstellungenGrafikApply(true);
-    }
-    /// <summary>
-    /// Aktualisiert die Vollbildeinstellung für den Einzelspieler
-    /// </summary>
-    /// <param name="toggle"></param>
-    public void UpdateFullscreen(Toggle toggle)
-    {
-        Config.APPLICATION_CONFIG.SetBool("GAME_DISPLAY_FULLSCREEN", toggle.isOn);
-        Utils.EinstellungenGrafikApply(true);
-    }
 }

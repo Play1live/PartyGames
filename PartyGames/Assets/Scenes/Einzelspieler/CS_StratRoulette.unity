@@ -1111,8 +1111,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2132897297}
-  - {fileID: 1327537736}
   - {fileID: 1047448452}
+  - {fileID: 1327537736}
   - {fileID: 1549860393}
   - {fileID: 1464571872}
   - {fileID: 1487053375}
@@ -4170,7 +4170,7 @@ RectTransform:
   m_Children:
   - {fileID: 1029044621}
   m_Father: {fileID: 294682665}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -5646,11 +5646,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1208827582620184622, guid: bed459dc1cc78214fa9e3d6af2bd9b16, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 50
+      value: 75
       objectReference: {fileID: 0}
     - target: {fileID: 1208827582620184622, guid: bed459dc1cc78214fa9e3d6af2bd9b16, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 50
+      value: 75
       objectReference: {fileID: 0}
     - target: {fileID: 1208827582620184622, guid: bed459dc1cc78214fa9e3d6af2bd9b16, type: 3}
       propertyPath: m_LocalPosition.x
@@ -5682,11 +5682,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1208827582620184622, guid: bed459dc1cc78214fa9e3d6af2bd9b16, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -18.800049
+      value: -19.599976
       objectReference: {fileID: 0}
     - target: {fileID: 1208827582620184622, guid: bed459dc1cc78214fa9e3d6af2bd9b16, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -9.799927
+      value: -11.5
       objectReference: {fileID: 0}
     - target: {fileID: 1208827582620184622, guid: bed459dc1cc78214fa9e3d6af2bd9b16, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -5699,6 +5699,14 @@ PrefabInstance:
     - target: {fileID: 1208827582620184622, guid: bed459dc1cc78214fa9e3d6af2bd9b16, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1208827582754535135, guid: bed459dc1cc78214fa9e3d6af2bd9b16, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 60
+      objectReference: {fileID: 0}
+    - target: {fileID: 1208827582754535135, guid: bed459dc1cc78214fa9e3d6af2bd9b16, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 60
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bed459dc1cc78214fa9e3d6af2bd9b16, type: 3}
@@ -6373,7 +6381,7 @@ PrefabInstance:
     - target: {fileID: 244109988490101875, guid: 1904c289c8597a0438ce6da9e6405b1d, type: 3}
       propertyPath: onValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1742973881}
+      objectReference: {fileID: 1487053378}
     - target: {fileID: 244109988490101875, guid: 1904c289c8597a0438ce6da9e6405b1d, type: 3}
       propertyPath: onValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
@@ -6384,7 +6392,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 244109988490101875, guid: 1904c289c8597a0438ce6da9e6405b1d, type: 3}
       propertyPath: onValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: CS_StratRouletteScene, Assembly-CSharp
+      value: EinstellungsmenueUtils, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 244109988490101875, guid: 1904c289c8597a0438ce6da9e6405b1d, type: 3}
       propertyPath: onValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgument
@@ -6808,7 +6816,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6991444114525430210, guid: 1904c289c8597a0438ce6da9e6405b1d, type: 3}
       propertyPath: m_RootOrder
-      value: 6
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 6991444114525430210, guid: 1904c289c8597a0438ce6da9e6405b1d, type: 3}
       propertyPath: m_AnchorMax.x
@@ -7037,7 +7045,7 @@ PrefabInstance:
     - target: {fileID: 9177519269571015134, guid: 1904c289c8597a0438ce6da9e6405b1d, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1742973881}
+      objectReference: {fileID: 1487053378}
     - target: {fileID: 9177519269571015134, guid: 1904c289c8597a0438ce6da9e6405b1d, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
@@ -7048,7 +7056,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9177519269571015134, guid: 1904c289c8597a0438ce6da9e6405b1d, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: CS_StratRouletteScene, Assembly-CSharp
+      value: EinstellungsmenueUtils, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 9177519269571015134, guid: 1904c289c8597a0438ce6da9e6405b1d, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgument
@@ -7090,6 +7098,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7b743370ac3e4ec2a1668f5455a8ef8a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1487053378 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2956615201577605991, guid: 1904c289c8597a0438ce6da9e6405b1d, type: 3}
+  m_PrefabInstance: {fileID: 1487053373}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2156af29d7400548939815dedbd4233, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1494200319

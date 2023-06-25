@@ -346,6 +346,13 @@ public class ServerUtils
         player.crowns = 0;
         player.isConnected = false;
         player.isDisconnected = true;
+        Config.SERVER_ALL_CONNECTED = false;
     }
+}
+
+public class ClientUtils
+{
+    #region Kommunikation
+    #endregion
 }
 

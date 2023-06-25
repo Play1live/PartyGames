@@ -211,22 +211,6 @@ public class MenschAergerDichNichtClient : MonoBehaviour
             case "#PlaySpielerZieht":
                 SpielerZieht.Play();
                 break;
-                /*
-            case "#SpielerTurn":
-                StartTurn(data);
-                break;
-            case "#SpielerWaehltFeld":
-                SpielerWähltFeld(data);
-                break;
-            case "#StartTurnSelectType":
-                StartTurnSelectType(board.GetPlayerTurn());
-                break;
-            case "#PlayerMergesBot":
-                SpielerWirdZumBot(data);
-                break;
-            case "#AddMSGProtokoll":
-                AddMSGProtokoll(data);
-                break;*/
         }
     }
     /// <summary>
@@ -461,6 +445,11 @@ public class MenschAergerDichNichtClient : MonoBehaviour
     }
     private void UpdateBoard(string data)
     {
+        if (board == null)
+        {
+            Logging.log(Logging.LogType.Error, "MenschÄrgerDichNicht", "UpdateBoard", "Board kann nicht geupdatet werden, da es noch nicht gestartet wurde.");
+            return;
+        }
         board.ClearMarkierungen();
         // Clear Board
         foreach (MenschAegerDichNichtFeld feld in board.GetRunWay())
@@ -509,7 +498,8 @@ public class MenschAergerDichNichtClient : MonoBehaviour
         // Schauen ob der Spieler noch dran ist
         if (Config.PLAYER_NAME == board.GetPlayerTurn().name && board.GetPlayerTurn().availableDices > 0)
         {
-            WuerfelAktivieren(true);
+            StartCoroutine(AktiviereWuerfelTime(2));
+            //WuerfelAktivieren(true);
         }
     }
     /// <summary>
@@ -578,6 +568,12 @@ public class MenschAergerDichNichtClient : MonoBehaviour
     {
         if (data == Config.PLAYER_NAME)
             WuerfelAktivieren(true);
+    }
+    private IEnumerator AktiviereWuerfelTime(int sec)
+    {
+        yield return new WaitForSeconds(sec);
+        WuerfelAktivieren(true);
+        yield break;
     }
     /// <summary>
     /// Aktiviert den Button zum Würfeln

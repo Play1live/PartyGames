@@ -133,6 +133,7 @@ public class StartupClient : MonoBehaviour
 
         Config.PLAYER_NAME = safename;
         CloseSocket();
+        
         Logging.log(Logging.LogType.Warning, "StartupClient", "TestIfStartConnectionError", "Verbindung zum Server war fehlerhaft.");
         Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server war fehlerhaft. Bitte versuche es erneut.\nWenn dieser Fehler erneut auftritt, starte das Programm bitte neu!";
         SceneManager.LoadSceneAsync("Startup");

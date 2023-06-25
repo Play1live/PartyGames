@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class QuizScene : MonoBehaviour
 {
@@ -72,13 +74,5 @@ public class QuizScene : MonoBehaviour
         //Wait for 10 secs.
         yield return new WaitForSeconds(10);
         IntroGO.SetActive(false);
-    }
-
-    void Update()
-    {
-    }
-
-    private void OnApplicationQuit()
-    {
     }
 }

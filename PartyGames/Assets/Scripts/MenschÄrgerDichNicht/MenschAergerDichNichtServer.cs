@@ -621,7 +621,8 @@ public class MenschAergerDichNichtServer : MonoBehaviour
         Logging.log(Logging.LogType.Debug, "MenschAergerDichNichtServer", "StartTurnServer", "Der Server ist dran und kann würfeln");
         DisplayMSGInfoBoard("Du bist dran!\n Du kannst würfeln.");
 
-        WuerfelAktivieren(true);
+        //WuerfelAktivieren(true);
+        StartCoroutine(WuerfelAktuivierenTime(1));
 
         if (BotWillReplaceServer)
         {
@@ -678,7 +679,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
         if (MenschAegerDichNichtBoard.watchBots)
             yield return new WaitForSeconds(0.1f);
         else 
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(1f);
 
         WuerfelStarteAnimation();
         yield break;
@@ -690,6 +691,12 @@ public class MenschAergerDichNichtServer : MonoBehaviour
     private void WuerfelAktivieren(bool aktivieren)
     {
         Würfel.transform.GetChild(0).gameObject.SetActive(aktivieren);
+    }
+    private IEnumerator WuerfelAktuivierenTime(int sec)
+    {
+        yield return new WaitForSeconds(sec);
+        WuerfelAktivieren(true);
+        yield break;
     }
     /// <summary>
     /// Ein Client würfelt. Wird verarbeitet und gesendet

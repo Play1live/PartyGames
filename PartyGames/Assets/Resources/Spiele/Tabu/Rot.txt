@@ -55,7 +55,7 @@ Armband|Hand-Gelenk-Schmuck-Perlen-Uhr
 Las Vegas|Stadt-Amerika-spielen-Casino-Gl#ue#ck
 Pommes|frittiert-essen-Kartoffeln-St#ae#bchen-Ketchup
 Rezept|Anleitung-Zutaten-kochen-backen-Aphotheke
-Omplett|essen-Ei-Pfanne-backen-Schinken
+Omelett|essen-Ei-Pfanne-backen-Schinken
 Date|Verabredung-treffen-blind-verliebt-Zeit
 Palme|Pflanze-F#ae#cher-Wedel-Strand-Kokosnuss
 Muffin|Kuchen-klein-s#ue##ss#-backen-Form

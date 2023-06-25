@@ -67,25 +67,6 @@ public class CS_StratRouletteScene : MonoBehaviour
     {
         
     }
-
-    /// <summary>
-    /// Aktualisiert die Screen Resolution für den Einzelspieler
-    /// </summary>
-    /// <param name="drop"></param>
-    public void UpdateScreenResolution(TMP_Dropdown drop)
-    {
-        Config.APPLICATION_CONFIG.SetInt("GAME_DISPLAY_RESOLUTION", drop.value);
-        Utils.EinstellungenGrafikApply(false);
-    }
-    /// <summary>
-    /// Aktualisiert die Vollbildeinstellung für den Einzelspieler
-    /// </summary>
-    /// <param name="toggle"></param>
-    public void UpdateFullscreen(Toggle toggle)
-    {
-        Config.APPLICATION_CONFIG.SetBool("GAME_DISPLAY_FULLSCREEN", toggle.isOn);
-        Utils.EinstellungenGrafikApply(false);
-    }
     /// <summary>
     /// Spiel Verlassen & Zurück in die Lobby laden
     /// </summary>

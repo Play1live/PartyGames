@@ -1832,6 +1832,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 294682665}
     m_Modifications:
+    - target: {fileID: 244109988490101875, guid: 1904c289c8597a0438ce6da9e6405b1d, type: 3}
+      propertyPath: onValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 76060882}
+    - target: {fileID: 244109988490101875, guid: 1904c289c8597a0438ce6da9e6405b1d, type: 3}
+      propertyPath: onValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: UpdateFullscreen
+      objectReference: {fileID: 0}
     - target: {fileID: 534706864574955146, guid: 1904c289c8597a0438ce6da9e6405b1d, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0.75
@@ -1943,6 +1951,10 @@ PrefabInstance:
     - target: {fileID: 2652892220081117258, guid: 1904c289c8597a0438ce6da9e6405b1d, type: 3}
       propertyPath: m_AnchorMin.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2956615201577605991, guid: 1904c289c8597a0438ce6da9e6405b1d, type: 3}
+      propertyPath: ForceFullscreen
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3109440942216904664, guid: 1904c289c8597a0438ce6da9e6405b1d, type: 3}
       propertyPath: m_SizeDelta.y
@@ -2468,6 +2480,14 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 9177519269571015134, guid: 1904c289c8597a0438ce6da9e6405b1d, type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 76060882}
+    - target: {fileID: 9177519269571015134, guid: 1904c289c8597a0438ce6da9e6405b1d, type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: UpdateScreenResolution
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1904c289c8597a0438ce6da9e6405b1d, type: 3}
 --- !u!1 &76060880 stripped
@@ -2480,6 +2500,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 6991444114525430210, guid: 1904c289c8597a0438ce6da9e6405b1d, type: 3}
   m_PrefabInstance: {fileID: 76060879}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &76060882 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2956615201577605991, guid: 1904c289c8597a0438ce6da9e6405b1d, type: 3}
+  m_PrefabInstance: {fileID: 76060879}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2156af29d7400548939815dedbd4233, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &80860130
 GameObject:
   m_ObjectHideFlags: 0
