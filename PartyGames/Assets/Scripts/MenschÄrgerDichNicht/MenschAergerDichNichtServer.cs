@@ -516,7 +516,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
     private void SendBoardUpdate()
     {
         ServerUtils.AddBroadcast("#UpdateBoard " + board.GetBoardString());
-        ServerUtils.AddBroadcast("#UpdateBoard " + board.GetBoardString());
+        //ServerUtils.AddBroadcast("#UpdateBoard " + board.GetBoardString());
     }
     public void BotReplaceServer(Toggle toggle)
     {

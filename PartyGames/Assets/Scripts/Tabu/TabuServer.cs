@@ -844,11 +844,11 @@ public class TabuServer : MonoBehaviour
             Karte.transform.GetChild(0).GetChild(1).GetComponent<TMP_Text>().text = name;
             if (TeamTurn.Equals("BLAU") && teamrotList.Contains(Config.PLAYER_NAME))
             {
-                DisplayKarte(true, name, selectedItem.verboteneWorte);
+                DisplayKarte(true, selectedItem.geheimwort, selectedItem.verboteneWorte);
             }
             else if (TeamTurn.Equals("ROT") && teamblauList.Contains(Config.PLAYER_NAME))
             {
-                DisplayKarte(true, name, selectedItem.verboteneWorte);
+                DisplayKarte(true, selectedItem.geheimwort, selectedItem.verboteneWorte);
             }
             else if (TeamTurn.Equals("BLAU") && teamblauList.Contains(Config.PLAYER_NAME))
             {
