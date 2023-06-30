@@ -318,6 +318,23 @@ public class CS_StratRouletteScene : MonoBehaviour
         AlleDatensaetze.Add(new CS_StartRouletteDatensatz("[MAP]Alle[MAP][SEITE]CT[SEITE][TITEL]Scheiße auf meine Einheit[TITEL][BESCHREIBUNG]1 Person kauft einen M249, alle anderen den M4s und das Team teilt sich auf, wobei eine Person alleine unterwegs ist. Diese Person darf sich die Minikarte nicht ansehen.[BESCHREIBUNG][KURZ]- Ein Einzelgägner mit M249\n- Der Rest mit M4[KURZ]"));
         AlleDatensaetze.Add(new CS_StartRouletteDatensatz("[MAP]Alle[MAP][SEITE]CT[SEITE][TITEL]Bisonherde[TITEL][BESCHREIBUNG]Jeder muss Bizons kaufen. Laufen oder Stillstehen ist nicht erlaubt.[BESCHREIBUNG][KURZ]- Nur PP-Bison\n- Immer leise laufen[KURZ]"));
         AlleDatensaetze.Add(new CS_StartRouletteDatensatz("[MAP]Alle[MAP][SEITE]CT[SEITE][TITEL]Negev 4-Win[TITEL][BESCHREIBUNG]Wählt einen Standort und stellt euch mit Negevs hin. Verteidigt den Ort so gut wie möglich. Keiner darf eine andere Waffe als eine Negev halten.[BESCHREIBUNG][KURZ]- Nur auf Bombspot stehen\n- Nur Negev[KURZ]"));
+        AlleDatensaetze.Add(new CS_StartRouletteDatensatz("[MAP]Alle[MAP][SEITE]CT[SEITE][TITEL]Hochfinanzierter Betrieb[TITEL][BESCHREIBUNG]Nur Spieler die über 5.000$ haben dürfen kaufen[BESCHREIBUNG][KURZ][KURZ]"));
+        AlleDatensaetze.Add(new CS_StartRouletteDatensatz("[MAP]Alle[MAP][SEITE]CT[SEITE][TITEL]Schlechte Angewohnheiten[TITEL][BESCHREIBUNG]Ihr könnt nur eine einzige Kugel abfeuern, bevor ihr nachladen müsst.[BESCHREIBUNG][KURZ][KURZ]"));
+        AlleDatensaetze.Add(new CS_StartRouletteDatensatz("[MAP]Alle[MAP][SEITE]CT[SEITE][TITEL]Helfer[TITEL][BESCHREIBUNG]Einzig der/den Person/en mit den meisten Assists ist das nutzen des Mikros gestattet. Alle anderen müssen leise bleiben.[BESCHREIBUNG][KURZ][KURZ]"));
+        AlleDatensaetze.Add(new CS_StartRouletteDatensatz("[MAP]Alle[MAP][SEITE]CT[SEITE][TITEL]Aus Freunden Feinde machen[TITEL][BESCHREIBUNG]Jeder kauft seine am meisten gehasste Waffe und gibt sie einem Teamkollegen.[BESCHREIBUNG][KURZ][KURZ]"));
+        AlleDatensaetze.Add(new CS_StartRouletteDatensatz("[MAP]Alle[MAP][SEITE]CT[SEITE][TITEL]Mit dem Opfer spielen[TITEL][BESCHREIBUNG]Tötet 4 Gegner, lasst den letzten die Bombe platzieren und tötet ihn dann[BESCHREIBUNG][KURZ][KURZ]"));
+        AlleDatensaetze.Add(new CS_StartRouletteDatensatz("[MAP]Alle[MAP][SEITE]CT[SEITE][TITEL]Rückzug!!![TITEL][BESCHREIBUNG]Die einzige Bewegungstaste, die Sie verwenden können, ist S.[BESCHREIBUNG][KURZ][KURZ]"));
+        AlleDatensaetze.Add(new CS_StartRouletteDatensatz("[MAP]Alle[MAP][SEITE]CT[SEITE][TITEL]Basis[TITEL][BESCHREIBUNG]Schnappt euch eine Schrotflinte und lauft zwischen CT-Spawn und T-Spawn hin und her, bis die Bombe platziert ist.[BESCHREIBUNG][KURZ][KURZ]"));
+        AlleDatensaetze.Add(new CS_StartRouletteDatensatz("[MAP]Alle[MAP][SEITE]CT[SEITE][TITEL]Begrenzte Zeit[TITEL][BESCHREIBUNG]Wenn der Timer 1:00 erreicht, müssen alle aufhören sich zu bewegen und zu schießen.[BESCHREIBUNG][KURZ][KURZ]"));
+        AlleDatensaetze.Add(new CS_StartRouletteDatensatz("[MAP]Alle[MAP][SEITE]CT[SEITE][TITEL]Nur am rotieren[TITEL][BESCHREIBUNG]Lauft ständig zwischen A und B hin und her, bis die Bombe platziert ist.[BESCHREIBUNG][KURZ][KURZ]"));
+        AlleDatensaetze.Add(new CS_StartRouletteDatensatz("[MAP]Alle[MAP][SEITE]CT[SEITE][TITEL]Waffenflex[TITEL][BESCHREIBUNG]Wenn ein Gegner getötet wird, müss der killer alles fallen lassen und die Waffen des Gegners nehmen.[BESCHREIBUNG][KURZ][KURZ]"));
+        AlleDatensaetze.Add(new CS_StartRouletteDatensatz("[MAP]Alle[MAP][SEITE]CT[SEITE][TITEL]Qual der Wahl[TITEL][BESCHREIBUNG]Jede Person muss eine der folgenden Waffen auswählen: MP7, AWP, XM-1014, Negev, Dual Berettas. Keine Waffe darf doppelt verwendet werden. Falls kein Geld zur verfügung steht USP-S nutzen.[BESCHREIBUNG][KURZ][KURZ]"));
+        AlleDatensaetze.Add(new CS_StartRouletteDatensatz("[MAP]Alle[MAP][SEITE]CT[SEITE][TITEL]Standortspezifisch[TITEL][BESCHREIBUNG]Wer zu A geht, muss man eine P90 oder XM-1014 verwenden, wer zu B geht muss eine AWP nutzen.[BESCHREIBUNG][KURZ][KURZ]"));
+        AlleDatensaetze.Add(new CS_StartRouletteDatensatz("[MAP]Alle[MAP][SEITE]CT[SEITE][TITEL]Alle müssen die ganze Runde geduckt bleiben (verwendet +duck wenn ihr wollt)[TITEL][BESCHREIBUNG] [BESCHREIBUNG][KURZ][KURZ]"));
+        AlleDatensaetze.Add(new CS_StartRouletteDatensatz("[MAP]Alle[MAP][SEITE]CT[SEITE][TITEL]Entladung[TITEL][BESCHREIBUNG]Kauft 4 Granaten und werft alle bevor ihr eure Waffen nutzt[BESCHREIBUNG][KURZ][KURZ]"));
+        AlleDatensaetze.Add(new CS_StartRouletteDatensatz("[MAP]Alle[MAP][SEITE]CT[SEITE][TITEL]SWAG-7[TITEL][BESCHREIBUNG]Jeder kauft eine MAG-7, wenn man damit einen Kill erzielt, schreibt man \"swag - 7 :)\" in den Chat, bevor man weiter spielen darf[BESCHREIBUNG][KURZ][KURZ]"));
+        AlleDatensaetze.Add(new CS_StartRouletteDatensatz("[MAP]Alle[MAP][SEITE]CT[SEITE][TITEL]Sozial Distanzierung[TITEL][BESCHREIBUNG]Niemand darf sich mit einer anderen Person im selben Raum aufhalten[BESCHREIBUNG][KURZ][KURZ]"));
+        AlleDatensaetze.Add(new CS_StartRouletteDatensatz("[MAP]Alle[MAP][SEITE]CT[SEITE][TITEL]Einzigartig[TITEL][BESCHREIBUNG]Jeder kauft eine Waffe die kein anderer Spieler aus dem Team nutzt.[BESCHREIBUNG][KURZ][KURZ]"));
         #region Ancient
         #endregion
         #region Anubis
@@ -327,6 +344,7 @@ public class CS_StratRouletteScene : MonoBehaviour
         #region Mirage
         #endregion
         #region Nuke
+        AlleDatensaetze.Add(new CS_StartRouletteDatensatz("[MAP]Nuke[MAP][SEITE]CT[SEITE][TITEL]Nuke: Full Heaven[TITEL][BESCHREIBUNG]Alle warten mit einer Smoke in Heaven. Wenn die Bombe platziert wurde, springt ihr runter und versucht zu gewinnen.[BESCHREIBUNG][KURZ][KURZ]"));
         #endregion
         #region Overpass
         #endregion

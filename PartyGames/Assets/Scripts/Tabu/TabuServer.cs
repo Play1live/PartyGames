@@ -421,7 +421,7 @@ public class TabuServer : MonoBehaviour
         started = true;
         selectedItem = Config.TABU_SPIEL.getSelected().GetRandomItem();
 
-        ServerUtils.AddBroadcast("#StartRunde " + playername + "|" + TeamTurn + "|" + TabuSpiel.GameType + "|" + timerseconds + "|" + selectedItem.geheimwort.Replace("\n", "\\n") + "|" + selectedItem.verboteneWorte.Replace("\n", "\\n"));
+        ServerUtils.AddBroadcast("#StartRunde " + playername + "|" + TeamTurn + "|" + TabuSpiel.GameType + "|" + timerseconds + "|" + selectedItem.geheimwort.Replace("\n", "\\n") + "|" + selectedItem.tabuworte.Replace("\n", "\\n"));
         RundeStarten.SetActive(false);
         JoinTeamRot.SetActive(false);
         JoinTeamBlau.SetActive(false);
@@ -451,18 +451,18 @@ public class TabuServer : MonoBehaviour
         // Blende Karte für Spieler der dran ist ein
         if (playername == Config.PLAYER_NAME)
         {
-            DisplayKarte(true, selectedItem.geheimwort, selectedItem.verboteneWorte);
+            DisplayKarte(true, selectedItem.geheimwort, selectedItem.tabuworte);
         }
         else
         {
             Karte.transform.GetChild(0).GetChild(1).GetComponent<TMP_Text>().text = playername;
             if (TeamTurn.Equals("BLAU") && teamrotList.Contains(Config.PLAYER_NAME))
             {
-                DisplayKarte(true, selectedItem.geheimwort, selectedItem.verboteneWorte);
+                DisplayKarte(true, selectedItem.geheimwort, selectedItem.tabuworte);
             }
             else if (TeamTurn.Equals("ROT") && teamblauList.Contains(Config.PLAYER_NAME))
             {
-                DisplayKarte(true, selectedItem.geheimwort, selectedItem.verboteneWorte);
+                DisplayKarte(true, selectedItem.geheimwort, selectedItem.tabuworte);
             }
             else if (TeamTurn.Equals("BLAU") && teamblauList.Contains(Config.PLAYER_NAME))
             {
@@ -580,7 +580,7 @@ public class TabuServer : MonoBehaviour
                 StartCoroutine(AnimateBackground("LOSE"));
                 // Neue Karte
                 selectedItem = Config.TABU_SPIEL.getSelected().GetRandomItem();
-                DisplayKarte(true, selectedItem.geheimwort, selectedItem.verboteneWorte);
+                DisplayKarte(true, selectedItem.geheimwort, selectedItem.tabuworte);
             }
             // Zeit vorbei
             else if (indicator == -1)
@@ -606,7 +606,7 @@ public class TabuServer : MonoBehaviour
                 }
                 // Neue Karte
                 selectedItem = Config.TABU_SPIEL.getSelected().GetRandomItem();
-                DisplayKarte(true, selectedItem.geheimwort, selectedItem.verboteneWorte);
+                DisplayKarte(true, selectedItem.geheimwort, selectedItem.tabuworte);
             }
             else
                 Logging.log(Logging.LogType.Error, "TabuServer", "RundeEnde", "Fehler: " + indicator + " " + TeamTurn);
@@ -618,11 +618,11 @@ public class TabuServer : MonoBehaviour
         if (!indicatorstrg.StartsWith("-") && !indicatorstrg.StartsWith("+"))
             indicatorstrg = "+" + indicatorstrg;
 
-        ServerUtils.AddBroadcast("#RundeEnde " + TeamTurn + "|" + indicatorstrg + "|" + TabuSpiel.GameType + "|" + teamrotPunkte + "|" + teamblauPunkte + "|" + true + "|" + selectedItem.geheimwort.Replace("\n", "\\n") + "|" + selectedItem.verboteneWorte.Replace("\n", "\\n"));
+        ServerUtils.AddBroadcast("#RundeEnde " + TeamTurn + "|" + indicatorstrg + "|" + TabuSpiel.GameType + "|" + teamrotPunkte + "|" + teamblauPunkte + "|" + true + "|" + selectedItem.geheimwort.Replace("\n", "\\n") + "|" + selectedItem.tabuworte.Replace("\n", "\\n"));
     }
     private void EndTurn()
     {
-        DisplayKarte(true, selectedItem.geheimwort, selectedItem.verboteneWorte);
+        DisplayKarte(true, selectedItem.geheimwort, selectedItem.tabuworte);
         StopCoroutine(TimerCoroutine);
         Timer.SetActive(false);
         Richtig.SetActive(false);

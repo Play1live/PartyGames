@@ -452,7 +452,7 @@ public class TabuClient : MonoBehaviour
         teamrotPunkte = Int32.Parse(data.Split('|')[3]);
         teamblauPunkte = Int32.Parse(data.Split('|')[4]);
         selectedItem = new TabuItem(data.Split('|')[6].Replace("\\n", "\n"), data.Split('|')[7].Replace("\\n", "\n"));
-        DisplayKarte(bool.Parse(data.Split('|')[5]), selectedItem.geheimwort, selectedItem.verboteneWorte);
+        DisplayKarte(bool.Parse(data.Split('|')[5]), selectedItem.geheimwort, selectedItem.tabuworte);
 
         if (TabuSpiel.GameType.Equals("1 Wort"))
         {
@@ -492,7 +492,7 @@ public class TabuClient : MonoBehaviour
                 FalschGeraten.Play();
                 StartCoroutine(AnimateBackground("LOSE"));
                 // Neue Karte
-                DisplayKarte(true, selectedItem.geheimwort, selectedItem.verboteneWorte);
+                DisplayKarte(true, selectedItem.geheimwort, selectedItem.tabuworte);
             }
             // Zeit vorbei
             else if (indicator == "-1")
@@ -511,7 +511,7 @@ public class TabuClient : MonoBehaviour
                 SetTeamPoints("ROT", teamrotPunkte);
                 SetTeamPoints("BLAU", teamblauPunkte);
                 // Neue Karte
-                DisplayKarte(true, selectedItem.geheimwort, selectedItem.verboteneWorte);
+                DisplayKarte(true, selectedItem.geheimwort, selectedItem.tabuworte);
             }
             else
                 Logging.log(Logging.LogType.Error, "TabuServer", "RundeEnde", "Fehler: " + indicator + " " + TeamTurn);
@@ -521,7 +521,7 @@ public class TabuClient : MonoBehaviour
     }
     private void EndTurn()
     {
-        DisplayKarte(true, selectedItem.geheimwort, selectedItem.verboteneWorte);
+        DisplayKarte(true, selectedItem.geheimwort, selectedItem.tabuworte);
         StopCoroutine(TimerCoroutine);
         Timer.SetActive(false);
         Richtig.SetActive(false);
@@ -585,18 +585,18 @@ public class TabuClient : MonoBehaviour
         // Blende Karte für Spieler der dran ist ein
         if (playername == Config.PLAYER_NAME)
         {
-            DisplayKarte(true, selectedItem.geheimwort, selectedItem.verboteneWorte);
+            DisplayKarte(true, selectedItem.geheimwort, selectedItem.tabuworte);
         }
         else
         {
             Karte.transform.GetChild(0).GetChild(1).GetComponent<TMP_Text>().text = playername;
             if (TeamTurn.Equals("BLAU") && teamrotList.Contains(Config.PLAYER_NAME))
             {
-                DisplayKarte(true, selectedItem.geheimwort, selectedItem.verboteneWorte);
+                DisplayKarte(true, selectedItem.geheimwort, selectedItem.tabuworte);
             }
             else if (TeamTurn.Equals("ROT") && teamblauList.Contains(Config.PLAYER_NAME))
             {
-                DisplayKarte(true, selectedItem.geheimwort, selectedItem.verboteneWorte);
+                DisplayKarte(true, selectedItem.geheimwort, selectedItem.tabuworte);
             }
             else if (TeamTurn.Equals("BLAU") && teamblauList.Contains(Config.PLAYER_NAME))
             {

@@ -4449,3 +4449,46 @@ Tigerhai|Hai-Fisch-Z#ae#hne-Braun-Land-Gro#ss#-Schnell
 Viper|Schlange-Giftig-Braun-Kriechen-Land-Gro#ss#-Langsam
 Waran|Echse-Schwanz-Kriechen-Braun-Wa#ss#er-Klein-Schnell
 Zobel|Raubtier-Fell-Braun-Land-Gro#ss#-Langsam-Winter
+Planeten|Himmelsk#OE#rper-Erd#AE#hnlich-Orbitieren-Gasriesen-Gesteinsplaneten-Sonnensystem-Monde-Sterne
+Astronomie|Himmelsbeobachtung-Sterne studieren-Planetenerforschung-Galaxienforschung-Teleskope-Erdn#AE#he-Astrologie-Fehlinterpretation
+Himmelsk#OE#rper|Kosmische Objekte-Gestirne-Meteoroiden-Kometen-Planetoiden-Exoplaneten-Himmelsph#AE#nomene-Himmel#ss#cheibe
+Schwerkraft|Anziehungskraft-Gravitation-Schwerelosigkeit-Auftrieb-Fliehkraft-Absto#ss#ung-Gleichgewicht-Levitation
+Orbit|Umlaufbahn-Kreisbahn-Ellipsenbahn-Satellitenorbit-Polarorbit-Sonnenumlaufbahn-Erdorbit-Stillstand
+Umlaufbahn|Bahnkurve-Kreislauf-Himmelslaufbahn-Umrundung-Planetenumlauf-Bahnperiode-Abweichung-Stillstand
+Planetoiden|Kleine Himmelsk#OE#rper-Zwergplaneten-Asteroideng#UE#rtel-Kometen-Meteoroiden-Planetenartig-Mond#AE#hnlich-Erdnah
+Meteorit|Weltraumgestein-Himmelsk#OE#rper-Meteor-Sternschnuppe-Meteoridenhagel-Einschlag-Krater-Verpuffen
+Asteroid|Kleinplanet-Gesteinsbrocken-Himmelsk#OE#rper-Asteroideng#UE#rtel-Erdnahe Asteroiden-Kollision-Zerst#OE#rung-Vorbeiflug
+Raumsonde|Erforschung-Daten#UE#bertragung-Raummi#ss#ion-Planetenexploration-Raumfahrttechnik-Signalempfang-Bodenstation-R#UE#ckkehr
+Raumstation|Orbitale Basis-I#ss#-Weltraumlabor-Astronautenwohnheim-Schwerelosigkeit-Kapsel-Au#ss#enbordeinsatz-Bodenkontakt
+Exoplaneten|Extrasolare Planeten-Weltraumentdeckungen-Planetenjagd-Ferne Welten-Planetenatmosph#AE#re-Astronomenteam-Planetenforschung-Erdgebunden
+Milchstra#ss#e|Heimatgalaxie-Sternensystem-Galaktisches Zentrum-Spiralarme-Sterne-Dunkle Materie-Schwarzes Loch-Au#ss#enbezirke
+Saturnringe|Ringebene-Planetenringe-Eiskristalle-Staubpartikel-Gaswolken-Sichtbarkeit-Durchme#ss#er-Aufl#OE#sung
+Jupitermond|Galileische Monde-Io-Europa-Ganymed-Kallisto-Himmelsk#OE#rper-Satelliten-Gesteinsmonde-Eismonde
+Venusatmosph#AE#re|Treibhauseffekt-S#AE#urewolken-Brodelnde Hitze-Schwefeldioxid-Dunstschleier-Lufth#UE#lle-Gash#UE#lle-Erd#AE#hnlich
+Marsrover|Erkundungsfahrzeug-Rovermi#ss#ion-Planetenerkundung-Gesteinsproben-Roboterfahrzeug-Oberfl#AE#chenanalyse-Marsatmosph#AE#re-Forschungsreisen
+Merkuroberfl#AE#che|Gesteinslandschaft-Krater-Sonnennah-Sonnenwind-Hitzeschwankungen-K#AE#lteextreme-Vulkane-Merkurschwerter
+Neptunsturm|Gro#ss#er Dunkler Fleck-Wirbelsturm-Sturmwolken-St#UE#rme-Windgeschwindigkeiten-Winde-Windstille-Wetterph#AE#nomene
+Uranusringe|Eisma#ss#en-Staubpartikel-Ringebene-Planetenringe-Uranusmonde-Sichtbarkeit-Reflexion-Uranusatmosph#AE#re
+Plutodwarfplanet|Kleinplanet-Kuiperg#UE#rtel-Pluto#AE#quator-Eiskappe-Zerkl#UE#ftete Oberfl#AE#che-Sonnendistanz-Raumsonde-Plutoausflug
+Raumfahrzeug|Rakete-Spaceshuttle-Raumkapsel-Satellit-Raumgleiter-Raumflugzeug-Landef#AE#hre-Transportmittel
+Weltraumforschung|Erkenntnisgewinnung-Forschungsexpeditionen-Wi#ss#enschaftler-Erdeerkundung-Universum-Fortschritte-R#UE#ckstand-Oberfl#AE#chlichkeit
+Planetarium|Sternwarte-Himmelsdarstellung-Projektionskuppel-Astronomieauff#UE#hrungen-Himmelsbeobachtung-Wi#ss#envermittlung-Multimedia-Laientheater
+Hubble-Teleskop|Weltraumteleskop-Sternenaufnahmen-Deep-Space-Forschung-Galaxienbeobachtung-Lichtsammlung-Kosmologie-Bildgebung-Sternennebel
+Sternsystem|Mehrfachstern-Doppelstern-Dreifachstern-Sonnensystem-Sternenkonstellation-Sternhaufen-Sternenformation-Einzelstern
+Sonneneruption|Sonnensturm-Plasmaausbruch-Magnetfelder-Koronama#ss#eauswurf-Sonnenaktivit#AE#t-Eruptionseffekte-Sonnenausbruch-Sonneneruptionen
+Kometenschweif|Kometenstaub-Gasaustritt-Schweifbildung-Kometenschweifpartikel-Himmelsph#AE#nomen-Helligkeit-Schweifl#AE#nge-Schweifstruktur
+Marsmi#ss#ion|Marslandung-Erkundungsmi#ss#ion-Planetenexpedition-Leben#ss#uche-Weltraumforschung-Rovererkundung-Marsatmosph#AE#re-Bodenproben
+Kuiperg#UE#rtel|Kometeng#UE#rtel-Eisk#OE#rper-Planetoideng#UE#rtel-Transneptunische Objekte-Kuiper-G#UE#rtel-Objekte-Himmelsregion-Weltraumforschung-Kuiperg#UE#rtelk#OE#rper
+Mondkrater|Kraterlandschaft-Einschlagkrater-Mondoberfl#AE#che-Kraterbildung-Meteoriteneinschl#AE#ge-Gesteinsbrocken-Mondkraterlandschaft-Krateranalyse
+Venusdichte|Schwere-Kompaktheit-Dichteeigenschaften-Atmosph#AE#rendruck-Gasdichte-Ma#ss#e-Schwerewellen-Luftverd#UE#nnung
+Saturnmonde|Titan-Enceladus-Mimas-Tethys-Dione-Rhea-Iapetus-Hyperion
+Erdumlaufbahn|Erdorbit-Umrundung-Sonnenentfernung-Bahngeschwindigkeit-Bahnparameter-Umlaufzeit-Umlaufbahnparameter-Abdrift
+Jupiteratmosph#AE#re|Wolkenb#AE#nder-Gro#ss#er Roter Fleck-Gasriesenatmosph#AE#re-Wirbelst#UE#rme-Jupiterst#UE#rme-Wolkenwirbel-Atmosph#AE#renzusammensetzung-Gewitter
+Marsmeteorit|Gesteinsbrocken-Marsgestein-Meteoritenfall-Asteroideneinschlag-Gesteinsproben-Himmel#ss#tein-Meteoritenanalyse-Meteoritenforschung
+Merkurtemperatur|Extreme Hitze-Sonnenn#AE#he-Sonneneinstrahlung-Temperaturschwankungen-Hitzerekord-Hitzeextreme-K#AE#lte-W#AE#rmeverlust
+Neptungravitation|Starke Anziehungskraft-Gravitationsfeld-Ma#ss#enanziehung-Sogwirkung-Schwere-Schwerefeld-Schwerkraftme#ss#er-Schwerelosigkeit
+Uranu#ss#ystem|Uranusmonde-Uranusringe-Uranusatmosph#AE#re-Uranuswolken-Himmel#ss#t#UE#rme-Uranusrotation-Uranusgravitation-Uranusmagnetfeld
+Plutoeis|Eiskruste-Plutoschicht-Eisoberfl#AE#che-Eish#UE#gel-Plutoeisformation-Ei#ss#chichten-Eisklumpen-Ei#ss#ublimation
+Sonnenwind|Plasmastrom-Sonnenpartikel-Magnetfeld-Sonnenstrahlung-Partikelstrom-Teilchenau#ss#to#ss#-Sonnenaktivit#AE#t-Magnetosph#AE#re
+Planetenformation|Entstehung von Planeten-Planetenentwicklung-Akkretion#ss#cheibe-Materieansammlung-Staubwolke-Planetenwachstum-Proto-Planeten-Planetenbildung
+Weltraumgesetz|Raumfahrtregelung-Kosmische Gesetze-Internationales Recht-Astronomieverordnung-Himmelsvorschriften-Weltraumvertrag-Universumsgesetz

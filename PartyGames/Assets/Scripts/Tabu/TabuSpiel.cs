@@ -10,6 +10,7 @@ public class TabuSpiel
     public static string GameType = "1 Wort"; // 1 Wort | Timer
     private List<Tabu> tabus;
     private Tabu selected;
+    public static readonly int TABU_WORTE_COUNT = 6;
     public int wortcounter;
 
     public TabuSpiel()
@@ -124,7 +125,7 @@ public class Tabu
                 .Replace("Ü", "#UE#").Replace("ü", "#ue#")
                 .Replace("Ö", "#OE#").Replace("ö", "#oe#")
                 .Replace("Ä", "#AE#").Replace("ä", "#ae#")
-                + "|" + item.verboteneWorte.Replace("\\n", "-").Replace("ß", "#ss#")
+                + "|" + item.tabuworte.Replace("\\n", "-").Replace("ß", "#ss#")
                 .Replace("Ü", "#UE#").Replace("ü", "#ue#")
                 .Replace("Ö", "#OE#").Replace("ö", "#oe#")
                 .Replace("Ä", "#AE#").Replace("ä", "#ae#");
@@ -150,11 +151,28 @@ public class Tabu
 public class TabuItem
 {
     public string geheimwort;
-    public string verboteneWorte;
+    public string tabuworte;
+    private List<string> tabuworteliste;
 
-    public TabuItem(string geheimwort, string verboteneWorte)
+    public TabuItem(string geheimwort, string tabuworte)
     {
         this.geheimwort = geheimwort;
-        this.verboteneWorte = verboteneWorte.Replace("-", "\\n");
+        this.tabuworteliste = new List<string>();
+        this.tabuworteliste.AddRange(tabuworte.Split('-'));
+        if (this.tabuworteliste.Count > TabuSpiel.TABU_WORTE_COUNT)
+        {
+            string worte = "";
+            for (int i = 0; i < TabuSpiel.TABU_WORTE_COUNT; i++)
+            {
+                int random = Random.Range(0, this.tabuworteliste.Count);
+                worte += "-" + this.tabuworteliste[random];
+                this.tabuworteliste.RemoveAt(random);
+            }
+            if (worte.Length > 1)
+                worte = worte.Substring("-".Length);
+            this.tabuworte = worte.Replace("-", "\\n");
+        }
+        else
+            this.tabuworte = tabuworte.Replace("-", "\\n");
     }
 }
