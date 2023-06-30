@@ -73,7 +73,7 @@ public class LoadConfigs
             Screen.fullScreenMode = FullScreenMode.Windowed;
         }*/
 
-        Utils.EinstellungenGrafikApply(true);
+        //Utils.EinstellungenGrafikApply(true);
     }
     #endregion
 }

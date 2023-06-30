@@ -53,14 +53,3 @@ public class TabuGamePacks
     }
 }
 
-public class TabuItem
-{
-    public string geheimwort;
-    public string verboteneWorte;
-
-    public TabuItem(string geheimwort, string verboteneWorte)
-    {
-        this.geheimwort = geheimwort;
-        this.verboteneWorte = verboteneWorte.Replace("-", "\\n");
-    }
-}

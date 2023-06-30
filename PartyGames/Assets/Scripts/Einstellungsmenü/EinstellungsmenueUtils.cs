@@ -35,6 +35,8 @@ public class EinstellungsmenueUtils : MonoBehaviour
     /// <param name="drop"></param>
     public void UpdateScreenResolution(TMP_Dropdown drop)
     {
+        if (!Config.APPLICATION_INITED)
+            return;
         Config.APPLICATION_CONFIG.SetInt("GAME_DISPLAY_RESOLUTION", drop.value);
         Utils.EinstellungenGrafikApply(ForceFullscreen);
     }
@@ -44,6 +46,8 @@ public class EinstellungsmenueUtils : MonoBehaviour
     /// <param name="toggle"></param>
     public void UpdateFullscreen(Toggle toggle)
     {
+        if (!Config.APPLICATION_INITED)
+            return;
         Config.APPLICATION_CONFIG.SetBool("GAME_DISPLAY_FULLSCREEN", toggle.isOn);
         Utils.EinstellungenGrafikApply(ForceFullscreen);
     }

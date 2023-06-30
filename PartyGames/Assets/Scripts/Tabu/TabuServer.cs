@@ -18,7 +18,6 @@ public class TabuServer : MonoBehaviour
     [SerializeField] AudioSource Erraten;
     [SerializeField] AudioSource Beeep;
     [SerializeField] AudioSource Moeoop;
-    //private List<string> broadcastmsgs;
 
     private GameObject BackgroundColor;
     private GameObject TeamRot;
@@ -30,9 +29,13 @@ public class TabuServer : MonoBehaviour
     private GameObject Timer;
     private GameObject Kreuze;
     private GameObject Karte;
-    private GameObject RichtigFalsch1;
-    private GameObject RichtigFalsch2;
+    private GameObject Richtig;
+    private GameObject Falsch;
     private GameObject RundeStarten;
+    private GameObject SkipWord;
+    private Toggle AllowSkip;
+    private TMP_InputField TimerSec; 
+    private int timerseconds;
 
     private List<string> teamrotList;
     private List<string> teamblauList;
@@ -40,13 +43,10 @@ public class TabuServer : MonoBehaviour
     private bool started;
 
     private Coroutine TimerCoroutine;
-    private TabuGamePacks selectedPack;
     private TabuItem selectedItem;
 
     void OnEnable()
     {
-        //broadcastmsgs = new List<string>();
-        //StartCoroutine(NewBroadcast());
         StartCoroutine(ServerUtils.Broadcast());
         PlayerConnected = new bool[Config.SERVER_MAX_CONNECTIONS];
         InitGame();
@@ -92,84 +92,6 @@ public class TabuServer : MonoBehaviour
 
     #region Server Stuff  
     #region Kommunikation
-    /*/// <summary>
-    /// Sendet eine Nachricht an den übergebenen Spieler
-    /// </summary>
-    /// <param name="data">Nachricht</param>
-    /// <param name="sc">Spieler</param>
-    private void SendMSG(string data, Player sc)
-    {
-        try
-        {
-            StreamWriter writer = new StreamWriter(sc.tcp.GetStream());
-            writer.WriteLine(data);
-            writer.Flush();
-        }
-        catch (Exception e)
-        {
-            Logging.log(Logging.LogType.Warning, "TabuServer", "SendMSG", "Nachricht an Client: " + sc.id + " (" + sc.name + ") konnte nicht gesendet werden.", e);
-            // Verbindung zum Client wird getrennt
-            ClientClosed(sc);
-        }
-    }
-    /// <summary>
-    /// Sendet eine Nachricht an alle Spieler der liste
-    /// </summary>
-    /// <param name="data">Nachricht</param>
-    /// <param name="spieler">Spielerliste</param>
-    private void Broadcast(string data, Player[] spieler)
-    {
-        foreach (Player sc in spieler)
-        {
-            if (sc.isConnected)
-                SendMSG(data, sc);
-        }
-    }
-    IEnumerator NewBroadcast()
-    {
-        while (true)
-        {
-            // Broadcastet alle MSGs nacheinander
-            if (broadcastmsgs.Count != 0)
-            {
-                string msg = broadcastmsgs[0];
-                broadcastmsgs.RemoveAt(0);
-                Broadcast(msg);
-                yield return null;
-            }
-            //yield return new WaitForSeconds(0.005f);
-            yield return new WaitForSeconds(0.01f);
-        }
-        yield break;
-    }
-    /// <summary>
-    /// Spieler beendet das Spiel
-    /// </summary>
-    /// <param name="player">Spieler</param>
-    private void ClientClosed(Player player)
-    {
-        player.icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
-        player.name = "";
-        player.points = 0;
-        player.isConnected = false;
-        player.isDisconnected = true;
-    }
-    /// <summary>
-    /// Sendet eine Nachricht an alle verbundenen Spieler
-    /// </summary>
-    /// <param name="data">Nachricht</param>
-    private void Broadcast(string data)
-    {
-        foreach (Player sc in Config.PLAYERLIST)
-        {
-            if (sc.isConnected)
-                SendMSG(data, sc);
-        }
-    }
-    private void BroadcastNew(string data)
-    {
-        broadcastmsgs.Add(data);
-    }*/
     /// <summary>
     /// Einkommende Nachrichten die von Spielern an den Server gesendet werden
     /// </summary>
@@ -205,7 +127,7 @@ public class TabuServer : MonoBehaviour
                 break;
 
             case "#ClientClosed":
-                PlayDisconnectSound();
+                DisconnectSound.Play();
                 teamrotList.Remove(player.name);
                 teamblauList.Remove(player.name);
                 ServerUtils.ClientClosed(player);
@@ -240,19 +162,14 @@ public class TabuServer : MonoBehaviour
     public void SpielVerlassenButton()
     {
         Logging.log(Logging.LogType.Debug, "TabuServer", "SpielVerlassenButton", "Spiel wird beendet. Lädt ins Hauptmenü.");
-        //SceneManager.LoadScene("Startup");
         ServerUtils.AddBroadcast("#ZurueckInsHauptmenue");
-    }
-    /// <summary>
-    /// Spielt den Disconnect Sound ab
-    /// </summary>
-    private void PlayDisconnectSound()
-    {
-        DisconnectSound.Play();
     }
     #region GameLogic
     private void InitGame()
     {
+        if (TabuSpiel.GameType.Equals(""))
+            TabuSpiel.GameType = "1 Wort";
+        // Spielbrett
         BackgroundColor = GameObject.Find("Spielbrett/BackgroundColor");
         BackgroundColor.SetActive(false);
         TeamRot = GameObject.Find("Spielbrett/TeamRot");
@@ -271,13 +188,22 @@ public class TabuServer : MonoBehaviour
         Kreuze.SetActive(false);
         Karte = GameObject.Find("Spielbrett/Karte");
         Karte.SetActive(false);
-        RichtigFalsch1 = GameObject.Find("Spielbrett/RichtigFalsch (0)");
-        RichtigFalsch1.SetActive(false);
-        RichtigFalsch2 = GameObject.Find("Spielbrett/RichtigFalsch (1)");
-        RichtigFalsch2.SetActive(false);
+        Richtig = GameObject.Find("Spielbrett/Richtig");
+        Richtig.SetActive(false);
+        Falsch = GameObject.Find("Spielbrett/Falsch");
+        Falsch.SetActive(false);
         RundeStarten = GameObject.Find("Spielbrett/RundeStarten");
         RundeStarten.SetActive(false);
+        SkipWord = GameObject.Find("Spielbrett/SkipWort");
+        SkipWord.SetActive(false);
+        AllowSkip = GameObject.Find("ServerSide/AllowSkip").GetComponent<Toggle>();
+        AllowSkip.isOn = false;
+        TimerSec = GameObject.Find("ServerSide/TimerSec").GetComponent<TMP_InputField>();
+        timerseconds = 61;
+        TimerSec.text = timerseconds + "";
         started = false;
+        GameObject.Find("ServerSide/PackTitle").GetComponent<TMP_Text>().text = "Pack: " + Config.TABU_SPIEL.getSelected().getTitel();
+        GameObject.Find("ServerSide/GameType").GetComponent<TMP_Text>().text = "GameType: " + TabuSpiel.GameType;
 
         teamblauList.Add(Config.PLAYER_NAME);
         foreach (Player item in Config.PLAYERLIST)
@@ -285,42 +211,6 @@ public class TabuServer : MonoBehaviour
                 teamblauList.Add(item.name);
 
         TeamTurn = "ROT";
-
-        // Random Pack select
-        string[] packs = new string[] { "Blau", "Gelb", "Lila", "Rot" };
-        int random = UnityEngine.Random.Range(0, packs.Length);
-        selectedPack = new TabuGamePacks(packs[random], "Spiele/Tabu/" + packs[random]);
-        GameObject.Find("ServerSide/PackTitle").GetComponent<TMP_Text>().text = selectedPack.titel;
-    }
-    private void StartTimer()
-    {
-        if (TimerCoroutine != null)
-            StopCoroutine(TimerCoroutine);
-        TimerCoroutine = StartCoroutine(RunTimer(61));
-    }
-    private IEnumerator RunTimer(int seconds)
-    {
-        Timer.SetActive(true);
-
-        while (seconds >= 0)
-        {
-            Timer.GetComponentInChildren<TMP_Text>().text = "" + seconds;
-
-            if (seconds == 0)
-            {
-                Beeep.Play();
-            }
-            // Moep Sound bei sekunden
-            if (seconds == 1 || seconds == 2 || seconds == 3)
-            {
-                Moeoop.Play();
-            }
-            seconds--;
-            yield return new WaitForSecondsRealtime(1);
-        }
-        Timer.SetActive(false);
-        RundeEnde(-1, "Zeit");
-        yield break;
     }
     private void SetTeamPoints(string team, int points)
     {
@@ -348,95 +238,32 @@ public class TabuServer : MonoBehaviour
         if (!started)
         {
             if (TeamTurn.Equals("ROT") && teamrotList.Contains(Config.PLAYER_NAME))
-            {
                 RundeStarten.SetActive(true);
-            }
             else if (TeamTurn.Equals("BLAU") && teamblauList.Contains(Config.PLAYER_NAME))
-            {
                 RundeStarten.SetActive(true);
-            }
             else
-            {
                 RundeStarten.SetActive(false);
-            }
         }
     }
     private void JoinTeam(string team, string player)
     {
-        if (team.Equals("") && player.Equals(""))
+        if (!team.Equals("") && !player.Equals(""))
         {
-            // Anzeigen aktualisieren
-            string teamrot1 = "";
-            for (int i = 1; i < TeamRot.transform.childCount; i++)
+            // Aus Teams löschen
+            teamrotList.Remove(player);
+            teamblauList.Remove(player);
+            // Team hinzufügen
+            if (team.Equals("ROT"))
             {
-                int index = i - 1;
-                Transform PlayerObject = TeamRot.transform.GetChild(i);
-                PlayerObject.gameObject.SetActive(false);
-                if (teamrotList.Count > index)
-                {
-                    PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = teamrotList[index];
-                    // Server
-                    if (teamrotList[index] == Config.PLAYER_NAME)
-                    {
-                        PlayerObject.GetChild(0).GetComponent<Image>().sprite = Config.SERVER_PLAYER.icon;
-                        teamrot1 += "[#]" + teamrotList[index] + "~" + Config.SERVER_PLAYER.icon.name;
-                    }
-                    // Client
-                    else
-                    {
-                        PlayerObject.GetChild(0).GetComponent<Image>().sprite = Player.getSpriteByPlayerName(teamrotList[index]);
-                        teamrot1 += "[#]" + teamrotList[index] + "~" + Player.getSpriteByPlayerName(teamrotList[index]).name;
-                    }
-                    PlayerObject.gameObject.SetActive(true);
-                }
+                teamrotList.Add(player);
             }
-            if (teamrot1.Length > 3)
-                teamrot1 = teamrot1.Substring("[#]".Length);
-            string teamblau1 = "";
-            for (int i = 1; i < TeamBlau.transform.childCount; i++)
+            else if (team.Equals("BLAU"))
             {
-                int index = i - 1;
-                Transform PlayerObject = TeamBlau.transform.GetChild(i);
-                PlayerObject.gameObject.SetActive(false);
-                if (teamblauList.Count > index)
-                {
-                    PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = teamblauList[index];
-                    // Server
-                    if (teamblauList[index] == Config.PLAYER_NAME)
-                    {
-                        PlayerObject.GetChild(0).GetComponent<Image>().sprite = Config.SERVER_PLAYER.icon;
-                        teamblau1 += "[#]" + teamblauList[index] + "~" + Config.SERVER_PLAYER.icon.name;
-                    }
-                    // Client
-                    else
-                    {
-                        PlayerObject.GetChild(0).GetComponent<Image>().sprite = Player.getSpriteByPlayerName(teamblauList[index]);
-                        teamblau1 += "[#]" + teamblauList[index] + "~" + Player.getSpriteByPlayerName(teamblauList[index]).name;
-                    }
-                    PlayerObject.gameObject.SetActive(true);
-                }
+                teamblauList.Add(player);
             }
-            if (teamblau1.Length > 3)
-                teamblau1 = teamblau1.Substring("[#]".Length);
-            // Listen Broadcast
-            ServerUtils.AddBroadcast("#TeamUpdate " + teamrot1 + "|" + teamblau1);
-            return;
+            else
+                Logging.log(Logging.LogType.Error, "TabuServer", "JoinTeam", "Team ist unbekannt: " + team);
         }
-
-        // Aus Teams löschen
-        teamrotList.Remove(player);
-        teamblauList.Remove(player);
-        // Team hinzufügen
-        if (team.Equals("ROT"))
-        {
-            teamrotList.Add(player);
-        }
-        else if (team.Equals("BLAU"))
-        {
-            teamblauList.Add(player);
-        }
-        else
-            Logging.log(Logging.LogType.Error, "TabuServer", "JoinTeam", "Team ist unbekannt: " + team);
         // Anzeigen aktualisieren
         string teamrot = "";
         for (int i = 1; i < TeamRot.transform.childCount; i++)
@@ -454,8 +281,8 @@ public class TabuServer : MonoBehaviour
                     teamrot += "[#]" + teamrotList[index] + "~" + Config.SERVER_PLAYER.icon.name;
                 }
                 // Client
-                else 
-                { 
+                else
+                {
                     PlayerObject.GetChild(0).GetComponent<Image>().sprite = Player.getSpriteByPlayerName(teamrotList[index]);
                     teamrot += "[#]" + teamrotList[index] + "~" + Player.getSpriteByPlayerName(teamrotList[index]).name;
                 }
@@ -501,167 +328,45 @@ public class TabuServer : MonoBehaviour
     {
         if (!Config.SERVER_STARTED)
             return;
-        RichtigFalsch1.SetActive(false);
-        RichtigFalsch2.SetActive(false);
+        //Richtig.SetActive(false);
+        //Falsch.SetActive(false);
 
-        if (RichtigFalsch1.GetComponentInChildren<TMP_Text>().text.Equals("Erraten"))
+        SetKreuz(Config.PLAYER_NAME);
+        /*if (Richtig.GetComponentInChildren<TMP_Text>().text.Equals("Erraten"))
             ServerRichtigGeraten();
-        if (RichtigFalsch1.GetComponentInChildren<TMP_Text>().text.Equals("Fehler"))
-            SetKreuz(Config.PLAYER_NAME);
+        if (Falsch.GetComponentInChildren<TMP_Text>().text.Equals("Fehler"))
+            SetKreuz(Config.PLAYER_NAME);*/
     }
     private void SetKreuz(string player)
     {
         if (!started)
             return;
-        if (TeamTurn == "ROT")
+
+        RundeEnde(-2, name);
+        /*
+        if (TeamTurn == "ROT" && teamblauList.Contains(player))
         {
-            if (teamblauList.Contains(player))
-            {
-                // 1
-                if (teamblauList.Count <= 2)
-                {
-                    if (!Kreuze.transform.GetChild(2).gameObject.activeInHierarchy)
-                    {
-                        Kreuze.transform.GetChild(2).gameObject.SetActive(true);
-                        ServerUtils.AddBroadcast("#KreuzAn 2");
-                        ParseAlleKreuzeAn(player);
-                    }
-                    else
-                    {
-                        // Alle Kreuze bereits an
-                        ParseAlleKreuzeAn(player);
-                    }
-                }
-                // 2
-                else if (teamblauList.Count <= 3)
-                {
-                    if (!Kreuze.transform.GetChild(0).gameObject.activeInHierarchy)
-                    {
-                        Kreuze.transform.GetChild(0).gameObject.SetActive(true);
-                        ServerUtils.AddBroadcast("#KreuzAn 0");
-                        DisplayX.Play();
-                    }
-                    else if (!Kreuze.transform.GetChild(2).gameObject.activeInHierarchy)
-                    {
-                        Kreuze.transform.GetChild(2).gameObject.SetActive(true);
-                        ServerUtils.AddBroadcast("#KreuzAn 2");
-                        ParseAlleKreuzeAn(player);
-                    }
-                    else
-                    {
-                        // Alle Kreuze bereits an
-                        ParseAlleKreuzeAn(player);
-                    }
-                }
-                // 3
-                else
-                {
-                    if (teamblauList.Contains(player))
-                    {
-                        if (!Kreuze.transform.GetChild(0).gameObject.activeInHierarchy)
-                        {
-                            Kreuze.transform.GetChild(0).gameObject.SetActive(true);
-                            ServerUtils.AddBroadcast("#KreuzAn 0");
-                            DisplayX.Play();
-                        }
-                        else if (!Kreuze.transform.GetChild(1).gameObject.activeInHierarchy)
-                        {
-                            Kreuze.transform.GetChild(1).gameObject.SetActive(true);
-                            ServerUtils.AddBroadcast("#KreuzAn 1");
-                            DisplayX.Play();
-                        }
-                        else if (!Kreuze.transform.GetChild(2).gameObject.activeInHierarchy)
-                        {
-                            Kreuze.transform.GetChild(2).gameObject.SetActive(true);
-                            ServerUtils.AddBroadcast("#KreuzAn 2");
-                            ParseAlleKreuzeAn(player);
-                        }
-                        else
-                        {
-                            // Alle Kreuze bereits an
-                            ParseAlleKreuzeAn(player);
-                        }
-                    }
-                }
-            }
+            Kreuze.transform.GetChild(0).gameObject.SetActive(true);
+            ServerUtils.AddBroadcast("#KreuzAn 0"); // TODO: über rundenende mitsenden?
+
+            RundeEnde(-2, name);
         }
-        else if (TeamTurn == "BLAU")
+        else if (TeamTurn == "BLAU" && teamrotList.Contains(player))
         {
-            if (teamrotList.Contains(player))
-            {
-                // 1
-                if (teamblauList.Count <= 2)
-                {
-                    if (!Kreuze.transform.GetChild(2).gameObject.activeInHierarchy)
-                    {
-                        Kreuze.transform.GetChild(2).gameObject.SetActive(true);
-                        ServerUtils.AddBroadcast("#KreuzAn 2");
-                        ParseAlleKreuzeAn(player);
-                    }
-                    else
-                    {
-                        // Alle Kreuze bereits an
-                        ParseAlleKreuzeAn(player);
-                    }
-                }
-                // 2
-                else if (teamblauList.Count <= 3)
-                {
-                    if (!Kreuze.transform.GetChild(1).gameObject.activeInHierarchy)
-                    {
-                        Kreuze.transform.GetChild(1).gameObject.SetActive(true);
-                        ServerUtils.AddBroadcast("#KreuzAn 1");
-                        DisplayX.Play();
-                    }
-                    else if (!Kreuze.transform.GetChild(2).gameObject.activeInHierarchy)
-                    {
-                        Kreuze.transform.GetChild(2).gameObject.SetActive(true);
-                        ServerUtils.AddBroadcast("#KreuzAn 2");
-                        ParseAlleKreuzeAn(player);
-                    }
-                    else
-                    {
-                        // Alle Kreuze bereits an
-                        ParseAlleKreuzeAn(player);
-                    }
-                }
-                // 3
-                else
-                {
-                    if (!Kreuze.transform.GetChild(0).gameObject.activeInHierarchy)
-                    {
-                        Kreuze.transform.GetChild(0).gameObject.SetActive(true);
-                        ServerUtils.AddBroadcast("#KreuzAn 0");
-                        DisplayX.Play();
-                    }
-                    else if (!Kreuze.transform.GetChild(1).gameObject.activeInHierarchy)
-                    {
-                        Kreuze.transform.GetChild(1).gameObject.SetActive(true);
-                        ServerUtils.AddBroadcast("#KreuzAn 1");
-                        DisplayX.Play();
-                    }
-                    else if (!Kreuze.transform.GetChild(2).gameObject.activeInHierarchy)
-                    {
-                        Kreuze.transform.GetChild(2).gameObject.SetActive(true);
-                        ServerUtils.AddBroadcast("#KreuzAn 2");
-                        ParseAlleKreuzeAn(player);
-                    }
-                    else
-                    {
-                        // Alle Kreuze bereits an
-                        ParseAlleKreuzeAn(player);
-                    }
-                }
-            }
+            Kreuze.transform.GetChild(0).gameObject.SetActive(true);
+            ServerUtils.AddBroadcast("#KreuzAn 0");
+
+            RundeEnde(-2, name);
         }
         else
             Logging.log(Logging.LogType.Error, "TabuServer", "SetKreuz", "Team ist unbekannt: " + TeamTurn);
+        */
     }
     private void ClientRichtigGeraten(Player p)
     {
         RichtigGeraten(p.name);
     }
-    private void ServerRichtigGeraten()
+    public void ServerRichtigGeraten()
     {
         if (!Config.SERVER_STARTED)
             return;
@@ -671,9 +376,112 @@ public class TabuServer : MonoBehaviour
     {
         RundeEnde(+1, name);
     }
-    private void ParseAlleKreuzeAn(string name)
+    private void StartTimer()
     {
-        RundeEnde(-1, name);
+        if (TimerCoroutine != null)
+            StopCoroutine(TimerCoroutine);
+        TimerCoroutine = StartCoroutine(RunTimer(timerseconds));
+    }
+    private IEnumerator RunTimer(int seconds)
+    {
+        Timer.SetActive(true);
+
+        while (seconds >= 0)
+        {
+            Timer.GetComponentInChildren<TMP_Text>().text = "" + seconds;
+
+            if (seconds == 0)
+            {
+                Beeep.Play();
+            }
+            // Moep Sound bei sekunden
+            if (seconds == 1 || seconds == 2 || seconds == 3)
+            {
+                Moeoop.Play();
+            }
+            seconds--;
+            yield return new WaitForSecondsRealtime(1);
+        }
+        Timer.SetActive(false);
+        RundeEnde(-1, "Zeit");
+        yield break;
+    }
+    private void ClientStartRunde(Player p)
+    {
+        StartRunde(p.name);
+    }
+    public void ServerStartRunde()
+    {
+        if (!Config.SERVER_STARTED)
+            return;
+        StartRunde(Config.PLAYER_NAME);
+    }
+    private void StartRunde(string playername)
+    {
+        started = true;
+        selectedItem = Config.TABU_SPIEL.getSelected().GetRandomItem();
+
+        ServerUtils.AddBroadcast("#StartRunde " + playername + "|" + TeamTurn + "|" + TabuSpiel.GameType + "|" + timerseconds + "|" + selectedItem.geheimwort.Replace("\n", "\\n") + "|" + selectedItem.verboteneWorte.Replace("\n", "\\n"));
+        RundeStarten.SetActive(false);
+        JoinTeamRot.SetActive(false);
+        JoinTeamBlau.SetActive(false);
+        for (int i = 0; i < Kreuze.transform.childCount; i++)
+            Kreuze.transform.GetChild(i).gameObject.SetActive(false);
+        Kreuze.SetActive(true);
+        if (playername == Config.PLAYER_NAME)
+        {
+            Richtig.SetActive(true);
+            Falsch.SetActive(true);
+        }
+        else if (TeamTurn.Equals("ROT") && teamblauList.Contains(Config.PLAYER_NAME))
+        {
+            Richtig.SetActive(false);
+            Falsch.SetActive(true);
+        }
+        else if (TeamTurn.Equals("BLAU") && teamrotList.Contains(Config.PLAYER_NAME))
+        {
+            Richtig.SetActive(false);
+            Falsch.SetActive(true);
+        }
+        else
+        {
+            Richtig.SetActive(false);
+            Falsch.SetActive(false);
+        }
+        // Blende Karte für Spieler der dran ist ein
+        if (playername == Config.PLAYER_NAME)
+        {
+            DisplayKarte(true, selectedItem.geheimwort, selectedItem.verboteneWorte);
+        }
+        else
+        {
+            Karte.transform.GetChild(0).GetChild(1).GetComponent<TMP_Text>().text = playername;
+            if (TeamTurn.Equals("BLAU") && teamrotList.Contains(Config.PLAYER_NAME))
+            {
+                DisplayKarte(true, selectedItem.geheimwort, selectedItem.verboteneWorte);
+            }
+            else if (TeamTurn.Equals("ROT") && teamblauList.Contains(Config.PLAYER_NAME))
+            {
+                DisplayKarte(true, selectedItem.geheimwort, selectedItem.verboteneWorte);
+            }
+            else if (TeamTurn.Equals("BLAU") && teamblauList.Contains(Config.PLAYER_NAME))
+            {
+                DisplayKarte(true, playername, "");
+                SpielerIstDran.Play();
+            }
+            else if (TeamTurn.Equals("ROT") && teamrotList.Contains(Config.PLAYER_NAME))
+            {
+                DisplayKarte(true, playername, "");
+                SpielerIstDran.Play();
+            }
+            else
+            {
+                Karte.transform.GetChild(0).GetChild(3).GetComponent<TMP_Text>().text = "";
+            }
+            Karte.SetActive(true);
+        }
+
+        StartTimer();
     }
     private void DisplayKarte(bool show, string Titel, string verboteneWorte)
     {
@@ -685,7 +493,7 @@ public class TabuServer : MonoBehaviour
         yield return new WaitForSeconds(0.0001f);
         Karte.transform.GetChild(0).GetChild(1).GetComponent<TMP_Text>().text = Titel;
         yield return new WaitForSeconds(0.0001f);
-        Karte.transform.GetChild(0).GetChild(3).GetComponent<TMP_Text>().text = verboteneWorte.Replace("\\n", "\n")+"\n ";
+        Karte.transform.GetChild(0).GetChild(3).GetComponent<TMP_Text>().text = verboteneWorte.Replace("\\n", "\n") + "\n ";
         yield return new WaitForSeconds(0.0001f);
         Karte.transform.GetChild(0).GetChild(3).GetComponent<TMP_Text>().text = verboteneWorte.Replace("\\n", "\n");
         yield return new WaitForSeconds(0.0001f);
@@ -699,7 +507,7 @@ public class TabuServer : MonoBehaviour
         if (type.Equals("WIN"))
         {
             c = new Color(38f / 255f, 255f / 255f, 0f / 255f, 1f / 255f);
-            
+
         }
         else if (type.Equals("LOSE"))
         {
@@ -724,54 +532,106 @@ public class TabuServer : MonoBehaviour
         BackgroundColor.SetActive(false);
         yield break;
     }
-    private void RundeEnde(int points, string playername)
+    private void RundeEnde(int indicator, string playername)
     {
-        StopCoroutine(TimerCoroutine);
-        Timer.SetActive(false);
-
-        ServerUtils.AddBroadcast("#RundeEnde " + TeamTurn + "|" + points + "|" + playername);
-        DisplayKarte(true, selectedItem.geheimwort, selectedItem.verboteneWorte);
-
-        if (points == +1)
+        if (TabuSpiel.GameType.Equals("1 Wort"))
         {
-            Erraten.Play();
-            StartCoroutine(AnimateBackground("WIN"));
-            if (TeamTurn.Equals("ROT"))
+            // Falsch gedrückt
+            if (indicator == -2)
             {
-                teamrotPunkte += 1;
-                SetTeamPoints("ROT", teamrotPunkte);
+                Kreuze.transform.GetChild(0).gameObject.SetActive(true);
+                FalschGeraten.Play();
+                StartCoroutine(AnimateBackground("LOSE"));
             }
-            else if (TeamTurn.Equals("BLAU"))
+            // Zeit vorbei
+            else if (indicator == -1)
             {
-                teamblauPunkte += 1;
-                SetTeamPoints("BLAU", teamblauPunkte);
+                FalschGeraten.Play();
+                StartCoroutine(AnimateBackground("LOSE"));
             }
+            // Richtig gedrückt
+            else if (indicator == +1)
+            {
+                Erraten.Play();
+                StartCoroutine(AnimateBackground("WIN"));
+                if (TeamTurn.Equals("ROT"))
+                {
+                    teamrotPunkte += 1;
+                    SetTeamPoints("ROT", teamrotPunkte);
+                }
+                else if (TeamTurn.Equals("BLAU"))
+                {
+                    teamblauPunkte += 1;
+                    SetTeamPoints("BLAU", teamblauPunkte);
+                }
+            }
+            else
+                Logging.log(Logging.LogType.Error, "TabuServer", "RundeEnde", "Fehler: " + indicator + " " + TeamTurn);
+
+            EndTurn();
         }
-        else if (points == -1)
+        else if (TabuSpiel.GameType.Equals("Timer"))
         {
-            FalschGeraten.Play();
-            StartCoroutine(AnimateBackground("LOSE"));
-            if (TeamTurn.Equals("ROT"))
+            // Falsch gedrückt
+            if (indicator == -2)
             {
-                teamblauPunkte += 1;
-                SetTeamPoints("BLAU", teamblauPunkte);
+                //Kreuze.transform.GetChild(0).gameObject.SetActive(true);
+                FalschGeraten.Play();
+                StartCoroutine(AnimateBackground("LOSE"));
+                // Neue Karte
+                selectedItem = Config.TABU_SPIEL.getSelected().GetRandomItem();
+                DisplayKarte(true, selectedItem.geheimwort, selectedItem.verboteneWorte);
             }
-            else if (TeamTurn.Equals("BLAU"))
+            // Zeit vorbei
+            else if (indicator == -1)
             {
-                teamrotPunkte += 1;
-                SetTeamPoints("ROT", teamrotPunkte);
+                FalschGeraten.Play();
+                StartCoroutine(AnimateBackground("LOSE"));
+                EndTurn();
             }
+            // Richtig gedrückt
+            else if (indicator == +1)
+            {
+                Erraten.Play();
+                StartCoroutine(AnimateBackground("WIN"));
+                if (TeamTurn.Equals("ROT"))
+                {
+                    teamrotPunkte += 1;
+                    SetTeamPoints("ROT", teamrotPunkte);
+                }
+                else if (TeamTurn.Equals("BLAU"))
+                {
+                    teamblauPunkte += 1;
+                    SetTeamPoints("BLAU", teamblauPunkte);
+                }
+                // Neue Karte
+                selectedItem = Config.TABU_SPIEL.getSelected().GetRandomItem();
+                DisplayKarte(true, selectedItem.geheimwort, selectedItem.verboteneWorte);
+            }
+            else
+                Logging.log(Logging.LogType.Error, "TabuServer", "RundeEnde", "Fehler: " + indicator + " " + TeamTurn);
         }
         else
-            Logging.log(Logging.LogType.Error, "TabuServer", "RundeEnde", "Fehler: " + points + " " + TeamTurn);
+            Logging.log(Logging.LogType.Error, "TabuServer", "RundeEnde", "Unbekannter Typ: "+ TabuSpiel.GameType);
 
-        RichtigFalsch1.SetActive(false);
-        RichtigFalsch2.SetActive(false);
+        string indicatorstrg = indicator + "";
+        if (!indicatorstrg.StartsWith("-") && !indicatorstrg.StartsWith("+"))
+            indicatorstrg = "+" + indicatorstrg;
+
+        ServerUtils.AddBroadcast("#RundeEnde " + TeamTurn + "|" + indicatorstrg + "|" + TabuSpiel.GameType + "|" + teamrotPunkte + "|" + teamblauPunkte + "|" + true + "|" + selectedItem.geheimwort.Replace("\n", "\\n") + "|" + selectedItem.verboteneWorte.Replace("\n", "\\n"));
+    }
+    private void EndTurn()
+    {
+        DisplayKarte(true, selectedItem.geheimwort, selectedItem.verboteneWorte);
+        StopCoroutine(TimerCoroutine);
+        Timer.SetActive(false);
+        Richtig.SetActive(false);
+        Falsch.SetActive(false);
         JoinTeamBlau.SetActive(true);
         JoinTeamRot.SetActive(true);
         if (TeamTurn.Equals("ROT"))
             TeamTurn = "BLAU";
-        else if (TeamTurn.Equals("BLAU"))
+        else
             TeamTurn = "ROT";
         started = false;
         if (TeamTurn.Equals("ROT") && teamrotList.Contains(Config.PLAYER_NAME))
@@ -779,97 +639,141 @@ public class TabuServer : MonoBehaviour
         else if (TeamTurn.Equals("BLAU") && teamblauList.Contains(Config.PLAYER_NAME))
             RundeStarten.SetActive(true);
     }
-    private void ClientStartRunde(Player p)
+    public void ChangePoints(Button btn)
     {
-        StartRunde(p.name);
-    }
-    public void ServerStartRunde()
-    {
-        if (!Config.SERVER_STARTED)
-            return;
-        StartRunde(Config.PLAYER_NAME);
-    }
-    private void StartRunde(string name)
-    {
-        started = true;
-        selectedItem = selectedPack.GetRandomItem();
-
-        ServerUtils.AddBroadcast("#StartRunde " + name + "|" + TeamTurn + "|" + selectedItem.geheimwort + "|" + selectedItem.verboteneWorte);
-        RundeStarten.SetActive(false);
-        JoinTeamRot.SetActive(false);
-        JoinTeamBlau.SetActive(false);
-        for (int i = 0; i < Kreuze.transform.childCount; i++)
-            Kreuze.transform.GetChild(i).gameObject.SetActive(false);
-        Kreuze.SetActive(true);
-        if (TeamTurn.Equals("ROT") && name == Config.PLAYER_NAME)
+        if (btn.name.StartsWith("Rot"))
         {
-            RichtigFalsch1.GetComponentInChildren<TMP_Text>().text = "Erraten";
-            RichtigFalsch2.GetComponentInChildren<TMP_Text>().text = "Erraten";
-            RichtigFalsch1.SetActive(true);
-            RichtigFalsch2.SetActive(true);
-        }
-        else if (TeamTurn.Equals("BLAU") && name == Config.PLAYER_NAME)
-        {
-            RichtigFalsch1.GetComponentInChildren<TMP_Text>().text = "Erraten";
-            RichtigFalsch2.GetComponentInChildren<TMP_Text>().text = "Erraten";
-            RichtigFalsch1.SetActive(true);
-            RichtigFalsch2.SetActive(true);
-        }
-        else if (TeamTurn.Equals("ROT") && teamblauList.Contains(Config.PLAYER_NAME))
-        {
-            RichtigFalsch1.GetComponentInChildren<TMP_Text>().text = "Fehler";
-            RichtigFalsch2.GetComponentInChildren<TMP_Text>().text = "Fehler";
-            RichtigFalsch1.SetActive(true);
-            RichtigFalsch2.SetActive(true);
-        }
-        else if (TeamTurn.Equals("BLAU") && teamrotList.Contains(Config.PLAYER_NAME))
-        {
-            RichtigFalsch1.GetComponentInChildren<TMP_Text>().text = "Fehler";
-            RichtigFalsch2.GetComponentInChildren<TMP_Text>().text = "Fehler";
-            RichtigFalsch1.SetActive(true);
-            RichtigFalsch2.SetActive(true);
-        }
-        else
-        {
-            RichtigFalsch1.SetActive(false);
-            RichtigFalsch2.SetActive(false);
-        }
-        // Blende Karte für Spieler der dran ist ein
-        if (name == Config.PLAYER_NAME)
-        {
-            DisplayKarte(true, selectedItem.geheimwort, selectedItem.verboteneWorte);
-        }
-        else
-        {
-            Karte.transform.GetChild(0).GetChild(1).GetComponent<TMP_Text>().text = name;
-            if (TeamTurn.Equals("BLAU") && teamrotList.Contains(Config.PLAYER_NAME))
+            if (btn.name.EndsWith("+1"))
             {
-                DisplayKarte(true, selectedItem.geheimwort, selectedItem.verboteneWorte);
+                teamrotPunkte++;
             }
-            else if (TeamTurn.Equals("ROT") && teamblauList.Contains(Config.PLAYER_NAME))
+            else if (btn.name.EndsWith("-1"))
             {
-                DisplayKarte(true, selectedItem.geheimwort, selectedItem.verboteneWorte);
-            }
-            else if (TeamTurn.Equals("BLAU") && teamblauList.Contains(Config.PLAYER_NAME))
-            {
-                DisplayKarte(true, name, "");
-                SpielerIstDran.Play();
-            }
-            else if (TeamTurn.Equals("ROT") && teamrotList.Contains(Config.PLAYER_NAME))
-            {
-                DisplayKarte(true, name, "");
-                SpielerIstDran.Play();
+                teamrotPunkte--;
             }
             else
+                Logging.log(Logging.LogType.Error, "TabuServer", "ChangePoints", "Button nicht bekannt: " + btn.name);
+        }
+        else if (btn.name.StartsWith("Blau"))
+        {
+            if (btn.name.EndsWith("+1"))
             {
-                Karte.transform.GetChild(0).GetChild(3).GetComponent<TMP_Text>().text = "";
+                teamblauPunkte++;
             }
-            Karte.SetActive(true);
+            else if (btn.name.EndsWith("-1"))
+            {
+                teamblauPunkte--;
+            }
+            else
+                Logging.log(Logging.LogType.Error, "TabuServer", "ChangePoints", "Button nicht bekannt: " + btn.name);
+        }
+        else
+            Logging.log(Logging.LogType.Error, "TabuServer", "ChangePoints", "Button nicht bekannt: " + btn.name);
+
+        SetTeamPoints("ROT", teamrotPunkte);
+        SetTeamPoints("BLAU", teamblauPunkte);
+        ServerUtils.AddBroadcast("#TeamPunkte " + teamrotPunkte + "|" + teamblauPunkte);
+    }
+    public void ZufaelligeTeams()
+    {
+        if (teamblauList.Count + teamrotList.Count == 0)
+            return;
+        teamrotList.Clear();
+        teamblauList.Clear();
+        List<string> plisttemp = new List<string>();
+        plisttemp.Add(Config.PLAYER_NAME);
+        foreach (Player item in Config.PLAYERLIST)
+            if (item.isConnected && item.name.Length > 0)
+                plisttemp.Add(item.name);
+        List<string> plist = new List<string>();
+        while (plisttemp.Count > 0)
+        {
+            int random = UnityEngine.Random.Range(0, plisttemp.Count);
+            plist.Add(plisttemp[random]);
+            plisttemp.RemoveAt(random);
+        }
+        for (int i = 0; i < plist.Count; i++)
+        {
+            if (i % 2 == 0)
+                teamrotList.Add(plist[i]);
+            else
+                teamblauList.Add(plist[i]);
         }
 
-        StartTimer();
+        // Anzeigen aktualisieren
+        string teamrot = "";
+        for (int i = 1; i < TeamRot.transform.childCount; i++)
+        {
+            int index = i - 1;
+            Transform PlayerObject = TeamRot.transform.GetChild(i);
+            PlayerObject.gameObject.SetActive(false);
+            if (teamrotList.Count > index)
+            {
+                PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = teamrotList[index];
+                // Server
+                if (teamrotList[index] == Config.PLAYER_NAME)
+                {
+                    PlayerObject.GetChild(0).GetComponent<Image>().sprite = Config.SERVER_PLAYER.icon;
+                    teamrot += "[#]" + teamrotList[index] + "~" + Config.SERVER_PLAYER.icon.name;
+                }
+                // Client
+                else
+                {
+                    PlayerObject.GetChild(0).GetComponent<Image>().sprite = Player.getSpriteByPlayerName(teamrotList[index]);
+                    teamrot += "[#]" + teamrotList[index] + "~" + Player.getSpriteByPlayerName(teamrotList[index]).name;
+                }
+                PlayerObject.gameObject.SetActive(true);
+            }
+        }
+        if (teamrot.Length > 3)
+            teamrot = teamrot.Substring("[#]".Length);
+        string teamblau = "";
+        for (int i = 1; i < TeamBlau.transform.childCount; i++)
+        {
+            int index = i - 1;
+            Transform PlayerObject = TeamBlau.transform.GetChild(i);
+            PlayerObject.gameObject.SetActive(false);
+            if (teamblauList.Count > index)
+            {
+                PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = teamblauList[index];
+                // Server
+                if (teamblauList[index] == Config.PLAYER_NAME)
+                {
+                    PlayerObject.GetChild(0).GetComponent<Image>().sprite = Config.SERVER_PLAYER.icon;
+                    teamblau += "[#]" + teamblauList[index] + "~" + Config.SERVER_PLAYER.icon.name;
+                }
+                // Client
+                else
+                {
+                    PlayerObject.GetChild(0).GetComponent<Image>().sprite = Player.getSpriteByPlayerName(teamblauList[index]);
+                    teamblau += "[#]" + teamblauList[index] + "~" + Player.getSpriteByPlayerName(teamblauList[index]).name;
+                }
+                PlayerObject.gameObject.SetActive(true);
+            }
+        }
+        if (teamblau.Length > 3)
+            teamblau = teamblau.Substring("[#]".Length);
+        // Listen Broadcast
+        ServerUtils.AddBroadcast("#TeamUpdate " + teamrot + "|" + teamblau);
+
+        if (!started)
+        {
+            if (TeamTurn.Equals("ROT") && teamrotList.Contains(Config.PLAYER_NAME))
+                RundeStarten.SetActive(true);
+            else if (TeamTurn.Equals("BLAU") && teamblauList.Contains(Config.PLAYER_NAME))
+                RundeStarten.SetActive(true);
+            else
+                RundeStarten.SetActive(false);
+        }
     }
-
-
+    public void ChangeTimerSec(TMP_InputField input)
+    {
+        if (input.text.Length == 0)
+            return;
+        int temp = Int32.Parse(input.text);
+        if (temp < 0)
+            return;
+        timerseconds = temp;
+    }
     #endregion
 }

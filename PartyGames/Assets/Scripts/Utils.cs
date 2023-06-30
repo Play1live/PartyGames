@@ -183,6 +183,65 @@ public class Utils
     /// </summary>
     public static void EinstellungenGrafikApply(bool ignoreSettings)
     {
+        // TODO: wenn gestartet ist vollbild und in den settings steht nicht vollbild!!
+        /*if (ignoreSettings == true)
+        {
+            if (Config.FULLSCREEN == true)
+            {
+                int index = Display.activeEditorGameViewTarget;
+                if (index < 0)
+                    index = 0;
+                Screen.SetResolution(Display.displays[index].systemWidth, Display.displays[index].systemWidth, true);
+                if (Screen.fullScreenMode == FullScreenMode.ExclusiveFullScreen)
+                {
+                    return;
+                }
+                else
+                {
+                    /*List<DisplayInfo> displays = new List<DisplayInfo>();
+                    Screen.GetDisplayLayout(displays);
+                    if (displays?.Count > 1) // don't bother running if only one display exists...
+                    {
+                        Screen.MoveMainWindowTo(displays[0], new Vector2Int(displays[0].width / 2, displays[0].height / 2));
+                    }
+                    Screen.fullScreenMode = FullScreenMode.ExclusiveFullScreen;*//*
+                    return;
+                }
+            }
+        }
+        string[] ress = new string[] { "2560x1440", "1920x1080", "1280x720" };
+        int width = Int32.Parse(ress[Config.APPLICATION_CONFIG.GetInt("GAME_DISPLAY_RESOLUTION", 2)].Split('x')[0]);
+        int height = Int32.Parse(ress[Config.APPLICATION_CONFIG.GetInt("GAME_DISPLAY_RESOLUTION", 2)].Split('x')[1]);
+        bool full = Config.APPLICATION_CONFIG.GetBool("GAME_DISPLAY_FULLSCREEN", true);
+        if (full)
+        {
+            if (Screen.fullScreenMode != FullScreenMode.ExclusiveFullScreen)
+            {
+                int index = Display.activeEditorGameViewTarget;
+                if (index < 0)
+                    index = 0;
+                Screen.SetResolution(Display.displays[index].systemWidth, Display.displays[index].systemWidth, false);
+
+                Screen.fullScreenMode = FullScreenMode.ExclusiveFullScreen;
+                //Screen.SetResolution(Display.displays[0].systemWidth, Display.displays[0].systemWidth, true);
+
+            }
+            else
+            {
+                Screen.SetResolution(width, height, false); 
+                if (Screen.fullScreenMode != FullScreenMode.Windowed)
+                    Screen.fullScreenMode = FullScreenMode.Windowed;
+            }
+        }
+        else
+        {
+            
+            Screen.SetResolution(width, height, false);
+            if (Screen.fullScreenMode != FullScreenMode.Windowed)
+                Screen.fullScreenMode = FullScreenMode.Windowed;
+        }
+        */
+
         if (ignoreSettings == true)
         {
             if (Config.FULLSCREEN == true)

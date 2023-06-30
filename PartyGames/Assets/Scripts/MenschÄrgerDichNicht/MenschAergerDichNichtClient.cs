@@ -632,6 +632,18 @@ public class MenschAergerDichNichtClient : MonoBehaviour
             Würfel.GetComponent<Image>().sprite = wuerfel[(count++) % wuerfel.Count];
             yield return new WaitForSeconds(0.05f);
         }
+        // Roll to 6
+        while (wuerfel[wuerfel.Count - 1] == wuerfel[count % wuerfel.Count])
+        {
+            Würfel.GetComponent<Image>().sprite = wuerfel[(count++) % wuerfel.Count];
+            yield return new WaitForSeconds(0.05f);
+        }
+        // Roll to 6
+        while (wuerfel[wuerfel.Count - 1] == wuerfel[count % wuerfel.Count])
+        {
+            Würfel.GetComponent<Image>().sprite = wuerfel[(count++) % wuerfel.Count];
+            yield return new WaitForSeconds(0.05f);
+        }
         // Roll Until selected
         while (!wuerfel[count % wuerfel.Count].name.Equals("würfel " + result))
         {

@@ -44,7 +44,7 @@ public class StartupScene : MonoBehaviour
         if (Config.APPLICATION_INITED == true)
         {
             SettingsAktualisiereAnzeigen();
-            Utils.EinstellungenGrafikApply(true);
+            //Utils.EinstellungenGrafikApply(false);
 
             if (!Config.CLIENT_STARTED && !Config.SERVER_STARTED)
             {
@@ -100,7 +100,6 @@ public class StartupScene : MonoBehaviour
             Logging.log(Logging.LogType.Debug, "StartupScene", "Start", "Datapath: " + Application.dataPath);
 
             WriteGameVersionFile();
-
             Utils.EinstellungenAudioUpdateVolume(Einstellungen, audiomixer);
             LoadConfigs.FetchRemoteConfig();    // Lädt Config
             MedienUtil.CreateMediaDirectory();
@@ -135,7 +134,7 @@ public class StartupScene : MonoBehaviour
                 Client.SetActive(false);
                 Server.SetActive(false);
                 Utils.EinstellungenStartSzene(Einstellungen, audiomixer, Utils.EinstellungsKategorien.Audio, Utils.EinstellungsKategorien.Grafik, Utils.EinstellungsKategorien.Server, Utils.EinstellungsKategorien.Sonstiges);
-                Utils.EinstellungenGrafikApply(true);
+                //Utils.EinstellungenGrafikApply(false);
                 GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(1).gameObject.SetActive(false);
             }
             // Zeigt den temporären Spielernamen an
@@ -203,6 +202,9 @@ public class StartupScene : MonoBehaviour
         }
         else
         {
+            Logging.log(Logging.LogType.Debug, Application.dataPath);
+            Logging.log(Logging.LogType.Debug, Application.persistentDataPath);
+            Logging.log(Logging.LogType.Debug, Application.productName);
             Logging.log(Logging.LogType.Error, "StartupScene", "UpdateGameUpdater", "Updaterversion konnte nicht gefunden werden. Path: " + UpdaterVersionPath + "/Version.txt");
             if (!File.Exists(UpdaterVersionPath + "/PartyGamesUpdater.exe"))
             {

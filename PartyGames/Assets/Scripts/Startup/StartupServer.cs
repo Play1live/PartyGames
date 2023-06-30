@@ -427,7 +427,7 @@ public class StartupServer : MonoBehaviour
     /// </summary>
     private void SperreGameSelection()
     {
-        allowedStartTime = DateTime.Now.AddSeconds(2);
+        allowedStartTime = DateTime.Now.AddSeconds(3);
         for (int i = 0; i < ServerControlGameSelection.transform.childCount; i++)
         {
             ServerControlGameSelection.transform.GetChild(i).gameObject.SetActive(false);
@@ -971,55 +971,39 @@ public class StartupServer : MonoBehaviour
     private Sprite FindFittingIconByName(string name)
     {
         if (name.ToLower().Contains("spieler"))
-        {
             return FindIconByName("Discord");
-        }
         else if (name.ToLower().Contains("alan"))
-        {
             return FindIconByName("Alan");
-        }
         else if (name.ToLower().Contains("fiona"))
-        {
             return FindIconByName("Fiona");
-        }
         else if (name.ToLower().Contains("hannah")
             || (name.ToLower().StartsWith("ha") && name.ToLower().EndsWith("nah"))
             || (name.ToLower().StartsWith("han") && name.ToLower().EndsWith("ah"))
             || (name.ToLower().StartsWith("haa") && name.ToLower().EndsWith("aah") && name.ToLower().Substring(3, name.Length - 3).Contains("nn")))
-        {
             return FindIconByName("Hannah");
-        }
-        else if (name.ToLower().Contains("henryk") || name.ToLower().Contains("play1live"))
-        {
+        else if (name.ToLower().Contains("henryk")
+            || name.ToLower().Contains("play1live"))
             return FindIconByName("Henryk");
-        }
         else if (name.ToLower().Contains("maxe"))
-        {
             return FindIconByName("Maxe");
-        }
-        else if (name.ToLower().Contains("michi") ||
-            name.ToLower().Contains("michelle"))
-        {
+        else if (name.ToLower().Contains("michi")
+            || name.ToLower().Contains("michelle"))
             return  FindIconByName("Michi");
-        }
         else if (name.ToLower().Contains("munck"))
-        {
             return FindIconByName("Munk");
-        }
         else if (name.ToLower().Contains("nils")
             || name.ToLower().Contains("nille")
             || name.ToLower().Contains("kater")
             || name.ToLower().Contains("katerjunge"))
-        {
             return FindIconByName ("Nils");
-        }
         else if (name.ToLower().Contains("ronald")
             || name.ToLower().Contains("ron")
             || name.ToLower().Contains("sterni")
             || name.ToLower().Contains("sternfaust"))
-        {
             return FindIconByName("Ronald");
-        }
+        else if (name.ToLower().Contains("nookie")
+            || name.ToLower().Contains("nicoruessel"))
+            return FindIconByName("Nookie");
         else
         {
             Logging.log(Logging.LogType.Warning, "StartupServer", "SpielerIconChange", "Spielername für Icons ist unbekannt: " + name);
@@ -1154,7 +1138,7 @@ public class StartupServer : MonoBehaviour
         // Kniffel
         gamelist.Add("[SPIELER-ANZ]" + KniffelBoard.minPlayer + "-" + KniffelBoard.maxPlayer + "[SPIELER-ANZ][MIN]" + KniffelBoard.minPlayer + "[MIN][MAX]" + KniffelBoard.maxPlayer + "[MAX][TITEL]Kniffel[TITEL][AVAILABLE]-1[AVAILABLE]");
         // Tabu
-        gamelist.Add("[SPIELER-ANZ]" + TabuBoard.minPlayer + "-" + TabuBoard.maxPlayer + "[SPIELER-ANZ][MIN]" + TabuBoard.minPlayer + "[MIN][MAX]" + TabuBoard.maxPlayer + "[MAX][TITEL]Tabu[TITEL][AVAILABLE]-1[AVAILABLE]");
+        gamelist.Add("[SPIELER-ANZ]" + TabuSpiel.minPlayer + "-" + TabuSpiel.maxPlayer + "[SPIELER-ANZ][MIN]" + TabuSpiel.minPlayer + "[MIN][MAX]" + TabuSpiel.maxPlayer + "[MAX][TITEL]Tabu[TITEL][AVAILABLE]" + Config.TABU_SPIEL.wortcounter + "[AVAILABLE]");
 
 
         string msg = "";
@@ -1368,6 +1352,10 @@ public class StartupServer : MonoBehaviour
         TMP_Dropdown SloxikonDropdown = GameObject.Find("Sloxikon/Sloxikon").GetComponent<TMP_Dropdown>();
         SloxikonDropdown.ClearOptions();
         SloxikonDropdown.AddOptions(Config.SLOXIKON_SPIEL.getGamesAsStringList());
+
+        TMP_Dropdown TabuDropdown = GameObject.Find("Tabu/Tabu").GetComponent<TMP_Dropdown>();
+        TabuDropdown.ClearOptions();
+        TabuDropdown.AddOptions(Config.TABU_SPIEL.getGamesAsStringList());
     }
     #region Starte Spiele
     /// <summary>
@@ -1392,6 +1380,8 @@ public class StartupServer : MonoBehaviour
         else if (spieltitel == "Auktion" && Config.AUKTION_SPIEL.getSelected() == null)
             return;
         else if (spieltitel == "Sloxikon" && Config.SLOXIKON_SPIEL.getSelected() == null)
+            return;
+        else if (spieltitel == "Tabu" && Config.TABU_SPIEL.getSelected() == null)
             return;
 
         // Lädt Spiel & Senden an Clients, falls das Spiel nicht existiert, wird der Server geschlossen
@@ -1418,6 +1408,9 @@ public class StartupServer : MonoBehaviour
     {
         switch (drop.name)
         {
+            default:
+                Logging.log(Logging.LogType.Error, "StartupServer", "SelectGameStat", "Spiel nicht hinzugefügt: " + drop.name);
+                break;
             case "Quiz":
                 Config.QUIZ_SPIEL.setSelected(Config.QUIZ_SPIEL.getQuizByIndex(drop.value));
                 break;
@@ -1438,6 +1431,21 @@ public class StartupServer : MonoBehaviour
                 break;
             case "Sloxikon":
                 Config.SLOXIKON_SPIEL.setSelected(Config.SLOXIKON_SPIEL.getQuizByIndex(drop.value));
+                break;
+            case "Tabu":
+                Config.TABU_SPIEL.setSelected(Config.TABU_SPIEL.getListe(drop.value));
+                break;
+        }
+    }
+    public void SelectGameInfoOption(TMP_Dropdown drop)
+    {
+        switch (drop.transform.parent.name)
+        {
+            default:
+                Logging.log(Logging.LogType.Error, "StartupServer", "SelectGameInfoOption", "Spiel nicht hinzugefügt: " + drop.name);
+                break;
+            case "Tabu":
+                TabuSpiel.GameType = drop.options[drop.value].text;
                 break;
         }
     }
