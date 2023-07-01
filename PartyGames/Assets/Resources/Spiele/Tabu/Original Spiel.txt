@@ -972,4 +972,4 @@ Roulette|Spiel-Casino-setzen-Kugel-Zahl
 Pyramide|Bauwerk-#ae#gypten-Grab-Gizeh-spitz
 Anden|S#ue#damerika-Gebirge-kette-hoch-besteigen
 #oe#lteppich|Wasser-auslaufen-Pest-Salat-Boden
-Haut|K#oe#rper-H#ue#lle-d#ue#nn-Organ-Schutz
+Haut|K#oe#rper-H#ue#lle-d#ue#nn-Organ-Schutz

@@ -1,4 +1,5 @@
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -10,7 +11,7 @@ public class TabuSpiel
     public static string GameType = "1 Wort"; // 1 Wort | Timer
     private List<Tabu> tabus;
     private Tabu selected;
-    public static readonly int TABU_WORTE_COUNT = 6;
+    public static int TABU_WORTE_COUNT = 6;
     public int wortcounter;
 
     public TabuSpiel()
@@ -18,8 +19,23 @@ public class TabuSpiel
         Logging.log(Logging.LogType.Debug, "TabuSpiel", "TabuSpiel", "Spieldateien werden geladen.");
         tabus = new List<Tabu>();
         wortcounter = 0;
-        string[] packnames = new string[] { "Original Spiel", "Normal", "Schwer" }; 
-        // TODO: Alle Dateien aus dem Ordner laden
+        List<string> packnames = new List<string>();
+        /*foreach (string item in Directory.GetFiles(Application.dataPath + "Assets/Resources/Spiele/Tabu"))
+        {
+            if (!item.EndsWith(".txt"))
+                continue;
+            string[] temp = item.Replace(".txt", "").Split('/');
+            string[] temp2 = temp[temp.Length - 1].Split('\\');
+            packnames.Add(temp2[temp2.Length-1]);
+        }*/
+        packnames.AddRange(new string[] { "Original Spiel", "Normal", "Schwer" });
+
+        // Weihnachtspack 15.11.XXXX - 30.12.XXXX
+        if (DateTime.Compare(DateTime.Now, new DateTime(DateTime.Now.Year, 11, 15)) > 0 && DateTime.Compare(DateTime.Now, new DateTime(DateTime.Now.Year, 12, 30)) < 0)
+            packnames.Add("Weihnachten");
+        // Oasternpack 15.03.XXXX - 30.4.XXXX
+        if (DateTime.Compare(DateTime.Now, new DateTime(DateTime.Now.Year, 3, 15)) > 0 && DateTime.Compare(DateTime.Now, new DateTime(DateTime.Now.Year, 4, 30)) < 0)
+            packnames.Add("Ostern");
 
         foreach (string item in packnames)
         {
@@ -63,10 +79,55 @@ public class TabuSpiel
     public List<Tabu> getListen() { return this.tabus; }
     public int getIndex(Tabu wort) { return tabus.IndexOf(wort); }
     public Tabu getListe(int index) { return tabus[index]; }
-    public Tabu getRandomListe() { return tabus[Random.Range(0, getListen().Count)]; }
+    public Tabu getRandomListe() { return tabus[UnityEngine.Random.Range(0, getListen().Count)]; }
     public Tabu getSelected() { return selected; }
     public void setSelected(Tabu wort) { selected = wort; }
-
+    public static int[] genWorteList(TabuItem item)
+    {
+        List<string> wtemp = item.getWorte();
+        int counter = TabuSpiel.TABU_WORTE_COUNT;
+        if (wtemp.Count < TabuSpiel.TABU_WORTE_COUNT)
+            counter = wtemp.Count;
+        int[] zahlentemp = new int[counter];
+        for (int i = 0; i < counter; i++)
+        {
+            int random = UnityEngine.Random.Range(0, wtemp.Count);
+            zahlentemp[i] = item.getWorte().IndexOf(wtemp[random]);
+            wtemp.Remove(wtemp[random]);
+        }
+        return zahlentemp;
+    }
+    public static string getIntArrayToString(int[] list)
+    {
+        string ausgabe = "";
+        foreach (int item in list)
+            ausgabe += "." + item;
+        if (ausgabe.Length > 1)
+            ausgabe = ausgabe.Substring(1);
+        return ausgabe;
+    }
+    public static string getStringArrayToString(string worte, string list)
+    {
+        string ausgabe = "";
+        List<string> wlist = new List<string>();
+        wlist.AddRange(worte.Split('-'));
+        foreach (string item in list.Split('.'))
+            ausgabe += "-" + wlist[Int32.Parse(item)];
+        if (ausgabe.Length > 1)
+            ausgabe = ausgabe.Substring(1);
+        return ausgabe;
+    }
+    public static string getKartenWorte(string worte, int[] zahlen)
+    {
+        string ausgabe = "";
+        List<string> wlist = new List<string>();
+        wlist.AddRange(worte.Split('-'));
+        foreach (int item in zahlen)
+            ausgabe += "-" + wlist[item];
+        if (ausgabe.Length > 1)
+            ausgabe = ausgabe.Substring(1);
+        return ausgabe;
+    }
     public List<string> getGamesAsStringList()
     {
         List<string> s = new List<string>();
@@ -76,6 +137,7 @@ public class TabuSpiel
         }
         return s;
     }
+
 }
 
 public class Tabu
@@ -152,27 +214,17 @@ public class TabuItem
 {
     public string geheimwort;
     public string tabuworte;
-    private List<string> tabuworteliste;
-
+    
     public TabuItem(string geheimwort, string tabuworte)
     {
         this.geheimwort = geheimwort;
-        this.tabuworteliste = new List<string>();
-        this.tabuworteliste.AddRange(tabuworte.Split('-'));
-        if (this.tabuworteliste.Count > TabuSpiel.TABU_WORTE_COUNT)
-        {
-            string worte = "";
-            for (int i = 0; i < TabuSpiel.TABU_WORTE_COUNT; i++)
-            {
-                int random = Random.Range(0, this.tabuworteliste.Count);
-                worte += "-" + this.tabuworteliste[random];
-                this.tabuworteliste.RemoveAt(random);
-            }
-            if (worte.Length > 1)
-                worte = worte.Substring("-".Length);
-            this.tabuworte = worte.Replace("-", "\\n");
-        }
-        else
-            this.tabuworte = tabuworte.Replace("-", "\\n");
+        this.tabuworte = tabuworte;
+    }
+
+    public List<string> getWorte()
+    {
+        List<string> worte = new List<string>();
+        worte.AddRange(this.tabuworte.Split('-'));
+        return worte;
     }
 }

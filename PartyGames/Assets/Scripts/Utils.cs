@@ -350,12 +350,14 @@ public class ServerUtils
                 string msg = broadcastmsgs[0];
                 broadcastmsgs.RemoveAt(0);
                 BroadcastImmediate(msg);
-
+                yield return null;
                 // Lädt zurück ins Hauptmenü
                 if (msg.Equals("#ZurueckInsHauptmenue"))
-                    SceneManager.LoadScene("Startup");
+                {
+                    yield return new WaitForSeconds(0.001f);
+                    SceneManager.LoadScene("Startup"); //Async?
+                }
                 blockBroadcastMsgs = false;
-                yield return null;
             }
             yield return new WaitForSeconds(0.005f);
             // Kürzer dann bugg MenschÄrgerDicHNicht

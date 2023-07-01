@@ -177,7 +177,7 @@ public class StartupScene : MonoBehaviour
 #pragma warning disable CS0162 // Unerreichbarer Code wurde entdeckt. (ist aber erreichbar)
         yield return null;
 #pragma warning restore CS0162 // Unerreichbarer Code wurde entdeckt. (ist aber erreichbar)
-        if (Application.dataPath.EndsWith("Builds/PartyGames_Data"))
+        if (Application.dataPath.EndsWith("Build/PartyGames_Data"))
         {
             UpdaterIsUpToDate = true;
             yield break;
@@ -189,7 +189,8 @@ public class StartupScene : MonoBehaviour
         string UpdaterFiles = datapath.Split('/')[datapath.Split('/').Length - 2];
         string UpdaterVersionPath = datapath.Replace("/" + GameFiles, "").Replace("\\" + GameFiles, "").Replace("/" + UpdaterFiles, "").Replace("\\" + UpdaterFiles, "");
         Logging.log(Logging.LogType.Debug, "StartupScene", "UpdateGameUpdater", "Updaterversion File: " + UpdaterVersionPath + "/Version.txt");
-        
+        // TODO: sorgt für Fehler bei Munck
+
         // Lösche alten UpdateZip
         if (File.Exists(UpdaterVersionPath + @"/Updater.zip"))
             File.Delete(UpdaterVersionPath + @"/Updater.zip");
