@@ -163,8 +163,7 @@ public class TabuClient : MonoBehaviour
     /// <param name="cmd">Befehl</param>
     private void Commands(string data, string cmd)
     {
-        // TODO:
-        Debug.LogWarning(cmd + "  ->  " + data);
+        //Debug.LogWarning(cmd + "  ->  " + data);
         Logging.log(Logging.LogType.Debug, "TabuClient", "Commands", "Eingehende Nachricht: " + cmd + " -> " + data);
         switch (cmd)
         {

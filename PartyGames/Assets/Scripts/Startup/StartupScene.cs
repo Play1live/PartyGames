@@ -206,6 +206,14 @@ public class StartupScene : MonoBehaviour
             Logging.log(Logging.LogType.Debug, Application.dataPath);
             Logging.log(Logging.LogType.Debug, Application.persistentDataPath);
             Logging.log(Logging.LogType.Debug, Application.productName);
+            foreach (string file in Directory.GetFiles(UpdaterVersionPath.Replace("/Version.txt", "")))
+            {
+                Logging.log(Logging.LogType.Warning, file);
+            }
+            foreach (string file in Directory.GetDirectories(UpdaterVersionPath.Replace("/Version.txt", "")))
+            {
+                Logging.log(Logging.LogType.Warning, file);
+            }
             Logging.log(Logging.LogType.Error, "StartupScene", "UpdateGameUpdater", "Updaterversion konnte nicht gefunden werden. Path: " + UpdaterVersionPath + "/Version.txt");
             if (!File.Exists(UpdaterVersionPath + "/PartyGamesUpdater.exe"))
             {
