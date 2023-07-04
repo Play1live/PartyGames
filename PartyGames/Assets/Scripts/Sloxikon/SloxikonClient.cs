@@ -358,6 +358,8 @@ public class SloxikonClient : MonoBehaviour
                 Antworten[i].transform.GetChild(1).gameObject.SetActive(false);
                 Antworten[i].transform.GetChild(2).gameObject.SetActive(true);
                 Antworten[i].transform.GetChild(2).GetComponentInChildren<TMP_InputField>().text = "";
+                Antworten[i].transform.GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/ProfileIcons/empty");
+
             }
             else
             {
@@ -368,15 +370,12 @@ public class SloxikonClient : MonoBehaviour
         // Blendet spielerselect aus
         for (int j = 0; j < Config.PLAYERLIST.Length; j++)
         {
-            if (Config.PLAYERLIST[j].name.Length > 1)
+            for (int i = 0; i < Config.PLAYERLIST.Length + 1; i++)
             {
-                for (int i = 0; i < Config.PLAYERLIST.Length + 1; i++)
-                {
-                    Antworten[i].transform.GetChild(3).GetChild(j).GetComponent<Button>().image.sprite = Config.PLAYERLIST[j].icon;
-                    Antworten[i].transform.GetChild(3).GetChild(j).GetComponent<Button>().image.color = new Color(255, 255, 255, 1f);
-                    Antworten[i].transform.GetChild(3).GetChild(j).GetComponent<Button>().interactable = false;
-                    Antworten[i].transform.GetChild(3).GetChild(j).gameObject.SetActive(false);
-                }
+                Antworten[i].transform.GetChild(3).GetChild(j).GetComponent<Button>().image.sprite = Config.PLAYERLIST[j].icon;
+                Antworten[i].transform.GetChild(3).GetChild(j).GetComponent<Button>().image.color = new Color(255, 255, 255, 1f);
+                Antworten[i].transform.GetChild(3).GetChild(j).GetComponent<Button>().interactable = false;
+                Antworten[i].transform.GetChild(3).GetChild(j).gameObject.SetActive(false);
             }
         }
     }

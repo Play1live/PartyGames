@@ -67,6 +67,8 @@ public class StartupClient : MonoBehaviour
         #region Prüft auf Nachrichten vom Server
         if (Config.CLIENT_STARTED)
         {
+            if (!Config.CLIENT_TCP.Connected)
+                ClientUtils.CloseSocket();
             NetworkStream stream = Config.CLIENT_TCP.GetStream();
             if (stream.DataAvailable)
             {

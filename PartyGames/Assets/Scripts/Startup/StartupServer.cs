@@ -1004,6 +1004,8 @@ public class StartupServer : MonoBehaviour
         else if (name.ToLower().Contains("nookie")
             || name.ToLower().Contains("nicoruessel"))
             return FindIconByName("Nookie");
+        else if (name.ToLower().Contains("piet"))
+            return FindIconByName("Piet");
         else
         {
             Logging.log(Logging.LogType.Warning, "StartupServer", "SpielerIconChange", "Spielername für Icons ist unbekannt: " + name);
@@ -1387,13 +1389,13 @@ public class StartupServer : MonoBehaviour
         // Lädt Spiel & Senden an Clients, falls das Spiel nicht existiert, wird der Server geschlossen
         try
         {
-            SceneManager.LoadScene(spieltitel);
-            ServerUtils.AddBroadcast("#StarteSpiel " + spieltitel);
+            ServerUtils.AddBroadcast("#StarteSpiel " + spieltitel); // oder BroadcastImmediate
+            //SceneManager.LoadScene(spieltitel);
         }
         catch
         {
             Logging.log(Logging.LogType.Error, "StartupServer", "StarteSpiel", "Unbekanntes Spiel soll geladen werden. Server wird geschlossen. Spiel: " + spieltitel);
-            ServerUtils.AddBroadcast("#ServerClosed");
+            ServerUtils.BroadcastImmediate("#ServerClosed");
             Logging.log(Logging.LogType.Normal, "StartupServer", "StarteSpiel", "Server wird geschlossen.");
             Config.SERVER_TCP.Stop();
             SceneManager.LoadSceneAsync("Startup");

@@ -436,7 +436,7 @@ Bodensee|Wasser-Grenze-Alpen-konstanz-gro#ss#
 Knabbern|essen-nagen-Z#ae#hne-klein-Zeug
 Dumm|d#ae#mlich-bl#oe#d-Intelligenz-schlau-Brot
 Marionette|Puppe-Kind-Theater-spielen-Faden
-Kichererbse|Kichererbse-H#ue#lsenfrucht-Gem#ue#se-essen-lachen-albern
+Kichererbse|H#ue#lsenfrucht-Gem#ue#se-essen-lachen-albern
 Einbrecher|R#ae#uber-stehlen-Haus-Nacht-T#ue#r
 Katzenauge|Licht-Fahrrad-rot-sehen-schnurren
 Sackgasse|Tasche-Beutel-tragen-Weg-Ende

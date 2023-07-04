@@ -574,7 +574,7 @@ Lagerhalle|Lagerung-Waren-Logistik-Versand
 Universit#ae#tsgeb#ae#ude|H#oe#rsaal-Campus-Studium-Vorlesung-Fakult#ae#t
 Fabrikgeb#ae#ude|Produktion-Industrie-Maschinen-Produkte
 Turnhalle|Sport-Fitness-Training-#UE#bungen
-Bauernhof|Tiere-Landwirtschaft-Feld-Tiere-Milch
+Bauernhof|Tiere-Landwirtschaft-Feld-Milch
 Herrenhaus|Adel-Geschichte-Garten-Anwesen
 Markthalle|Essen-St#ae#nde-Lebensmittel-Handel-Frische
 Lagerhaus|Lagerung-Waren-Logistik-Inventar
@@ -861,7 +861,7 @@ Landesgesetze|Gesetze-Regeln-Land-Recht
 Landbeschaffung|Beschaffung-Erwerb-Grundst#ue#ck-Immobilien
 Landessitten|Sitten-Br#ae#uche-Traditionen-Kultur
 Unternehmen|Firma-Wirtschaft-Gesch#ae#ft-Arbeit
-Finanzen|Geld-Wirtschaft-Finanzen-Investment
+Finanzen|Geld-Wirtschaft-Investment
 Wachstum|Entwicklung-Wirtschaft-Fortschritt-Erweiterung
 Arbeitsmarkt|Arbeit-Jobs-Besch#ae#ftigung-Karriere
 B#oe#rse|Aktien-M#ae#rkte-Wirtschaft-Finanzwesen
@@ -909,5 +909,4 @@ Herzschrittmacher|Medizin-Herz-Gesundheit-Implantat-Rhythmus
 Videokamera|Aufnahme-Film-Bild-Speicherung-Objektiv
 Laser|Licht-Technologie-Strahl-Photon-Optik
 Walkie-Talkie|Kommunikation-Funkger#ae#t-Drahtlos-Ger#ae#t-Handheld
-Plattenspieler|Musik-Tontr#ae#ger-Vinyl-Grammophon-Schallplatte
-|
+Plattenspieler|Musik-Tontr#ae#ger-Vinyl-Grammophon-Schallplatte

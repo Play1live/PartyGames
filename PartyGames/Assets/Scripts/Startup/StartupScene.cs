@@ -304,8 +304,8 @@ public class StartupScene : MonoBehaviour
         Hauptmenue.transform.GetChild(4).gameObject.SetActive(false);// Server/Client StartButton
         Hauptmenue.transform.GetChild(5).gameObject.SetActive(false); // Einzelspieler StartButton
         yield return new WaitUntil(() => Config.REMOTECONFIG_FETCHTED == true);
-        if (Config.isServer)
-            UpdateIPCoroutine = StartCoroutine(UpdateIpAddress.UpdateNoIP_DNS());
+        //if (Config.isServer)
+          //  UpdateIPCoroutine = StartCoroutine(UpdateIpAddress.UpdateNoIP_DNS());
         Utils.EinstelungenServerUpdatePortIP(Einstellungen, Config.isServer, Config.SERVER_CONNECTION_IP, Config.SERVER_CONNECTION_PORT + "");
         yield return new WaitUntil(() => UpdaterIsUpToDate == true); // Warte bis die Version des Updater aktualisiert wurde
         Logging.log(Logging.LogType.Debug, "StartupScene", "EnableConnectionButton", "Spieler darf sich nun verbinden.");

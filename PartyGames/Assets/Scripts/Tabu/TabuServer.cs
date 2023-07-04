@@ -31,8 +31,9 @@ public class TabuServer : MonoBehaviour
     private GameObject Karte;
     private GameObject Richtig;
     private GameObject Falsch;
+    private GameObject Skip;
+    private Coroutine SkipCoroutine;
     private GameObject RundeStarten;
-    private GameObject SkipWord;
     private Toggle AllowSkip;
     private TMP_InputField TimerSec; 
     private int timerseconds;
@@ -41,6 +42,7 @@ public class TabuServer : MonoBehaviour
     private List<string> teamblauList;
     private string TeamTurn;
     private bool started;
+    private string erklaerer;
 
     private Coroutine TimerCoroutine;
     private TabuItem selectedItem;
@@ -150,6 +152,9 @@ public class TabuServer : MonoBehaviour
             case "#ClientStartRunde":
                 ClientStartRunde(player);
                 break;
+            case "#ClientSkipWort":
+                ClientSkip(player);
+                break;
             case "#ClientRichtigGeraten":
                 ClientRichtigGeraten(player);
                 break;
@@ -194,8 +199,8 @@ public class TabuServer : MonoBehaviour
         Falsch.SetActive(false);
         RundeStarten = GameObject.Find("Spielbrett/RundeStarten");
         RundeStarten.SetActive(false);
-        SkipWord = GameObject.Find("Spielbrett/SkipWort");
-        SkipWord.SetActive(false);
+        Skip = GameObject.Find("Spielbrett/Skip");
+        Skip.SetActive(false);
         AllowSkip = GameObject.Find("ServerSide/AllowSkip").GetComponent<Toggle>();
         AllowSkip.isOn = false;
         TimerSec = GameObject.Find("ServerSide/TimerSec").GetComponent<TMP_InputField>();
@@ -328,39 +333,13 @@ public class TabuServer : MonoBehaviour
     {
         if (!Config.SERVER_STARTED)
             return;
-        //Richtig.SetActive(false);
-        //Falsch.SetActive(false);
-
         SetKreuz(Config.PLAYER_NAME);
-        /*if (Richtig.GetComponentInChildren<TMP_Text>().text.Equals("Erraten"))
-            ServerRichtigGeraten();
-        if (Falsch.GetComponentInChildren<TMP_Text>().text.Equals("Fehler"))
-            SetKreuz(Config.PLAYER_NAME);*/
     }
     private void SetKreuz(string player)
     {
         if (!started)
             return;
-
         RundeEnde(-2, name);
-        /*
-        if (TeamTurn == "ROT" && teamblauList.Contains(player))
-        {
-            Kreuze.transform.GetChild(0).gameObject.SetActive(true);
-            ServerUtils.AddBroadcast("#KreuzAn 0"); // TODO: über rundenende mitsenden?
-
-            RundeEnde(-2, name);
-        }
-        else if (TeamTurn == "BLAU" && teamrotList.Contains(player))
-        {
-            Kreuze.transform.GetChild(0).gameObject.SetActive(true);
-            ServerUtils.AddBroadcast("#KreuzAn 0");
-
-            RundeEnde(-2, name);
-        }
-        else
-            Logging.log(Logging.LogType.Error, "TabuServer", "SetKreuz", "Team ist unbekannt: " + TeamTurn);
-        */
     }
     private void ClientRichtigGeraten(Player p)
     {
@@ -375,6 +354,20 @@ public class TabuServer : MonoBehaviour
     private void RichtigGeraten(string name)
     {
         RundeEnde(+1, name);
+    }
+    private void ClientSkip(Player p)
+    {
+        SkipWort(p.name);
+    }
+    public void ServerSkip()
+    {
+        if (!Config.SERVER_STARTED)
+            return;
+        SkipWort(Config.PLAYER_NAME);
+    }
+    private void SkipWort(string name)
+    {
+        RundeEnde(-3, name);
     }
     private void StartTimer()
     {
@@ -421,13 +414,38 @@ public class TabuServer : MonoBehaviour
     private void StartRunde(string playername)
     {
         started = true;
-        selectedItem = Config.TABU_SPIEL.getSelected().GetRandomItem();
+        erklaerer = playername;
+        if (TabuSpiel.GameType.Equals("1 Wort"))
+            selectedItem = Config.TABU_SPIEL.getSelected().GetRandomItem(true);
+        else
+            selectedItem = Config.TABU_SPIEL.getSelected().GetRandomItem(false);
+
+        if (TabuSpiel.GameType.Equals("Normal"))
+            Skip.SetActive(true);
 
         wortzahlen = TabuSpiel.genWorteList(selectedItem);
         displayworte = TabuSpiel.getKartenWorte(selectedItem.tabuworte, wortzahlen);
 
         ServerUtils.AddBroadcast("#StartRunde " + playername + "|" + TeamTurn + "|" + TabuSpiel.GameType + "|" + timerseconds + "|" + TabuSpiel.getIntArrayToString(wortzahlen) + "|" + selectedItem.geheimwort + "|" + selectedItem.tabuworte);
-        //ServerUtils.AddBroadcast("#DisplayKarte " + selectedItem.geheimwort + "|" + selectedItem.tabuworte);
+
+        // Färbe Namen in der Liste der Spieler damit jeder weiß wer dran ist
+        for (int i = 1; i < TeamRot.transform.childCount; i++)
+        {
+            int index = i - 1;
+            Transform PlayerObject = TeamRot.transform.GetChild(i);
+            if (teamrotList.Count > index)
+                if (teamrotList[index].Equals(erklaerer))
+                    PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = "<color=green>" + teamrotList[index];
+        }
+        for (int i = 1; i < TeamBlau.transform.childCount; i++)
+        {
+            int index = i - 1;
+            Transform PlayerObject = TeamBlau.transform.GetChild(i);
+            if (teamblauList.Count > index)
+                if (teamblauList[index].Equals(erklaerer))
+                PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = "<color=green>" + teamblauList[index];
+        }
+
         RundeStarten.SetActive(false);
         JoinTeamRot.SetActive(false);
         JoinTeamBlau.SetActive(false);
@@ -538,6 +556,14 @@ public class TabuServer : MonoBehaviour
         BackgroundColor.SetActive(false);
         yield break;
     }
+
+    private IEnumerator SkipWort()
+    {
+        yield return new WaitForSeconds(5);
+        if (erklaerer.Equals(Config.PLAYER_NAME))
+            Skip.SetActive(true);
+        yield break;
+    }
     private void RundeEnde(int indicator, string playername)
     {
         if (TabuSpiel.GameType.Equals("1 Wort"))
@@ -576,25 +602,37 @@ public class TabuServer : MonoBehaviour
 
             EndTurn();
         }
-        else if (TabuSpiel.GameType.Equals("Timer"))
+        else if (TabuSpiel.GameType.Equals("Normal"))
         {
+            // Skip Wort
+            if (indicator == -3)
+            {
+                if (erklaerer.Equals(Config.PLAYER_NAME))
+                {
+                    Skip.SetActive(false);
+                    if (SkipCoroutine != null)
+                        StopCoroutine(SkipCoroutine);
+                    SkipCoroutine = StartCoroutine(SkipWort());
+                }
+            }
             // Falsch gedrückt
-            if (indicator == -2)
+            else if (indicator == -2)
             {
                 //Kreuze.transform.GetChild(0).gameObject.SetActive(true);
                 FalschGeraten.Play();
                 StartCoroutine(AnimateBackground("LOSE"));
-                // Neue Karte
-                selectedItem = Config.TABU_SPIEL.getSelected().GetRandomItem();
-                wortzahlen = TabuSpiel.genWorteList(selectedItem);
-                displayworte = TabuSpiel.getKartenWorte(selectedItem.tabuworte, wortzahlen);
-                DisplayKarte(true, selectedItem.geheimwort, displayworte);
+                if (TeamTurn.Equals("ROT"))
+                    teamrotPunkte--;
+                else if (TeamTurn.Equals("BLAU"))
+                    teamblauPunkte--;
+                SetTeamPoints("ROT", teamrotPunkte); 
+                SetTeamPoints("BLAU", teamblauPunkte);
             }
             // Zeit vorbei
             else if (indicator == -1)
             {
                 FalschGeraten.Play();
-                StartCoroutine(AnimateBackground("LOSE"));
+                //StartCoroutine(AnimateBackground("LOSE"));
                 EndTurn();
             }
             // Richtig gedrückt
@@ -612,14 +650,22 @@ public class TabuServer : MonoBehaviour
                     teamblauPunkte += 1;
                     SetTeamPoints("BLAU", teamblauPunkte);
                 }
-                // Neue Karte
-                selectedItem = Config.TABU_SPIEL.getSelected().GetRandomItem();
-                wortzahlen = TabuSpiel.genWorteList(selectedItem);
-                displayworte = TabuSpiel.getKartenWorte(selectedItem.tabuworte, wortzahlen);
-                DisplayKarte(true, selectedItem.geheimwort, displayworte);
             }
             else
                 Logging.log(Logging.LogType.Error, "TabuServer", "RundeEnde", "Fehler: " + indicator + " " + TeamTurn);
+
+            // Neue Karte
+            selectedItem = Config.TABU_SPIEL.getSelected().GetRandomItem(false);
+            wortzahlen = TabuSpiel.genWorteList(selectedItem);
+            displayworte = TabuSpiel.getKartenWorte(selectedItem.tabuworte, wortzahlen);
+            if (erklaerer.Equals(Config.PLAYER_NAME))
+                DisplayKarte(true, selectedItem.geheimwort, displayworte);
+            else if (teamrotList.Contains(Config.PLAYER_NAME) && TeamTurn.Equals("BLAU"))
+                DisplayKarte(true, selectedItem.geheimwort, displayworte);
+            else if (teamblauList.Contains(Config.PLAYER_NAME) && TeamTurn.Equals("ROT"))
+                DisplayKarte(true, selectedItem.geheimwort, displayworte);
+            else
+                DisplayKarte(true, erklaerer, "");
         }
         else
             Logging.log(Logging.LogType.Error, "TabuServer", "RundeEnde", "Unbekannter Typ: "+ TabuSpiel.GameType);
@@ -638,6 +684,7 @@ public class TabuServer : MonoBehaviour
         Falsch.SetActive(false);
         JoinTeamBlau.SetActive(true);
         JoinTeamRot.SetActive(true);
+        erklaerer = "";
         if (TeamTurn.Equals("ROT"))
             TeamTurn = "BLAU";
         else
@@ -647,6 +694,22 @@ public class TabuServer : MonoBehaviour
             RundeStarten.SetActive(true);
         else if (TeamTurn.Equals("BLAU") && teamblauList.Contains(Config.PLAYER_NAME))
             RundeStarten.SetActive(true);
+
+        // Färbt namen wieder weiß
+        for (int i = 1; i < TeamRot.transform.childCount; i++)
+        {
+            int index = i - 1;
+            Transform PlayerObject = TeamRot.transform.GetChild(i);
+            if (teamrotList.Count > index)
+                    PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = teamrotList[index];
+        }
+        for (int i = 1; i < TeamBlau.transform.childCount; i++)
+        {
+            int index = i - 1;
+            Transform PlayerObject = TeamBlau.transform.GetChild(i);
+            if (teamblauList.Count > index)
+                    PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = teamblauList[index];
+        }
     }
     public void ChangePoints(Button btn)
     {

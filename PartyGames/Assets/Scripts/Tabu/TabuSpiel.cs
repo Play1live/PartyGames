@@ -8,7 +8,7 @@ public class TabuSpiel
 {
     public static int minPlayer = 4;
     public static int maxPlayer = 8;
-    public static string GameType = "1 Wort"; // 1 Wort | Timer
+    public static string GameType = "1 Wort"; // 1 Wort | Normal | Timer
     private List<Tabu> tabus;
     private Tabu selected;
     public static int TABU_WORTE_COUNT = 6;
@@ -20,14 +20,6 @@ public class TabuSpiel
         tabus = new List<Tabu>();
         wortcounter = 0;
         List<string> packnames = new List<string>();
-        /*foreach (string item in Directory.GetFiles(Application.dataPath + "Assets/Resources/Spiele/Tabu"))
-        {
-            if (!item.EndsWith(".txt"))
-                continue;
-            string[] temp = item.Replace(".txt", "").Split('/');
-            string[] temp2 = temp[temp.Length - 1].Split('\\');
-            packnames.Add(temp2[temp2.Length-1]);
-        }*/
         packnames.AddRange(new string[] { "Original Spiel", "Normal", "Schwer" });
 
         // Weihnachtspack 15.11.XXXX - 30.12.XXXX
@@ -162,7 +154,7 @@ public class Tabu
             {
                 if (!wort.Contains(temp.Split('|')[0]))
                 {
-                    if (temp.Equals(""))
+                    if (temp.Length <= 1 || temp.Equals(""))
                         continue;
                     wort.Add(temp.Split('|')[0]);
                     worte.Add(new TabuItem(temp.Split('|')[0], temp.Split('|')[1]));
@@ -200,12 +192,13 @@ public class Tabu
     }
     public string getTitel() { return this.name; }
     public List<TabuItem> getGeheimwörter() { return this.worte; }
-    public TabuItem GetRandomItem()
+    public TabuItem GetRandomItem(bool deleteFromList)
     {
         if (this.worte.Count == 0)
             return new TabuItem("Keine weiteren Worte", "");
         TabuItem item = this.worte[UnityEngine.Random.Range(0, this.worte.Count)];
-        this.worte.Remove(item);
+        if (deleteFromList)
+            this.worte.Remove(item);
         return item;
     }
 }
@@ -218,7 +211,20 @@ public class TabuItem
     public TabuItem(string geheimwort, string tabuworte)
     {
         this.geheimwort = geheimwort;
-        this.tabuworte = tabuworte;
+        List<string> worte = new List<string>();
+        this.tabuworte = "";
+        foreach (string item in tabuworte.Split('-'))
+        {
+            if (!worte.Contains(item.ToLower()) && item.ToLower() != this.geheimwort.ToLower())
+            {
+                worte.Add(item.ToLower());
+                this.tabuworte += "-" + item;
+            }
+            else
+                Logging.log(Logging.LogType.Warning, "TabuItem", "TabuItem", geheimwort + " -> Dopplung: " + item);
+        }
+        if (this.tabuworte.Length > 1)
+            this.tabuworte = this.tabuworte.Substring(1);
     }
 
     public List<string> getWorte()

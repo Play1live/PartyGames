@@ -292,16 +292,16 @@ public class ServerUtils
                 string msg = broadcastmsgs[0];
                 broadcastmsgs.RemoveAt(0);
                 BroadcastImmediate(msg);
-                yield return null;
+                /*yield return null;
                 // Lädt zurück ins Hauptmenü
                 if (msg.Equals("#ZurueckInsHauptmenue"))
                 {
                     yield return new WaitForSeconds(0.001f);
                     SceneManager.LoadScene("Startup"); //Async?
-                }
+                }*/
                 blockBroadcastMsgs = false;
             }
-            yield return new WaitForSeconds(0.005f);
+            yield return new WaitForSeconds(0.008f);
             // Kürzer dann bugg MenschÄrgerDicHNicht
         }
     }
@@ -315,6 +315,12 @@ public class ServerUtils
         foreach (Player sc in Config.PLAYERLIST)
             if (sc.isConnected)
                 SendMSG(msg, sc);
+
+        // Lädt zurück ins Hauptmenü
+        if (msg.Equals("#ZurueckInsHauptmenue"))
+            SceneManager.LoadScene("Startup"); //Async?
+        else if (msg.StartsWith("#StarteSpiel "))
+            SceneManager.LoadScene(msg.Split(' ')[1]);
         blockBroadcastMsgs = false;
     }
     /// <summary>
@@ -349,7 +355,7 @@ public class ServerUtils
         player.points = 0;
         player.crowns = 0;
         player.isConnected = false;
-        player.isDisconnected = true;
+        player.isDisconnected = false;
         Config.SERVER_ALL_CONNECTED = false;
     }
 }
