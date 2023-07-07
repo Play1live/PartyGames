@@ -386,7 +386,7 @@ kopf#ue#ber|#ue#berkopf-kopfstehend-umgekehrt-verkehrt-auf den Kopf gestellt-auf
 Gewicht|Masse-Last-Schwere-Belastung-Gewichtung-Wucht-Heftigkeit
 Gramm|Einheit-Ma#ss#einheit-Gewichtseinheit-Ma#ss#-Ma#ss#einheit
 Kilo|Kilogramm-Gewichtseinheit-Einheit-Ma#ss#einheit
-Sternzeichen|Tierkreiszeichen-Horoskop-Sternbild-Himmelszeichen
+Sternzeichen|Tierkreiszeichen-Horoskop-Sternbild-Himmelszeichen-L#oe#we-Waage-Zwilling-Stier-Sch#ue#tze
 erkennen|identifizieren-ausmachen-wahrnehmen-feststellen-bemerken-erkennen
 Kasse|Kassentisch-Kassenbereich-Kassenstation-Kassenschalter-Kassenplatz-Kassenraum-Kassenstelle
 Piep|Signalton-Tonsignal-Signalger#ae#usch-Piepen-Ton-Ger#ae#usch
@@ -1039,7 +1039,7 @@ Sonnenaufgang|Morgen-Tagesbeginn-Himmel-Sonne-D#ae#mmerung-Farbe-Horizont-Strahl
 Schl#ue#sselanh#ae#nger|Bund-Ring-personalisiert-Halter-Souvenir-Tourist
 Kreide|Schreiben-Tafel-Stra#ss#enkreide-Farbe-Staub-Stift-Spuren-Schule
 Sonnenuntergang|Abend-Tagesende-Himmel-Sonne-Abendrot-D#ae#mmerung-Farbe-Rot-Horizont-Aufgang
-Schal|Winter-K#ae#lte-Hals-Strickware-Halstuch-Bindung-Fransen-
+Schal|Winter-K#ae#lte-Hals-Strickware-Halstuch-Bindung-Fransen
 Hubschrauber|Fliegen-Rotoren-Rettung-Helikopter-Pilot-Landeplatz-Luftaufnahmen
 Rezept|Kochen-Backen-Zutaten-Anleitung-K#ue#che-Gericht-Kochrezept-Kochbuch
 Laterne|Licht-Beleuchtung-Garten-Fest-Stra#ss#en-Kerze-Anz#ue#nder
@@ -3820,7 +3820,7 @@ Tierhaut|Tierfell-Tierpelz-Tierk#oe#rper-Tierh#ue#lle-Pflanzenhaut-Pflanzenk#oe#
 Rindsleder|Krokodilleder-Schlangenleder-Strau#ss#enleder-Reptilleder-Kunstleder-Stoff-Baumwolle-Seide
 Lederartikel|Ledertasche-Lederjacke-Lederg#ue#rtel-Lederschuhe-Stoffartikel-Kunststoffartikel-Textilartikel-Stoffwaren
 Notbremse|Sicherheitsbremse-Panikbremse-Bremsvorrichtung-Handbremse-Beschleunigen-Weiterfahren-Losfahren-Vorw#ae#rtsgehen
-Sicherung#ss#eil|Halteseil-Schutzseil-Rettung#ss#eil-Freiseil-Losla#ss#en-Fallenla#ss#en-Sich-Unbefestigt
+Sicherungsseil|Halteseil-Schutzseil-Rettung#ss#eil-Freiseil-Losla#ss#en-Fallenla#ss#en-Sich-Unbefestigt
 Abbruchseil|Trennseil-Durchtrennseil-Losla#ss#seil-Trennvorrichtung-Verbinden-Befestigen-Festhalten-Festbinden
 Nothilfeseil|Rettung#ss#eil-Hilf#ss#eil-Sicherung#ss#eil-Losla#ss#seil-Befreien-Helfen-Rettung-Unterst#ue#tzung
 Entbl#oe##ss#en|Enth#ue#llen-Zeigen-Offenlegen-Verbergen-Bedecken-Verdecken-Verschleiern-Verh#ue#llen
@@ -4175,7 +4175,7 @@ Angebot|Angebotspalette-Auswahl-Sortiment-Produktpalette-Nachfrage-Knappheit-Man
 Versuch|Experiment-Test-Probe-Studie-Untersuchung-Scheitern-Erfolglosigkeit-Mi#ss#erfolg
 Materialien|Rohstoffe-Werkstoffe-Stoffe-Substanzen-Re#ss#ourcen-Leere-Knappheit-Mangel
 Dienste|Service-Leistungen-Unterst#ue#tzung-Hilfsangebote-Dienstleistungen-Selbstbedienung-Eigenst#ae#ndigkeit-Unabh#ae#ngigkeit
-Wa#ss#erstoff|H2-Energietr#ae#ger-chemisches Element-Gas-Brennstoffzelle-Sauerstoff-Luft-Stickstoff
+Wasserstoff|H2-Energietr#ae#ger-chemisches Element-Gas-Brennstoffzelle-Sauerstoff-Luft-Stickstoff
 Sonnenenergie|Solarenergie-Solarkraft-Photovoltaik-Sonnenkraft-erneuerbare Energie-Dunkelheit-Stromausfall-Energiemangel
 Schichtung|Schichten-Strukturierung-Hierarchie-Ebenen-Gleichheit-Ebene-Vereinheitlichung-Egalisierung
 Genetik|Erbgut-DNA-Vererbung-Genetikforschung-Genomanalyse-Unwi#ss#enheit-Ahnungslosigkeit-Ignoranz
@@ -4192,8 +4192,8 @@ Fernsehzimmer|TV-Medienraum-Heimkino-Entspannungsort-Unterhaltung-Stille-Langewe
 Bewohner|Einwohner-Bewohnerinnen-Haushalte-Wohnbev#oe#lkerung-Gemeinschaft-Abwesenheit-Leerstand-Unbelebtheit
 Tauchsport|Unterwa#ss#ersport-Tauchen-Wa#ss#ersport-Tauchaktivit#ae#ten-Abenteuer-Tauchunfall-Tauchunf#ae#higkeit-Tauchverbot
 Tauglichkeit|Eignung-F#ae#higkeit-Bef#ae#higung-Tauglichkeitspr#ue#fung-Geeignetheit-Untauglichkeit-Inkompatibilit#ae#t-Ungeeignetheit
-Str#oe#mungen|Flie#ss#en-Flu#ss#-Wa#ss#erbewegung-Meere#ss#tr#oe#mung-Str#oe#mungsanalyse-Stagnation-Stillstand-Unbeweglichkeit
-Pegel|Wa#ss#erstand-Wa#ss#erstandsme#ss#ung-Wa#ss#erpegel-H#oe#he-Me#ss#wert-Niedrigstand-Tiefpunkt-Unterkante
+Str#oe#mungen|Flie#ss#en-Fluss-Wasserbewegung-Meere#ss#tr#oe#mung-Str#oe#mungsanalyse-Stagnation-Stillstand-Unbeweglichkeit
+Pegel|Wasserstand-Wa#ss#erstandsme#ss#ung-Wa#ss#erpegel-H#oe#he-Messwert-Niedrigstand-Tiefpunkt-Unterkante
 Zyklus|Kreislauf-Wiederholung-Rhythmus-Ablauf-Periodizit#ae#t-Stillstand-Unterbrechung-Unregelm#ae##ss#igkeit
 Titanik|Schiff-Ozeandampfer-Seefahrzeug-Wrack-Schiffsungl#ue#ck-Ganzheit-Vollst#ae#ndigkeit-Untergang
 #UE#berreste|#UE#berbleibsel-#UE#berbleibende-Hinterla#ss#enschaften-Reste-Tr#ue#mmer-Ganzheit-Vollst#ae#ndigkeit-Neuentstehung
@@ -4461,12 +4461,12 @@ Raumsonde|Erforschung-Daten#UE#bertragung-Raummi#ss#ion-Planetenexploration-Raum
 Raumstation|Orbitale Basis-I#ss#-Weltraumlabor-Astronautenwohnheim-Schwerelosigkeit-Kapsel-Au#ss#enbordeinsatz-Bodenkontakt
 Exoplaneten|Extrasolare Planeten-Weltraumentdeckungen-Planetenjagd-Ferne Welten-Planetenatmosph#AE#re-Astronomenteam-Planetenforschung-Erdgebunden
 Milchstra#ss#e|Heimatgalaxie-Sternensystem-Galaktisches Zentrum-Spiralarme-Sterne-Dunkle Materie-Schwarzes Loch-Au#ss#enbezirke
-Saturnringe|Ringebene-Planetenringe-Eiskristalle-Staubpartikel-Gaswolken-Sichtbarkeit-Durchme#ss#er-Aufl#OE#sung
+Saturnringe|Ringebene-Planetenringe-Eiskristalle-Staubpartikel-Gaswolken-Sichtbarkeit-Durchme#ss#er-Aufl#oe#sung
 Jupitermond|Galileische Monde-Io-Europa-Ganymed-Kallisto-Himmelsk#OE#rper-Satelliten-Gesteinsmonde-Eismonde
-Venusatmosph#AE#re|Treibhauseffekt-S#AE#urewolken-Brodelnde Hitze-Schwefeldioxid-Dunstschleier-Lufth#UE#lle-Gash#UE#lle-Erd#AE#hnlich
-Marsrover|Erkundungsfahrzeug-Rovermi#ss#ion-Planetenerkundung-Gesteinsproben-Roboterfahrzeug-Oberfl#AE#chenanalyse-Marsatmosph#AE#re-Forschungsreisen
-Merkuroberfl#AE#che|Gesteinslandschaft-Krater-Sonnennah-Sonnenwind-Hitzeschwankungen-K#AE#lteextreme-Vulkane-Merkurschwerter
-Neptunsturm|Gro#ss#er Dunkler Fleck-Wirbelsturm-Sturmwolken-St#UE#rme-Windgeschwindigkeiten-Winde-Windstille-Wetterph#AE#nomene
+Venusatmosph#AE#re|Treibhauseffekt-S#ae#urewolken-Brodelnde Hitze-Schwefeldioxid-Dunstschleier-Lufth#ue#lle-Gash#ue#lle-Erd#ae#hnlich
+Marsrover|Erkundungsfahrzeug-Rovermi#ss#ion-Planetenerkundung-Gesteinsproben-Roboterfahrzeug-Oberfl#ae#chenanalyse-Marsatmosph#ae#re-Forschungsreisen
+Merkuroberfl#ae#che|Gesteinslandschaft-Krater-Sonnennah-Sonnenwind-Hitzeschwankungen-K#ae#lteextreme-Vulkane-Merkurschwerter
+Neptunsturm|Gro#ss#er Dunkler Fleck-Wirbelsturm-Sturmwolken-St#UE#rme-Windgeschwindigkeiten-Winde-Windstille-Wetterph#ae#nomene
 Uranusringe|Eisma#ss#en-Staubpartikel-Ringebene-Planetenringe-Uranusmonde-Sichtbarkeit-Reflexion-Uranusatmosph#AE#re
 Plutodwarfplanet|Kleinplanet-Kuiperg#UE#rtel-Pluto#AE#quator-Eiskappe-Zerkl#UE#ftete Oberfl#AE#che-Sonnendistanz-Raumsonde-Plutoausflug
 Raumfahrzeug|Rakete-Spaceshuttle-Raumkapsel-Satellit-Raumgleiter-Raumflugzeug-Landef#AE#hre-Transportmittel
@@ -4477,17 +4477,17 @@ Sternsystem|Mehrfachstern-Doppelstern-Dreifachstern-Sonnensystem-Sternenkonstell
 Sonneneruption|Sonnensturm-Plasmaausbruch-Magnetfelder-Koronama#ss#eauswurf-Sonnenaktivit#AE#t-Eruptionseffekte-Sonnenausbruch-Sonneneruptionen
 Kometenschweif|Kometenstaub-Gasaustritt-Schweifbildung-Kometenschweifpartikel-Himmelsph#AE#nomen-Helligkeit-Schweifl#AE#nge-Schweifstruktur
 Marsmi#ss#ion|Marslandung-Erkundungsmi#ss#ion-Planetenexpedition-Leben#ss#uche-Weltraumforschung-Rovererkundung-Marsatmosph#AE#re-Bodenproben
-Kuiperg#UE#rtel|Kometeng#UE#rtel-Eisk#OE#rper-Planetoideng#UE#rtel-Transneptunische Objekte-Kuiper-G#UE#rtel-Objekte-Himmelsregion-Weltraumforschung-Kuiperg#UE#rtelk#OE#rper
-Mondkrater|Kraterlandschaft-Einschlagkrater-Mondoberfl#AE#che-Kraterbildung-Meteoriteneinschl#AE#ge-Gesteinsbrocken-Mondkraterlandschaft-Krateranalyse
-Venusdichte|Schwere-Kompaktheit-Dichteeigenschaften-Atmosph#AE#rendruck-Gasdichte-Ma#ss#e-Schwerewellen-Luftverd#UE#nnung
+Kuiperg#ue#rtel|Kometeng#ue#rtel-Eisk#oe#rper-Planetoideng#ue#rtel-Transneptunische Objekte-Kuiper-G#ue#rtel-Objekte-Himmelsregion-Weltraumforschung-Kuiperg#ue#rtelk#oe#rper
+Mondkrater|Kraterlandschaft-Einschlagkrater-Mondoberfl#ae#che-Kraterbildung-Meteoriteneinschl#ae#ge-Gesteinsbrocken-Mondkraterlandschaft-Krateranalyse
+Venusdichte|Schwere-Kompaktheit-Dichteeigenschaften-Atmosph#ae#rendruck-Gasdichte-Masse-Schwerewellen-Luftverd#ue#nnung
 Saturnmonde|Titan-Enceladus-Mimas-Tethys-Dione-Rhea-Iapetus-Hyperion
 Erdumlaufbahn|Erdorbit-Umrundung-Sonnenentfernung-Bahngeschwindigkeit-Bahnparameter-Umlaufzeit-Umlaufbahnparameter-Abdrift
-Jupiteratmosph#AE#re|Wolkenb#AE#nder-Gro#ss#er Roter Fleck-Gasriesenatmosph#AE#re-Wirbelst#UE#rme-Jupiterst#UE#rme-Wolkenwirbel-Atmosph#AE#renzusammensetzung-Gewitter
-Marsmeteorit|Gesteinsbrocken-Marsgestein-Meteoritenfall-Asteroideneinschlag-Gesteinsproben-Himmel#ss#tein-Meteoritenanalyse-Meteoritenforschung
-Merkurtemperatur|Extreme Hitze-Sonnenn#AE#he-Sonneneinstrahlung-Temperaturschwankungen-Hitzerekord-Hitzeextreme-K#AE#lte-W#AE#rmeverlust
+Jupiteratmosph#ae#re|Wolkenb#ae#nder-Gro#ss#er Roter Fleck-Gasriesenatmosph#ae#re-Wirbelst#ue#rme-Jupiterst#ue#rme-Wolkenwirbel-Atmosph#ae#renzusammensetzung-Gewitter
+Marsmeteorit|Gesteinsbrocken-Marsgestein-Meteoritenfall-Asteroideneinschlag-Gesteinsproben-Himmelsstein-Meteoritenanalyse-Meteoritenforschung
+Merkurtemperatur|Extreme Hitze-Sonnenn#ae#he-Sonneneinstrahlung-Temperaturschwankungen-Hitzerekord-Hitzeextreme-K#ae#lte-W#ae#rmeverlust
 Neptungravitation|Starke Anziehungskraft-Gravitationsfeld-Ma#ss#enanziehung-Sogwirkung-Schwere-Schwerefeld-Schwerkraftme#ss#er-Schwerelosigkeit
-Uranu#ss#ystem|Uranusmonde-Uranusringe-Uranusatmosph#AE#re-Uranuswolken-Himmel#ss#t#UE#rme-Uranusrotation-Uranusgravitation-Uranusmagnetfeld
+Uranu#ss#ystem|Uranusmonde-Uranusringe-Uranusatmosph#AE#re-Uranuswolken-Himmelsst#UE#rme-Uranusrotation-Uranusgravitation-Uranusmagnetfeld
 Plutoeis|Eiskruste-Plutoschicht-Eisoberfl#AE#che-Eish#UE#gel-Plutoeisformation-Ei#ss#chichten-Eisklumpen-Ei#ss#ublimation
-Sonnenwind|Plasmastrom-Sonnenpartikel-Magnetfeld-Sonnenstrahlung-Partikelstrom-Teilchenau#ss#to#ss#-Sonnenaktivit#AE#t-Magnetosph#AE#re
+Sonnenwind|Plasmastrom-Sonnenpartikel-Magnetfeld-Sonnenstrahlung-Partikelstrom-Teilchenaussto#ss#-Sonnenaktivit#ae#t-Magnetosph#ae#re
 Planetenformation|Entstehung von Planeten-Planetenentwicklung-Akkretion#ss#cheibe-Materieansammlung-Staubwolke-Planetenwachstum-Proto-Planeten-Planetenbildung
 Weltraumgesetz|Raumfahrtregelung-Kosmische Gesetze-Internationales Recht-Astronomieverordnung-Himmelsvorschriften-Weltraumvertrag-Universumsgesetz

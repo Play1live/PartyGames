@@ -170,7 +170,7 @@ public class Tabu
             }
         }
 
-        // Save Files
+        /*// Save Files
         if (inhalt.Split('\n').Length != worte.Count)
         {
             string newFile = "";
@@ -188,7 +188,7 @@ public class Tabu
 
             File.WriteAllText(Application.dataPath + "/Resources/Spiele/Tabu/" + name + ".txt", newFile);
             Logging.log(Logging.LogType.Normal, "Tabu", "Tabu", "File: " + name + " wurde gespeichert.");
-        }
+        }*/
     }
     public string getTitel() { return this.name; }
     public List<TabuItem> getGeheimwörter() { return this.worte; }
@@ -225,6 +225,78 @@ public class TabuItem
         }
         if (this.tabuworte.Length > 1)
             this.tabuworte = this.tabuworte.Substring(1);
+
+        /*
+        geheimwort = replaceWort(geheimwort);
+        if (geheimwort.Contains("ß"))
+            Debug.LogWarning(geheimwort);
+        for (int i = 0; i < worte.Count; i++)
+        {
+            worte[i] = replaceWort(worte[i]);
+            if (worte[i].Contains("ß"))
+                Debug.LogWarning(worte[i]);
+        }*/
+    }
+
+    private string replaceWort(string w)
+    {
+        switch(w)
+        {
+            default:
+                return w;
+            case "straße":
+                return "Straße";
+            case "fuß":
+                return "Fuß";
+            case "kloß":
+                return "Kloß";
+            case "soße":
+                return "Soße";
+            case "verstoß":
+                return "Verstoß";
+            case "außenseiter":
+                return "Außenseiter";
+            case "spaß":
+                return "Spaß";
+            case "fußball":
+                return "Fußball";
+            case "fließband":
+                return "Fließband";
+            case "raße":
+                return "rasse";
+            case "tasse":
+                return "Tasse";
+            case "naß":
+                return "Nass";
+            case "waßer":
+                return "Wasser";
+            case "weißweihnachten":
+                return "weiße weihnachten";
+            case "reißleine":
+                return "Reißleine";
+            case "eßen":
+                return "Essen";
+            case "taße":
+                return "Tasse";
+            case "regißeur":
+                return "Regisseur";
+            case "salzwaßer":
+                return "Salzwasser";
+            case "außicht":
+                return "Aussicht";
+            case "außtellung":
+                return "Ausstellung";
+            case "Taße":
+                return "Tasse";
+            case "faßade":
+                return "Fassade";
+            case "durchmeßer":
+                return "Durchmesser";
+            case "rovermißion":
+                return "Rovermission";
+            case "Marsmißion":
+                return "Marsmission";
+        }
     }
 
     public List<string> getWorte()

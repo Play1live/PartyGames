@@ -177,7 +177,7 @@ public class StartupScene : MonoBehaviour
 #pragma warning disable CS0162 // Unerreichbarer Code wurde entdeckt. (ist aber erreichbar)
         yield return null;
 #pragma warning restore CS0162 // Unerreichbarer Code wurde entdeckt. (ist aber erreichbar)
-        if (Application.dataPath.EndsWith("Build/PartyGames_Data"))
+        if (Application.dataPath.EndsWith("Builds/PartyGames_Data") || Application.dataPath.EndsWith("Build/PartyGames_Data"))
         {
             UpdaterIsUpToDate = true;
             yield break;
@@ -203,9 +203,6 @@ public class StartupScene : MonoBehaviour
         }
         else
         {
-            Logging.log(Logging.LogType.Debug, Application.dataPath);
-            Logging.log(Logging.LogType.Debug, Application.persistentDataPath);
-            Logging.log(Logging.LogType.Debug, Application.productName);
             foreach (string file in Directory.GetFiles(UpdaterVersionPath.Replace("/Version.txt", "")))
             {
                 Logging.log(Logging.LogType.Warning, file);
@@ -214,6 +211,9 @@ public class StartupScene : MonoBehaviour
             {
                 Logging.log(Logging.LogType.Warning, file);
             }
+            Logging.log(Logging.LogType.Debug, Application.dataPath);
+            Logging.log(Logging.LogType.Debug, Application.persistentDataPath);
+            Logging.log(Logging.LogType.Debug, Application.productName);
             Logging.log(Logging.LogType.Error, "StartupScene", "UpdateGameUpdater", "Updaterversion konnte nicht gefunden werden. Path: " + UpdaterVersionPath + "/Version.txt");
             if (!File.Exists(UpdaterVersionPath + "/PartyGamesUpdater.exe"))
             {

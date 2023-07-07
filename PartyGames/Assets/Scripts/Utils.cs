@@ -301,7 +301,7 @@ public class ServerUtils
                 }*/
                 blockBroadcastMsgs = false;
             }
-            yield return new WaitForSeconds(0.008f);
+            yield return new WaitForSeconds(0.01f);
             // Kürzer dann bugg MenschÄrgerDicHNicht
         }
     }
