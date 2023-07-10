@@ -36,6 +36,7 @@ public class TabuClient : MonoBehaviour
     private GameObject Skip;
     private Coroutine SkipCoroutine;
     private int timerseconds;
+    private Coroutine HideRichtigFalschSecCoroutine;
 
     private List<string> teamrotList;
     private List<string> teamblauList;
@@ -411,7 +412,34 @@ public class TabuClient : MonoBehaviour
     {
         if (!Config.CLIENT_STARTED)
             return;
-        SendToServer("#ClientKreuz");
+        SendToServer("#ClientKreuz " + selectedItem.geheimwort);
+    }
+    private IEnumerator HideRichtigFalschSec()
+    {
+        Richtig.SetActive(false);
+        Falsch.SetActive(false);
+        yield return new WaitForSeconds(1);
+        if (erklaerer == Config.PLAYER_NAME)
+        {
+            Richtig.SetActive(true);
+            Falsch.SetActive(true);
+        }
+        else if (TeamTurn.Equals("ROT") && teamblauList.Contains(Config.PLAYER_NAME))
+        {
+            Richtig.SetActive(false);
+            Falsch.SetActive(true);
+        }
+        else if (TeamTurn.Equals("BLAU") && teamrotList.Contains(Config.PLAYER_NAME))
+        {
+            Richtig.SetActive(false);
+            Falsch.SetActive(true);
+        }
+        else
+        {
+            Richtig.SetActive(false);
+            Falsch.SetActive(false);
+        }
+        yield break;
     }
     public void RichtigGeraten()
     {
@@ -537,6 +565,9 @@ public class TabuClient : MonoBehaviour
             {
                 FalschGeraten.Play();
                 StartCoroutine(AnimateBackground("LOSE"));
+                if (HideRichtigFalschSecCoroutine != null)
+                    StopCoroutine(HideRichtigFalschSecCoroutine);
+                HideRichtigFalschSecCoroutine = StartCoroutine(HideRichtigFalschSec());
             }
             // Zeit vorbei
             else if (indicator == "-1")
@@ -550,6 +581,9 @@ public class TabuClient : MonoBehaviour
             {
                 Erraten.Play();
                 StartCoroutine(AnimateBackground("WIN"));
+                if (HideRichtigFalschSecCoroutine != null)
+                    StopCoroutine(HideRichtigFalschSecCoroutine);
+                HideRichtigFalschSecCoroutine = StartCoroutine(HideRichtigFalschSec());
                 SetTeamPoints("ROT", teamrotPunkte);
                 SetTeamPoints("BLAU", teamblauPunkte);
             }
@@ -591,7 +625,9 @@ public class TabuClient : MonoBehaviour
             {
                 FalschGeraten.Play();
                 StartCoroutine(AnimateBackground("LOSE"));
-
+                if (HideRichtigFalschSecCoroutine != null)
+                    StopCoroutine(HideRichtigFalschSecCoroutine);
+                HideRichtigFalschSecCoroutine = StartCoroutine(HideRichtigFalschSec());
                 SetTeamPoints("ROT", teamrotPunkte);
                 SetTeamPoints("BLAU", teamblauPunkte);
                 if (teamblauPunkte <= 0 || teamrotPunkte <= 0)
@@ -609,6 +645,9 @@ public class TabuClient : MonoBehaviour
             {
                 Erraten.Play();
                 StartCoroutine(AnimateBackground("WIN"));
+                if (HideRichtigFalschSecCoroutine != null)
+                    StopCoroutine(HideRichtigFalschSecCoroutine);
+                HideRichtigFalschSecCoroutine = StartCoroutine(HideRichtigFalschSec());
                 SetTeamPoints("ROT", teamrotPunkte);
                 SetTeamPoints("BLAU", teamblauPunkte);
             }

@@ -36,6 +36,7 @@ public class TabuServer : MonoBehaviour
     private GameObject RundeStarten;
     private TMP_InputField TimerSec; 
     private int timerseconds;
+    private Coroutine HideRichtigFalschSecCoroutine;
 
     private List<string> teamrotList;
     private List<string> teamblauList;
@@ -331,6 +332,8 @@ public class TabuServer : MonoBehaviour
     }
     private void SetKreuzClient(Player p, string data)
     {
+        if (selectedItem.geheimwort != data)
+            return;
         SetKreuz(p.name);
     }
     public void SetKreuzServer()
@@ -339,6 +342,33 @@ public class TabuServer : MonoBehaviour
             return;
         SetKreuz(Config.PLAYER_NAME);
     }
+    private IEnumerator HideRichtigFalschSec()
+    {
+        Richtig.SetActive(false);
+        Falsch.SetActive(false);
+        yield return new WaitForSeconds(1);
+        if (erklaerer == Config.PLAYER_NAME)
+        {
+            Richtig.SetActive(true);
+            Falsch.SetActive(true);
+        }
+        else if (TeamTurn.Equals("ROT") && teamblauList.Contains(Config.PLAYER_NAME))
+        {
+            Richtig.SetActive(false);
+            Falsch.SetActive(true);
+        }
+        else if (TeamTurn.Equals("BLAU") && teamrotList.Contains(Config.PLAYER_NAME))
+        {
+            Richtig.SetActive(false);
+            Falsch.SetActive(true);
+        }
+        else
+        {
+            Richtig.SetActive(false);
+            Falsch.SetActive(false);
+        }
+        yield break;
+    } 
     private void SetKreuz(string player)
     {
         if (!started)
@@ -636,6 +666,9 @@ public class TabuServer : MonoBehaviour
                 //Kreuze.transform.GetChild(0).gameObject.SetActive(true);
                 FalschGeraten.Play();
                 StartCoroutine(AnimateBackground("LOSE"));
+                if (HideRichtigFalschSecCoroutine != null)
+                    StopCoroutine(HideRichtigFalschSecCoroutine);
+                HideRichtigFalschSecCoroutine = StartCoroutine(HideRichtigFalschSec());
                 if (TeamTurn.Equals("ROT"))
                     teamrotPunkte--;
                 else if (TeamTurn.Equals("BLAU"))
@@ -709,7 +742,9 @@ public class TabuServer : MonoBehaviour
             {
                 FalschGeraten.Play();
                 StartCoroutine(AnimateBackground("LOSE"));
-
+                if (HideRichtigFalschSecCoroutine != null)
+                    StopCoroutine(HideRichtigFalschSecCoroutine);
+                HideRichtigFalschSecCoroutine = StartCoroutine(HideRichtigFalschSec());
                 if (TeamTurn.Equals("ROT"))
                     SetTeamPoints("ROT", teamrotPunkte -= 10);
                 if (TeamTurn.Equals("BLAU"))
