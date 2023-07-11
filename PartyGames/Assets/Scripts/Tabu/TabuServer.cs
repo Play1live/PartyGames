@@ -87,7 +87,7 @@ public class TabuServer : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        ServerUtils.BroadcastImmediate("#ServerClosed");
+        ServerUtils.BroadcastImmediate(Config.GLOBAL_TITLE + "#ServerClosed");
         Logging.log(Logging.LogType.Normal, "TabuServer", "OnApplicationQuit", "Server wird geschlossen.");
         Config.SERVER_TCP.Server.Close();
     }
@@ -101,12 +101,19 @@ public class TabuServer : MonoBehaviour
     /// <param name="data">Nachricht</param>
     private void OnIncommingData(Player spieler, string data)
     {
+        if (data.StartsWith(Config.GAME_TITLE + "#"))
+            data = data.Substring(Config.GAME_TITLE.Length);
+        else
+            Logging.log(Logging.LogType.Error, "TabuServer", "OnIncommingData", "Wrong Command format: " + data);
+
         string cmd;
         if (data.Contains(" "))
+        {
             cmd = data.Split(' ')[0];
+            data = data.Substring(cmd.Length + 1);
+        }
         else
             cmd = data;
-        data = data.Replace(cmd + " ", "");
 
         Commands(spieler, data, cmd);
     }
@@ -347,7 +354,12 @@ public class TabuServer : MonoBehaviour
         Richtig.SetActive(false);
         Falsch.SetActive(false);
         yield return new WaitForSeconds(1);
-        if (erklaerer == Config.PLAYER_NAME)
+        if (!started)
+        {
+            Richtig.SetActive(false);
+            Falsch.SetActive(false);
+        }
+        else if (erklaerer == Config.PLAYER_NAME)
         {
             Richtig.SetActive(true);
             Falsch.SetActive(true);
@@ -611,6 +623,13 @@ public class TabuServer : MonoBehaviour
     }
     private void RundeEnde(int indicator, string playername)
     {
+        Logging.log(Logging.LogType.Normal, "TabuServer", "RundeEnde", 
+            "Indicator: " + indicator
+            + " Player: " + playername
+            + " Wort: " + selectedItem.geheimwort
+            + " Blau: " + teamblauPunkte
+            + " Rot: " + teamrotPunkte);
+
         if (TabuSpiel.GameType.Equals("1 Wort"))
         {
             // Falsch gedrückt
@@ -688,6 +707,9 @@ public class TabuServer : MonoBehaviour
             {
                 Erraten.Play();
                 StartCoroutine(AnimateBackground("WIN"));
+                if (HideRichtigFalschSecCoroutine != null)
+                    StopCoroutine(HideRichtigFalschSecCoroutine);
+                HideRichtigFalschSecCoroutine = StartCoroutine(HideRichtigFalschSec());
                 if (TeamTurn.Equals("ROT"))
                 {
                     teamrotPunkte += 1;
@@ -755,7 +777,7 @@ public class TabuServer : MonoBehaviour
             // Zeit vorbei
             else if (indicator == -1)
             {
-                FalschGeraten.Play();
+                //FalschGeraten.Play();
                 //StartCoroutine(AnimateBackground("LOSE"));
                 EndTurn();
             }
@@ -764,10 +786,13 @@ public class TabuServer : MonoBehaviour
             {
                 Erraten.Play();
                 StartCoroutine(AnimateBackground("WIN"));
+                if (HideRichtigFalschSecCoroutine != null)
+                    StopCoroutine(HideRichtigFalschSecCoroutine);
+                HideRichtigFalschSecCoroutine = StartCoroutine(HideRichtigFalschSec());
                 if (TeamTurn.Equals("ROT"))
-                    SetTeamPoints("ROT", teamrotPunkte += 30);
+                    SetTeamPoints("ROT", teamrotPunkte += 20);
                 else if (TeamTurn.Equals("BLAU"))
-                    SetTeamPoints("BLAU", teamblauPunkte += 30);
+                    SetTeamPoints("BLAU", teamblauPunkte += 20);
             }
             else
                 Logging.log(Logging.LogType.Error, "TabuServer", "RundeEnde", "Fehler: " + indicator + " " + TeamTurn);

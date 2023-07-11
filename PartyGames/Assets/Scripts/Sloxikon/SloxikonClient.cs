@@ -33,7 +33,7 @@ public class SloxikonClient : MonoBehaviour
             return;
 
         InitAnzeigen();
-        SendToServer("#JoinSloxikon");
+        ClientUtils.SendToServer("#JoinSloxikon");
 
         StartCoroutine(TestConnectionToServer());
     }
@@ -71,13 +71,13 @@ public class SloxikonClient : MonoBehaviour
 
     private void OnApplicationFocus(bool focus)
     {
-        SendToServer("#ClientFocusChange " + focus);
+        ClientUtils.SendToServer("#ClientFocusChange " + focus);
     }
 
     private void OnApplicationQuit()
     {
         Logging.log(Logging.LogType.Normal, "SloxikonClient", "OnApplicationQuit", "Client wird geschlossen.");
-        SendToServer("#ClientClosed");
+        ClientUtils.SendToServer("#ClientClosed");
         CloseSocket();
     }
 
@@ -94,7 +94,7 @@ public class SloxikonClient : MonoBehaviour
     {
         while (Config.CLIENT_STARTED)
         {
-            SendToServer("#TestConnection");
+            ClientUtils.SendToServer("#TestConnection");
             yield return new WaitForSeconds(10);
         }
         yield break;
@@ -116,41 +116,24 @@ public class SloxikonClient : MonoBehaviour
     #endregion
     #region Kommunikation
     /// <summary>
-    /// Sendet eine Nachricht an den Server.
-    /// </summary>
-    /// <param name="data"></param>
-    public void SendToServer(string data)
-    {
-        if (!Config.CLIENT_STARTED)
-            return;
-
-        try
-        {
-            NetworkStream stream = Config.CLIENT_TCP.GetStream();
-            StreamWriter writer = new StreamWriter(stream);
-            writer.WriteLine(data);
-            writer.Flush();
-        }
-        catch (Exception e)
-        {
-            Logging.log(Logging.LogType.Warning, "SloxikonClient", "SendToServer", "Nachricht an Server konnte nicht gesendet werden.", e);
-            Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server wurde verloren.";
-            CloseSocket();
-            SceneManager.LoadSceneAsync("StartUp");
-        }
-    }
-    /// <summary>
     /// Einkommende Nachrichten die vom Sever
     /// </summary>
     /// <param name="data"></param>
     private void OnIncomingData(string data)
     {
+        if (data.StartsWith(Config.GAME_TITLE + "#"))
+            data = data.Substring(Config.GAME_TITLE.Length);
+        else
+            Logging.log(Logging.LogType.Error, "SloxikonClient", "OnIncommingData", "Wrong Command format: " + data);
+
         string cmd;
         if (data.Contains(" "))
+        {
             cmd = data.Split(' ')[0];
+            data = data.Substring(cmd.Length + 1);
+        }
         else
             cmd = data;
-        data = data.Replace(cmd + " ", "");
 
         Commands(data, cmd);
     }
@@ -566,7 +549,7 @@ public class SloxikonClient : MonoBehaviour
     /// </summary>
     public void SpielerBuzzered()
     {
-        SendToServer("#SpielerBuzzered");
+        ClientUtils.SendToServer("#SpielerBuzzered");
     }
     /// <summary>
     /// Gibt den Buzzer frei
@@ -670,6 +653,6 @@ public class SloxikonClient : MonoBehaviour
     /// <param name="input"></param>
     public void SpielerAntwortEingabeInput(TMP_InputField input)
     {
-        SendToServer("#SpielerAntwortEingabe "+input.text);
+        ClientUtils.SendToServer("#SpielerAntwortEingabe "+input.text);
     }
 }

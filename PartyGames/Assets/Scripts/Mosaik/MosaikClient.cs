@@ -32,7 +32,7 @@ public class MosaikClient : MonoBehaviour
 
         if (!Config.CLIENT_STARTED)
             return;
-        SendToServer("#JoinMosaik");
+        ClientUtils.SendToServer("#JoinMosaik");
 
         StartCoroutine(TestConnectionToServer());
     }
@@ -71,13 +71,13 @@ public class MosaikClient : MonoBehaviour
 
     private void OnApplicationFocus(bool focus)
     {
-        SendToServer("#ClientFocusChange " + focus);
+        ClientUtils.SendToServer("#ClientFocusChange " + focus);
     }
 
     private void OnApplicationQuit()
     {
         Logging.log(Logging.LogType.Normal, "MosaikClient", "OnApplicationQuit", "Client wird geschlossen.");
-        SendToServer("#ClientClosed");
+        ClientUtils.SendToServer("#ClientClosed");
         CloseSocket();
     }
 
@@ -93,7 +93,7 @@ public class MosaikClient : MonoBehaviour
     {
         while (Config.CLIENT_STARTED)
         {
-            SendToServer("#TestConnection");
+            ClientUtils.SendToServer("#TestConnection");
             yield return new WaitForSeconds(10);
         }
         yield break;
@@ -115,41 +115,24 @@ public class MosaikClient : MonoBehaviour
     #endregion
     #region Kommunikation
     /// <summary>
-    /// Sendet eine Nachricht an den Server.
-    /// </summary>
-    /// <param name="data">Nachricht</param>
-    private void SendToServer(string data)
-    {
-        if (!Config.CLIENT_STARTED)
-            return;
-
-        try
-        {
-            NetworkStream stream = Config.CLIENT_TCP.GetStream();
-            StreamWriter writer = new StreamWriter(stream);
-            writer.WriteLine(data);
-            writer.Flush();
-        }
-        catch (Exception e)
-        {
-            Logging.log(Logging.LogType.Warning, "MosaikClient", "SendToServer", "Nachricht an Server konnte nicht gesendet werden.", e);
-            Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server wurde verloren.";
-            CloseSocket();
-            SceneManager.LoadSceneAsync("StartUp");
-        }
-    }
-    /// <summary>
     /// Einkommende Nachrichten die vom Sever
     /// </summary>
     /// <param name="data">Nachricht</param>
     private void OnIncomingData(string data)
     {
+        if (data.StartsWith(Config.GAME_TITLE + "#"))
+            data = data.Substring(Config.GAME_TITLE.Length);
+        else
+            Logging.log(Logging.LogType.Error, "MosaikClient", "OnIncommingData", "Wrong Command format: " + data);
+
         string cmd;
         if (data.Contains(" "))
+        {
             cmd = data.Split(' ')[0];
+            data = data.Substring(cmd.Length + 1);
+        }
         else
             cmd = data;
-        data = data.Replace(cmd + " ", "");
 
         Commands(data, cmd);
     }
@@ -280,7 +263,7 @@ public class MosaikClient : MonoBehaviour
     /// </summary>
     public void SpielerBuzzered()
     {
-        SendToServer("#SpielerBuzzered");
+        ClientUtils.SendToServer("#SpielerBuzzered");
     }
     /// <summary>
     /// Gibt den Buzzer frei
@@ -419,7 +402,7 @@ public class MosaikClient : MonoBehaviour
             {
                 Bild[0].transform.parent.gameObject.GetComponent<Image>().sprite = Config.MOSAIK_SPIEL.getBeispiel();
                 Bild[0].transform.parent.gameObject.SetActive(einblenden);
-                SendToServer("#SpielerHatBildGeladen success");
+                ClientUtils.SendToServer("#SpielerHatBildGeladen success");
             }
             // Unbekanntes Bild
             else
@@ -429,7 +412,7 @@ public class MosaikClient : MonoBehaviour
                 {
                     Bild[0].transform.parent.gameObject.GetComponent<Image>().sprite = geladeneBilder[geladeneURls.IndexOf(url)];
                     Bild[0].transform.parent.gameObject.SetActive(einblenden);
-                    SendToServer("#SpielerHatBildGeladen success");
+                    ClientUtils.SendToServer("#SpielerHatBildGeladen success");
                 }
                 // Sonst Bild herunterladen
                 else
@@ -512,7 +495,7 @@ public class MosaikClient : MonoBehaviour
         if (www.result != UnityWebRequest.Result.Success)
         {
             Logging.log(Logging.LogType.Warning, "MosaikClient", "LoadImageFromWeb", "Lädt Bild aus dem Internet herunter: " + imageUrl);
-            SendToServer("#SpielerHatBildGeladen error");
+            ClientUtils.SendToServer("#SpielerHatBildGeladen error");
         }
         else
         {
@@ -520,7 +503,7 @@ public class MosaikClient : MonoBehaviour
             Sprite sprite1 = Sprite.Create(myTexture1, new Rect(0, 0, myTexture1.width, myTexture1.height), new Vector2(0.5f, 0.5f), 100);
             geladeneURls.Add(imageUrl);
             geladeneBilder.Add(sprite1);
-            SendToServer("#SpielerHatBildGeladen success");
+            ClientUtils.SendToServer("#SpielerHatBildGeladen success");
 
             Bild[0].transform.parent.gameObject.GetComponent<Image>().sprite = geladeneBilder[geladeneURls.IndexOf(imageUrl)];
             Bild[0].transform.parent.gameObject.SetActive(true);
@@ -635,14 +618,14 @@ public class MosaikClient : MonoBehaviour
         if (www.result != UnityWebRequest.Result.Success)
         {
             Logging.log(Logging.LogType.Warning, "MosaikClient", "LoadImageFromWebIntoScene", "Bild konnte nicht geladen werden: " + www.error);
-            SendToServer("#SpielerHatBildGeladen error");
+            ClientUtils.SendToServer("#SpielerHatBildGeladen error");
         }
         else
         {
             Texture2D myTexture2 = ((DownloadHandlerTexture)www.downloadHandler).texture;
             Sprite sprite2 = Sprite.Create(myTexture2, new Rect(0, 0, myTexture2.width, myTexture2.height), new Vector2(0.5f, 0.5f), 100);
 
-            SendToServer("#SpielerHatBildGeladen success");
+            ClientUtils.SendToServer("#SpielerHatBildGeladen success");
 
             Bild[0].transform.parent.gameObject.GetComponent<Image>().sprite = sprite2;
         }

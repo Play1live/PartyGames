@@ -18,6 +18,7 @@ public class StartupServer : MonoBehaviour
     [SerializeField] GameObject ServerControlGameSelection;
     [SerializeField] GameObject ServerControlControlField;
     [SerializeField] GameObject[] SpielerAnzeigeLobby;
+    [SerializeField] GameObject ChatCloneObject;
 
     [SerializeField] GameObject gesperrtfuerSekundenAnzeige;
     DateTime allowedStartTime;
@@ -29,6 +30,7 @@ public class StartupServer : MonoBehaviour
 
     void Start()
     {
+        Config.GAME_TITLE = "Startup";
         UpdateSpieler();
         StartCoroutine(ServerUtils.Broadcast());
     }
@@ -136,7 +138,7 @@ public class StartupServer : MonoBehaviour
 
     void OnApplicationQuit()
     {
-        ServerUtils.BroadcastImmediate("#ServerClosed");
+        ServerUtils.BroadcastImmediate(Config.GLOBAL_TITLE + "#ServerClosed");
         Logging.log(Logging.LogType.Normal, "StartupServer", "OnApplicationQuit", "Server wird geschlossen.");
         //Config.SERVER_TCP.Server.Close();
         Config.SERVER_TCP.Stop();
@@ -152,7 +154,7 @@ public class StartupServer : MonoBehaviour
         Logging.log(Logging.LogType.Normal, "StartupServer", "ZurueckZumHauptmenue", "Spieler wird ins Hauptmenü geladen und Server- & Client-Verbindung wird beendet.");
         if (Config.isServer && Config.SERVER_STARTED)
         {
-            ServerUtils.BroadcastImmediate("#ServerClosed");
+            ServerUtils.BroadcastImmediate(Config.GLOBAL_TITLE + "#ServerClosed");
             Config.SERVER_TCP.Stop();
             Config.SERVER_STARTED = false;
             SceneManager.LoadSceneAsync("Startup");
@@ -268,64 +270,6 @@ public class StartupServer : MonoBehaviour
     }
     #endregion
     #region Kommunikation
-    /*/// <summary>
-    /// Sendet eine Nachricht an den angegebenen Spieler.
-    /// </summary>
-    /// <param name="data">Nachricht</param>
-    /// <param name="sc">Spieler</param>
-    private void SendMSG(string data, Player sc)
-    {
-        try
-        {
-            StreamWriter writer = new StreamWriter(sc.tcp.GetStream());
-            writer.WriteLine(data);
-            writer.Flush();
-        }
-        catch (Exception e)
-        {
-            Logging.log(Logging.LogType.Warning, "Server", "SendMSG", "Nachricht an Client: " + sc.id + " (" + sc.name + ") konnte nicht gesendet werden.", e);
-            // Verbindung zum Client wird getrennt
-            ClientClosed(sc);
-        }
-    }
-    /// <summary>
-    /// Sendet eine Nachticht an alle übergebenen Spieler
-    /// </summary>
-    /// <param name="data">Nachricht</param>
-    /// <param name="spieler">Spielerliste</param>
-    private void Broadcast(string data, Player[] spieler)
-    {
-        foreach (Player sc in spieler)
-        {
-            if (sc.isConnected)
-                SendMSG(data, sc);
-        }
-    }
-    /// <summary>
-    /// Sendet eine Nachticht an alle verbundenen Spieler. (Config.PLAYLIST)
-    /// </summary>
-    /// <param name="data">Nachricht</param>
-    private void Broadcast(string data)
-    {
-        foreach (Player sc in Config.PLAYERLIST)
-        {
-            if (sc.isConnected)
-                SendMSG(data, sc);
-        }
-    }
-    /// <summary>
-    /// Löscht Daten des Spielers von dem die Verbindung getrennt wurde
-    /// </summary>
-    /// <param name="player">Spieler</param>
-    private void ClientClosed(Player player)
-    {
-        player.icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
-        player.name = "";
-        player.points = 0;
-        player.crowns = 0;
-        player.isConnected = false;
-        player.isDisconnected = true;
-    }*/
     /// <summary>
     /// Einkommende Nachrichten die von Spielern an den Server gesendet werden. 
     /// Extrahiert die Commands und gibt die in Commands() weiter
@@ -334,12 +278,19 @@ public class StartupServer : MonoBehaviour
     /// <param name="data">Daten inklusive Command</param>
     private void OnIncommingData(Player spieler, string data)
     {
+        if (data.StartsWith(Config.GAME_TITLE + "#"))
+            data = data.Substring(Config.GAME_TITLE.Length);
+        else
+            Logging.log(Logging.LogType.Error, "StartupServer", "OnIncommingData", "Wrong Command format: " + data);
+
         string cmd;
         if (data.Contains(" "))
+        {
             cmd = data.Split(' ')[0];
+            data = data.Substring(cmd.Length + 1);
+        }
         else
             cmd = data;
-        data = data.Replace(cmd + " ", "");
 
         Commands(spieler, data, cmd);
     }
@@ -390,13 +341,16 @@ public class StartupServer : MonoBehaviour
                 PlayerPing(player, data);
                 //UpdatePing();
                 break;
+            case "#ClientAddChatMSG":
+                ClientAddChatMSG(player, data);
+                break;
 
             // Minigames
-            case "#StartTickTackToe":
-                StartTickTackToe(player);
+            case "#StartTicTacToe":
+                StartTicTacToe(player);
                 break;
-            case "#TickTackToeSpielerZug":
-                TickTackToeSpielerZug(player, data);
+            case "#TicTacToeSpielerZug":
+                TicTacToeSpielerZug(player, data);
                 break;
         }
     }
@@ -1165,29 +1119,29 @@ public class StartupServer : MonoBehaviour
         switch(drop.options[drop.value]+"")
         {
             default:
-                SwitchToTickTackToe();
+                SwitchToTicTacToe();
                 break;
-            case "TickTackToe":
-                SwitchToTickTackToe();
+            case "TicTacToe":
+                SwitchToTicTacToe();
                 break;
         }
     }
-    #region TickTackToe
+    #region TicTacToe
     /// <summary>
-    /// Zeigt TickTackToe für alle Spieler an
+    /// Zeigt TicTacToe für alle Spieler an
     /// </summary>
-    private void SwitchToTickTackToe()
+    private void SwitchToTicTacToe()
     {
         SpielerMiniGames[0].SetActive(true);
-        ServerUtils.AddBroadcast("#SwitchToTickTackToe");
+        ServerUtils.AddBroadcast("#SwitchToTicTacToe");
     }
     /// <summary>
     /// Bestimmt den ersten Zug gegen einen Spieler
     /// </summary>
     /// <param name="player">Spieler</param>
-    private void StartTickTackToe(Player player)
+    private void StartTicTacToe(Player player)
     {
-        Logging.log(Logging.LogType.Debug, "StartupServer", "StartTickTackToe", "Spieler " + player.name + " startet TickTackToe.");
+        Logging.log(Logging.LogType.Debug, "StartupServer", "StartTicTacToe", "Spieler " + player.name + " startet TicTacToe.");
         string msg = "";
         int beginner = UnityEngine.Random.Range(0, 2);
         int initzug = UnityEngine.Random.Range(1,10);
@@ -1200,32 +1154,32 @@ public class StartupServer : MonoBehaviour
             else
                 msg = msg + "[" + i + "][" + i + "]";
         }
-        ServerUtils.SendMSG("#TickTackToeZug " + msg, player);
+        ServerUtils.SendMSG("#TicTacToeZug " + msg, player);
     }
     /// <summary>
     /// Lässt den Server einen Zug machen & prüft ob das Spiel beendet ist
     /// </summary>
     /// <param name="player">Spieler</param>
-    /// <param name="data">TickTackToe Daten</param>
-    private void TickTackToeSpielerZug(Player player, string data)
+    /// <param name="data">TicTacToe Daten</param>
+    private void TicTacToeSpielerZug(Player player, string data)
     {
         // Freie Felder berechnen
-        List<int> freieFelder = TickTackToe.GetFreieFelder(data);
-        List<string> belegteFelder = TickTackToe.GetBelegteFelder(data);
+        List<int> freieFelder = TicTacToe.GetFreieFelder(data);
+        List<string> belegteFelder = TicTacToe.GetBelegteFelder(data);
         // CheckForWin
-        if (TickTackToe.CheckForEnd(freieFelder, belegteFelder))
+        if (TicTacToe.CheckForEnd(freieFelder, belegteFelder))
         {
-            ServerUtils.SendMSG("#TickTackToeZugEnde |" + TickTackToe.getResult(belegteFelder) + "| " + data, player);
+            ServerUtils.SendMSG("#TicTacToeZugEnde |" + TicTacToe.getResult(belegteFelder) + "| " + data, player);
             return;
         }
         // Ziehen
-        belegteFelder = TickTackToe.ServerZiehen(freieFelder, belegteFelder);
-        freieFelder = TickTackToe.GetFreieFelder(belegteFelder);
+        belegteFelder = TicTacToe.ServerZiehen(freieFelder, belegteFelder);
+        freieFelder = TicTacToe.GetFreieFelder(belegteFelder);
         //Check for End
-        if (TickTackToe.CheckForEnd(freieFelder, belegteFelder))
-            ServerUtils.SendMSG("#TickTackToeZugEnde |" + TickTackToe.getResult(belegteFelder) + "|" + TickTackToe.PrintBelegteFelder(belegteFelder), player);
+        if (TicTacToe.CheckForEnd(freieFelder, belegteFelder))
+            ServerUtils.SendMSG("#TicTacToeZugEnde |" + TicTacToe.getResult(belegteFelder) + "|" + TicTacToe.PrintBelegteFelder(belegteFelder), player);
         else
-            ServerUtils.SendMSG("#TickTackToeZug " + TickTackToe.PrintBelegteFelder(belegteFelder), player);
+            ServerUtils.SendMSG("#TicTacToeZug " + TicTacToe.PrintBelegteFelder(belegteFelder), player);
     }
     #endregion
     #endregion
@@ -1367,8 +1321,7 @@ public class StartupServer : MonoBehaviour
     public void StarteSpiel(string spieltitel)
     {
         Logging.log(Logging.LogType.Normal, "StartupServer", "StarteSpiel", "Spiel wird geladen: " + spieltitel);
-        Config.GAME_TITLE = spieltitel;
-
+        
         if (spieltitel == "Quiz" && Config.QUIZ_SPIEL.getSelected() == null)
             return;
         else if (spieltitel == "Listen" && Config.LISTEN_SPIEL.getSelected() == null)
@@ -1391,11 +1344,12 @@ public class StartupServer : MonoBehaviour
         {
             ServerUtils.AddBroadcast("#StarteSpiel " + spieltitel); // oder BroadcastImmediate
             //SceneManager.LoadScene(spieltitel);
+            //Config.GAME_TITLE = spieltitel;
         }
         catch
         {
             Logging.log(Logging.LogType.Error, "StartupServer", "StarteSpiel", "Unbekanntes Spiel soll geladen werden. Server wird geschlossen. Spiel: " + spieltitel);
-            ServerUtils.BroadcastImmediate("#ServerClosed");
+            ServerUtils.BroadcastImmediate(Config.GLOBAL_TITLE + "#ServerClosed");
             Logging.log(Logging.LogType.Normal, "StartupServer", "StarteSpiel", "Server wird geschlossen.");
             Config.SERVER_TCP.Stop();
             SceneManager.LoadSceneAsync("Startup");
@@ -1450,6 +1404,58 @@ public class StartupServer : MonoBehaviour
                 TabuSpiel.GameType = drop.options[drop.value].text;
                 break;
         }
+    }
+    #endregion
+    #region Chat
+    public void ServerAddChatMSG(TMP_InputField input)
+    {
+        if (Config.CLIENT_STARTED)
+            return;
+        if (input.text.Length == 0)
+            return;
+        string msg = input.text.Replace("*", "").Replace("|", "");
+        input.text = "";
+        AddChatMSG(Config.SERVER_PLAYER, msg);
+    }
+    private void ClientAddChatMSG(Player player, string data)
+    {
+        if (data.Length == 0)
+            return;
+        string msg = data.Replace("*", "").Replace("|", "");
+        AddChatMSG(player, msg);
+    }
+    private void AddChatMSG(Player player, string msg)
+    {
+        Transform content = ChatCloneObject.transform.parent;
+        AddMSG(player, msg, content);
+
+        string lastmsgs = "";
+        for (int i = content.childCount-1; i > Mathf.Max(0, content.childCount-10); i--)
+        {
+            lastmsgs += "|" + content.GetChild(i).name + "*" + content.GetChild(i).GetComponentInChildren<TMP_Text>().text;
+        }
+        if (lastmsgs.Length > 1)
+            lastmsgs = lastmsgs.Substring(1);
+
+        ServerUtils.AddBroadcast("#ChatMSGs " + lastmsgs);
+    }
+    private void AddMSG(Player player, string msg, Transform content)
+    {
+        GameObject newObject = GameObject.Instantiate(content.GetChild(0).gameObject, content, false);
+        newObject.transform.localScale = new Vector3(1, 1, 1);
+        newObject.name = (content.childCount+1) + "*" + player.icon.name;
+        newObject.SetActive(true);
+        newObject.GetComponentInChildren<Image>().sprite = player.icon;
+        newObject.GetComponentInChildren<TMP_Text>().text = msg;
+        StartCoroutine(ChangeMSGText(newObject, msg));
+    }
+    private IEnumerator ChangeMSGText(GameObject go, string data)
+    {
+        yield return null;
+        go.GetComponentInChildren<TMP_Text>().text = data +"\n";
+        yield return null;
+        go.GetComponentInChildren<TMP_Text>().text = data;
+        yield break;
     }
     #endregion
 

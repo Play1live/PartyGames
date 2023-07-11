@@ -84,91 +84,13 @@ public class MenschAergerDichNichtServer : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        ServerUtils.BroadcastImmediate("#ServerClosed");
+        ServerUtils.BroadcastImmediate(Config.GLOBAL_TITLE + "#ServerClosed");
         Logging.log(Logging.LogType.Normal, "MenschÄrgerDichNichtServer", "OnApplicationQuit", "Server wird geschlossen.");
         Config.SERVER_TCP.Server.Close();
     }
 
     #region Server Stuff  
     #region Kommunikation
-    /*
-    IEnumerator NewBroadcast()
-    {
-        while (true)
-        {
-            // Broadcastet alle MSGs nacheinander
-            if (broadcastmsgs.Count != 0)
-            {
-                string msg = broadcastmsgs[0];
-                broadcastmsgs.RemoveAt(0);
-                Broadcast(msg);
-                yield return null;
-            }
-            yield return new WaitForSeconds(0.01f);
-        }
-        yield break;
-    }
-    /// <summary>
-    /// Sendet eine Nachricht an den übergebenen Spieler
-    /// </summary>
-    /// <param name="data">Nachricht</param>
-    /// <param name="sc">Spieler</param>
-    private void SendMSG(string data, Player sc)
-    {
-        try
-        {
-            StreamWriter writer = new StreamWriter(sc.tcp.GetStream());
-            writer.WriteLine(data);
-            writer.Flush();
-        }
-        catch (Exception e)
-        {
-            Logging.log(Logging.LogType.Warning, "MenschÄrgerDichNichtServer", "SendMSG", "Nachricht an Client: " + sc.id + " (" + sc.name + ") konnte nicht gesendet werden.", e);
-            // Verbindung zum Client wird getrennt
-            ClientClosed(sc);
-        }
-    }
-    /// <summary>
-    /// Sendet eine Nachricht an alle Spieler der liste
-    /// </summary>
-    /// <param name="data">Nachricht</param>
-    /// <param name="spieler">Spielerliste</param>
-    private void Broadcast(string data, Player[] spieler)
-    {
-        foreach (Player sc in spieler)
-        {
-            if (sc.isConnected)
-                SendMSG(data, sc);
-        }
-    }
-    /// <summary>
-    /// Sendet eine Nachricht an alle verbundenen Spieler
-    /// </summary>
-    /// <param name="data">Nachricht</param>
-    private void Broadcast(string data)
-    {
-        foreach (Player sc in Config.PLAYERLIST)
-        {
-            if (sc.isConnected)
-                SendMSG(data, sc);
-        }
-    }
-    private void BroadcastNew(string data)
-    {
-        broadcastmsgs.Add(data);
-    }
-    /// <summary>
-    /// Spieler beendet das Spiel
-    /// </summary>
-    /// <param name="player">Spieler</param>
-    private void ClientClosed(Player player)
-    {
-        player.icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
-        player.name = "";
-        player.points = 0;
-        player.isConnected = false;
-        player.isDisconnected = true;
-    }*/
     /// <summary>
     /// Einkommende Nachrichten die von Spielern an den Server gesendet werden
     /// </summary>
@@ -176,12 +98,19 @@ public class MenschAergerDichNichtServer : MonoBehaviour
     /// <param name="data">Nachricht</param>
     private void OnIncommingData(Player spieler, string data)
     {
+        if (data.StartsWith(Config.GAME_TITLE + "#"))
+            data = data.Substring(Config.GAME_TITLE.Length);
+        else
+            Logging.log(Logging.LogType.Error, "MenschAergerDichNichtServer", "OnIncommingData", "Wrong Command format: " + data);
+
         string cmd;
         if (data.Contains(" "))
+        {
             cmd = data.Split(' ')[0];
+            data = data.Substring(cmd.Length + 1);
+        }
         else
             cmd = data;
-        data = data.Replace(cmd + " ", "");
 
         Commands(spieler, data, cmd);
     }

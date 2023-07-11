@@ -52,7 +52,7 @@ public class TabuClient : MonoBehaviour
     {
         if (!Config.CLIENT_STARTED)
             return;
-        SendToServer("#JoinTabu");
+        ClientUtils.SendToServer("#JoinTabu");
         InitGame();
         StartCoroutine(TestConnectionToServer());
     }
@@ -76,13 +76,13 @@ public class TabuClient : MonoBehaviour
 
     private void OnApplicationFocus(bool focus)
     {
-        SendToServer("#ClientFocusChange " + focus);
+        ClientUtils.SendToServer("#ClientFocusChange " + focus);
     }
 
     private void OnApplicationQuit()
     {
         Logging.log(Logging.LogType.Normal, "TabuClient", "OnApplicationQuit", "Client wird geschlossen.");
-        SendToServer("#ClientClosed");
+        ClientUtils.SendToServer("#ClientClosed");
         CloseSocket();
     }
 
@@ -99,7 +99,7 @@ public class TabuClient : MonoBehaviour
         Logging.log(Logging.LogType.Debug, "TabuClient", "TestConnectionToServer", "Testet die Verbindumg zum Server.");
         while (Config.CLIENT_STARTED)
         {
-            SendToServer("#TestConnection");
+            ClientUtils.SendToServer("#TestConnection");
             yield return new WaitForSeconds(10);
         }
         yield break;
@@ -119,41 +119,24 @@ public class TabuClient : MonoBehaviour
     #endregion
     #region Kommunikation
     /// <summary>
-    /// Sendet eine Nachricht an den Server.
-    /// </summary>
-    /// <param name="data">Nachricht</param>
-    private void SendToServer(string data)
-    {
-        if (!Config.CLIENT_STARTED)
-            return;
-
-        try
-        {
-            NetworkStream stream = Config.CLIENT_TCP.GetStream();
-            StreamWriter writer = new StreamWriter(stream);
-            writer.WriteLine(data);
-            writer.Flush();
-        }
-        catch (Exception e)
-        {
-            Logging.log(Logging.LogType.Warning, "TabuClient", "SendToServer", "Nachricht an Server konnte nicht gesendet werden.", e);
-            Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server wurde verloren.";
-            CloseSocket();
-            SceneManager.LoadSceneAsync("Startup");
-        }
-    }
-    /// <summary>
     /// Einkommende Nachrichten die vom Sever
     /// </summary>
     /// <param name="data">Nachricht</param>
     private void OnIncomingData(string data)
     {
+        if (data.StartsWith(Config.GAME_TITLE + "#"))
+            data = data.Substring(Config.GAME_TITLE.Length);
+        else
+            Logging.log(Logging.LogType.Error, "TabuClient", "OnIncommingData", "Wrong Command format: " + data);
+
         string cmd;
         if (data.Contains(" "))
+        {
             cmd = data.Split(' ')[0];
+            data = data.Substring(cmd.Length + 1);
+        }
         else
             cmd = data;
-        data = data.Replace(cmd + " ", "");
 
         Commands(data, cmd);
     }
@@ -347,7 +330,7 @@ public class TabuClient : MonoBehaviour
     {
         if (!Config.CLIENT_STARTED)
             return;
-        SendToServer("#ClientJoinTeam " + team);
+        ClientUtils.SendToServer("#ClientJoinTeam " + team);
     }
     private int playercount;
     private void JoinTeam(string data)
@@ -412,14 +395,19 @@ public class TabuClient : MonoBehaviour
     {
         if (!Config.CLIENT_STARTED)
             return;
-        SendToServer("#ClientKreuz " + selectedItem.geheimwort);
+        ClientUtils.SendToServer("#ClientKreuz " + selectedItem.geheimwort);
     }
     private IEnumerator HideRichtigFalschSec()
     {
         Richtig.SetActive(false);
         Falsch.SetActive(false);
         yield return new WaitForSeconds(1);
-        if (erklaerer == Config.PLAYER_NAME)
+        if (!started)
+        {
+            Richtig.SetActive(false);
+            Falsch.SetActive(false);
+        }
+        else if (erklaerer == Config.PLAYER_NAME)
         {
             Richtig.SetActive(true);
             Falsch.SetActive(true);
@@ -445,13 +433,13 @@ public class TabuClient : MonoBehaviour
     {
         if (!Config.CLIENT_STARTED)
             return;
-        SendToServer("#ClientRichtigGeraten");
+        ClientUtils.SendToServer("#ClientRichtigGeraten");
     }
     public void SkipWort()
     {
         if (!Config.CLIENT_STARTED)
             return;
-        SendToServer("#ClientSkipWort");
+        ClientUtils.SendToServer("#ClientSkipWort");
     }
     private void DisplayKarte(bool show, string Titel, string verboteneWorte)
     {
@@ -636,7 +624,7 @@ public class TabuClient : MonoBehaviour
             // Zeit vorbei
             else if (indicator == "-1")
             {
-                FalschGeraten.Play();
+                //FalschGeraten.Play();
                 //StartCoroutine(AnimateBackground("LOSE"));
                 EndTurn();
             }
@@ -697,7 +685,7 @@ public class TabuClient : MonoBehaviour
     {
         if (!Config.CLIENT_STARTED)
             return;
-        SendToServer("#ClientStartRunde");
+        ClientUtils.SendToServer("#ClientStartRunde");
     }
     private void StartRunde(string data)
     {

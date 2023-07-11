@@ -259,6 +259,30 @@ public class Utils
             output = output.Substring(1);
         return "[" + output + "]";
     }
+    /// <summary>
+    /// Lässt nur Commands durch die sich im selben Game befinden.
+    /// Oder mit Allgemeinem Title. Sonst zurück zur Lobby oder so
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
+    public static string ParseCMDGameTitle(string data, bool isServer)
+    {
+        if (data.StartsWith(Config.GAME_TITLE + "#"))
+            data = data.Substring(Config.GAME_TITLE.Length);
+        else if (data.StartsWith(Config.GLOBAL_TITLE + "#"))
+            data = data.Substring(Config.GLOBAL_TITLE.Length);
+        else
+        {
+            Logging.log(Logging.LogType.Error, "Utils", "ParseCMDGameTitle", "Server: " + isServer + " Command format: " + data);
+            /*
+            if (isServer)
+                ServerUtils.BroadcastImmediate("");
+            else
+                ClientUtils.SendToServer("");*/
+        }
+
+        return data;
+    }
 }
 public class ServerUtils
 {
@@ -272,7 +296,7 @@ public class ServerUtils
     /// <param name="msg"></param>
     public static void AddBroadcast(string msg)
     {
-        broadcastmsgs.Add(msg);
+        broadcastmsgs.Add(Config.GAME_TITLE + msg);
         if (broadcastmsgs.Count >= 10)
             Logging.log(Logging.LogType.Warning, "ServerUtils", "AddBroadcast", "Zu viele MSGs im Puffer: " + broadcastmsgs.Count + " \n" + Utils.ListToString(broadcastmsgs).Replace(",", "\n"));
     }
@@ -291,18 +315,10 @@ public class ServerUtils
                 blockBroadcastMsgs = true;
                 string msg = broadcastmsgs[0];
                 broadcastmsgs.RemoveAt(0);
-                BroadcastImmediate(msg);
-                /*yield return null;
-                // Lädt zurück ins Hauptmenü
-                if (msg.Equals("#ZurueckInsHauptmenue"))
-                {
-                    yield return new WaitForSeconds(0.001f);
-                    SceneManager.LoadScene("Startup"); //Async?
-                }*/
+                BroadcastImmediate(Config.GLOBAL_TITLE + msg);
                 blockBroadcastMsgs = false;
             }
             yield return new WaitForSeconds(0.01f);
-            // Kürzer dann bugg MenschÄrgerDicHNicht
         }
     }
     /// <summary>
@@ -317,10 +333,14 @@ public class ServerUtils
                 SendMSG(msg, sc);
 
         // Lädt zurück ins Hauptmenü
-        if (msg.Equals("#ZurueckInsHauptmenue"))
+        if (msg.Equals(Config.GAME_TITLE + "#ZurueckInsHauptmenue"))
             SceneManager.LoadScene("Startup"); //Async?
-        else if (msg.StartsWith("#StarteSpiel "))
+        // Startet ein Spiel
+        else if (msg.StartsWith(Config.GAME_TITLE + "#StarteSpiel "))
+        {
+            Config.GAME_TITLE = msg.Split(' ')[1];
             SceneManager.LoadScene(msg.Split(' ')[1]);
+        }
         blockBroadcastMsgs = false;
     }
     /// <summary>
@@ -371,6 +391,8 @@ public class ClientUtils
     {
         if (!Config.CLIENT_STARTED)
             return;
+
+        data = Config.GAME_TITLE + data;
 
         try
         {

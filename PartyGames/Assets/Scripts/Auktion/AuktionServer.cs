@@ -71,7 +71,7 @@ public class AuktionServer : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        ServerUtils.BroadcastImmediate("#ServerClosed");
+        ServerUtils.BroadcastImmediate(Config.GLOBAL_TITLE + "#ServerClosed");
         Logging.log(Logging.LogType.Normal, "AuktionServer", "OnApplicationQuit", "Server wird geschlossen");
         Config.SERVER_TCP.Server.Close();
     }
@@ -114,63 +114,6 @@ public class AuktionServer : MonoBehaviour
     }
     #region Server Stuff
     #region Kommunikation
-    /*/// <summary>
-    /// Spieler beendet das Spiel
-    /// </summary>
-    /// <param name="player"></param>
-    private void ClientClosed(Player player)
-    {
-        player.icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
-        player.name = "";
-        player.points = 0;
-        player.isConnected = false;
-        player.isDisconnected = true;
-    }
-    /// <summary>
-    /// Sendet eine Nachricht an den übergebenen Spieler
-    /// </summary>
-    /// <param name="data"></param>
-    /// <param name="sc"></param>
-    private void SendMSG(string data, Player sc)
-    {
-        try
-        {
-            StreamWriter writer = new StreamWriter(sc.tcp.GetStream());
-            writer.WriteLine(data);
-            writer.Flush();
-        }
-        catch (Exception e)
-        {
-            Logging.log(Logging.LogType.Warning, "AuktionServer", "SendMSG", "Nachricht an Client: " + sc.id + " (" + sc.name + ") konnte nicht gesendet werden.", e);
-            // Verbindung zum Client wird getrennt
-            ClientClosed(sc);
-        }
-    }
-    /// <summary>
-    /// Sendet eine Nachricht an alle verbundenen Spieler
-    /// </summary>
-    /// <param name="data"></param>
-    /// <param name="spieler"></param>
-    private void Broadcast(string data, Player[] spieler)
-    {
-        foreach (Player sc in spieler)
-        {
-            if (sc.isConnected)
-                SendMSG(data, sc);
-        }
-    }
-    /// <summary>
-    /// Sendet eine Nachricht an alle verbundenen Spieler
-    /// </summary>
-    /// <param name="data"></param>
-    private void Broadcast(string data)
-    {
-        foreach (Player sc in Config.PLAYERLIST)
-        {
-            if (sc.isConnected)
-                SendMSG(data, sc);
-        }
-    }*/
     /// <summary>
     /// Einkommende Nachrichten die von Spielern an den Server gesendet werden.
     /// </summary>
@@ -178,12 +121,19 @@ public class AuktionServer : MonoBehaviour
     /// <param name="data"></param>
     private void OnIncommingData(Player spieler, string data)
     {
+        if (data.StartsWith(Config.GAME_TITLE + "#"))
+            data = data.Substring(Config.GAME_TITLE.Length);
+        else
+            Logging.log(Logging.LogType.Error, "AuktionServer", "OnIncommingData", "Wrong Command format: " + data);
+
         string cmd;
         if (data.Contains(" "))
+        {
             cmd = data.Split(' ')[0];
+            data = data.Substring(cmd.Length + 1);
+        }
         else
             cmd = data;
-        data = data.Replace(cmd + " ", "");
 
         Commands(spieler, data, cmd);
     }

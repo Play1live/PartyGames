@@ -22,6 +22,7 @@ public class Controller : MonoBehaviour
     private string DownloadPath = "";
 
     private string InstalledVersion = "";
+    private Coroutine DownloadCoroutine;
 
     [SerializeField] TMP_Text type;
     [SerializeField] Slider slider;
@@ -36,7 +37,7 @@ public class Controller : MonoBehaviour
     {
         if (quitApp == true)
         {
-            StopCoroutine(Download());
+            StopCoroutine(DownloadCoroutine);
 
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
@@ -58,7 +59,7 @@ public class Controller : MonoBehaviour
     private void OnApplicationQuit()
     {
         UnityEngine.Debug.Log("Updater wird beendet.");
-        StopCoroutine(Download());
+        StopCoroutine(DownloadCoroutine);
         type.text = "Wird beendet...";
     }
 
@@ -92,8 +93,8 @@ public class Controller : MonoBehaviour
             return;
         }
         DeleteOldFiles();
-        
-        StartCoroutine(Download());
+
+        DownloadCoroutine = StartCoroutine(Download());
     }
 
     IEnumerator Download()

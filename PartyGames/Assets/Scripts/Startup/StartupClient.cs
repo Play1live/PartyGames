@@ -23,6 +23,7 @@ public class StartupClient : MonoBehaviour
     private bool PingWarteAufAntwort = false;
     Coroutine UpdateClientGameVorschauCoroutine;
     private int connectedPlayer;
+    [SerializeField] GameObject ChatCloneObject;
 
     [SerializeField] GameObject UmbenennenFeld;
 
@@ -31,6 +32,7 @@ public class StartupClient : MonoBehaviour
 
     void OnEnable()
     {
+        Config.GAME_TITLE = "Startup";
         InitPlayerLobby();
 
         #region Client Verbindungsaufbau zum Server
@@ -243,12 +245,19 @@ public class StartupClient : MonoBehaviour
     /// <param name="data">Eingehende Nachricht</param>
     private void OnIncomingData(string data)
     {
+        if (data.StartsWith(Config.GAME_TITLE + "#"))
+            data = data.Substring(Config.GAME_TITLE.Length);
+        else
+            Logging.log(Logging.LogType.Error, "StartupClient", "OnIncommingData", "Wrong Command format: " + data);
+
         string cmd;
         if (data.Contains(" "))
+        {
             cmd = data.Split(' ')[0];
+            data = data.Substring(cmd.Length + 1);
+        }
         else
             cmd = data;
-        data = data.Replace(cmd + " ", "");
 
         Commands(data, cmd);
     }
@@ -312,20 +321,23 @@ public class StartupClient : MonoBehaviour
             case "#AllowNameChange":
                 AllowNameChange(data);
                 break;
+            case "#ChatMSGs":
+                AddChatMSG(data);
+                break;
 
             case "#StarteSpiel":
                 StarteSpiel(data);
                 break;
 
             // MiniGames
-            case "#SwitchToTickTackToe":
-                SwitchToTickTackToe();
+            case "#SwitchToTicTacToe":
+                SwitchToTicTacToe();
                 break;
-            case "#TickTackToeZug":
-                TickTackToeZug(data);
+            case "#TicTacToeZug":
+                TicTacToeZug(data);
                 break;
-            case "#TickTackToeZugEnde":
-                TickTackToeZugEnde(data);
+            case "#TicTacToeZugEnde":
+                TicTacToeZugEnde(data);
                 break;
         }
     }
@@ -793,14 +805,29 @@ public class StartupClient : MonoBehaviour
             ClientUtils.CloseSocket();
         }
     }
-    #region MiniGames
-    #region TickTackToe
     /// <summary>
-    /// Blendet das TickTackToe Spiel ein
+    /// Gibt ein Sprite eines Icons zurück das per Name gesucht wird
     /// </summary>
-    private void SwitchToTickTackToe()
+    /// <param name="name">Name des neuen Icons</param>
+    /// <returns>Sprite, null</returns>
+    private Sprite FindIconByName(string name)
     {
-        Logging.log(Logging.LogType.Normal, "StartupClient", "SwitchToTickTackToe", "MiniSpiel wird zu TickTackToe gewechselt.");
+        foreach (Sprite sprite in Config.PLAYER_ICONS)
+        {
+            if (sprite.name.Equals(name))
+                return sprite;
+        }
+        Logging.log(Logging.LogType.Warning, "StartupServer", "FindIconByName", "Icon " + name + " konnte nicht gefunden werden.");
+        return null;
+    }
+    #region MiniGames
+    #region TicTacToe
+    /// <summary>
+    /// Blendet das TicTacToe Spiel ein
+    /// </summary>
+    private void SwitchToTicTacToe()
+    {
+        Logging.log(Logging.LogType.Normal, "StartupClient", "SwitchToTicTacToe", "MiniSpiel wird zu TicTacToe gewechselt.");
         foreach (GameObject go in MiniGames)
             go.SetActive(false);
 
@@ -808,21 +835,21 @@ public class StartupClient : MonoBehaviour
         MiniGames[0].SetActive(true);
     }
     /// <summary>
-    /// Startet TickTackToe
+    /// Startet TicTacToe
     /// </summary>
-    public void StartTickTackToe()
+    public void StartTicTacToe()
     {
-        Logging.log(Logging.LogType.Normal, "StartupClient", "StartTickTackToe", "TickTackToe wird gestartet.");
+        Logging.log(Logging.LogType.Normal, "StartupClient", "StartTicTacToe", "TicTacToe wird gestartet.");
         ticktacktoe = "";
-        ClientUtils.SendToServer("#StartTickTackToe");
+        ClientUtils.SendToServer("#StartTicTacToe");
     }
     /// <summary>
     /// Zeigt den Zug des Servers an
     /// </summary>
     /// <param name="data">Daten zum Zug des Servers</param>
-    private void TickTackToeZug(string data)
+    private void TicTacToeZug(string data)
     {
-        Logging.log(Logging.LogType.Normal, "StartupClient", "TickTackToeZug", "TickTackToe Zug wird gewählt.");
+        Logging.log(Logging.LogType.Normal, "StartupClient", "TicTacToeZug", "TicTacToe Zug wird gewählt.");
         MiniGames[0].transform.GetChild(2).gameObject.SetActive(false);
         MiniGames[0].transform.GetChild(3).gameObject.SetActive(false);
         ticktacktoe = data;
@@ -845,30 +872,30 @@ public class StartupClient : MonoBehaviour
         }
     }
     /// <summary>
-    /// TickTackToe wird beendet. Statistik wird aktualisiert
+    /// TicTacToe wird beendet. Statistik wird aktualisiert
     /// </summary>
-    /// <param name="data">TickTackToe Result & Zug des Servers</param>
-    private void TickTackToeZugEnde(string data)
+    /// <param name="data">TicTacToe Result & Zug des Servers</param>
+    private void TicTacToeZugEnde(string data)
     {
-        Logging.log(Logging.LogType.Normal, "StartupClient", "TickTackToeZugEnde", "TickTackToe Spiel ist zuende.");
+        Logging.log(Logging.LogType.Normal, "StartupClient", "TicTacToeZugEnde", "TicTacToe Spiel ist zuende.");
         // Save Result
         string result = data.Split('|')[1];
         data = data.Split('|')[2];
         int type = Int32.Parse(ticktacktoeRes.Split(result)[1])+1;
         ticktacktoeRes = ticktacktoeRes.Replace(result + (type - 1) + result, result + type + result);
 
-        TickTackToeZug(data);
+        TicTacToeZug(data);
         MiniGames[0].transform.GetChild(2).gameObject.SetActive(true);
         MiniGames[0].transform.GetChild(3).gameObject.SetActive(true);
         MiniGames[0].transform.GetChild(4).GetComponent<TMP_Text>().text = "W:" + ticktacktoeRes.Split('W')[1] + " L:" + ticktacktoeRes.Split('L')[1] + " D:" + ticktacktoeRes.Split('D')[1];
     }
     /// <summary>
-    /// Macht einen Zug in TickTackToe & sendet die daten an den Server
+    /// Macht einen Zug in TicTacToe & sendet die daten an den Server
     /// </summary>
     /// <param name="button">Ausgewähltes Feld</param>
-    public void TickTackToeButtonPress(GameObject button)
+    public void TicTacToeButtonPress(GameObject button)
     {
-        Logging.log(Logging.LogType.Normal, "StartupClient", "TickTackToeButtonPress", "Spieler zieht.");
+        Logging.log(Logging.LogType.Normal, "StartupClient", "TicTacToeButtonPress", "Spieler zieht.");
         // Feld bereits belegt
         if (ticktacktoe.Replace("["+button.name+"]","|").Split('|')[1] != "")
         {
@@ -877,8 +904,50 @@ public class StartupClient : MonoBehaviour
         MiniGames[0].transform.GetChild(2).gameObject.SetActive(true);
 
         ticktacktoe = ticktacktoe.Replace("[" + button.name + "][" + button.name + "]", "["+ button.name + "]O[" + button.name + "]");
-        ClientUtils.SendToServer("#TickTackToeSpielerZug "+ ticktacktoe);
+        ClientUtils.SendToServer("#TicTacToeSpielerZug "+ ticktacktoe);
     }
     #endregion
-    #endregion        
+    #endregion
+
+    #region Chat
+    public void ClientAddChatMSG(TMP_InputField input)
+    {
+        if (Config.SERVER_STARTED)
+            return;
+        ClientUtils.SendToServer("#ClientAddChatMSG " + input.text);
+        input.text = "";
+    }
+    private void AddChatMSG(string msg)
+    {
+        Transform content = ChatCloneObject.transform.parent;
+        string[] daten = msg.Split('|');
+        for (int i = daten.Length-1; i >= 0; i--)
+        {
+            int contentId = content.childCount - 1;
+            if (Int32.Parse(content.GetChild(contentId).name.Split('*')[0]) < Int32.Parse(daten[i].Split('*')[0]))
+            {
+                Player player = new Player(-1);
+                player.icon = FindIconByName(daten[i].Split('*')[1]);
+                AddMSG(player, daten[i].Split('*')[2], content);
+            }
+        }
+    }
+    private void AddMSG(Player player, string msg, Transform content)
+    {
+        GameObject newObject = GameObject.Instantiate(content.GetChild(0).gameObject, content, false);
+        newObject.transform.localScale = new Vector3(1, 1, 1);
+        newObject.name = (content.childCount+1) + "*" + player.icon.name;
+        newObject.SetActive(true);
+        newObject.GetComponentInChildren<Image>().sprite = player.icon;
+        StartCoroutine(ChangeMSGText(newObject, msg));
+    }
+    private IEnumerator ChangeMSGText(GameObject go, string data)
+    {
+        yield return null;
+        go.GetComponentInChildren<TMP_Text>().text = data + "\n";
+        yield return null;
+        go.GetComponentInChildren<TMP_Text>().text = data;
+        yield break;
+    }
+    #endregion
 }

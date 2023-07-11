@@ -28,7 +28,7 @@ public class KniffelClient : MonoBehaviour
     {
         if (!Config.CLIENT_STARTED)
             return;
-        SendToServer("#JoinKniffel");
+        ClientUtils.SendToServer("#JoinKniffel");
 
         StartCoroutine(TestConnectionToServer());
     }
@@ -52,13 +52,13 @@ public class KniffelClient : MonoBehaviour
 
     private void OnApplicationFocus(bool focus)
     {
-        SendToServer("#ClientFocusChange " + focus);
+        ClientUtils.SendToServer("#ClientFocusChange " + focus);
     }
 
     private void OnApplicationQuit()
     {
         Logging.log(Logging.LogType.Normal, "KniffelClient", "OnApplicationQuit", "Client wird geschlossen.");
-        SendToServer("#ClientClosed");
+        ClientUtils.SendToServer("#ClientClosed");
         CloseSocket();
     }
 
@@ -75,7 +75,7 @@ public class KniffelClient : MonoBehaviour
         Logging.log(Logging.LogType.Debug, "KniffelClient", "TestConnectionToServer", "Testet die Verbindumg zum Server.");
         while (Config.CLIENT_STARTED)
         {
-            SendToServer("#TestConnection");
+            ClientUtils.SendToServer("#TestConnection");
             yield return new WaitForSeconds(10);
         }
         yield break;
@@ -95,41 +95,24 @@ public class KniffelClient : MonoBehaviour
     #endregion
     #region Kommunikation
     /// <summary>
-    /// Sendet eine Nachricht an den Server.
-    /// </summary>
-    /// <param name="data">Nachricht</param>
-    private void SendToServer(string data)
-    {
-        if (!Config.CLIENT_STARTED)
-            return;
-
-        try
-        {
-            NetworkStream stream = Config.CLIENT_TCP.GetStream();
-            StreamWriter writer = new StreamWriter(stream);
-            writer.WriteLine(data);
-            writer.Flush();
-        }
-        catch (Exception e)
-        {
-            Logging.log(Logging.LogType.Warning, "KniffelClient", "SendToServer", "Nachricht an Server konnte nicht gesendet werden.", e);
-            Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung zum Server wurde verloren.";
-            CloseSocket();
-            SceneManager.LoadSceneAsync("StartUp");
-        }
-    }
-    /// <summary>
     /// Einkommende Nachrichten die vom Sever
     /// </summary>
     /// <param name="data">Nachricht</param>
     private void OnIncomingData(string data)
     {
+        if (data.StartsWith(Config.GAME_TITLE + "#"))
+            data = data.Substring(Config.GAME_TITLE.Length);
+        else
+            Logging.log(Logging.LogType.Error, "KniffelClient", "OnIncommingData", "Wrong Command format: " + data);
+
         string cmd;
         if (data.Contains(" "))
+        {
             cmd = data.Split(' ')[0];
+            data = data.Substring(cmd.Length + 1);
+        }
         else
             cmd = data;
-        data = data.Replace(cmd + " ", "");
 
         Commands(data, cmd);
     }
@@ -428,7 +411,7 @@ public class KniffelClient : MonoBehaviour
         if (msgZahlenSafe.Length > 1)
             msgZahlenSafe = msgZahlenSafe.Substring("+".Length);
 
-        SendToServer("#WuerfelnClient " + board.GetPlayerTurn().gamerid + "*" + msgZahlenUnsafe + "[#]" + msgZahlenSafe);
+        ClientUtils.SendToServer("#WuerfelnClient " + board.GetPlayerTurn().gamerid + "*" + msgZahlenUnsafe + "[#]" + msgZahlenSafe);
 
         // Starte Animation
         if (StartWuerfelAnimationCoroutine != null)
@@ -722,13 +705,13 @@ public class KniffelClient : MonoBehaviour
         if (wuerfel.name.StartsWith("SafeWuerfel"))
         {
             type = "Unsafe";
-            SendToServer("#SafeUnsafe Unsafe|" + board.GetPlayerTurn().gamerid + "|" + zahl);
+            ClientUtils.SendToServer("#SafeUnsafe Unsafe|" + board.GetPlayerTurn().gamerid + "|" + zahl);
             //SafeUnsafeWuerfel("Unsafe|" + board.GetPlayerTurn().gamerid + "|" + zahl);
         }
         else
         {
             type = "Safe";
-            SendToServer("#SafeUnsafe Safe|" + board.GetPlayerTurn().gamerid + "|" + zahl);
+            ClientUtils.SendToServer("#SafeUnsafe Safe|" + board.GetPlayerTurn().gamerid + "|" + zahl);
             //SafeUnsafeWuerfel("Safe|" + board.GetPlayerTurn().gamerid + "|" + zahl);
         }
 
@@ -1025,79 +1008,79 @@ public class KniffelClient : MonoBehaviour
     {
         if (!Config.CLIENT_STARTED)
             return;
-        SendToServer("#ClickPlayerKategorie Einsen*" + GetWuerfelString());
+        ClientUtils.SendToServer("#ClickPlayerKategorie Einsen*" + GetWuerfelString());
     }
     public void ClickZweien(GameObject Spieler)
     {
         if (!Config.CLIENT_STARTED)
             return;
-        SendToServer("#ClickPlayerKategorie Zweien*" + GetWuerfelString());
+        ClientUtils.SendToServer("#ClickPlayerKategorie Zweien*" + GetWuerfelString());
     }
     public void ClickDreien(GameObject Spieler)
     {
         if (!Config.CLIENT_STARTED)
             return;
-        SendToServer("#ClickPlayerKategorie Dreien*" + GetWuerfelString());
+        ClientUtils.SendToServer("#ClickPlayerKategorie Dreien*" + GetWuerfelString());
     }
     public void ClickVieren(GameObject Spieler)
     {
         if (!Config.CLIENT_STARTED)
             return;
-        SendToServer("#ClickPlayerKategorie Vieren*" + GetWuerfelString());
+        ClientUtils.SendToServer("#ClickPlayerKategorie Vieren*" + GetWuerfelString());
     }
     public void ClickFuenfen(GameObject Spieler)
     {
         if (!Config.CLIENT_STARTED)
             return;
-        SendToServer("#ClickPlayerKategorie Fuenfen*" + GetWuerfelString());
+        ClientUtils.SendToServer("#ClickPlayerKategorie Fuenfen*" + GetWuerfelString());
     }
     public void ClickSechsen(GameObject Spieler)
     {
         if (!Config.CLIENT_STARTED)
             return;
-        SendToServer("#ClickPlayerKategorie Sechsen*" + GetWuerfelString());
+        ClientUtils.SendToServer("#ClickPlayerKategorie Sechsen*" + GetWuerfelString());
     }
     public void ClickDreierpasch(GameObject Spieler)
     {
         if (!Config.CLIENT_STARTED)
             return;
-        SendToServer("#ClickPlayerKategorie Dreierpasch*" + GetWuerfelString());
+        ClientUtils.SendToServer("#ClickPlayerKategorie Dreierpasch*" + GetWuerfelString());
     }
     public void ClickViererpasch(GameObject Spieler)
     {
         if (!Config.CLIENT_STARTED)
             return;
-        SendToServer("#ClickPlayerKategorie Viererpasch*" + GetWuerfelString());
+        ClientUtils.SendToServer("#ClickPlayerKategorie Viererpasch*" + GetWuerfelString());
     }
     public void ClickFullHouse(GameObject Spieler)
     {
         if (!Config.CLIENT_STARTED)
             return;
-        SendToServer("#ClickPlayerKategorie FullHouse*" + GetWuerfelString());
+        ClientUtils.SendToServer("#ClickPlayerKategorie FullHouse*" + GetWuerfelString());
     }
     public void ClickKleineStraﬂe(GameObject Spieler)
     {
         if (!Config.CLIENT_STARTED)
             return;
-        SendToServer("#ClickPlayerKategorie KleineStraﬂe*" + GetWuerfelString());
+        ClientUtils.SendToServer("#ClickPlayerKategorie KleineStraﬂe*" + GetWuerfelString());
     }
     public void ClickGroﬂeStraﬂe(GameObject Spieler)
     {
         if (!Config.CLIENT_STARTED)
             return;
-        SendToServer("#ClickPlayerKategorie GroﬂeStraﬂe*" + GetWuerfelString());
+        ClientUtils.SendToServer("#ClickPlayerKategorie GroﬂeStraﬂe*" + GetWuerfelString());
     }
     public void ClickKniffel(GameObject Spieler)
     {
         if (!Config.CLIENT_STARTED)
             return;
-        SendToServer("#ClickPlayerKategorie Kniffel*" + GetWuerfelString());
+        ClientUtils.SendToServer("#ClickPlayerKategorie Kniffel*" + GetWuerfelString());
     }
     public void ClickChance(GameObject Spieler)
     {
         if (!Config.CLIENT_STARTED)
             return;
-        SendToServer("#ClickPlayerKategorie Chance*" + GetWuerfelString());
+        ClientUtils.SendToServer("#ClickPlayerKategorie Chance*" + GetWuerfelString());
     }
     #endregion
 }

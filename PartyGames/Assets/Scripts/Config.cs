@@ -52,6 +52,7 @@ public class Config
 
     // Scenenspezifisches
     public static string GAME_TITLE = "Startup";
+    public static string GLOBAL_TITLE = "GLOBAL";
     // Hauptmenue
     public static string HAUPTMENUE_FEHLERMELDUNG = "";
     public static string PLAYER_UpdateClientGameVorschau = "";

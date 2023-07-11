@@ -387,7 +387,7 @@ Gewicht|Masse-Last-Schwere-Belastung-Gewichtung-Wucht-Heftigkeit
 Gramm|Einheit-Ma#ss#einheit-Gewichtseinheit-Ma#ss#-Ma#ss#einheit
 Kilo|Kilogramm-Gewichtseinheit-Einheit-Ma#ss#einheit
 Sternzeichen|Tierkreiszeichen-Horoskop-Sternbild-Himmelszeichen-L#oe#we-Waage-Zwilling-Stier-Sch#ue#tze
-erkennen|identifizieren-ausmachen-wahrnehmen-feststellen-bemerken-erkennen
+erkennen|identifizieren-ausmachen-wahrnehmen-feststellen-bemerken
 Kasse|Kassentisch-Kassenbereich-Kassenstation-Kassenschalter-Kassenplatz-Kassenraum-Kassenstelle
 Piep|Signalton-Tonsignal-Signalger#ae#usch-Piepen-Ton-Ger#ae#usch
 Disco|Diskothek-Club-Tanzlokal-Nachtclub-Tanzclub-Tanzbar-Tanzlokal
@@ -514,7 +514,7 @@ einbalsamieren|Mumifizieren-Konservieren-Pr#ae#parieren-Einbalsamierung-Mumie-K#
 #AE#gypten|Pyramiden-Pharao-Antike-Nil-Kairo-Hieroglyphen-W#ue#ste-Sphinx
 Interesse|Neugier-Begeisterung-Faszination-Aufmerksamkeit-Leidenschaft-Interessengebiet-Motivation-Interessenslage
 erfahren|Wissen-Kenntnis-Erfahrung-Information-Erlebnis-Kompetenz-erfahren sein-informiert sein
-fragen|Anfrage-Nachfrage-Bitten-Umfrage-Interview-R#ae#tsel-Neugierde-Auskunft
+Fragen|Anfrage-Nachfrage-Bitten-Umfrage-Interview-R#ae#tsel-Neugierde-Auskunft
 herausfinden|Entdecken-Ermitteln-Feststellen-Aufkl#ae#ren-Ergr#ue#nden-Enth#ue#llen-Herausforderung-Untersuchen
 spannend|Aufregend-Fesselnd-Interessant-Nervenkitzel-Spannung-Packend-Begeisternd-Adrenalinf#oe#rdernd
 verlieren|Niederlage-Versagen-Scheitern-Abgeben-Verlust-Misserfolg-Unterliegen-Einb#ue##ss#en
@@ -1242,7 +1242,7 @@ Diplomat|Botschafter-Staatsmann-Gesandter-Vertreter-Staatsdiener-Konsulat
 Vertreter|Repr#ae#sentant-Bevollm#ae#chtigter-Agent-Handels-Sachbearbeiter
 Staat|Land-Nation-Regierung-Landeswesen-Gemeinwesen-Gewalt-Souver#ae#nit#ae#t
 Katastrophe|Desaster-Ungl#ue#ck-Fiasko-Trag#oe#die-Chaos-Niederlage-Zusammenbruch-Mi#ss#geschick
-vorbei|vergangen-beendet-abgelaufen-#ue#berwinden
+vorbei|vergangen-beendet-abgelaufen-#ue#berwinden-bald
 Anfang|Start-Beginn-Auftakt-Einstieg-Ursprung-Startpunkt
 Seiten|Bl#ae#tter-Papiere-Buchseiten-Textseiten-Druckseiten-Schrift-Layout
 rollen|drehen-w#ae#lzen-bewegen-rotieren-kugeln-schwenken
@@ -1291,7 +1291,7 @@ Heilung|Genesung-Wiederherstellung-Therapie-Behandlung-Linderung-Rehabilitation
 Therapie|Behandlung-Heilbehandlung-Kur-medizinisch-Rehabilitation
 Scherz|Witz-Spa#ss#-Streich-humorvolle-Dumm-machen
 reinfallen|hereintappen-hereinlegen-hinters Licht f#ue#hren-get#ae#uscht werden-Trick
-Tropen|Regionen-tropisches Klima-tropische Gebiete-tropische Zone-tropische Vegetation-tropische Pflanzen-tropische L#ae#nder
+Tropen|Regionen-Klima-Gebiete-Zone-Vegetation-Pflanzen-L#ae#nder
 Ungeheuer|Monster-Kreatur-Fabelwesen-Bestie-Unget#ue#m-Unhold-Schreckgestalt
 Horror|Grusel-Angst-Schrecken-G#ae#nsehaut-unheimliche-Albtraum-Psychothriller
 h#ae##ss#lich|unattraktiv-unsch#oe#n-ansprechend-entstellt-unansehnlich-un#ae#sthetisch
@@ -2787,7 +2787,7 @@ Zifferblatt|Uhr-Zeiger-Zahlen-Digital-Anzeige-Display-Nichtanzeige-Stoppuhr
 Bach|Flie#ss#end-Pl#ae#tschern-Nat#ue#rlich-Ruhig-Quelle-Stagnieren-Trocken-Stillstand
 F#ue##ss#e|Gehen-Laufen-Treten-Stolpern-Schweben-Schrumpfen-Schrumpelig-Vergr#oe##ss#ern
 Klicken|Maus-Tastatur-Ger#ae#usch-Laut-Stumm-Dr#ue#cken-Ber#ue#hren-Widerstand
-Scrollen|Bildschirm-Hoch-Runter-Langsam-Schnell-Stoppen-Bewegen-Stillstand
+Scrollen|Bildschirm-Hoch-Runter-Langsam-Schnell-Stoppen-Bewegen-Stillstand-Internet
 Kabellos|Drahtlos-Freiheit-Verbunden-Verbindung-Kabelgebunden-Eingeschr#ae#nkt-Begrenzt-Verkabelt
 Nager|Nagetier-Z#ae#hne-N#ue##ss#e-Knabbern-Kauen-Fleischfre#ss#er-Raubtier-Pflanzenfre#ss#er
 Weidezaun|Tier-Schutz-Einz#ae#unung-Offen-Freiheit-Grenze-Begrenzung-Durchl#ae##ss#ig
@@ -3093,7 +3093,7 @@ Ladeinfrastruktur|Ladestationen-Lades#ae#ulen-Ladepunkte-Schnellladung-Ladegesch
 Umweltfreundlich|Nachhaltig-#OE#kologisch-Re#ss#ourcenschonend-Umweltsch#ae#dlich-Verschmutzend-Umweltbelastend-Klimasch#ae#dlich-Emi#ss#ionsreich
 Sprachsteuerung|Sprachbefehle-Spracherkennung-Stimmaktivierung-Nichterkennung-Fehlfunktion-Mi#ss#verst#ae#ndnis-Unzuverl#ae##ss#igkeit
 Smart Home|Vernetztes Zuhause-Hausautomatisierung-Intelligente Haustechnik-Komfort-Effizienz-Inkompatibilit#ae#t-St#oe#rung-Unsicherheit
-Datenspeicherung|Datenarchivierung-Datenhaltung-Langzeitspeicherung-Datensicherung-Datenverlust-Dateninkonsistenz-Datenl#oe#schung-Datenzugriff-Datensicherheit
+Datenspeicherung|Archivierung-Haltung-Sicherung-Verlust-Inkonsistenz-L#oe#schung-Uugriff-USB-Festplatte-Backup
 Maschinen|Ger#ae#te-Apparate-Automaten-Maschinenbau-Mechanik-Stillstand-Defekt-Ausfall-Effizienz-Produktivit#ae#t
 Vernetzung|Netzwerkbildung-Verbindung-Verkn#ue#pfung-Zusammenarbeit-Isolation-Trennung-Entkopplung-Unverbundenheit-Alleingang
 Sensoren|Me#ss#ger#ae#te-Erfa#ss#ung-Detektoren-Sensorik-Me#ss#genauigkeit-Sensorfehler-Sensorausfall-Sensorunempfindlichkeit-Sensorst#oe#rung
@@ -3364,7 +3364,7 @@ Erkundung|Erforschung-Entdeckung-Bekanntes-Allt#ae#gliches-Gew#oe#hnlichkeit-Rou
 Weite|Gr#oe##ss#e-Enge-Begrenztheit-Beschr#ae#nkung-Kleinheit-Engstirnigkeit-Engherzigkeit-Begrenzung
 Krustentiere|Krebstiere-Wirbellose-Insekten-Wirbeltiere-S#ae#ugetiere-Reptilien-Amphibien-V#oe#gel
 Salzluft|Meeresbrise-Frische-Reinheit-Duft-angenehm-stickig-muffig-verbraucht
-#OE#kologie|Umwelt-Natur-Nachhaltigkeit-Gleichgewicht-Zerst#oe#rung-Verschmutzung-Umweltverschmutzung-Mi#ss#achtung
+#OE#kologie|Umwelt-Natur-Nachhaltigkeit-Gleichgewicht-Zerst#oe#rung-Verschmutzung-Umweltverschmutzung-Missachtung
 Sinne|Wahrnehmung-Empfindung-Geschmack-Geruch-H#oe#ren-Taubheit-Blindheit-Stumpfheit
 Ereignis|Veranstaltung-Vorfall-Vorkommnis-Alltag-Routine-Normalit#ae#t-Gew#oe#hnlichkeit-Ereignislosigkeit
 Parks|Gr#ue#nfl#ae#chen-Naturreservate-G#ae#rten-Betonw#ue#sten-Versiegelung-Trostlosigkeit-#OE#dnis-Abwesenheit
@@ -3374,7 +3374,7 @@ Wunder|Staunen-#UE#berraschung-Allt#ae#glichkeit-Normalit#ae#t-Erwartbarkeit-Gew
 Beeindruckend|Faszinierend-Atemberaubend-Langweilig-Unintere#ss#ant-Entt#ae#uschend-Durchschnittlich
 Einzigartig|Einmalig-Unvergleichlich-Gew#oe#hnlich-Allt#ae#glich-Gleichartig-Standard-Durchschnittlich-Gemeinsam
 Heilkunde|Medizin-Gesundheit-Krankheit-Verletzung-Schaden-Schmerz-Beschwerde-Krankheitserreger
-Ernte|Ertrag-Ausbeute-Mangel-Verlust-Mi#ss#ernte-Fehlschlag-Mi#ss#erfolg-Nichterf#ue#llung
+Ernte|Ertrag-Ausbeute-Mangel-Verlust-Missernte-Fehlschlag-Misserfolg-Nichterf#ue#llung
 Regierung|Politik-Staat-Herrschaft-Anarchie-Chaos-Unordnung-Willk#ue#r-Diktatur
 Kleinstadt|Dorf-Provinz-Landleben-Gro#ss#stadt-Metropole-Urbanit#ae#t-Stadtleben-Anonymit#ae#t
 Anbau|Landwirtschaft-Kultivierung-Ernte-Abholzung-Zerst#oe#rung-Ver#oe#dung-Brache-Vernachl#ae##ss#igung
@@ -4250,7 +4250,7 @@ Flaschen|Beh#ae#lter-Gef#ae##ss#e-Beh#ae#ltni#ss#e-Glaswaren-Plastikflaschen-Bec
 ##OE#ffner|Werkzeug-Hilfsmittel-Verschlu#ss##oe#ffner-Verschlu#ss#entferner-Deckelheber-Verschlu#ss#werkzeug-Schraubenzieher
 Krebstier|Krustentier-Schalentier-Krabbe-Languste-Hummer-Fisch-Muschel-Weichtier
 Krabbenlebensraum|K#ue#ste-Strand-Meeresboden-Felsformationen-Flu#ss#m#ue#ndung-S#ue##ss#wa#ss#er-Teich-See
-Navigationshilfe|Navigationsger#ae#t-GPS-Karte-Kompa#ss#-Orientierungshilfe-Wegweiser-Navigation#ss#ystem-F#ue#hrer
+Navigationshilfe|Ger#ae#t-GPS-Karte-Kompa#ss#-Orientierungs-Wegweiser-System-F#ue#hrer-weißt-nicht
 Essbar|Genie#ss#bar-verzehrbar-lecker-schmackhaft-ungenie#ss#bar-unverzehrbar-unappetitlich
 Totenkopf|Skelett-Sch#ae#del-Gebeine-Knochen-Grab-Friedhof-Leben-Lebendig
 Truhe|Kiste-Beh#ae#lter-Schatztruhe-Schrank-Schublade-offen-leer-unbenutzt
