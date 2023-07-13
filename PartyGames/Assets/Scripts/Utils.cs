@@ -273,8 +273,8 @@ public class Utils
             data = data.Substring(Config.GLOBAL_TITLE.Length);
         else
         {
-            Logging.log(Logging.LogType.Error, "Utils", "ParseCMDGameTitle", "Server: " + isServer + " Command format: " + data);
-            /*
+            Logging.log(Logging.LogType.Warning, "Utils", "ParseCMDGameTitle", "Server: " + isServer + " Command format: " + data);
+            /*´TODO
             if (isServer)
                 ServerUtils.BroadcastImmediate("");
             else
@@ -315,7 +315,7 @@ public class ServerUtils
                 blockBroadcastMsgs = true;
                 string msg = broadcastmsgs[0];
                 broadcastmsgs.RemoveAt(0);
-                BroadcastImmediate(Config.GLOBAL_TITLE + msg);
+                BroadcastImmediate(msg);
                 blockBroadcastMsgs = false;
             }
             yield return new WaitForSeconds(0.01f);
@@ -348,7 +348,7 @@ public class ServerUtils
     /// </summary>
     /// <param name="data">Nachricht</param>
     /// <param name="sc">Spieler</param>
-    public static void SendMSG(string data, Player sc)
+    private static void SendMSG(string data, Player sc)
     {
         try
         {
@@ -362,6 +362,19 @@ public class ServerUtils
             // Verbindung zum Client wird getrennt
             ClientClosed(sc);
         }
+    }
+    /// <summary>
+    /// Sendet eine Nachricht an den angegebenen Spieler und schreibt einen Prefix dafor
+    /// </summary>
+    /// <param name="data"></param>
+    /// <param name="sc"></param>
+    /// <param name="globalPrefix"></param>
+    public static void SendMSG(string data, Player sc, bool globalPrefix)
+    {
+        if (globalPrefix)
+            SendMSG(Config.GLOBAL_TITLE + data, sc);
+        else
+            SendMSG(Config.GAME_TITLE + data, sc);
     }
     #endregion
     /// <summary>
@@ -377,6 +390,69 @@ public class ServerUtils
         player.isConnected = false;
         player.isDisconnected = false;
         Config.SERVER_ALL_CONNECTED = false;
+    }
+    /// <summary>
+    /// Startet das empfangen von Nachrichten von Clients
+    /// </summary>
+    public static void startListening()
+    {
+        Config.SERVER_TCP.BeginAcceptTcpClient(AcceptTcpClient, Config.SERVER_TCP);
+    }
+    /// <summary>
+    /// Fügt Client der Empfangsliste hinzu (Config.PLAYLIST)
+    /// </summary>
+    /// <param name="ar"></param>
+    public static void AcceptTcpClient(IAsyncResult ar)
+    {
+        Logging.log(Logging.LogType.Debug, "ServerUtils", "AcceptTcpClient", "Ein neuer Spieler verbindet sich...");
+        // Sucht freien Spieler Platz
+        Player freierS = null;
+        foreach (Player sp in Config.PLAYERLIST)
+        {
+            if (sp.isConnected == false && sp.isDisconnected == false)
+            {
+                freierS = sp;
+                break;
+            }
+        }
+        // Spieler sind voll
+        if (freierS == null)
+        {
+            Logging.log(Logging.LogType.Warning, "ServerUtils", "AcceptTcpClient", "Server ist voll. Spieler wird abgelehnt.");
+            Player temp = new Player(-1);
+            temp.name = "full";
+            TcpListener ll = (TcpListener)ar.AsyncState;
+            temp.tcp = ll.EndAcceptTcpClient(ar);
+            // Log ausgabe und Clientseite testen weil es nicht geht
+            ServerUtils.SendMSG("#ServerFull", temp, true);
+            startListening();
+            return;
+        }
+
+        TcpListener listener = (TcpListener)ar.AsyncState;
+        freierS.isConnected = true;
+        freierS.tcp = listener.EndAcceptTcpClient(ar);
+        StartupServer.connectedPlayer++;
+        Logging.log(Logging.LogType.Debug, "ServerUtils", "AcceptTcpClient", "Ein neuer Spieler verbindet sich: " + freierS.id);
+        // Prüft ob der Server voll ist
+        bool tempAllConnected = true;
+        for (int i = 0; i < Config.PLAYERLIST.Length; i++)
+        {
+            if (!Config.PLAYERLIST[i].isConnected)
+            {
+                tempAllConnected = false;
+                break;
+            }
+        }
+
+        Config.SERVER_ALL_CONNECTED = tempAllConnected;
+        Logging.log(Logging.LogType.Debug, "ServerUtils", "AcceptTcpClient", "Server ist voll: " + Config.SERVER_ALL_CONNECTED);
+        startListening();
+
+        // Sendet neuem Spieler zugehörige ID
+        ServerUtils.SendMSG("#SetID [ID]" + freierS.id + "[ID][GAMEFILES]" + StartupServer.UpdateClientGameVorschau, freierS, true);
+        // Dazu die GameFiles
+        Logging.log(Logging.LogType.Normal, "ServerUtils", "AcceptTcpClient", "Spieler: " + freierS.id + " ist jetzt verbunden. IP: " + freierS.tcp.Client.RemoteEndPoint);
     }
 }
 
@@ -408,6 +484,7 @@ public class ClientUtils
             CloseSocket();
         }
     }
+    #endregion
     /// <summary>
     /// Trennt die Verbindung zum Server
     /// </summary>
@@ -421,9 +498,8 @@ public class ClientUtils
             Config.CLIENT_TCP.Close();
             Config.CLIENT_STARTED = false;
         }
-        catch {}
+        catch { }
         SceneManager.LoadSceneAsync("Startup");
     }
-    #endregion
 }
 

@@ -191,7 +191,14 @@ public class StartupClient : MonoBehaviour
         }
         catch
         {
-            Logging.log(Logging.LogType.Warning, "StartupClient", "StarteClient", "Verbindung konnte nicht aufgebaut werden. Keine Verbindung zum Internet?");
+            Logging.log(Logging.LogType.Warning, "StartupClient", "StarteClient", "Verbindung konnte nicht aufgebaut werden. Keine Verbindung zum Internet oder falsche IP");
+            Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindung fehlgeschlagen,\nbitte prüfe deine Internetverbindung\nund die eingegebene IP";
+            Config.CLIENT_STARTED = false;
+            transform.gameObject.SetActive(false);
+            Logging.log(Logging.LogType.Normal, "StartupClient", "StarteClient", "Client wird ins Hauptmenü geladen.");
+            ClientUtils.CloseSocket();
+            SceneManager.LoadScene("Startup");
+            yield break;
         }
         for (int i = 1; i <= 4; i++)
         {
@@ -210,9 +217,7 @@ public class StartupClient : MonoBehaviour
         yield return null;
         try
         {
-            //Config.CLIENT_TCP = new TcpClient("localhost", Config.SERVER_CONNECTION_PORT);
             //Config.CLIENT_TCP = new TcpClient(Config.SERVER_CONNECTION_IP, Config.SERVER_CONNECTION_PORT);
-            
             Config.CLIENT_TCP.Client.NoDelay = true;
             Config.CLIENT_STARTED = true;
             Logging.log(Logging.LogType.Normal, "StartupClient", "StarteClient", "Verbindung wurde erfolgreich aufgebaut.");
@@ -245,10 +250,12 @@ public class StartupClient : MonoBehaviour
     /// <param name="data">Eingehende Nachricht</param>
     private void OnIncomingData(string data)
     {
-        if (data.StartsWith(Config.GAME_TITLE + "#"))
-            data = data.Substring(Config.GAME_TITLE.Length);
-        else
-            Logging.log(Logging.LogType.Error, "StartupClient", "OnIncommingData", "Wrong Command format: " + data);
+        if (!data.StartsWith(Config.GAME_TITLE) && !data.StartsWith(Config.GLOBAL_TITLE))
+        {
+            Logging.log(Logging.LogType.Warning, "", "OnIncommingData", "Wrong Prefix: " + data);
+            return;
+        }
+        data = Utils.ParseCMDGameTitle(data, Config.isServer);
 
         string cmd;
         if (data.Contains(" "))
@@ -466,6 +473,23 @@ public class StartupClient : MonoBehaviour
             SpielerAnzeigeLobby[i + 1].transform.GetChild(5).GetComponent<TMP_Text>().text = "";
             SpielerAnzeigeLobby[i + 1].transform.GetChild(6).gameObject.SetActive(false);
         }
+
+        foreach (Player p in Config.PLAYERLIST)
+        {
+            int pos = Player.getPosInLists(p.id);
+            // Display PlayerInfos                
+            SpielerAnzeigeLobby[p.id].GetComponentsInChildren<Image>()[1].sprite = Config.PLAYERLIST[pos].icon;
+            SpielerAnzeigeLobby[p.id].GetComponentInChildren<TMP_Text>().text = Config.PLAYERLIST[pos].name;
+            if (Config.PLAYERLIST[pos].name != "")
+            {
+                SpielerAnzeigeLobby[p.id].SetActive(true);
+            }
+            else
+            {
+                SpielerAnzeigeLobby[p.id].SetActive(false);
+            }
+        }
+       
     }
     /// <summary>
     /// Updated die Spieleranzeige

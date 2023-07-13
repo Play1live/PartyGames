@@ -38,7 +38,6 @@ public class StartupScene : MonoBehaviour
         }
 #endif
         /*Testzwecke*/
-        //Config.isServer = true;
         Config.GAME_TITLE = "Startup";
         if (Config.APPLICATION_INITED == true)
         {
@@ -107,8 +106,7 @@ public class StartupScene : MonoBehaviour
 
             if (Config.isServer)
             {
-                //StartCoroutine(SetupSpiele.LoadGameFiles());
-                //UpdateIPCoroutine = StartCoroutine(UpdateIpAddress.UpdateNoIP_DNS());
+                UpdateIPCoroutine = StartCoroutine(UpdateIpAddress.UpdateNoIP_DNS());
             }
             StartCoroutine(SetupSpiele.LoadGameFiles());
             StartCoroutine(EnableConnectionButton());

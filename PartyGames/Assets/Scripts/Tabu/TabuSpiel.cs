@@ -8,7 +8,7 @@ public class TabuSpiel
 {
     public static int minPlayer = 4;
     public static int maxPlayer = 8;
-    public static string GameType = "1 Wort"; // 1 Wort | Normal | Timer
+    public static string GameType = "1 Wort"; // 1 Wort | Normal | Timer | Battle Royale
     private List<Tabu> tabus;
     private Tabu selected;
     public static int TABU_WORTE_COUNT = 6;
@@ -129,7 +129,6 @@ public class TabuSpiel
         }
         return s;
     }
-
 }
 
 public class Tabu
@@ -225,78 +224,6 @@ public class TabuItem
         }
         if (this.tabuworte.Length > 1)
             this.tabuworte = this.tabuworte.Substring(1);
-
-        /*
-        geheimwort = replaceWort(geheimwort);
-        if (geheimwort.Contains("ß"))
-            Debug.LogWarning(geheimwort);
-        for (int i = 0; i < worte.Count; i++)
-        {
-            worte[i] = replaceWort(worte[i]);
-            if (worte[i].Contains("ß"))
-                Debug.LogWarning(worte[i]);
-        }*/
-    }
-
-    private string replaceWort(string w)
-    {
-        switch(w)
-        {
-            default:
-                return w;
-            case "straße":
-                return "Straße";
-            case "fuß":
-                return "Fuß";
-            case "kloß":
-                return "Kloß";
-            case "soße":
-                return "Soße";
-            case "verstoß":
-                return "Verstoß";
-            case "außenseiter":
-                return "Außenseiter";
-            case "spaß":
-                return "Spaß";
-            case "fußball":
-                return "Fußball";
-            case "fließband":
-                return "Fließband";
-            case "raße":
-                return "rasse";
-            case "tasse":
-                return "Tasse";
-            case "naß":
-                return "Nass";
-            case "waßer":
-                return "Wasser";
-            case "weißweihnachten":
-                return "weiße weihnachten";
-            case "reißleine":
-                return "Reißleine";
-            case "eßen":
-                return "Essen";
-            case "taße":
-                return "Tasse";
-            case "regißeur":
-                return "Regisseur";
-            case "salzwaßer":
-                return "Salzwasser";
-            case "außicht":
-                return "Aussicht";
-            case "außtellung":
-                return "Ausstellung";
-            case "Taße":
-                return "Tasse";
-            case "faßade":
-                return "Fassade";
-            case "durchmeßer":
-                return "Durchmesser";
-            case "rovermißion":
-                return "Rovermission";
-            case "Marsmißion":
-                return "Marsmission";
-        }
     }
 
     public List<string> getWorte()
@@ -304,5 +231,37 @@ public class TabuItem
         List<string> worte = new List<string>();
         worte.AddRange(this.tabuworte.Split('-'));
         return worte;
+    }
+}
+
+public class TabuData
+{
+    // TODO: feste Daten hier einlagern
+    // CORRECT, WRONG, SKIP
+    public static List<int> P_1WORT = new List<int> { 1, 0, 0 };
+    public static List<int> P_NORMAL = new List<int> { 1, -1, 0 };
+    public static List<int> P_TIMER = new List<int> { 20, -10, -5 };
+    public static List<int> P_BATTLE_ROYALE = new List<int> { 0, -10, -5 };
+
+    private static List<string> TimerDecPoints = new List<string>{ "Timer", "Battle Royale" };
+
+    public static int InitTeamPoints(string team)
+    {
+        switch (TabuSpiel.GameType)
+        {
+            default:
+                return 0;
+            case "Timer":
+                return 300;
+            case "Battle Royale":
+                return 600;
+        }
+    }
+    public static bool TimerDecreasePoints()
+    {
+        if (TimerDecPoints.Contains(TabuSpiel.GameType))
+            return true;
+        else
+            return false;
     }
 }

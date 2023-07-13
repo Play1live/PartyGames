@@ -37,7 +37,8 @@ public class Controller : MonoBehaviour
     {
         if (quitApp == true)
         {
-            StopCoroutine(DownloadCoroutine);
+            if (DownloadCoroutine != null)
+                StopCoroutine(DownloadCoroutine);
 
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
@@ -59,7 +60,8 @@ public class Controller : MonoBehaviour
     private void OnApplicationQuit()
     {
         UnityEngine.Debug.Log("Updater wird beendet.");
-        StopCoroutine(DownloadCoroutine);
+        if (DownloadCoroutine != null)
+            StopCoroutine(DownloadCoroutine);
         type.text = "Wird beendet...";
     }
 

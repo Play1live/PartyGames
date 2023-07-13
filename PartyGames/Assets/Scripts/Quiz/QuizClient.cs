@@ -114,10 +114,12 @@ public class QuizClient : MonoBehaviour
     /// <param name="data">Nachricht</param>
     private void OnIncomingData(string data)
     {
-        if (data.StartsWith(Config.GAME_TITLE + "#"))
-            data = data.Substring(Config.GAME_TITLE.Length);
-        else
-            Logging.log(Logging.LogType.Error, "QuizClient", "OnIncommingData", "Wrong Command format: " + data);
+        if (!data.StartsWith(Config.GAME_TITLE) && !data.StartsWith(Config.GLOBAL_TITLE))
+        {
+            Logging.log(Logging.LogType.Warning, "", "OnIncommingData", "Wrong Prefix: " + data);
+            return;
+        }
+        data = Utils.ParseCMDGameTitle(data, Config.isServer);
 
         string cmd;
         if (data.Contains(" "))

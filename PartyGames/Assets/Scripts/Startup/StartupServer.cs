@@ -22,8 +22,8 @@ public class StartupServer : MonoBehaviour
 
     [SerializeField] GameObject gesperrtfuerSekundenAnzeige;
     DateTime allowedStartTime;
-    string UpdateClientGameVorschau = "";
-    private int connectedPlayer;
+    public static string UpdateClientGameVorschau = "";
+    public static int connectedPlayer;
 
     [SerializeField] AudioSource ConnectSound;
     [SerializeField] AudioSource DisconnectSound;
@@ -173,7 +173,7 @@ public class StartupServer : MonoBehaviour
             Config.SERVER_TCP = new TcpListener(IPAddress.Any, Config.SERVER_CONNECTION_PORT);
             Config.SERVER_TCP.Server.NoDelay = true;
             Config.SERVER_TCP.Start();
-            startListening();
+            ServerUtils.startListening();
             Config.SERVER_STARTED = true;
             Logging.log(Logging.LogType.Normal, "StartupServer", "Start", "Server gestartet. Port: " + Config.SERVER_CONNECTION_PORT);
             Config.HAUPTMENUE_FEHLERMELDUNG = "Server wurde gestartet.";
@@ -205,69 +205,6 @@ public class StartupServer : MonoBehaviour
         // Sendet PingUpdate alle paar sekunden
         StartCoroutine(UpdatePingOnTime());
     }
-    /// <summary>
-    /// Startet das empfangen von Nachrichten von Clients
-    /// </summary>
-    private void startListening()
-    {
-        Config.SERVER_TCP.BeginAcceptTcpClient(AcceptTcpClient, Config.SERVER_TCP);
-    }
-    /// <summary>
-    /// Fügt Client der Empfangsliste hinzu (Config.PLAYLIST)
-    /// </summary>
-    /// <param name="ar"></param>
-    private void AcceptTcpClient(IAsyncResult ar)
-    {
-        Logging.log(Logging.LogType.Debug, "StartupServer", "AcceptTcpClient", "Ein neuer Spieler verbindet sich...");
-        // Sucht freien Spieler Platz
-        Player freierS = null;
-        foreach (Player sp in Config.PLAYERLIST)
-        {
-            if (sp.isConnected == false && sp.isDisconnected == false)
-            {
-                freierS = sp;
-                break;
-            }
-        }
-        // Spieler sind voll
-        if (freierS == null)
-        {
-            Logging.log(Logging.LogType.Warning, "StartupServer", "AcceptTcpClient", "Server ist voll. Spieler wird abgelehnt.");
-            Player temp = new Player(100);
-            temp.name = "full";
-            TcpListener ll = (TcpListener)ar.AsyncState;
-            temp.tcp = ll.EndAcceptTcpClient(ar);
-            // Log ausgabe und Clientseite testen weil es nicht geht
-            ServerUtils.SendMSG("#ServerFull", temp);
-            startListening();
-            return;
-        }
-
-        TcpListener listener = (TcpListener)ar.AsyncState;
-        freierS.isConnected = true;
-        freierS.tcp = listener.EndAcceptTcpClient(ar);
-        connectedPlayer++;
-        Logging.log(Logging.LogType.Debug, "StartupServer", "AcceptTcpClient", "Ein neuer Spieler verbindet sich: "+ freierS.id);
-        // Prüft ob der Server voll ist
-        bool tempAllConnected = true;
-        for (int i = 0; i < Config.PLAYERLIST.Length; i++)
-        {
-            if (!Config.PLAYERLIST[i].isConnected)
-            {
-                tempAllConnected = false;
-                break;
-            }
-        }
-
-        Config.SERVER_ALL_CONNECTED = tempAllConnected;
-        Logging.log(Logging.LogType.Debug, "StartupServer", "AcceptTcpClient", "Server ist voll: " + Config.SERVER_ALL_CONNECTED);
-        startListening();
-
-        // Sendet neuem Spieler zugehörige ID
-        ServerUtils.SendMSG("#SetID [ID]" + freierS.id + "[ID][GAMEFILES]" + UpdateClientGameVorschau, freierS);
-        // Dazu die GameFiles
-        Logging.log(Logging.LogType.Normal, "StartupServer", "AcceptTcpClient", "Spieler: " + freierS.id + " ist jetzt verbunden. IP:" + freierS.tcp.Client.RemoteEndPoint);
-    }
     #endregion
     #region Kommunikation
     /// <summary>
@@ -278,10 +215,13 @@ public class StartupServer : MonoBehaviour
     /// <param name="data">Daten inklusive Command</param>
     private void OnIncommingData(Player spieler, string data)
     {
-        if (data.StartsWith(Config.GAME_TITLE + "#"))
-            data = data.Substring(Config.GAME_TITLE.Length);
-        else
-            Logging.log(Logging.LogType.Error, "StartupServer", "OnIncommingData", "Wrong Command format: " + data);
+        if (!data.StartsWith(Config.GAME_TITLE) && !data.StartsWith(Config.GLOBAL_TITLE))
+        {
+            // TODO: Hier bei allen Klassen einfügen fürs Nachjoinen
+            Logging.log(Logging.LogType.Warning, "", "OnIncommingData", "Wrong Prefix: " + data);
+            return;
+        }
+        data = Utils.ParseCMDGameTitle(data, Config.isServer);
 
         string cmd;
         if (data.Contains(" "))
@@ -318,7 +258,7 @@ public class StartupServer : MonoBehaviour
                 PlayDisconnectSound();
                 break;
             case "#TestConnection":
-                ServerUtils.SendMSG("#ConnectionEstablished", player);
+                ServerUtils.SendMSG("#ConnectionEstablished", player, false);
                 break;
             case "#ClientFocusChange":
                 break;
@@ -696,7 +636,7 @@ public class StartupServer : MonoBehaviour
         if (version != Config.APPLICATION_VERSION)
         {
             Logging.log(Logging.LogType.Warning, "StartupServer", "ClientSetName", "Spieler ID: " + player.id + " versucht mit einer falschen Version beizutreten.Spieler Version: " + version + " | Server Version: " + Config.APPLICATION_VERSION);
-            ServerUtils.SendMSG("#WrongVersion " + Application.version, player);
+            ServerUtils.SendMSG("#WrongVersion " + Application.version, player, false);
             ServerUtils.ClientClosed(player);
             return;
         }
@@ -708,7 +648,7 @@ public class StartupServer : MonoBehaviour
         {
             Logging.log(Logging.LogType.Normal, "StartupServer", "ClientSetName", "Spieler " + player.name + " heißt jetzt " + name);
             player.name = name;
-            ServerUtils.SendMSG("#SpielerChangeName " + name, player);
+            ServerUtils.SendMSG("#SpielerChangeName " + name, player, false);
             UpdateSpielerBroadcast();
             return;
         }
@@ -723,7 +663,7 @@ public class StartupServer : MonoBehaviour
         }
         Logging.log(Logging.LogType.Normal, "StartupServer", "ClientSetName", "Spieler " + player.name + "heißt jetzt " + name);
         player.name = name;
-        ServerUtils.SendMSG("#SpielerChangeName " + name, player);
+        ServerUtils.SendMSG("#SpielerChangeName " + name, player, false);
         // Sendet Update an alle Spieler & Updatet Spieler Anzeigen
         UpdateSpielerBroadcast();
     }
@@ -858,7 +798,7 @@ public class StartupServer : MonoBehaviour
             return;
         int playerid = Int32.Parse(dropdown.options[dropdown.value].text.Split('|')[0]);
         
-        ServerUtils.SendMSG("#ServerClosed", Config.PLAYERLIST[playerid - 1]);
+        ServerUtils.SendMSG("#ServerClosed", Config.PLAYERLIST[playerid - 1], false);
         Logging.log(Logging.LogType.Normal, "StartupServer", "SpielerRauswerfen", "Spieler " + Config.PLAYERLIST[playerid - 1].name + " wird gekickt.");
         ServerUtils.ClientClosed(Config.PLAYERLIST[playerid - 1]);
         UpdateSpielerBroadcast();
@@ -1154,7 +1094,7 @@ public class StartupServer : MonoBehaviour
             else
                 msg = msg + "[" + i + "][" + i + "]";
         }
-        ServerUtils.SendMSG("#TicTacToeZug " + msg, player);
+        ServerUtils.SendMSG("#TicTacToeZug " + msg, player, false);
     }
     /// <summary>
     /// Lässt den Server einen Zug machen & prüft ob das Spiel beendet ist
@@ -1169,7 +1109,7 @@ public class StartupServer : MonoBehaviour
         // CheckForWin
         if (TicTacToe.CheckForEnd(freieFelder, belegteFelder))
         {
-            ServerUtils.SendMSG("#TicTacToeZugEnde |" + TicTacToe.getResult(belegteFelder) + "| " + data, player);
+            ServerUtils.SendMSG("#TicTacToeZugEnde |" + TicTacToe.getResult(belegteFelder) + "| " + data, player, false);
             return;
         }
         // Ziehen
@@ -1177,9 +1117,9 @@ public class StartupServer : MonoBehaviour
         freieFelder = TicTacToe.GetFreieFelder(belegteFelder);
         //Check for End
         if (TicTacToe.CheckForEnd(freieFelder, belegteFelder))
-            ServerUtils.SendMSG("#TicTacToeZugEnde |" + TicTacToe.getResult(belegteFelder) + "|" + TicTacToe.PrintBelegteFelder(belegteFelder), player);
+            ServerUtils.SendMSG("#TicTacToeZugEnde |" + TicTacToe.getResult(belegteFelder) + "|" + TicTacToe.PrintBelegteFelder(belegteFelder), player, false);
         else
-            ServerUtils.SendMSG("#TicTacToeZug " + TicTacToe.PrintBelegteFelder(belegteFelder), player);
+            ServerUtils.SendMSG("#TicTacToeZug " + TicTacToe.PrintBelegteFelder(belegteFelder), player, false);
     }
     #endregion
     #endregion
