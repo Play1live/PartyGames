@@ -647,37 +647,6 @@ public class TabuClient : MonoBehaviour
                     EndTurn();
                     return;
                 }
-                else
-                {
-                    // Switch Team
-                    Skip.SetActive(false);
-                    if (erklaerer.Equals(Config.PLAYER_NAME))
-                        Skip.SetActive(true);
-
-                    // F‰rbt namen wieder weiﬂ
-                    for (int i = 1; i < TeamRot.transform.childCount; i++)
-                    {
-                        int index = i - 1;
-                        Transform PlayerObject = TeamRot.transform.GetChild(i);
-                        if (teamrotList.Count > index)
-                        {
-                            PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = teamrotList[index];
-                            if (teamrotList[index] == erklaerer)
-                                PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = "<color=green>" + teamrotList[index];
-                        }
-                    }
-                    for (int i = 1; i < TeamBlau.transform.childCount; i++)
-                    {
-                        int index = i - 1;
-                        Transform PlayerObject = TeamBlau.transform.GetChild(i);
-                        if (teamblauList.Count > index)
-                        {
-                            PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = teamblauList[index];
-                            if (teamblauList[index] == erklaerer)
-                                PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = "<color=green>" + teamblauList[index];
-                        }
-                    }
-                }
 
             }
             // Zeit vorbei
@@ -699,29 +668,7 @@ public class TabuClient : MonoBehaviour
                 if (erklaerer.Equals(Config.PLAYER_NAME))
                     Skip.SetActive(true);
 
-                // F‰rbt namen wieder weiﬂ
-                for (int i = 1; i < TeamRot.transform.childCount; i++)
-                {
-                    int index = i - 1;
-                    Transform PlayerObject = TeamRot.transform.GetChild(i);
-                    if (teamrotList.Count > index)
-                    {
-                        PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = teamrotList[index];
-                        if (teamrotList[index] == erklaerer)
-                            PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = "<color=green>" + teamrotList[index];
-                    }
-                }
-                for (int i = 1; i < TeamBlau.transform.childCount; i++)
-                {
-                    int index = i - 1;
-                    Transform PlayerObject = TeamBlau.transform.GetChild(i);
-                    if (teamblauList.Count > index)
-                    {
-                        PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = teamblauList[index];
-                        if (teamblauList[index] == erklaerer)
-                            PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = "<color=green>" + teamblauList[index];
-                    }
-                }
+                MarkErklaerer();
             }
             else
                 Logging.log(Logging.LogType.Error, "TabuServer", "RundeEnde", "Fehler: " + indicator + " " + TeamTurn);
@@ -865,6 +812,13 @@ public class TabuClient : MonoBehaviour
             }
             Karte.SetActive(true);
         }
+        MarkErklaerer();
+
+        StartTimer(timerseconds);
+    }
+    #endregion
+    private void MarkErklaerer()
+    {
         // F‰rbt namen wieder weiﬂ
         for (int i = 1; i < TeamRot.transform.childCount; i++)
         {
@@ -888,10 +842,5 @@ public class TabuClient : MonoBehaviour
                     PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = "<color=green>" + teamblauList[index];
             }
         }
-
-        StartTimer(timerseconds);
     }
-
-    #endregion
 }
-// TODO: h‰ufige algorithmen auslagern

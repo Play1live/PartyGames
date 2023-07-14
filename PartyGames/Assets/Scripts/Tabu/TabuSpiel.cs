@@ -133,6 +133,7 @@ public class TabuSpiel
 
 public class Tabu
 {
+    public static bool needToSafe = false;
     private string name;
     private List<TabuItem> worte;
 
@@ -140,6 +141,7 @@ public class Tabu
     {
         Logging.log(Logging.LogType.Debug, "Tabu", "Tabu", "Lade Datei: " + name);
         this.name = name;
+        needToSafe = false;
 
         this.worte = new List<TabuItem>();
         List<string> wort = new List<string>();
@@ -161,6 +163,7 @@ public class Tabu
                 else
                 {
                     Logging.log(Logging.LogType.Warning, "Tabu", "Tabu", name + " -> Dopplung: " + temp.Split('|')[0]);
+                    needToSafe = true;
                 }
             }
             catch
@@ -169,8 +172,8 @@ public class Tabu
             }
         }
 
-        /*// Save Files
-        if (inhalt.Split('\n').Length != worte.Count)
+        // Save Files
+        if (needToSafe)
         {
             string newFile = "";
             foreach (TabuItem item in this.worte)
@@ -187,7 +190,7 @@ public class Tabu
 
             File.WriteAllText(Application.dataPath + "/Resources/Spiele/Tabu/" + name + ".txt", newFile);
             Logging.log(Logging.LogType.Normal, "Tabu", "Tabu", "File: " + name + " wurde gespeichert.");
-        }*/
+        }
     }
     public string getTitel() { return this.name; }
     public List<TabuItem> getGeheimwörter() { return this.worte; }
@@ -209,10 +212,10 @@ public class TabuItem
     
     public TabuItem(string geheimwort, string tabuworte)
     {
-        this.geheimwort = geheimwort;
+        this.geheimwort = replaceShit(geheimwort);
         List<string> worte = new List<string>();
         this.tabuworte = "";
-        foreach (string item in tabuworte.Split('-'))
+        foreach (string item in replaceShit(tabuworte).Split('-'))
         {
             if (!worte.Contains(item.ToLower()) && item.ToLower() != this.geheimwort.ToLower())
             {
@@ -220,7 +223,10 @@ public class TabuItem
                 this.tabuworte += "-" + item;
             }
             else
+            {
                 Logging.log(Logging.LogType.Warning, "TabuItem", "TabuItem", geheimwort + " -> Dopplung: " + item);
+                Tabu.needToSafe = true;
+            }
         }
         if (this.tabuworte.Length > 1)
             this.tabuworte = this.tabuworte.Substring(1);
@@ -232,11 +238,26 @@ public class TabuItem
         worte.AddRange(this.tabuworte.Split('-'));
         return worte;
     }
+
+    private string replaceShit(string data)
+    {
+        string tempsafe = data;
+        data = data.Replace("#ß#", "ß");
+        data = data.Replace("Flu#ss#", "Fluss");
+
+
+        if (tempsafe.Equals(data))
+            return data;
+        else
+        {
+            Tabu.needToSafe = true;
+            return data;
+        }
+    }
 }
 
 public class TabuData
 {
-    // TODO: feste Daten hier einlagern
     // CORRECT, WRONG, SKIP
     public static List<int> P_1WORT = new List<int> { 1, 0, 0 };
     public static List<int> P_NORMAL = new List<int> { 1, -1, 0 };

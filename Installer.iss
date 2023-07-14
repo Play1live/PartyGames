@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "PartyGames"
-#define MyAppVersion "1.9"
+#define MyAppVersion "2.0"
 #define MyAppPublisher "Play1live"
 #define MyAppExeName "PartyGamesUpdater.exe"
 #define MyAppAssocName MyAppName + ""

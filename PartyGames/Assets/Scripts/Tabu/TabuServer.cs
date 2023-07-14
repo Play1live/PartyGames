@@ -482,23 +482,7 @@ public class TabuServer : MonoBehaviour
 
         ServerUtils.AddBroadcast("#StartRunde " + playername + "|" + TeamTurn + "|" + TabuSpiel.GameType + "|" + timerseconds + "|" + TabuSpiel.getIntArrayToString(wortzahlen) + "|" + selectedItem.geheimwort + "|" + selectedItem.tabuworte);
 
-        // F‰rbe Namen in der Liste der Spieler damit jeder weiﬂ wer dran ist
-        for (int i = 1; i < TeamRot.transform.childCount; i++)
-        {
-            int index = i - 1;
-            Transform PlayerObject = TeamRot.transform.GetChild(i);
-            if (teamrotList.Count > index)
-                if (teamrotList[index].Equals(erklaerer))
-                    PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = "<color=green>" + teamrotList[index];
-        }
-        for (int i = 1; i < TeamBlau.transform.childCount; i++)
-        {
-            int index = i - 1;
-            Transform PlayerObject = TeamBlau.transform.GetChild(i);
-            if (teamblauList.Count > index)
-                if (teamblauList[index].Equals(erklaerer))
-                PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = "<color=green>" + teamblauList[index];
-        }
+        MarkErklaerer();
 
         RundeStarten.SetActive(false);
         JoinTeamRot.SetActive(false);
@@ -794,52 +778,6 @@ public class TabuServer : MonoBehaviour
                 {
                     EndTurn();
                 }
-                else
-                {
-                    // Switch Team
-                    if (TeamTurn.Equals("ROT"))
-                        TeamTurn = "BLAU";
-                    else
-                        TeamTurn = "ROT";
-
-                    Skip.SetActive(false);
-                    if (TeamTurn.Equals("ROT"))
-                    {
-                        erklaerer = teamrotList[UnityEngine.Random.Range(0, teamrotList.Count)];
-                    }
-                    else if (TeamTurn.Equals("BLAU"))
-                    {
-                        erklaerer = teamblauList[UnityEngine.Random.Range(0, teamblauList.Count)];
-                    }
-                    if (erklaerer.Equals(Config.PLAYER_NAME))
-                        Skip.SetActive(true);
-
-                    // F‰rbt namen wieder weiﬂ
-                    for (int i = 1; i < TeamRot.transform.childCount; i++)
-                    {
-                        int index = i - 1;
-                        Transform PlayerObject = TeamRot.transform.GetChild(i);
-                        if (teamrotList.Count > index)
-                        {
-                            PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = teamrotList[index];
-                            if (teamrotList[index] == erklaerer)
-                                PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = "<color=green>" + teamrotList[index];
-                        }
-                        
-                    }
-                    for (int i = 1; i < TeamBlau.transform.childCount; i++)
-                    {
-                        int index = i - 1;
-                        Transform PlayerObject = TeamBlau.transform.GetChild(i);
-                        if (teamblauList.Count > index)
-                        {
-                            PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = teamblauList[index];
-                            if (teamblauList[index] == erklaerer)
-                                PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = "<color=green>" + teamblauList[index];
-                        }
-                        
-                    }
-                }
 
             }
             // Zeit vorbei
@@ -880,29 +818,7 @@ public class TabuServer : MonoBehaviour
                 if (erklaerer.Equals(Config.PLAYER_NAME))
                     Skip.SetActive(true);
 
-                // F‰rbt namen wieder weiﬂ
-                for (int i = 1; i < TeamRot.transform.childCount; i++)
-                {
-                    int index = i - 1;
-                    Transform PlayerObject = TeamRot.transform.GetChild(i);
-                    if (teamrotList.Count > index)
-                    {
-                        PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = teamrotList[index];
-                        if (teamrotList[index] == erklaerer)
-                            PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = "<color=green>" + teamrotList[index];
-                    }
-                }
-                for (int i = 1; i < TeamBlau.transform.childCount; i++)
-                {
-                    int index = i - 1;
-                    Transform PlayerObject = TeamBlau.transform.GetChild(i);
-                    if (teamblauList.Count > index)
-                    {
-                        PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = teamblauList[index];
-                        if (teamblauList[index] == erklaerer)
-                            PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = "<color=green>" + teamblauList[index];
-                    }
-                }
+                MarkErklaerer();
             }
             else
                 Logging.log(Logging.LogType.Error, "TabuServer", "RundeEnde", "Fehler: " + indicator + " " + TeamTurn);
@@ -949,21 +865,7 @@ public class TabuServer : MonoBehaviour
         else if (TeamTurn.Equals("BLAU") && teamblauList.Contains(Config.PLAYER_NAME))
             RundeStarten.SetActive(true);
 
-        // F‰rbt namen wieder weiﬂ
-        for (int i = 1; i < TeamRot.transform.childCount; i++)
-        {
-            int index = i - 1;
-            Transform PlayerObject = TeamRot.transform.GetChild(i);
-            if (teamrotList.Count > index)
-                    PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = teamrotList[index];
-        }
-        for (int i = 1; i < TeamBlau.transform.childCount; i++)
-        {
-            int index = i - 1;
-            Transform PlayerObject = TeamBlau.transform.GetChild(i);
-            if (teamblauList.Count > index)
-                    PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = teamblauList[index];
-        }
+        MarkErklaerer();
     }
     public void ChangePoints(Button btn)
     {
@@ -1102,5 +1004,30 @@ public class TabuServer : MonoBehaviour
         timerseconds = temp;
     }
     #endregion
+    private void MarkErklaerer()
+    {
+        // F‰rbt namen wieder weiﬂ
+        for (int i = 1; i < TeamRot.transform.childCount; i++)
+        {
+            int index = i - 1;
+            Transform PlayerObject = TeamRot.transform.GetChild(i);
+            if (teamrotList.Count > index)
+            {
+                PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = teamrotList[index];
+                if (teamrotList[index] == erklaerer)
+                    PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = "<color=green>" + teamrotList[index];
+            }
+        }
+        for (int i = 1; i < TeamBlau.transform.childCount; i++)
+        {
+            int index = i - 1;
+            Transform PlayerObject = TeamBlau.transform.GetChild(i);
+            if (teamblauList.Count > index)
+            {
+                PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = teamblauList[index];
+                if (teamblauList[index] == erklaerer)
+                    PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = "<color=green>" + teamblauList[index];
+            }
+        }
+    }
 }
-// TODO: h‰ufige algorithmen auslagern
