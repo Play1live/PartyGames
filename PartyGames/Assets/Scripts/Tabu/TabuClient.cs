@@ -284,7 +284,11 @@ public class TabuClient : MonoBehaviour
     }
     private IEnumerator RunTimer(int seconds, bool decPoints)
     {
-        Timer.SetActive(true);
+        bool showTimer = true;
+        if (TabuSpiel.GameType.Equals("Battle Royale"))
+            showTimer = false;
+
+        Timer.SetActive(showTimer);
 
         while (seconds >= 0)
         {
@@ -299,15 +303,22 @@ public class TabuClient : MonoBehaviour
             {
                 Moeoop.Play();
             }
-            seconds--;
+            if (showTimer)
+                seconds--;
             if (decPoints)
             {
                 if (TeamTurn.Equals("ROT"))
                     SetTeamPoints("ROT", teamrotPunkte--);
                 else if (TeamTurn.Equals("BLAU"))
                     SetTeamPoints("BLAU", teamblauPunkte--);
+
+                yield return new WaitForSecondsRealtime(1);
+
+                if (teamrotPunkte <= 0 || teamblauPunkte <= 0)
+                    yield break;
             }
-            yield return new WaitForSecondsRealtime(1);
+            else
+                yield return new WaitForSecondsRealtime(1);
         }
         Timer.SetActive(false);
         yield break;
@@ -501,8 +512,10 @@ public class TabuClient : MonoBehaviour
         string indicator = data.Split('|')[1];
         TabuSpiel.GameType = data.Split('|')[2];
         teamrotPunkte = Int32.Parse(data.Split('|')[3]);
+        int teamrot = teamrotPunkte;
         SetTeamPoints("ROT", teamrotPunkte);
         teamblauPunkte = Int32.Parse(data.Split('|')[4]);
+        int teamblau = teamblauPunkte;
         SetTeamPoints("BLAU", teamblauPunkte);
         erklaerer = data.Split("|")[5];
         selectedItem.geheimwort = data.Split('|')[8];
@@ -533,7 +546,7 @@ public class TabuClient : MonoBehaviour
             else
                 Logging.log(Logging.LogType.Error, "TabuServer", "RundeEnde", "Fehler: " + indicator + " " + TeamTurn);
 
-            EndTurn();
+            EndTurn(teamrotPunkte, teamblauPunkte);
         }
         else if (TabuSpiel.GameType.Equals("Normal"))
         {
@@ -560,7 +573,7 @@ public class TabuClient : MonoBehaviour
             // Zeit vorbei
             else if (indicator == "-1")
             {
-                EndTurn();
+                EndTurn(teamrotPunkte, teamblauPunkte);
             }
             // Richtig gedrückt
             else if (indicator == "1")
@@ -587,7 +600,7 @@ public class TabuClient : MonoBehaviour
                     SkipCoroutine = StartCoroutine(SkipWortCoro());
                 }
                 if (teamblauPunkte <= 0 || teamrotPunkte <= 0)
-                    EndTurn();
+                    EndTurn(teamrotPunkte, teamblauPunkte);
             }
             // Falsch gedrückt
             else if (indicator == "-2")
@@ -598,12 +611,12 @@ public class TabuClient : MonoBehaviour
                     StopCoroutine(HideRichtigFalschSecCoroutine);
                 HideRichtigFalschSecCoroutine = StartCoroutine(HideRichtigFalschSec());
                 if (teamblauPunkte <= 0 || teamrotPunkte <= 0)
-                    EndTurn();
+                    EndTurn(teamrotPunkte, teamblauPunkte);
             }
             // Zeit vorbei
             else if (indicator == "-1")
             {
-                EndTurn();
+                EndTurn(teamrotPunkte, teamblauPunkte);
             }
             // Richtig gedrückt
             else if (indicator == "1")
@@ -631,7 +644,7 @@ public class TabuClient : MonoBehaviour
                 }
 
                 if (teamblauPunkte <= 0 || teamrotPunkte <= 0)
-                    EndTurn();
+                    EndTurn(teamrotPunkte, teamblauPunkte);
             }
             // Falsch gedrückt
             else if (indicator == "-2")
@@ -644,7 +657,7 @@ public class TabuClient : MonoBehaviour
 
                 if (teamblauPunkte <= 0 || teamrotPunkte <= 0)
                 {
-                    EndTurn();
+                    EndTurn(teamrotPunkte, teamblauPunkte);
                     return;
                 }
 
@@ -652,7 +665,7 @@ public class TabuClient : MonoBehaviour
             // Zeit vorbei
             else if (indicator == "-1")
             {
-                EndTurn();
+                EndTurn(teamrotPunkte, teamblauPunkte);
             }
             // Richtig gedrückt
             else if (indicator == "1")
@@ -689,7 +702,7 @@ public class TabuClient : MonoBehaviour
                 DisplayKarte(bool.Parse(data.Split('|')[6]), erklaerer, "");
         }
     }
-    private void EndTurn()
+    private void EndTurn(int rotpoints, int blaupoints)
     {
         if (!started)
             return;
@@ -702,26 +715,18 @@ public class TabuClient : MonoBehaviour
         Falsch.SetActive(false);
         JoinTeamBlau.SetActive(true);
         JoinTeamRot.SetActive(true);
+        MarkErklaerer();
+
+        SetTeamPoints("ROT", rotpoints);
+        SetTeamPoints("BLAU", blaupoints);
+
         if (TeamTurn.Equals("ROT") && teamrotList.Contains(Config.PLAYER_NAME))
             RundeStarten.SetActive(true);
         else if (TeamTurn.Equals("BLAU") && teamblauList.Contains(Config.PLAYER_NAME))
             RundeStarten.SetActive(true);
 
-        // Färbt namen wieder weiß
-        for (int i = 1; i < TeamRot.transform.childCount; i++)
-        {
-            int index = i - 1;
-            Transform PlayerObject = TeamRot.transform.GetChild(i);
-            if (teamrotList.Count > index)
-                PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = teamrotList[index];
-        }
-        for (int i = 1; i < TeamBlau.transform.childCount; i++)
-        {
-            int index = i - 1;
-            Transform PlayerObject = TeamBlau.transform.GetChild(i);
-            if (teamblauList.Count > index)
-                PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = teamblauList[index];
-        }
+        if (TabuSpiel.GameType.Equals("Battle Royale"))
+            RundeStarten.SetActive(false);
     }
     private void KreuzAn(string data)
     {

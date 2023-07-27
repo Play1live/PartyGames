@@ -187,7 +187,7 @@ public class StartupClient : MonoBehaviour
         yield return new WaitForSeconds(0.001f);
         try
         {
-            Dns.GetHostAddresses(Config.SERVER_CONNECTION_IP);
+            Debug.LogWarning(Dns.GetHostAddresses(Config.SERVER_CONNECTION_IP)[0]);
         }
         catch
         {
@@ -205,6 +205,7 @@ public class StartupClient : MonoBehaviour
             Config.HAUPTMENUE_FEHLERMELDUNG = "Verbindungsversuch: " + i + "/4";
             yield return null;
             yield return null;
+            Debug.LogWarning(Config.SERVER_CONNECTION_IP);
             if (!Config.CLIENT_TCP.ConnectAsync(Config.SERVER_CONNECTION_IP, Config.SERVER_CONNECTION_PORT).Wait(1000 * i))
             {
                 // connection failure

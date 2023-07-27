@@ -37,13 +37,10 @@ public class MenschAergerDichNichtServer : MonoBehaviour
     private bool ServerAllowZugWahl;
     private bool BotWillReplaceServer;
 
-    //private List<string> broadcastmsgs;
 
     void OnEnable()
     {
         StartCoroutine(ServerUtils.Broadcast());
-        //broadcastmsgs = new List<string>();
-        //StartCoroutine(NewBroadcast());
         PlayerConnected = new bool[Config.SERVER_MAX_CONNECTIONS];
         Lobby.SetActive(true);
         Games.SetActive(false);

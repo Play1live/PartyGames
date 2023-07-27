@@ -418,7 +418,11 @@ public class TabuServer : MonoBehaviour
     }
     private IEnumerator RunTimer(int seconds, bool decPoints)
     {
-        Timer.SetActive(true);
+        bool showTimer = true;
+        if (TabuSpiel.GameType.Equals("Battle Royale"))
+            showTimer = false;
+
+        Timer.SetActive(showTimer);
 
         while (seconds >= 0)
         {
@@ -433,17 +437,22 @@ public class TabuServer : MonoBehaviour
             {
                 Moeoop.Play();
             }
-            seconds--;
+            if (showTimer)
+                seconds--;
             if (decPoints)
             {
                 if (TeamTurn.Equals("ROT"))
                     SetTeamPoints("ROT", teamrotPunkte--);
-                if (TeamTurn.Equals("BLAU"))
+                else if (TeamTurn.Equals("BLAU"))
                     SetTeamPoints("BLAU", teamblauPunkte--);
+
+                yield return new WaitForSecondsRealtime(1);
+
                 if (teamrotPunkte <= 0 || teamblauPunkte <= 0)
                     RundeEnde(-1, "Zeit");
             }
-            yield return new WaitForSecondsRealtime(1);
+            else
+                yield return new WaitForSecondsRealtime(1);
         }
         Timer.SetActive(false);
         RundeEnde(-1, "Zeit");
@@ -637,7 +646,7 @@ public class TabuServer : MonoBehaviour
             else
                 Logging.log(Logging.LogType.Error, "TabuServer", "RundeEnde", "Fehler: " + indicator + " " + TeamTurn);
 
-            EndTurn();
+            EndTurn(teamrotPunkte, teamblauPunkte);
         }
         else if (TabuSpiel.GameType.Equals("Normal"))
         {
@@ -668,7 +677,7 @@ public class TabuServer : MonoBehaviour
             // Zeit vorbei
             else if (indicator == -1)
             {
-                EndTurn();
+                EndTurn(teamrotPunkte, teamblauPunkte);
             }
             // Richtig gedrückt
             else if (indicator == +1)
@@ -703,7 +712,7 @@ public class TabuServer : MonoBehaviour
                 if (TeamTurn.Equals("BLAU"))
                     SetTeamPoints("BLAU", teamblauPunkte += TabuData.P_TIMER[2]);
                 if (teamblauPunkte <= 0 || teamrotPunkte <= 0)
-                    EndTurn();
+                    EndTurn(teamrotPunkte, teamblauPunkte);
             }
             // Falsch gedrückt
             else if (indicator == -2)
@@ -718,12 +727,12 @@ public class TabuServer : MonoBehaviour
                 if (TeamTurn.Equals("BLAU"))
                     SetTeamPoints("BLAU", teamblauPunkte += TabuData.P_TIMER[1]);
                 if (teamblauPunkte <= 0 || teamrotPunkte <= 0)
-                    EndTurn();
+                    EndTurn(teamrotPunkte, teamblauPunkte);
             }
             // Zeit vorbei
             else if (indicator == -1)
             {
-                EndTurn();
+                EndTurn(teamrotPunkte, teamblauPunkte);
             }
             // Richtig gedrückt
             else if (indicator == +1)
@@ -759,7 +768,7 @@ public class TabuServer : MonoBehaviour
                     SetTeamPoints("BLAU", teamblauPunkte += TabuData.P_BATTLE_ROYALE[2]);
 
                 if (teamblauPunkte <= 0 || teamrotPunkte <= 0)
-                    EndTurn();
+                    EndTurn(teamrotPunkte, teamblauPunkte);
             }
             // Falsch gedrückt
             else if (indicator == -2)
@@ -776,14 +785,14 @@ public class TabuServer : MonoBehaviour
 
                 if (teamblauPunkte <= 0 || teamrotPunkte <= 0)
                 {
-                    EndTurn();
+                    EndTurn(teamrotPunkte, teamblauPunkte);
                 }
 
             }
             // Zeit vorbei
             else if (indicator == -1)
             {
-                EndTurn();
+                EndTurn(teamrotPunkte, teamblauPunkte);
             }
             // Richtig gedrückt
             else if (indicator == +1)
@@ -842,7 +851,7 @@ public class TabuServer : MonoBehaviour
 
         ServerUtils.AddBroadcast("#RundeEnde " + TeamTurn + "|" + indicator + "|" + TabuSpiel.GameType + "|" + teamrotPunkte + "|" + teamblauPunkte + "|" + erklaerer + "|" + true + "|" + TabuSpiel.getIntArrayToString(wortzahlen) + "|" + selectedItem.geheimwort + "|" + selectedItem.tabuworte);
     }
-    private void EndTurn()
+    private void EndTurn(int rotpoints, int blaupoints)
     {
         if (!started)
             return;
@@ -856,6 +865,11 @@ public class TabuServer : MonoBehaviour
         JoinTeamBlau.SetActive(true);
         JoinTeamRot.SetActive(true);
         erklaerer = "";
+        MarkErklaerer();
+
+        SetTeamPoints("ROT", rotpoints);
+        SetTeamPoints("BLAU", blaupoints);
+
         if (TeamTurn.Equals("ROT"))
             TeamTurn = "BLAU";
         else
@@ -865,7 +879,8 @@ public class TabuServer : MonoBehaviour
         else if (TeamTurn.Equals("BLAU") && teamblauList.Contains(Config.PLAYER_NAME))
             RundeStarten.SetActive(true);
 
-        MarkErklaerer();
+        if (TabuSpiel.GameType.Equals("Battle Royale"))
+            RundeStarten.SetActive(false);
     }
     public void ChangePoints(Button btn)
     {
@@ -897,6 +912,25 @@ public class TabuServer : MonoBehaviour
         }
         else
             Logging.log(Logging.LogType.Error, "TabuServer", "ChangePoints", "Button nicht bekannt: " + btn.name);
+
+        SetTeamPoints("ROT", teamrotPunkte);
+        SetTeamPoints("BLAU", teamblauPunkte);
+        ServerUtils.AddBroadcast("#TeamPunkte " + teamrotPunkte + "|" + teamblauPunkte);
+    }
+    public void ChangePoints(TMP_InputField input)
+    {
+        if (input.name.StartsWith("Rot"))
+        {
+            int points = int.Parse(input.text);
+            teamrotPunkte += points;
+        }
+        else if (input.name.StartsWith("Blau"))
+        {
+            int points = int.Parse(input.text);
+            teamblauPunkte += points;
+        }
+        else
+            Logging.log(Logging.LogType.Error, "TabuServer", "ChangePoints", "InputField nicht bekannt: " + input.name);
 
         SetTeamPoints("ROT", teamrotPunkte);
         SetTeamPoints("BLAU", teamblauPunkte);

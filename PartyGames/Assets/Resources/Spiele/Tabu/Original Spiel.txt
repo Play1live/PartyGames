@@ -103,13 +103,13 @@ Kreide|malen-schreiben-Tafel-Stra#ss#e-wei#ss#
 Moor|Natur-Gebiet-feucht-Schlamm-versinken
 Ballermann|Mallorca-Urlaub-Party-feiern-saufen
 Besen|kehren-Schaufel-Stiel-Boden-fliegen
-Laser|Strahl-Licht-schie#ss#en-schneiden-zerlegen
+Laser|Strahl-Licht-schiessen-schneiden-zerlegen
 Verkehrsinfarkt|Stra#ss#e-Auto-viel-Stau-Herz
 Schlecht|b#oe#se-#ue#bel-negativ-falsch-gut
 Peeling|Haut-Schuppen-l#oe#sen-glatt-weich
 Anker|Schiff-Haken-halten-setzen-lichten
 Cycling|Rad-fahren-Studio-drinnen-Fitness
-Ader|K#oe#rper-Blut-Herz-flie#ss#en-Vene
+Ader|K#oe#rper-Blut-Herz-fliessen-Vene
 Karaoke|Musik-singen-Mikrofon-Bar-Lied-trinken
 Reich|arm-Geld-viel-Million#ae#r-Luxus
 Schwitzkasten|k#ae#mpfen-ringen-Kopf-halten-Sauna
@@ -175,9 +175,9 @@ Puzzel|Bild-Teil-legen-passen-Hobby
 Eule|Vogel-Nacht-fliegen-Uhu-weise
 Salzburg|Stadt-#oe#sterreich-Mozart-Pfeffer-Schloss
 Sauna|hei#ss#-schwitzen-Dampf-Winter-Handtuch
-Elfmeter|Fu#ss#ball-Tor-Punkt-schie#ss#en-Strafe
+Elfmeter|Fu#ss#ball-Tor-Punkt-schiessen-Strafe
 Sch#ae#len|Haut-abmachen-Banane-Apfel-Orange
-Dressing|Salat-So#ss#e-Essig-#oe#l-gie#ss#en
+Dressing|Salat-So#ss#e-Essig-#oe#l-giessen
 Grand Canyon|Schlucht-Graben-riesen-Arizona-Amerika
 Champagner|Sekt-Kohlens#ae#ure-Frankreich-ansto#ss#en-feiern
 Einhorn|Pferd-wei#ss#-Kopf-M#ae#rchen-Fantasie
@@ -397,7 +397,7 @@ Cocktail|trinken-Alkohol-mischen-Bar-Schirmchen
 Paradies|Eden-Himmel-Urlaub-gl#ue#cklich-Vogel
 Smartphone|Handy-Internet-eMail-Touchscreen-Kontakt
 Bodygoard|Meer-Wasser-Welle-flach-surfen
-Sieb|Netz-Loch-schwenken-gie#ss#en-Ged#ae#chtnis
+Sieb|Netz-Loch-schwenken-giessen-Ged#ae#chtnis
 Pfote|Tier-Fu#ss#-Kralle-Hund-Katze
 Nussknacker|Weihnachten-Schale-brechen-Zange-Ballett
 Singleb#oe#rse|Partner-suchen-online-Internet-Kontakt
@@ -440,7 +440,7 @@ Kichererbse|H#ue#lsenfrucht-Gem#ue#se-essen-lachen-albern
 Einbrecher|R#ae#uber-stehlen-Haus-Nacht-T#ue#r
 Katzenauge|Licht-Fahrrad-rot-sehen-schnurren
 Sackgasse|Tasche-Beutel-tragen-Weg-Ende
-Frieden|Ruhe-Einigkeit-schlie#ss#en-Krieg-Taube
+Frieden|Ruhe-Einigkeit-schliessen-Krieg-Taube
 Tr#oe#delmarkt|alt-Sachen-Stand-kaufen-handeln
 Bed & Breakfast|Zimmer-Nacht-reisen-Ferien-Hotel
 Skat|Karten-spielen-Blatt-Stich-reizen
@@ -485,7 +485,7 @@ Glas|durchsichtig-Scheibe-Fenster-trinken-zerbrechen
 M#ae#hne|Haare-lang-viel-L#oe#we-Pferd
 Kr#ae#henf#ue##ss#e|Augen-Falten-lachen-Vogel-laufen
 Nerd|Typ-Computer-schlau-Brille-Au#ss#enseiter
-Form|Art-Aussehen-Gestalt-backen-gie#ss#en
+Form|Art-Aussehen-Gestalt-backen-giessen
 Stammbaum|Ahnen-Familie-Herkunft-Zweig-Pflanze
 Pudding|Desert-kochen-Vanille-weich-wackeln
 Nachos|Chips-Tortilla-dreieckig-So#ss#e-Kino
@@ -532,7 +532,7 @@ Finger|Hand-f#ue#nf-Daumen-zeigen-Ring
 Gr#ue#nschnabel|Anf#ae#nger-jung-wissen-Farbe-Ente
 Eiskaffee|kalt-hei#ss#-Sommer-trinken-Sahne
 Fledermaus|Tier-fliegen-Nacht-Vampier-Batman
-USB-Stick|speichern-Gigabyte-Medium-anschlie#ss#en-Computer
+USB-Stick|speichern-Gigabyte-Medium-anschliessen-Computer
 Bankett|Essen-Fest-G#ae#ste-Tisch-Rede
 Samenbank|Baby-Kind-Sperma-Lager-spenden
 Geige|Musik-Instrument-Saite-Bogen-spielen
@@ -658,7 +658,7 @@ Delfin|Meer-Fisch-klug-Tier-Flipper
 Bio|Natur-Schule-essen-gesund-#oe#ko
 D#oe#ner|Kebab-Fleisch-essen-Brot-T#ue#rkei
 Remake|Film-neu-alt-Auflage-modern
-Abzug|Pistole-Gewehr-schie#ss#en-Finger-Rauch
+Abzug|Pistole-Gewehr-schiessen-Finger-Rauch
 Golf|Sport-spielen-Schl#ae#ger-Platz-Auto
 Flussbett|Wasser-Bach-Boden-schlafen-Nacht
 Steckbrieg|Person-suchen-Beschreibung-Verbrechen-Post

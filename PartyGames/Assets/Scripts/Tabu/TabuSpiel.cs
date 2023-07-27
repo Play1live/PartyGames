@@ -147,11 +147,13 @@ public class Tabu
         List<string> wort = new List<string>();
         foreach (string item in inhalt.Split('\n'))
         {
-            string temp = item.Replace("##ss##", "ß").Replace("#ss#", "ß")
+            string temp = item; //= replaceShit(item);
+
+            temp = temp.Replace("##ss##", "ß").Replace("#ss#", "ß")
                 .Replace("#ue#", "ü").Replace("#UE#", "Ü")
                 .Replace("#oe#", "ö").Replace("#OE#", "Ö")
                 .Replace("#ae#", "ä").Replace("#AE#", "Ä");
-            try
+            //try
             {
                 if (!wort.Contains(temp.Split('|')[0]))
                 {
@@ -166,9 +168,9 @@ public class Tabu
                     needToSafe = true;
                 }
             }
-            catch
+            //catch
             {
-                Logging.log(Logging.LogType.Warning, "Tabu", "Tabu", "Fehler beim laden: " + name + " -> " + temp + " >>" + worte.Count);
+            //    Logging.log(Logging.LogType.Warning, "Tabu", "Tabu", "Fehler beim laden: " + name + " -> " + temp + " >>" + worte.Count);
             }
         }
 
@@ -203,6 +205,47 @@ public class Tabu
             this.worte.Remove(item);
         return item;
     }
+
+    private string replaceShit(string data)
+    {
+        string tempsafe = data;
+
+        data = data.Replace("#ß#", "ß");
+        data = data.Replace("Flu#ss#", "Fluss");
+        data = data.Replace("gew#ae#sser", "gew#ae#sser");
+        data = data.Replace("Wa#ss#er", "Wasser");
+        data = data.Replace("la#ss#en", "lassen");
+        data = data.Replace("Genu#ss#", "Genuss");
+        data = data.Replace("ma#ss#iv", "massiv");
+        data = data.Replace("be#ss#er", "besser");
+        data = data.Replace("Au#ss#icht", "Aussicht");
+        data = data.Replace("Kenntni#ss#", "Kenntniss");
+        data = data.Replace("e#ss#en", "essen");
+        data = data.Replace("E#ss#en", "Essen");
+        data = data.Replace("Genu#ss#", "Genuss");
+        data = data.Replace("Mi#ss#gunst", "Missgunst");
+        data = data.Replace("Animation#ss#erie", "Animationsserie");
+        data = data.Replace("Gesang#ss#t#ue#ck", "Gesangsst#ue#ck");
+        data = data.Replace("Arbeit#ss#telle", "Arbeitsstelle");
+        data = data.Replace("Schlu#ss#", "Schluss");
+        data = data.Replace("Mi#ss#geschick", "Missgeschick");
+        data = data.Replace("Gl#ue#ck#ss#pielhaus", "Gl#ue#cksspielhaus");
+        data = data.Replace("Acce#ss#oires", "Accessoires");
+        data = data.Replace("Fitne#ss#", "Fitness");
+        data = data.Replace("me#ss#er", "messer");
+        data = data.Replace("Me#ss#er", "Messer");
+        data = data.Replace("Pa#ss#", "Pass");
+
+
+        if (tempsafe.Equals(data))
+            return data;
+        else
+        {
+            Debug.LogWarning(tempsafe);
+            Tabu.needToSafe = true;
+            return data;
+        }
+    }
 }
 
 public class TabuItem
@@ -212,10 +255,10 @@ public class TabuItem
     
     public TabuItem(string geheimwort, string tabuworte)
     {
-        this.geheimwort = replaceShit(geheimwort);
+        this.geheimwort = geheimwort;
         List<string> worte = new List<string>();
         this.tabuworte = "";
-        foreach (string item in replaceShit(tabuworte).Split('-'))
+        foreach (string item in tabuworte.Split('-'))
         {
             if (!worte.Contains(item.ToLower()) && item.ToLower() != this.geheimwort.ToLower())
             {
@@ -239,21 +282,7 @@ public class TabuItem
         return worte;
     }
 
-    private string replaceShit(string data)
-    {
-        string tempsafe = data;
-        data = data.Replace("#ß#", "ß");
-        data = data.Replace("Flu#ss#", "Fluss");
-
-
-        if (tempsafe.Equals(data))
-            return data;
-        else
-        {
-            Tabu.needToSafe = true;
-            return data;
-        }
-    }
+    
 }
 
 public class TabuData
@@ -262,7 +291,7 @@ public class TabuData
     public static List<int> P_1WORT = new List<int> { 1, 0, 0 };
     public static List<int> P_NORMAL = new List<int> { 1, -1, 0 };
     public static List<int> P_TIMER = new List<int> { 20, -10, -5 };
-    public static List<int> P_BATTLE_ROYALE = new List<int> { 0, -10, -5 };
+    public static List<int> P_BATTLE_ROYALE = new List<int> { 5, -10, -5 };
 
     private static List<string> TimerDecPoints = new List<string>{ "Timer", "Battle Royale" };
 
