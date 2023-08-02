@@ -333,7 +333,7 @@ public class ServerUtils
                 SendMSG(msg, sc);
 
         // Lädt zurück ins Hauptmenü
-        if (msg.Equals(Config.GAME_TITLE + "#ZurueckInsHauptmenue"))
+        if (msg.Equals(Config.GAME_TITLE + "#ZurueckInsHauptmenue") || msg.Equals(Config.GLOBAL_TITLE + "#ZurueckInsHauptmenue"))
             SceneManager.LoadScene("Startup"); //Async?
         // Startet ein Spiel
         else if (msg.StartsWith(Config.GAME_TITLE + "#StarteSpiel "))
