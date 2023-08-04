@@ -375,7 +375,7 @@ pl#ae#tschern|rauschen-fliessen-murmeln-str#oe#men-rieseln-pl#ae#tschern
 Bl#ue#ten|Blumen-Bl#ue#tenpracht-Blumenpracht-Bl#ue#tenschmuck
 denken|nachdenken-#ue#berlegen-gr#ue#beln-nachsinnen-bedenken-reflektieren-#ue#berdenken-nachgr#ue#beln
 Verstand|Intellekt-Geist-Denkverm#oe#gen-Denken-Intellekt
-neu|frisch-neuartig-unverbraucht-ungebraucht-unbenutzt-ungetragen-unverbraucht
+neu|frisch-neuartig-unverbraucht-ungebraucht-unbenutzt-ungetragen-unverbraucht-alt
 s#ae#ubern|reinigen-putzen-abwischen-sauber machen
 ohne|abz#ue#glich-ausgenommen-mit Ausnahme von
 Dach|Bedachung-Dachfl#ae#che-Dachkonstruktion-Dach#ue#berstand-Dachaufbau-Dachfl#ae#che
@@ -528,7 +528,7 @@ Paar|Partner-Zweisamkeit-Beziehung-Paarung-Liebespaar-Duo-Verbindung-Zusammengeh
 #AE#rger|Wut-Zorn-Unmut-Frustration-Aufregung-Ver#ae#rgerung-Missfallen-Konflikt
 Arbeiten|T#ae#tigkeit-Beruf-Job-Besch#ae#ftigung-Arbeit-Berufsleben-Arbeitsplatz-Karriere
 #ue#brig|Rest-#UE#berbleibsel-Restbestand-Restliche-Verbleibende-Restmenge-Restlicher Teil-#UE#briggeblieben
-wenig|Knapp-Gering-Wenige-Mangelhaft-Sp#ae#rlich-Beschr#ae#nkt-Minimal-Knapp bemessen
+wenig|Knapp-Gering-Wenige-Mangelhaft-Sp#ae#rlich-Beschr#ae#nkt-Minimal-Knapp-viel
 Ende|Abschluss-Schluss-Finale-Abschliessend-Beendigung-Ausgang-Ende des Tages-Abschliessen
 M#ue#ll|Abfall-Abfallprodukt-Abfallstoffe-M#ue#llentsorgung-M#ue#lltrennung-M#ue#lldeponie-Abfallwirtschaft-M#ue#llhaufen
 Troph#ae#e|Auszeichnung-Ehrenpreis-Siegertroph#ae#e-Preistr#ae#ger-Errungenschaft-Ehrung-Pokal-Gewinnertroph#ae#e
@@ -653,7 +653,7 @@ Wohnraum|Bereich-Haus-Fl#ae#che-Zimmer-Raum-Umgebung-Feld-Lebensraum
 Minimalismus|Einfachheit-Purismus-Reduktion-Klarheit-#AE#sthetik-Weniger-ist-mehr
 Haustier|Wohnung-Garten-Begleiter-Freund-Hund-Katze-Maus-Vogel-Hamster-Hase
 Kaninchen|Hase-Nagetier-Kleintier-Hoppel-Hoppler
-Hamster|Nagetier-Kleintier-Pl#ue#schtier-Nager-Streifenh#oe#rnchen
+Hamster|Nagetier-Kleintier-Pl#ue#schtier-Nager-Streifenh#oe#rnchen-Hase
 Meerschweinchen|Nagetier-Kleintier-See-Wasser-dreckig-Kuh-Bauernhof
 Tierheim|Schutz-Einrichtung-Unterkunft-Auffangstation-Pension-Rettung-Herberge
 Wildtiere|Garten-Wald-Bestand-nat#ue#rlich
@@ -1246,7 +1246,7 @@ Seiten|Bl#ae#tter-Papiere-Buchseiten-Textseiten-Druckseiten-Schrift-Layout
 rollen|drehen-w#ae#lzen-bewegen-rotieren-kugeln-schwenken
 intelligent|klug-schlau-clever-geistreich-scharfsinnig-gebildet-verst#ae#ndig-brillant-dumm
 Gas|Luft-Dampf-Treibstoff-Sauerstoff-Stickstoff-Kohlenstoffdioxid-Methan-Gasgemisch
-Casino|Spielbank-Spielhalle-Gl#ue#cksspielhaus-Spielcasino-Spielst#ae#tte-Spieltempel-Spielh#oe#lle-Spielklub
+Casino|Spielbank-Spielhalle-Gl#ue#cksspielhaus-Las Vegas-Spielst#ae#tte-Spieltempel-Spielh#oe#lle-Spielklub
 setzen|platzieren-stellen-legen-einsetzen-positionieren-anbringen-festsetzen-anordnen
 Bauwerk|Geb#ae#ude-Konstruktion-Struktur-Architektur-Errichtung-Bau-Monument
 spitz|scharf-spitz zulaufend-spitzig-akut-zugespitzt-schlank-schmal
@@ -1468,7 +1468,7 @@ Uni|Hochschule-Studium-Forschung-Lehre-Campus-Abitur-Schulabschluss-Ausbildung
 Hochschule|Universit#ae#t-Studium-Forschung-Lehre-Campus-Abitur-Schulabschluss-Ausbildung
 Grad|Temperatur-Ma#ss#-Winkel-Stufe-Rang-Abschluss-Unterlassung-Ignoranz
 Abschluss|Ende-Beendigung-Abschied-Finale-Start-Anfang-Beginn-Auftakt
-Kohle|Holz-Briketts-Steinkohle-Braunkohle-Geld-Banknoten-M#ue#nzen-Reichtum
+Kohle|Holz-Briketts-Stein-Braunkohle-Geld-Banknoten-M#ue#nzen-Reichtum-Braun
 Moneten|Geld-Knete-Kohle-Scheine-Scheinchen-Armut-Knappheit-Mangel
 Zaster|Geld-Moneten-Knete-Kohle-Scheine-Armut-Knappheit-Mangel
 Flocken|Schnee-Haferflocken-Flakes-Getreide-Geld-Moneten-M#ue#nzen-Reichtum
@@ -1580,7 +1580,7 @@ Degen|Schwert-Waffe-Kampf-Duell-Frieden-Verteidigung-Angriff-R#ue#stung
 k#ae#mpfen|streiten-konflikt-sich ergeben-kooperieren-harmonieren-friedlich-aufgeben-unterwerfen
 Duell|Kampf-Streit-Herausforderung-Zusammenarbeit-Frieden-Einigkeit-Koexistenz-Harmonie
 tief|flach-oberfl#ae#chlich-seicht-hoch-erh#oe#ht-angehoben-aufsteigend-erh#oe#ht
-Stimme|Sprechen-Singen-Klang-Stille-Lautlosigkeit-Stimmlosigkeit-Schweigen-Stottern
+Stimme|Sprechen-Singen-Klang-Stille-Lautlosigkeit-Stimmlosigkeit-Schweigen-Stottern-redet
 gesund|fit-vital-gesundheitlich-krank-unwohl-krankhaft-ungesund-kr#ae#nklich
 B|Buchstabe-Beginn-Bezeichnung-Bedeutung-A-Seite
 schmal|d#ue#nn-eng-breit-weit-ausladend-umfangreich-volumin#oe#s
@@ -1870,7 +1870,7 @@ rei#ss#en|zerrei#ss#en-auseinanderrei#ss#en-zerrei#ss#end-kaputt-heilen-verbinde
 glatt|geschmeidig-weich-seidig-rutschig-uneben-rau-kantig-starr
 gering|niedrig-geringf#ue#gig-minimal-bescheiden-hoch-gro#ss#-bedeutend-erheblich
 Lohn|Gehalt-Bezahlung-Entlohnung-Verdienst-Einkommen-Verlust-Ausgaben-Schulden
-Euro|W#ae#hrung-Geld-Eurozone-Eurovision-Cent-Dollar-Pfund-Yen
+Euro|W#ae#hrung-Geld-Eurozone-Eurovision-Cent-Dollar-Pfund
 Aroma|Duft-Geruch-Parf#ue#m-Wohlgeruch-Gestank-Geruchslosigkeit-Neutralit#ae#t-Geruchsabweisung
 schn#ue#ffeln|riechen-erschnuppern-wittern-inhalieren-meiden-ignorieren-ablehnen-meiden
 unfassbar|unglaublich-erstaunlich-unvorstellbar-begreiflich-fassbar-real-verst#ae#ndlich-nachvollziehbar
@@ -2428,7 +2428,7 @@ Punkt|Komma-Satzzeichen-Linie-Kurve-Form-Fl#ae#che-Bereich
 anlegen|investieren-sparen-ausgeben-verschwenden-verlieren-ablegen-abwerfen-loslassen
 Jacht|Luxusyacht-Schiff-klein-bescheiden-einfach-schlicht-gew#oe#hnlich-durchschnittlich
 Flo#ss#e|Schwanzflo#ss#e-R#ue#ckenflo#ss#e-ohne Flo#ss#e-flo#ss#enlos-flo#ss#efrei-flo#ss#enlos
-Treffer|Erfolg-Trefferquote-Fehlschlag-Mi#ss#erfolg-Verfehlung-Versagen-Fehler
+Treffer|Erfolg-Trefferquote-Fehlschlag-Misserfolg-Verfehlung-Versagen-Fehler-Dart
 Google|Suchmaschine-Internet-alternative-Konkurrenz-Yahoo-Bing-DuckDuckGo-Suchdienst
 Bing|Suchmaschine-Internet-alternative-Konkurrenz-Google-Yahoo-DuckDuckGo-Suchdienst
 Yahoo|Suchmaschine-Internet-alternative-Konkurrenz-Google-Bing-DuckDuckGo-Suchdienst
@@ -2534,7 +2534,7 @@ Filmstart|Premiere-Ver#oe#ffentlichung-Launch-Beginn-Ende-Auslaufen-Abschlu#ss#-
 Radfahren|Fahrradfahren-Radeln-Pedalieren-Treten-Rennrad-Laufen-Auto-Motorrad
 Pedale|Fahrrad-Treten-Fu#ss#-Bein-Autofahren-Halten-Statisch-Unbeweglich
 Helm|Schutz-Sicherheit-Kopf-Unfall-Gefahr-Risiko-Nacken-Haare
-Brennen|Feuer-Flamme-Gl#ue#hen-Licht-K#ae#lte-L#oe#schmittel-L#oe#schen-L#oe#schen
+Brennen|Feuer-Flamme-Gl#ue#hen-Licht-K#ae#lte-L#oe#schmittel-L#oe#schen
 W#ae#rme|Hei#ss#-K#ae#lte-K#ue#hle-Frische-Hitze-Klimaanlage-K#ue#hlschrank-Eisesk#ae#lte
 Anziehen|Kleidung-Ausziehen-Anprobieren-Ankleiden-Entkleiden-Nackt-Nacktheit-Unbekleidet
 Mode|Trends-Stil-Kleidung-Fashion-Outfits-Veraltet-Unmodern-Altmodisch
@@ -2674,7 +2674,7 @@ Sonnenstrahlen|Sonne-Licht-Strahlen-Dunkelheit-Schatten-Finsternis-D#ae#mmerung-
 Vergr#oe##ss#erung|Vergr#oe##ss#ern-Zoom-Verkleinerung-Verkleinern-Detail-Au#ss#chnitt-Schrumpfen-Verringern
 Sicht|Blick-Ansicht-Perspektive-Blindheit-Dunkelheit-Verdeckung-Verschwommenheit-Unsichtbarkeit
 Fokus|Konzentration-Sch#ae#rfe-Unsch#ae#rfe-Ablenkung-Zerstreutheit-Unfoku#ss#iert-Verwirrung-Unkonzentriert
-Aufh#ae#ngen|Aufh#ae#ngung-Anbringen-Befestigen-Abh#ae#ngen-Abnehmen-Ablegen-Hinlegen
+Aufh#ae#ngen|Anbringen-Befestigen-Abh#ae#ngen-Abnehmen-Ablegen-Hinlegen-Bild
 Organisieren|Ordnen-Strukturieren-Planen-Chaos-Unordnung-Durcheinander-Verwirrung-Verstreuen
 Schl#ue##ss#elhaken|Schl#ue##ss#elanh#ae#nger-Schl#ue##ss#elring-Schl#ue##ss#elbox-Schl#ue##ss#elbund-Haken-Halter-Schl#ue##ss#elhalter-Verriegelung
 Flur|Gang-Korridor-Eingangsbereich-Zimmer-Raum-Treppe-Aufzug-Verlassen
@@ -3176,7 +3176,7 @@ Platzsparend|Platzsparsam-Platzoptimiert-Kompakt-Platznutzung-Platzvergeudung-Pl
 Drehbar|Rotierend-Dreht-Drehend-Drehbewegung-Stillstand-Unbeweglich-Fest-Unver#ae#nderlich
 Fernsehger#ae#t|Fernseher-TV-Bildschirm-Flachbildfernseher-Unterhaltung-Dunkelheit-Ausfall-St#oe#rung
 Abfragen|Fragen-Abfragenstellung-Anfragen-Informationserhaltung-Informationsverlust-Ignoranz-Nichtwi#ss#en-Unwi#ss#enheit
-Tabellen|Datenstruktur-Spalten-Zeilen-Datenvisualisierung-Tabellenaufbau-Verwirrung-Unordnung-Unstrukturiertheit
+Tabellen|Datenstruktur-Spalten-Zeilen-Datenvisualisierung-Verwirrung-Unordnung-Excel
 Nutzerfreundlichkeit|Benutzerfreundlichkeit-Bedienbarkeit-Benutzbarkeit-Gebrauchstauglichkeit-Einfachheit-Komplexit#ae#t-Ineffizienz-Schwierigkeit
 #AE#nderungen|Ver#ae#nderungen-Modifikationen-Anpa#ss#ungen-Aktualisierungen-Transformationen-Stagnation-Stillstand-Unver#ae#nderlichkeit
 Verlauf|Chronologie-Ablauf-Zeitverlauf-Historie-Entwicklung-Stillstand-R#ue#ckschritt-Stillstand
@@ -4042,7 +4042,7 @@ Geburtstage|Feier-Jubil#ae#um-Festlichkeit-Vergessen-Ignorieren-#UE#bersehen-Nic
 Wohlstand|Reichtum-F#ue#lle-Armut-Mangel-Bed#ue#rftigkeit-Knappheit-Verarmung-Finanzielle Not
 Exklusivit#ae#t|Exklusiv-Einzigartigkeit-Inklusivit#ae#t-Zug#ae#nglichkeit-Gemeinschaft-Offenheit-Allgemeinheit-Standard
 Eleganz|Stilvoll-Raffiniert-Grob-Schlicht-Unauff#ae#llig-Unscheinbar-Unelegant-Taktlos
-Verw#oe#hnen|Verw#oe#hnt-Verw#oe#hnprogramm-Vernachl#ae##ss#igen-Ignorieren-Mi#ss#handeln-Vernachl#ae##ss#igung-Mi#ss#handlung-Zur#ue#ckweisung
+Verw#oe#hnen|Verw#oe#hnt-Verw#oe#hnprogramm-Vernachl#ae##ss#igen-Ignorieren-Misshandeln-Vernachl#ae#ssigung-Zur#ue#ckweisung
 Prestige|Ansehen-Renommee-Bescheidenheit-Niedriges Ansehen-Geringes Renommee-Einfachheit-Unauff#ae#lligkeit-Bedeutungslosigkeit
 Zielsetzung|Ziel-Planung-Ziellosigkeit-Orientierungslosigkeit-Ziellos-Planlos-Zweck-Absichtslosigkeit
 Absicht|Vorhaben-Intention-Zufall-Versehentlich-Unbeabsichtigt-Ungeplant-Ziel-Planlosigkeit
@@ -4077,7 +4077,7 @@ Intere#ss#ant|Spannend-Fe#ss#elnd-Faszinierend-Langweilig-#OE#de-Unintere#ss#ant
 Scheitern|Versagen-Misserfolg-Niederlage-Erfolg-Gelingen-Erfolgserlebnis-Triumph-Durchbruch
 Abgeben|#UE#bergeben-Weitergeben-Abtreten-Behalten-Zur#ue#ckhalten-Aufbewahren-Annehmen
 Verlust|Niederlage-Einbu#ss#e-Gewinn-Erfolg-Zugewinn-Zuwachs-Ertrag
-Mi#ss#erfolg|Fehlschlag-Versagen-Erfolg-Gelingen-Triumph-Durchbruch-Erfolgserlebnis
+Misserfolg|Fehlschlag-Versagen-Erfolg-Gelingen-Triumph-Durchbruch-Erfolgserlebnis
 Einb#ue##ss#en|Verlieren-Verzichten-Behalten-Zugewinn-Zuwachs-Ertrag-Gewinn
 Sinken|Abfallen-Fallen-St#ue#rzen-Steigen-Ansteigen-Anwachsen-Erh#oe#hen-Aufsteigen
 Herabfallen|Fallen-St#ue#rzen-Aufsteigen-Steigen-Emporschiessen-Emporsteigen-Aufsteigen
@@ -4140,7 +4140,7 @@ Lagerhaltung|Warenlagerung-Bestandsf#ue#hrung-Inventarverwaltung-Materiallogisti
 Stapler|Gabelstapler-Flurf#oe#rderzeug-Hubwagen-Transportmaschine-Hebefahrzeug-Stillstand-Ausfall-St#oe#rung
 Vorlesungen|Vortr#ae#ge-Lehrveranstaltungen-Unterrichtseinheiten-Seminare-Workshops-Stille-Leerlauf-Pausen
 Seminare|Schulungen-Workshops-Trainings-Weiterbildungen-Fortbildungen-Theorie-Passivit#ae#t-Inaktivit#ae#t
-Profe#ss#oren|Dozenten-Lehrende-Hochschullehrer-Wi#ss#enschaftler-Gastredner-Abwesenheit-Laienhaftigkeit-Inkompetenz
+Professoren|Dozenten-Lehrende-Hochschullehrer-Wi#ss#enschaftler-Gastredner-Abwesenheit-Laienhaftigkeit-Inkompetenz
 Gymnastik|Sport-Bewegung-Fitness-Training-#UE#bungen-Inaktivit#ae#t-Tr#ae#gheit-Faulheit
 Nutztiere|Haustiere-Tiere-Vieh-Haustier-Heimtier-Wildtiere-Exoten-Tierfreiheit
 Ackerbau|Landwirtschaft-Pflanzenbau-Feldbau-Kulturen-Anbau-Brachland-Ernteausfall-Mi#ss#ernte
