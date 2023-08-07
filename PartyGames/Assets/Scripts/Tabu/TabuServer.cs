@@ -43,6 +43,7 @@ public class TabuServer : MonoBehaviour
     private string TeamTurn;
     private bool started;
     private string erklaerer;
+    private string lastErklaerer;
 
     private Coroutine TimerCoroutine;
     private TabuItem selectedItem;
@@ -814,14 +815,25 @@ public class TabuServer : MonoBehaviour
                     TeamTurn = "ROT";
 
                 Skip.SetActive(false);
+                lastErklaerer = erklaerer;
                 if (TeamTurn.Equals("ROT"))
                 {
-                    if (teamrotList.Count > 0)
+                    List<string> namen = new List<string>();
+                    namen.AddRange(teamrotList);
+                    namen.Remove(lastErklaerer);
+                    if (namen.Count > 0)
+                        erklaerer = namen[UnityEngine.Random.Range(0, namen.Count)];
+                    else
                         erklaerer = teamrotList[UnityEngine.Random.Range(0, teamrotList.Count)];
                 }
                 else if (TeamTurn.Equals("BLAU"))
                 {
-                    if (teamblauList.Count > 0)
+                    List<string> namen = new List<string>();
+                    namen.AddRange(teamblauList);
+                    namen.Remove(lastErklaerer);
+                    if (namen.Count > 0)
+                        erklaerer = namen[UnityEngine.Random.Range(0, namen.Count)];
+                    else
                         erklaerer = teamblauList[UnityEngine.Random.Range(0, teamblauList.Count)];
                 }
                 if (erklaerer.Equals(Config.PLAYER_NAME))
@@ -919,6 +931,8 @@ public class TabuServer : MonoBehaviour
     }
     public void ChangePoints(TMP_InputField input)
     {
+        if (input.text.Length == 0)
+            return;
         if (input.name.StartsWith("Rot"))
         {
             int points = int.Parse(input.text);
@@ -931,7 +945,7 @@ public class TabuServer : MonoBehaviour
         }
         else
             Logging.log(Logging.LogType.Error, "TabuServer", "ChangePoints", "InputField nicht bekannt: " + input.name);
-
+        input.text = "";
         SetTeamPoints("ROT", teamrotPunkte);
         SetTeamPoints("BLAU", teamblauPunkte);
         ServerUtils.AddBroadcast("#TeamPunkte " + teamrotPunkte + "|" + teamblauPunkte);

@@ -758,6 +758,8 @@ public class TabuClient : MonoBehaviour
             Skip.SetActive(true);
         else if (TabuSpiel.GameType.Equals("Timer") && erklaerer.Equals(Config.PLAYER_NAME))
             Skip.SetActive(true);
+        else if (TabuSpiel.GameType.Equals("Battle Royale") && erklaerer.Equals(Config.PLAYER_NAME))
+            Skip.SetActive(true);
 
         RundeStarten.SetActive(false);
         JoinTeamRot.SetActive(false);

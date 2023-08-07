@@ -375,7 +375,7 @@ pl#ae#tschern|rauschen-fliessen-murmeln-str#oe#men-rieseln-pl#ae#tschern
 Bl#ue#ten|Blumen-Bl#ue#tenpracht-Blumenpracht-Bl#ue#tenschmuck
 denken|nachdenken-#ue#berlegen-gr#ue#beln-nachsinnen-bedenken-reflektieren-#ue#berdenken-nachgr#ue#beln
 Verstand|Intellekt-Geist-Denkverm#oe#gen-Denken-Intellekt
-neu|frisch-neuartig-unverbraucht-ungebraucht-unbenutzt-ungetragen-unverbraucht-alt
+neu|frisch-neuartig-unverbraucht-ungebraucht-unbenutzt-ungetragen-alt
 s#ae#ubern|reinigen-putzen-abwischen-sauber machen
 ohne|abz#ue#glich-ausgenommen-mit Ausnahme von
 Dach|Bedachung-Dachfl#ae#che-Dachkonstruktion-Dach#ue#berstand-Dachaufbau-Dachfl#ae#che
@@ -528,7 +528,7 @@ Paar|Partner-Zweisamkeit-Beziehung-Paarung-Liebespaar-Duo-Verbindung-Zusammengeh
 #AE#rger|Wut-Zorn-Unmut-Frustration-Aufregung-Ver#ae#rgerung-Missfallen-Konflikt
 Arbeiten|T#ae#tigkeit-Beruf-Job-Besch#ae#ftigung-Arbeit-Berufsleben-Arbeitsplatz-Karriere
 #ue#brig|Rest-#UE#berbleibsel-Restbestand-Restliche-Verbleibende-Restmenge-Restlicher Teil-#UE#briggeblieben
-wenig|Knapp-Gering-Wenige-Mangelhaft-Sp#ae#rlich-Beschr#ae#nkt-Minimal-Knapp-viel
+wenig|Knapp-Gering-Wenige-Mangelhaft-Sp#ae#rlich-Beschr#ae#nkt-Minimal-viel
 Ende|Abschluss-Schluss-Finale-Abschliessend-Beendigung-Ausgang-Ende des Tages-Abschliessen
 M#ue#ll|Abfall-Abfallprodukt-Abfallstoffe-M#ue#llentsorgung-M#ue#lltrennung-M#ue#lldeponie-Abfallwirtschaft-M#ue#llhaufen
 Troph#ae#e|Auszeichnung-Ehrenpreis-Siegertroph#ae#e-Preistr#ae#ger-Errungenschaft-Ehrung-Pokal-Gewinnertroph#ae#e
