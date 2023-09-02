@@ -475,7 +475,10 @@ public class TabuServer : MonoBehaviour
     {
         started = true;
         erklaerer = playername;
+        lastErklaerer = erklaerer;
         if (TabuSpiel.GameType.Equals("1 Wort"))
+            selectedItem = Config.TABU_SPIEL.getSelected().GetRandomItem(true);
+        else if (TabuSpiel.GameType.Equals("Battle Royale"))
             selectedItem = Config.TABU_SPIEL.getSelected().GetRandomItem(true);
         else
             selectedItem = Config.TABU_SPIEL.getSelected().GetRandomItem(false);
@@ -815,7 +818,7 @@ public class TabuServer : MonoBehaviour
                     TeamTurn = "ROT";
 
                 Skip.SetActive(false);
-                lastErklaerer = erklaerer;
+                string templastErklaerer = erklaerer;
                 if (TeamTurn.Equals("ROT"))
                 {
                     List<string> namen = new List<string>();
@@ -836,6 +839,7 @@ public class TabuServer : MonoBehaviour
                     else
                         erklaerer = teamblauList[UnityEngine.Random.Range(0, teamblauList.Count)];
                 }
+                lastErklaerer = templastErklaerer;
                 if (erklaerer.Equals(Config.PLAYER_NAME))
                     Skip.SetActive(true);
 
@@ -848,7 +852,10 @@ public class TabuServer : MonoBehaviour
         // Neue Karte
         if (started)
         {
-            selectedItem = Config.TABU_SPIEL.getSelected().GetRandomItem(false);
+            if (TabuSpiel.GameType.Equals("Battle Royale"))
+                selectedItem = Config.TABU_SPIEL.getSelected().GetRandomItem(true);
+            else
+                selectedItem = Config.TABU_SPIEL.getSelected().GetRandomItem(false);
             wortzahlen = TabuSpiel.genWorteList(selectedItem);
             displayworte = TabuSpiel.getKartenWorte(selectedItem.tabuworte, wortzahlen);
             if (erklaerer.Equals(Config.PLAYER_NAME))

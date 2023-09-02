@@ -31,7 +31,7 @@ public class TabuSpiel
 
         foreach (string item in packnames)
         {
-            tabus.Add(new Tabu(item, Resources.Load<TextAsset>("Spiele/Tabu/" + item).text));
+            tabus.Add(new Tabu(item, Resources.Load<TextAsset>("Spiele/Tabu/" + item).text.Replace("\n", "")));
         }
 
         foreach (Tabu item in tabus)
@@ -40,16 +40,16 @@ public class TabuSpiel
         if (tabus.Count > 0)
             setSelected(tabus[0]);
 
-        /*
+        
         //Erstelle Liste mit allen Worten die nicht verwendet werden
-        List<string> verwendete = new List<string>();
+        /*List<string> verwendete = new List<string>();
         List<string> nichtverwendete = new List<string>();
         foreach (Tabu item in tabus)
             foreach (TabuItem i in item.getGeheimwörter())
                 verwendete.Add(i.geheimwort);
         foreach (Tabu item in tabus)
             foreach (TabuItem i in item.getGeheimwörter())
-                foreach (string worte in i.verboteneWorte.Replace("\\n", "-").Split("-"))
+                foreach (string worte in i.tabuworte.Replace("\\n", "-").Split("-"))
                     if (!verwendete.Contains(worte))
                         nichtverwendete.Add(worte);
         foreach (string item in verwendete)
@@ -142,19 +142,21 @@ public class Tabu
         Logging.log(Logging.LogType.Debug, "Tabu", "Tabu", "Lade Datei: " + name);
         this.name = name;
         needToSafe = false;
-
         this.worte = new List<TabuItem>();
         List<string> wort = new List<string>();
-        foreach (string item in inhalt.Split('\n'))
+        foreach (string item in inhalt.Split('~'))
         {
+            if (item.Length == 0)
+                continue;
             string temp = item; //= replaceShit(item);
 
             temp = temp.Replace("##ss##", "ß").Replace("#ss#", "ß")
                 .Replace("#ue#", "ü").Replace("#UE#", "Ü")
                 .Replace("#oe#", "ö").Replace("#OE#", "Ö")
                 .Replace("#ae#", "ä").Replace("#AE#", "Ä");
-            //try
+            try
             {
+                // TODO: dopplung am anfang wird nicht gehandelt
                 if (!wort.Contains(temp.Split('|')[0]))
                 {
                     if (temp.Length <= 1 || temp.Equals(""))
@@ -164,29 +166,43 @@ public class Tabu
                 }
                 else
                 {
-                    Logging.log(Logging.LogType.Warning, "Tabu", "Tabu", name + " -> Dopplung: " + temp.Split('|')[0]);
+                    Logging.log(Logging.LogType.Warning, "Tabu", "Tabu", name + " -> Dopplung: " + temp);
+                    foreach (var dopplungswort in worte)
+                    {
+                        if (dopplungswort.geheimwort.Equals(temp.Split('|')[0]))
+                        {
+                            dopplungswort.AddTabuWorte(temp.Split('|')[1]);
+                            break;
+                        }
+                    }
+
                     needToSafe = true;
                 }
             }
-            //catch
+            catch
             {
-            //    Logging.log(Logging.LogType.Warning, "Tabu", "Tabu", "Fehler beim laden: " + name + " -> " + temp + " >>" + worte.Count);
+                Logging.log(Logging.LogType.Warning, "Tabu", "Tabu", "Fehler beim laden: " + name + " -> " + temp + " >>" + worte.Count);
             }
         }
-
+        Debug.LogWarning(worte.Count);
+        
         // Save Files
         if (needToSafe)
         {
             string newFile = "";
             foreach (TabuItem item in this.worte)
-                newFile += "\n" + item.geheimwort.Replace("ß", "#ss#")
+            {
+                newFile += "\n~" + item.geheimwort.Replace("ß", "#ss#")
                 .Replace("Ü", "#UE#").Replace("ü", "#ue#")
                 .Replace("Ö", "#OE#").Replace("ö", "#oe#")
                 .Replace("Ä", "#AE#").Replace("ä", "#ae#")
-                + "|" + item.tabuworte.Replace("\\n", "-").Replace("ß", "#ss#")
+                + "|" + item.tabuworte.Replace("\n", "-")
+                .Replace("ß", "#ss#")
                 .Replace("Ü", "#UE#").Replace("ü", "#ue#")
                 .Replace("Ö", "#OE#").Replace("ö", "#oe#")
                 .Replace("Ä", "#AE#").Replace("ä", "#ae#");
+            }
+
             if (newFile.Length > 2)
                 newFile = newFile.Substring("\n".Length);
 
@@ -212,29 +228,6 @@ public class Tabu
 
         data = data.Replace("#ß#", "ß");
         data = data.Replace("Flu#ss#", "Fluss");
-        data = data.Replace("gew#ae#sser", "gew#ae#sser");
-        data = data.Replace("Wa#ss#er", "Wasser");
-        data = data.Replace("la#ss#en", "lassen");
-        data = data.Replace("Genu#ss#", "Genuss");
-        data = data.Replace("ma#ss#iv", "massiv");
-        data = data.Replace("be#ss#er", "besser");
-        data = data.Replace("Au#ss#icht", "Aussicht");
-        data = data.Replace("Kenntni#ss#", "Kenntniss");
-        data = data.Replace("e#ss#en", "essen");
-        data = data.Replace("E#ss#en", "Essen");
-        data = data.Replace("Genu#ss#", "Genuss");
-        data = data.Replace("Mi#ss#gunst", "Missgunst");
-        data = data.Replace("Animation#ss#erie", "Animationsserie");
-        data = data.Replace("Gesang#ss#t#ue#ck", "Gesangsst#ue#ck");
-        data = data.Replace("Arbeit#ss#telle", "Arbeitsstelle");
-        data = data.Replace("Schlu#ss#", "Schluss");
-        data = data.Replace("Mi#ss#geschick", "Missgeschick");
-        data = data.Replace("Gl#ue#ck#ss#pielhaus", "Gl#ue#cksspielhaus");
-        data = data.Replace("Acce#ss#oires", "Accessoires");
-        data = data.Replace("Fitne#ss#", "Fitness");
-        data = data.Replace("me#ss#er", "messer");
-        data = data.Replace("Me#ss#er", "Messer");
-        data = data.Replace("Pa#ss#", "Pass");
 
 
         if (tempsafe.Equals(data))
@@ -282,7 +275,30 @@ public class TabuItem
         return worte;
     }
 
-    
+    public void AddTabuWorte(string liste)
+    {
+        List<string> neueworte = new List<string>();
+        foreach (var item in tabuworte.Split('-'))
+        {
+            if (item.Length == 0)
+                continue;
+            neueworte.Add(item);
+        }
+        foreach (var item in liste.Split('-'))
+        {
+            if (item.Length == 0)
+                continue;
+            if (item.Contains(geheimwort) || item.Contains(geheimwort.ToLower()))
+                continue;
+            if (!neueworte.Contains(item))
+                neueworte.Add(item);
+        }
+        tabuworte = "";
+        foreach (var item in neueworte)
+            tabuworte += "-" + item;
+        if (tabuworte.Length > 0)
+            tabuworte = tabuworte.Substring(1);
+    }
 }
 
 public class TabuData
