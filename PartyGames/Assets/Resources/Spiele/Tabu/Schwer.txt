@@ -10,7 +10,7 @@
 ~Staatswappen|Hoheitszeichen-Heraldik-Symbol-Abzeichen-Wappenfigur-Pr#ae#gung
 ~Stolz|Selbstbewusstsein-Ehre-Selbstgef#ue#hl-W#ue#rde-Anerkennung-Eitelkeit
 ~Emblem|Symbol-Zeichen-Insignie-Signet-Markenlogo-Darstellung
-~Banner|Fahne-Plakat-Standarte-Gewerbe-Stoff-Transparent-Flagge-Transparent-Abwesenheit-Unscheinbarkeit-Abdeckung
+~Banner|Fahne-Plakat-Standarte-Gewerbe-Stoff-Transparent-Flagge-Abwesenheit-Unscheinbarkeit-Abdeckung
 ~Land|Gebiet-Territorium-Region-Staat-Terrain-Erde-Boden-Nation-Heimat-Staatsangeh#oe#rigkeit
 ~Nation|Gesellschaft-Gemeinschaft-Volk-Bev#oe#lkerung-Einheit-Kollektiv-Land-Global-Weltweit-Globalisierung
 ~Zugeh#oe#rigkeit|Einbindung-Mitgliedschaft-Verbundenheit-Teilnahme-Integration-Einheit
@@ -21,12 +21,12 @@
 ~Tradition|Brauch-Erbe-Kultur-#UE#berlieferung-Brauchtum-Gepflogenheit-Gewohnheit-Ritual-Kulturlosigkeit-Gewohnheitslosigkeit-Innovativit#ae#t
 ~Anerkennung|W#ue#rdigung-Respekt-Lob-Ehre-Zustimmung-Beachtung
 ~Hymne|Nationalhymne-Lied-Melodie-Hochgesang-Huldigung-Musik
-~Wahrzeichen|Symbol-Bauwerk-Markenzeichen-Erkennungszeichen-Denkmal-Ikone-Ikone-Unbekanntheit-Belanglosigkeit-Unwichtigkeit-Bedeutungslosigkeit-Anonymit#ae#t
+~Wahrzeichen|Symbol-Bauwerk-Markenzeichen-Erkennungszeichen-Denkmal-Ikone-Unbekanntheit-Belanglosigkeit-Unwichtigkeit-Bedeutungslosigkeit-Anonymit#ae#t
 ~Zeremonie|Feier-Ritual-Veranstaltung-Ablauf-Zelebration-Feierlichkeit-Alltag-Gew#oe#hnlichkeit-Informalit#ae#t-L#ae##ss#igkeit-Zwanglosigkeit
-~Feier|Jubil#ae#um-Fest-Anlass-Zusammenkunft-Veranstaltung-Party-Party-Trauer-Zur#ue#ckhaltung-Einsamkeit-Stille-Zur#ue#ckgezogenheit-Abgeschiedenheit-Isolation
+~Feier|Jubil#ae#um-Fest-Anlass-Zusammenkunft-Veranstaltung-Party-Trauer-Zur#ue#ckhaltung-Einsamkeit-Stille-Zur#ue#ckgezogenheit-Abgeschiedenheit-Isolation
 ~Vielfalt|Diversit#ae#t-Unterschiedlichkeit-Varianz-Abwechslung-Mannigfaltigkeit-Heterogenit#ae#t
 ~Einheit|Verbundenheit-Gemeinschaft-Harmonie-Konsens-Gleichheit-Zusammenhalt
-~Identifikation|Erkennung-Kennzeichnung-Zuordnung-Verbindung-Best#ae#tigung-Zugeh#oe#rigkeit-Zugeh#oe#rigkeit-Verbundenheit-Identit#ae#tsbildung-Gemeinschaft-Entfremdung-Anonymit#ae#t-Verlust der Identit#ae#t
+~Identifikation|Erkennung-Kennzeichnung-Zuordnung-Verbindung-Best#ae#tigung-Zugeh#oe#rigkeit-Verbundenheit-Identit#ae#tsbildung-Gemeinschaft-Entfremdung-Anonymit#ae#t-Verlust der Identit#ae#t
 ~Demokratie|Volksherrschaft-Freiheit-Gleichheit-Partizipation-Rechtsstaat-Wahlen
 ~Autokratie|Alleinherrschaft-Macht-Kontrolle-Entscheidungen-Einzelne-Autokrat
 ~Monarchie|K#oe#nigtum-Erbfolge-Herrscher-Adel-Thron-Monarch
@@ -56,14 +56,14 @@
 ~Schilder|Verkehrszeichen-Wegweiser-Hinweisschild-Verkehrsinformation-Verkehrsregeln-Anzeige
 ~Stra#ss#enschild|Verkehrsschild-Hinweisschild-Stra#ss#ennamen-Stra#ss#e-Information-Ort
 ~Weg|Pfad-Richtung-Strecke-Route-Pfadfinden-Reise-Stra#ss#e-Spur-Gang-Bahn
-~Stau|Verkehrsstau-Stockung-Stillstand-Verkehr-Mobilit#ae#t-Verz#oe#gerung-Verkehr#ss#tau-Verz#oe#gerung-Fluss-Geschwindigkeit-Freie Fahrt
+~Stau|Verkehrsstau-Stockung-Stillstand-Verkehr-Mobilit#ae#t-Verz#oe#gerung-Verkehr#ss#tau-Fluss-Geschwindigkeit-Freie Fahrt
 ~Abzweigung|Gabelung-Trennung-Wege-Verzweigung-Weg-Biegung
 ~Einbahnstra#ss#e|Verkehr-Fahrtrichtung-Einseitig-Stra#ss#e-Einbahnverkehr-Sackgasse
 ~Verkehrsregeln|Vorschriften-Verkehrssicherheit-Regelungen-Stra#ss#enverkehr-Verhalten-Gesetze
 ~Baustelle|Bauarbeiten-Umleitung-Bauprojekt-Stra#ss#enbau-Sperrung-Arbeit
 ~Fahrradweg|Radweg-Radfahrer-Strecke-Fahrradfahren-Bewegung-Rad
 ~Schnellstra#ss#e|Autobahnzubringer-Stra#ss#e-H#oe#here-Geschwindigkeit-Schnellverkehr-Ausfahrten
-~Landstra#ss#e|Landverbindung-Strecke-Stra#ss#e-L#ae#ndliche-Gegend-Verbindung-Land-Landschaft-Verbindung-Ortschaft-L#ae#ndlich-Kurve-Ausblick
+~Landstra#ss#e|Landverbindung-Strecke-Stra#ss#e-L#ae#ndliche-Gegend-Verbindung-Land-Landschaft-Ortschaft-L#ae#ndlich-Kurve-Ausblick
 ~Autobahn|Schnellstra#ss#e-Autobahnnetz-Fernverkehr-Verbindung-Stra#ss#ennetz-Ausfahrten
 -Stra#ss#e-Verkehr-Autofahren-Fahrbahn-Kilometer-Ausfahrt-Geschwindigkeit
 ~Fu#ss#g#ae#nger#ue#berweg|Zebrastreifen-#UE#berquerung-Fu#ss#g#ae#nger-Verkehrsregel-Passanten
@@ -271,9 +271,9 @@
 ~Website|Internetseite-Webpr#ae#senz-Onlineauftritt-Homepage-Webplattform-Webadresse-Internetpr#ae#senz-Webinhalte
 ~speichern|Sichern-Aufbewahren-Abspeichern-Archivieren-Ablegen-Daten-Datei-Speicherplatz
 ~Keks|Geb#ae#ck-Pl#ae#tzchen-Backware-Naschwerk-Keksvariation-Keksform-Keksrezept-Knusperkeks
-~Mann|M#ae#nnlich-Mannsbild-Herr-Herrenperson-Erwachsener-Manneskraft-Geschlecht-Mannsein
+~Mann|M#ae#nnlich-Mannsbild-Herr-Herrenperson-Erwachsener-Manneskraft-Geschlecht-Mannsein-Frau
 ~Ehe|Ehebund-Eheschlie#ss#ung-Ehevertrag-Eheleben-Ehepartner-Ehestand-Ehegel#ue#bde-Ehegemeinschaft
-~Frau|Weiblich-Dame-Frauensperson-Erwachsene-Weiblichkeit-Geschlecht-Frausein
+~Frau|Weiblich-Dame-Person-Mann-Erwachsene-Weiblichkeit-Geschlecht-Frausein
 ~darunter|Unterhalb-Unterliegend-Unter-Inbegriffen-Inklusive-davon-Untergeordnet
 ~acht|Zahl-Achtzahl-Achtung-Position-Achtstufig-Achtseitig-Achtform-Achterbahn
 ~Beine|Gliedma#ss#en-Extremit#ae#ten-Beinpaar-Laufwerkzeuge-Standbeine-Beinmuskulatur-Kniegelenke-Beinl#ae#nge
@@ -608,7 +608,7 @@
 ~Z#ae#hne|Bei#ss#en-Kauen-Arzt-B#ue#rste-Gebiss-Schmerzen-Zunge
 ~Pfefferminz|Frisch-Atem-Minze-Erfrischend-Menthol-K#ue#hlend-Pflanze-Tee
 ~fliegen|Schwerelosigkeit-H#oe#he-Fl#ue#gel-Schweben-Luft-Vogel-Pilot-Flugh#oe#he
-~Fahrzeug|Transport-Mobilit#ae#t-Motor-Fortbewegung-Stra#ss#e-Fahrer-Lenken-Geschwindigkeit
+~Fahrzeug|Transport-Mobilit#ae#t-Motor-Fortbewegung-Stra#ss#e-Fahrer-Lenken-Geschwindigkeit-Auto
 ~Werbung|Kommunikation-Marketing-Produktpr#ae#sentation-Konsumenten-Medien-Werbeagentur-Aufmerksamkeit-Botschaft
 ~Zeppelin|Luftschiff-Passagiere-Steuern-H#ue#lle-Antrieb-Geschichte-Hindenburg-Luftfahrt
 ~sprengen|Explosion-Detonation-Zerst#oe#rung-Sprengstoff-Sicherheit-Gefahr-Abriss-Sprengmeister
@@ -899,7 +899,7 @@
 ~Externe Festplatte|Portable-Datenspeicherung-Speicherkapazit#ae#t-Robustheit-Dateisicherung-Sicherheit-Lagern
 ~Gaming-Tastatur|Maus-Tastenreaktionszeit-Tastenbeleuchtung-Makros-Konnektivit#ae#t-Komfort-PC
 ~Gaming-Maus|Tastatur-DPI-Programmierbare Tasten-Ergonomie-Sensor-Rate
-~WLAN-Repeater|WiFi-Signalverst#ae#rkung-Dual Band-Platzierung-LAN
+~Repeater|WiFi-Signalverst#ae#rkung-Dual Band-Platzierung-LAN
 ~RGB-Beleuchtung|Mehrfarbige-Beleuchtung-Effekte-Farbwechsel-Steuerung-Details
 ~Smart-Home|Ger#ae#te-Zuhause-Steckdose-Alexa-Google-Steuern
 ~Powerbank|Extern-Akku-Stromversorgung-Ladeleistung-Anschl#ue#sse-Design-tragbar-mitnehmen
@@ -1898,7 +1898,7 @@
 ~Trauung|Hochzeit-Ehe-Trennung-Scheidung-Single-Alleinstehender-Einsamkeit-Beziehung
 ~Schleier|Schal-offen-enth#ue#llen-zeigen-offenbaren
 ~Kleid|Kleidung-Outfit-Anzug-Hemd-Hosen-Shorts-Oberteil-Schuhe
-~nass|feucht-trocken-wasserdicht-wasserfest-abschirmend-trocken
+~nass|feucht-trocken-wasserdicht-wasserfest-abschirmend-trocken-Regen
 ~Durchgang|Passage-Eingang-Ausgang-Blockade-Hindernis-Stopp-Stillstand-Stillstand
 ~Pforte|Tor-T#ue#r-Eingang-Ausgang-Schliessen-Verschliessen-#OE#ffnen-Durchgang
 ~schlucken|spucken-ausspucken-erbrechen
@@ -2128,7 +2128,7 @@
 ~Oktopus|Meereslebewesen-Krake-Fisch-S#ae#ugetier-Landtier-Wirbeltier-Vogel-Insekt
 ~Haube|Kapuze-Motorhaube-Abdeckung-M#ue#tze-Hut-Nackenschutz-Enth#ue#llung-Aufdeckung
 ~Kn#oe#llchen|Strafzettel-Bu#ss#geld-Verwarnung-Geldstrafe-Mahnung-Belohnung-Bonus-Anerkennung
-~parken|abstellen-stehen lassen-fahren-losfahren-weiterfahren-wegfahren-abfahren
+~parken|abstellen-Auto-fahren-losfahren-weiterfahren-wegfahren-Einkauf
 ~aufschreiben|notieren-aufzeichnen-merken-vergessen-l#oe#schen-streichen-ausl#oe#schen-entfernen
 ~Comic|Cartoon-Comicstrip-Bildergeschichte-humorvoll-ernst-langweilig-traurig-realistisch
 ~Mutant|Superheld-au#ss#ergew#oe#hnlich-normal-Mensch-unscheinbar-gew#oe#hnlich-durchschnittlich-typisch
@@ -2319,7 +2319,7 @@
 ~Ersatz|Alternative-Original-Fehlen-Mangel-Defekt-Ersatzlos-Fehlend-Unvollst#ae#ndig
 ~tauschen|austauschen-behalten-verkaufen-kaufen-zur#ue#ckgeben-einbehalten
 ~Narr|Spa#ss#vogel-Ernsthafter-Vern#ue#nftiger-Ernst-Verstand-Weise-Vernunft-Rationalist
-~reden|sprechen-schweigen-verstummen-stumm sein-ruhig sein-verstummen
+~reden|sprechen-schweigen-verstummen-ruhig sein-Gespr#ae#ch
 ~tratschen|klatschen-schweigen-verschweigen-Geheimnis wahren-diskret sein-nichts sagen
 ~Vermutung|Annahme-Tatsache-Gewi#ss#heit-Wi#ss#en-Fakt-Wahrheit-Realit#ae#t-Gewi#ss#heit
 ~Summe|Gesamt-Einzelheit-Teil-Bruchteil-Einheit-Fragment-Einzelner-Fragment
@@ -2718,7 +2718,7 @@
 ~Bewegung|Beweglichkeit-Flexibilit#ae#t-Stillstand-Immobilit#ae#t-Ruhig-Stehen-Stagnation-Erstarrung
 ~Wettbewerb|Wettkampf-Rivalit#ae#t-Zusammenarbeit-Kooperation-Teamwork-Solidarit#ae#t-Harmonie-Einigkeit
 ~Sportler|Athlet-Spieler-Nichtsportler-Couchpotato-Unsportlich-Bewegungsarm-Unsportlichkeit-Inaktivit#ae#t
-~Au#ss#tellung|Pr#ae#sentation-Galerie-Verborgenheit-Versteck-Geheimnis-Unsichtbarkeit-Verschlo#ss#enheit-Zur#ue#ckhaltung
+~Ausstellung|Pr#ae#sentation-Galerie-Verborgenheit-Versteck-Geheimnis-Unsichtbarkeit-Verschlo#ss#enheit-Zur#ue#ckhaltung
 ~F#ue#ttern|Essen geben-Versorgen-Hunger-Fasten-Verhungern-Hungern-Appetitlosigkeit-Nahrungsverweigerung
 ~Tierpfleger|Tierarzt-Betreuer-Vernachl#ae#ssigung-Tierqu#ae#lerei-Tierfeindlichkeit-Tierverachtung-Inhumanit#ae#t
 ~Tragen|Last-Schwer-M#ue#he-Abgeben-Ablegen-Aufgeben-Loslassen-Entlasten-Einkauf-Tasche
@@ -3110,7 +3110,7 @@
 ~Weiden|Grasen-Fressen-Verhungern-Trockenheit-Vertrocknen-Verdursten-Stagnation-Stillstand
 ~Schwerelosigkeit|Astronaut-Raumfahrt-Bodenst#ae#ndig-Erdanziehung-Gewicht-Schwere-Gleichgewicht-Erdanziehungskraft
 ~Rutschig|Glatt-Sturzgefahr-Sicher-Fest-Griffig-Stabil-Sicherer Halt-Gepolstert
-~N#ue##ss#e|Knacken-Schale-Kern-Leer-Ausgeglichen-Unauff#ae#llig-Unaufregend-Banal
+~N#ue#sse|Knacken-Schale-Kern-Leer-Ausgeglichen-Unauff#ae#llig-Unaufregend-Banal
 ~Polar|Eis-Kalt-#AE#quator-Tropisch-Temperiert-Hei#ss#-Warm-Subtropisch
 ~Gabelzinken|Gabelstapler-Aufheben-Ablegen-Glatte Oberfl#ae#che-Unbeweglich-Festhalten-Halten-Loslassen
 ~Zinken|Werkzeug-Schaufel-Spaten-Glatt-Flach-Breit-Ausgebreitet-Auseinander
@@ -3190,7 +3190,7 @@
 ~Umweltfreundlich|Nachhaltig-#OE#kologisch-Re#ss#ourcenschonend-Umweltsch#ae#dlich-Verschmutzend-Umweltbelastend-Klimasch#ae#dlich-Emi#ss#ionsreich
 ~Sprachsteuerung|Sprachbefehle-Spracherkennung-Stimmaktivierung-Nichterkennung-Fehlfunktion-Mi#ss#verst#ae#ndnis-Unzuverl#ae##ss#igkeit
 ~Smart Home|Vernetztes Zuhause-Hausautomatisierung-Intelligente Haustechnik-Komfort-Effizienz-Inkompatibilit#ae#t-St#oe#rung-Unsicherheit
-~Datenspeicherung|Archivierung-Haltung-Sicherung-Verlust-Inkonsistenz-L#oe#schung-Uugriff-USB-Festplatte-Backup
+~Datenspeicherung|Archivierung-Haltung-Sicherung-Verlust-Inkonsistenz-L#oe#schung-Zugriff-USB-Festplatte-Backup
 ~Maschinen|Ger#ae#te-Apparate-Automaten-Maschinenbau-Mechanik-Stillstand-Defekt-Ausfall-Effizienz-Produktivit#ae#t
 ~Vernetzung|Netzwerkbildung-Verbindung-Verkn#ue#pfung-Zusammenarbeit-Isolation-Trennung-Entkopplung-Unverbundenheit-Alleingang
 ~Sensoren|Me#ss#ger#ae#te-Erfa#ss#ung-Detektoren-Sensorik-Me#ss#genauigkeit-Sensorfehler-Sensorausfall-Sensorunempfindlichkeit-Sensorst#oe#rung
@@ -3723,7 +3723,7 @@
 ~Bistro|Restaurant-Café-Imbi#ss#-Lokal-Ruhe-Stille-Rast-Gastst#ae#tte
 ~Kaffeehaus|Café-Bistro-Imbi#ss#-Lokal-Ruhe-Stille-Rast-Gastst#ae#tte
 ~Imbi#ss#|Restaurant-Café-Bistro-Kaffeehaus-Ruhe-Stille-Rast-Gastst#ae#tte
-~Lokal|Restaurant-Café-Bistro-Kaffeehaus-Ruhe-Stille-Rast-Gastst#ae#tte
+~Lokal|Restaurant-Café-Bistro-Kaffeehaus-Ruhe-Stille-Rast-Gastst#ae#tte-Bar
 ~Witterung|Wetter-Klima-Sturm-Regen-Schnee-Sonnenschein-Himmel-Wetterph#ae#nomen
 ~Wetterlage|Witterung-Klima-Sturm-Regen-Schnee-Sonnenschein-Himmel-Wetterph#ae#nomen
 ~Meteorologie|Wetter-Witterung-Klima-Sturm-Regen-Schnee-Sonnenschein-Himmel
