@@ -55,7 +55,7 @@ public class AnimationController : MonoBehaviour
             if (!Player[i].activeInHierarchy)
                 continue;
 
-            Player[i].GetComponent<Image>().sprite = Config.PLAYERLIST[i].icon;
+            Player[i].GetComponent<Image>().sprite = Config.PLAYERLIST[i].icon2.icon;
             Player[i].transform.GetChild(1).gameObject.SetActive(true);
             setSPIELER_POSITION_X(i, getSTART_POSITION(i));
             if (getSPIELER_WERT(i) < getSTART_WERT(i))

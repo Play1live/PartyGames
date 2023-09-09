@@ -37,6 +37,7 @@ public class TabuServer : MonoBehaviour
     private TMP_InputField TimerSec; 
     private int timerseconds;
     private Coroutine HideRichtigFalschSecCoroutine;
+    private GameObject HistoryContentElement;
 
     private List<string> teamrotList;
     private List<string> teamblauList;
@@ -212,6 +213,7 @@ public class TabuServer : MonoBehaviour
         timerseconds = 60;
         TimerSec.text = timerseconds + "";
         started = false;
+        HistoryContentElement = GameObject.Find("WortHistory/Viewport/Content/Object*0");
         GameObject.Find("ServerSide/PackTitle").GetComponent<TMP_Text>().text = "Pack: " + Config.TABU_SPIEL.getSelected().getTitel();
         GameObject.Find("ServerSide/GameType").GetComponent<TMP_Text>().text = "GameType: " + TabuSpiel.GameType;
 
@@ -290,14 +292,14 @@ public class TabuServer : MonoBehaviour
                 // Server
                 if (teamrotList[index] == Config.PLAYER_NAME)
                 {
-                    PlayerObject.GetChild(0).GetComponent<Image>().sprite = Config.SERVER_PLAYER.icon;
-                    teamrot += "[#]" + teamrotList[index] + "~" + Config.SERVER_PLAYER.icon.name;
+                    PlayerObject.GetChild(0).GetComponent<Image>().sprite = Config.SERVER_PLAYER.icon2.icon;
+                    teamrot += "[#]" + teamrotList[index] + "~" + Config.SERVER_PLAYER.icon2.id;
                 }
                 // Client
                 else
                 {
-                    PlayerObject.GetChild(0).GetComponent<Image>().sprite = Player.getSpriteByPlayerName(teamrotList[index]);
-                    teamrot += "[#]" + teamrotList[index] + "~" + Player.getSpriteByPlayerName(teamrotList[index]).name;
+                    PlayerObject.GetChild(0).GetComponent<Image>().sprite = Player.getPlayerIconByPlayerName(teamrotList[index]).icon;
+                    teamrot += "[#]" + teamrotList[index] + "~" + Player.getPlayerIconByPlayerName(teamrotList[index]).id;
                 }
                 PlayerObject.gameObject.SetActive(true);
             }
@@ -316,14 +318,14 @@ public class TabuServer : MonoBehaviour
                 // Server
                 if (teamblauList[index] == Config.PLAYER_NAME)
                 {
-                    PlayerObject.GetChild(0).GetComponent<Image>().sprite = Config.SERVER_PLAYER.icon;
-                    teamblau += "[#]" + teamblauList[index] + "~" + Config.SERVER_PLAYER.icon.name;
+                    PlayerObject.GetChild(0).GetComponent<Image>().sprite = Config.SERVER_PLAYER.icon2.icon;
+                    teamblau += "[#]" + teamblauList[index] + "~" + Config.SERVER_PLAYER.icon2.id;
                 }
                 // Client
                 else
                 {
-                    PlayerObject.GetChild(0).GetComponent<Image>().sprite = Player.getSpriteByPlayerName(teamblauList[index]);
-                    teamblau += "[#]" + teamblauList[index] + "~" + Player.getSpriteByPlayerName(teamblauList[index]).name;
+                    PlayerObject.GetChild(0).GetComponent<Image>().sprite = Player.getPlayerIconByPlayerName(teamblauList[index]).icon;
+                    teamblau += "[#]" + teamblauList[index] + "~" + Player.getPlayerIconByPlayerName(teamblauList[index]).id;
                 }
                 PlayerObject.gameObject.SetActive(true);
             }
@@ -479,7 +481,11 @@ public class TabuServer : MonoBehaviour
         if (TabuSpiel.GameType.Equals("1 Wort"))
             selectedItem = Config.TABU_SPIEL.getSelected().GetRandomItem(true);
         else if (TabuSpiel.GameType.Equals("Battle Royale"))
+        {
             selectedItem = Config.TABU_SPIEL.getSelected().GetRandomItem(true);
+            SetTeamPoints("ROT", teamrotPunkte = TabuData.InitTeamPoints("ROT"));
+            SetTeamPoints("BLAU", teamblauPunkte = TabuData.InitTeamPoints("BLAU"));
+        }
         else
             selectedItem = Config.TABU_SPIEL.getSelected().GetRandomItem(false);
 
@@ -493,7 +499,7 @@ public class TabuServer : MonoBehaviour
         wortzahlen = TabuSpiel.genWorteList(selectedItem);
         displayworte = TabuSpiel.getKartenWorte(selectedItem.tabuworte, wortzahlen);
 
-        ServerUtils.AddBroadcast("#StartRunde " + playername + "|" + TeamTurn + "|" + TabuSpiel.GameType + "|" + timerseconds + "|" + TabuSpiel.getIntArrayToString(wortzahlen) + "|" + selectedItem.geheimwort + "|" + selectedItem.tabuworte);
+        ServerUtils.AddBroadcast("#StartRunde " + playername + "|" + TeamTurn + "|" + TabuSpiel.GameType + "|" + timerseconds + "|" + teamrotPunkte + "|" + teamblauPunkte + "|" + TabuSpiel.getIntArrayToString(wortzahlen) + "|" + selectedItem.geheimwort + "|" + selectedItem.tabuworte);
 
         MarkErklaerer();
 
@@ -624,6 +630,10 @@ public class TabuServer : MonoBehaviour
             + " Blau: " + teamblauPunkte
             + " Rot: " + teamrotPunkte);
 
+        #region WortHistory
+        AddWortHistory(erklaerer, indicator, selectedItem.geheimwort, selectedItem.tabuworte);
+        #endregion
+
         if (TabuSpiel.GameType.Equals("1 Wort"))
         {
             // Falsch gedrückt
@@ -634,9 +644,7 @@ public class TabuServer : MonoBehaviour
                 StartCoroutine(AnimateBackground("LOSE"));
             }
             // Zeit vorbei
-            else if (indicator == -1)
-            {
-            }
+            else if (indicator == -1) {}
             // Richtig gedrückt
             else if (indicator == +1)
             {
@@ -897,9 +905,6 @@ public class TabuServer : MonoBehaviour
             RundeStarten.SetActive(true);
         else if (TeamTurn.Equals("BLAU") && teamblauList.Contains(Config.PLAYER_NAME))
             RundeStarten.SetActive(true);
-
-        if (TabuSpiel.GameType.Equals("Battle Royale"))
-            RundeStarten.SetActive(false);
     }
     public void ChangePoints(Button btn)
     {
@@ -996,14 +1001,14 @@ public class TabuServer : MonoBehaviour
                 // Server
                 if (teamrotList[index] == Config.PLAYER_NAME)
                 {
-                    PlayerObject.GetChild(0).GetComponent<Image>().sprite = Config.SERVER_PLAYER.icon;
-                    teamrot += "[#]" + teamrotList[index] + "~" + Config.SERVER_PLAYER.icon.name;
+                    PlayerObject.GetChild(0).GetComponent<Image>().sprite = Config.SERVER_PLAYER.icon2.icon;
+                    teamrot += "[#]" + teamrotList[index] + "~" + Config.SERVER_PLAYER.icon2.id;
                 }
                 // Client
                 else
                 {
-                    PlayerObject.GetChild(0).GetComponent<Image>().sprite = Player.getSpriteByPlayerName(teamrotList[index]);
-                    teamrot += "[#]" + teamrotList[index] + "~" + Player.getSpriteByPlayerName(teamrotList[index]).name;
+                    PlayerObject.GetChild(0).GetComponent<Image>().sprite = Player.getPlayerIconByPlayerName(teamrotList[index]).icon;
+                    teamrot += "[#]" + teamrotList[index] + "~" + Player.getPlayerIconByPlayerName(teamrotList[index]).id;
                 }
                 PlayerObject.gameObject.SetActive(true);
             }
@@ -1022,14 +1027,14 @@ public class TabuServer : MonoBehaviour
                 // Server
                 if (teamblauList[index] == Config.PLAYER_NAME)
                 {
-                    PlayerObject.GetChild(0).GetComponent<Image>().sprite = Config.SERVER_PLAYER.icon;
-                    teamblau += "[#]" + teamblauList[index] + "~" + Config.SERVER_PLAYER.icon.name;
+                    PlayerObject.GetChild(0).GetComponent<Image>().sprite = Config.SERVER_PLAYER.icon2.icon;
+                    teamblau += "[#]" + teamblauList[index] + "~" + Config.SERVER_PLAYER.icon2.id;
                 }
                 // Client
                 else
                 {
-                    PlayerObject.GetChild(0).GetComponent<Image>().sprite = Player.getSpriteByPlayerName(teamblauList[index]);
-                    teamblau += "[#]" + teamblauList[index] + "~" + Player.getSpriteByPlayerName(teamblauList[index]).name;
+                    PlayerObject.GetChild(0).GetComponent<Image>().sprite = Player.getPlayerIconByPlayerName(teamblauList[index]).icon;
+                    teamblau += "[#]" + teamblauList[index] + "~" + Player.getPlayerIconByPlayerName(teamblauList[index]).id;
                 }
                 PlayerObject.gameObject.SetActive(true);
             }
@@ -1084,5 +1089,50 @@ public class TabuServer : MonoBehaviour
                     PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = "<color=green>" + teamblauList[index];
             }
         }
+    }
+    private void AddWortHistory(string icon, int index, string wort, string tabus)
+    {
+        Transform content = HistoryContentElement.transform.parent;
+
+        GameObject newObject = GameObject.Instantiate(content.GetChild(0).gameObject, content, false);
+        newObject.transform.localScale = new Vector3(1, 1, 1);
+        newObject.name = "Object" + "*" + content.childCount;
+        newObject.SetActive(true);
+        if (icon == Config.SERVER_PLAYER.name)
+        {
+            newObject.transform.GetChild(0).GetComponent<Image>().sprite = Config.SERVER_PLAYER.icon2.icon;
+        }
+        else
+        {
+            newObject.transform.GetChild(0).GetComponent<Image>().sprite = Player.getPlayerIconByPlayerName(icon).icon;
+        }
+        newObject.transform.GetChild(1).GetComponent<TMP_Text>().text = wort;
+        newObject.transform.GetChild(1).GetChild(0).GetComponent<TMP_Text>().text = tabus.Replace("-", "\n");
+        if (index == -3) // Skip
+        {
+            newObject.transform.GetChild(2).GetChild(0).gameObject.SetActive(true);
+        }
+        else if (index == -2) // Falsch
+        {
+            newObject.transform.GetChild(2).GetChild(2).gameObject.SetActive(true);
+        }
+        else if (index == -1) // Zeit
+        {
+            //newObject.transform.GetChild(2).GetChild(2).gameObject.SetActive(true);
+        }
+        else if (index == +1) // Richtig
+        {
+            newObject.transform.GetChild(2).GetChild(1).gameObject.SetActive(true);
+
+        }
+        StartCoroutine(ChangeWortHistoryText(newObject, wort));
+    }
+    private IEnumerator ChangeWortHistoryText(GameObject go, string data)
+    {
+        yield return null;
+        go.transform.GetChild(1).GetComponent<TMP_Text>().text = data + " ";
+        yield return null;
+        go.transform.GetChild(1).GetComponent<TMP_Text>().text = data;
+        yield break;
     }
 }

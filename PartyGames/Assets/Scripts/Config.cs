@@ -33,7 +33,7 @@ public class Config
     // Spieler stats
     public static Player SERVER_PLAYER;
     public static Player[] PLAYERLIST;
-    public static List<Sprite> PLAYER_ICONS;
+    public static List<PlayerIcon> PLAYER_ICONS;
     public static int PLAYER_ID = 0;
     public static string PLAYER_NAME = "Spieler" + UnityEngine.Random.Range(1000, 10000);
     public static int MAX_PLAYER_NAME_LENGTH = 12;

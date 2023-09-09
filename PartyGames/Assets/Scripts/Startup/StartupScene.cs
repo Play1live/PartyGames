@@ -319,12 +319,12 @@ public class StartupScene : MonoBehaviour
         Config.PLAYERLIST = new Player[] { new Player(1), new Player(2), new Player(3), new Player(4), new Player(5), new Player(6), new Player(7), new Player(8) };
         Config.SERVER_PLAYER = new Player(0);
         Config.SERVER_MAX_CONNECTIONS = Config.PLAYERLIST.Length;
-        Config.PLAYER_ICONS = new List<Sprite>();
+        Config.PLAYER_ICONS = new List<PlayerIcon>();
         foreach (Sprite sprite in Resources.LoadAll<Sprite>("Images/ProfileIcons/"))
         {
             if (sprite.name.Equals("empty"))
                 continue;
-            Config.PLAYER_ICONS.Add(sprite);
+            Config.PLAYER_ICONS.Add(new PlayerIcon(Config.PLAYER_ICONS.Count, sprite));
         }
     }
     /// <summary>
@@ -374,13 +374,14 @@ public class StartupScene : MonoBehaviour
             p.name = "";
             p.points = 0;
             p.tcp = null;
-            p.icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
+            p.icon2 = new PlayerIcon();
         }
-        Config.SERVER_PLAYER.points = 0;
-        Config.SERVER_PLAYER.crowns = 0;
-
         Config.PLAYER_NAME = "";
         Config.PLAYER_NAME = GameObject.Find("ChooseYourName_TXT").gameObject.GetComponent<TMP_InputField>().text;
+
+        Config.SERVER_PLAYER.points = 0;
+        Config.SERVER_PLAYER.crowns = 0;
+        Config.SERVER_PLAYER.name = Config.PLAYER_NAME;
         Config.APPLICATION_CONFIG.SetString("PLAYER_DISPLAY_NAME", Config.PLAYER_NAME);
         // Game is Player
         if (!Config.isServer)

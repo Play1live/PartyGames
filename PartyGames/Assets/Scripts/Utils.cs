@@ -296,7 +296,10 @@ public class ServerUtils
     /// <param name="msg"></param>
     public static void AddBroadcast(string msg)
     {
-        broadcastmsgs.Add(Config.GAME_TITLE + msg);
+        if (msg.StartsWith(Config.GAME_TITLE))
+            broadcastmsgs.Add(msg);
+        else
+            broadcastmsgs.Add(Config.GAME_TITLE + msg);
         if (broadcastmsgs.Count >= 10)
             Logging.log(Logging.LogType.Warning, "ServerUtils", "AddBroadcast", "Zu viele MSGs im Puffer: " + broadcastmsgs.Count + " \n" + Utils.ListToString(broadcastmsgs).Replace(",", "\n"));
     }
@@ -383,7 +386,7 @@ public class ServerUtils
     /// <param name="player">Spieler</param>
     public static void ClientClosed(Player player)
     {
-        player.icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
+        player.icon2 = new PlayerIcon();
         player.name = "";
         player.points = 0;
         player.crowns = 0;

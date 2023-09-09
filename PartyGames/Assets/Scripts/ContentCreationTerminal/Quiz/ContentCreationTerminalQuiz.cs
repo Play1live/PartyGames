@@ -213,55 +213,64 @@ public class ContentCreationTerminalQuiz : MonoBehaviour
     /// </summary>
     private void ReloadFragen()
     {
-        fragenList.Clear();
-        for (int i = 0; i < ScrollFragenContent.transform.childCount; i++)
+        try
         {
-            ScrollFragenContent.transform.GetChild(i).gameObject.SetActive(false);
+            fragenList.Clear();
+            for (int i = 0; i < ScrollFragenContent.transform.childCount; i++)
+            {
+                ScrollFragenContent.transform.GetChild(i).gameObject.SetActive(false);
+            }
+
+            string[] zeilen = File.ReadAllLines(datapath + "/" + AusgewaehlterTitel.transform.GetChild(1).GetComponentInChildren<TMP_InputField>().text + ".txt");
+            Logging.log(Logging.LogType.Normal, "CCT-Quiz", "ReloadFragen", "ZeilenZahl: " + zeilen + "/3 = ?");
+            for (int i = 0; i < zeilen.Length;)
+            {
+                string frage = zeilen[i];
+                i++;
+                string antwort = zeilen[i];
+                i++;
+                string info = zeilen[i];
+                i++;
+                Logging.log(Logging.LogType.Normal, "CCT-Quiz", "ReloadFragen", "Frage: " + frage + "\nAntwort: " + antwort + "\nInfo: " + info);
+
+                if (frage.StartsWith("Frage"))
+                    frage = frage.Substring("Frage".Length);
+                if (frage.StartsWith(":"))
+                    frage = frage.Substring(":".Length);
+                if (frage.StartsWith(" "))
+                    frage = frage.Substring(" ".Length);
+
+                if (antwort.StartsWith("Antwort"))
+                    antwort = antwort.Substring("Antwort".Length);
+                if (antwort.StartsWith(":"))
+                    antwort = antwort.Substring(":".Length);
+                if (antwort.StartsWith(" "))
+                    antwort = antwort.Substring(" ".Length);
+
+                if (info.StartsWith("Info"))
+                    info = info.Substring("Info".Length);
+                if (info.StartsWith(":"))
+                    info = info.Substring(":".Length);
+                if (info.StartsWith(" "))
+                    info = info.Substring(" ".Length);
+
+                fragenList.Add(new QuizFragen(frage, antwort, info));
+            }
+            for (int i = 0; i < fragenList.Count; i++)
+            {
+                if (i >= ScrollFragenContent.transform.childCount)
+                    break;
+                int index = ScrollFragenContent.transform.childCount - i - 1;
+                ScrollFragenContent.transform.GetChild(index).GetChild(0).GetComponentInChildren<TMP_Text>().text = (i + 1) + "";
+                ScrollFragenContent.transform.GetChild(index).GetChild(1).GetComponent<TMP_InputField>().text = fragenList[i].getFrage();
+                ScrollFragenContent.transform.GetChild(index).GetChild(2).GetComponent<TMP_InputField>().text = fragenList[i].getAntwort();
+                ScrollFragenContent.transform.GetChild(index).GetChild(3).GetComponent<TMP_InputField>().text = fragenList[i].getInfo();
+                ScrollFragenContent.transform.GetChild(index).gameObject.SetActive(true);
+            }
         }
-
-        string[] zeilen = File.ReadAllLines(datapath + "/" + AusgewaehlterTitel.transform.GetChild(1).GetComponentInChildren<TMP_InputField>().text + ".txt");
-        for (int i = 0; i < zeilen.Length;)
+        catch
         {
-            string frage = zeilen[i];
-            i++;
-            string antwort = zeilen[i];
-            i++;
-            string info = zeilen[i];
-            i++;
-
-            if (frage.StartsWith("Frage"))
-                frage = frage.Substring("Frage".Length);
-            if (frage.StartsWith(":"))
-                frage = frage.Substring(":".Length);
-            if (frage.StartsWith(" "))
-                frage = frage.Substring(" ".Length);
-
-            if (antwort.StartsWith("Antwort"))
-                antwort = antwort.Substring("Antwort".Length);
-            if (antwort.StartsWith(":"))
-                antwort = antwort.Substring(":".Length);
-            if (antwort.StartsWith(" "))
-                antwort = antwort.Substring(" ".Length);
-
-            if (info.StartsWith("Info"))
-                info = info.Substring("Info".Length);
-            if (info.StartsWith(":"))
-                info = info.Substring(":".Length);
-            if (info.StartsWith(" "))
-                info = info.Substring(" ".Length);
-
-            fragenList.Add(new QuizFragen(frage, antwort, info));
-        }
-        for (int i = 0; i < fragenList.Count; i++)
-        {
-            if (i >= ScrollFragenContent.transform.childCount)
-                break;
-            int index = ScrollFragenContent.transform.childCount - i - 1;
-            ScrollFragenContent.transform.GetChild(index).GetChild(0).GetComponentInChildren<TMP_Text>().text = (i + 1) + "";
-            ScrollFragenContent.transform.GetChild(index).GetChild(1).GetComponent<TMP_InputField>().text = fragenList[i].getFrage();
-            ScrollFragenContent.transform.GetChild(index).GetChild(2).GetComponent<TMP_InputField>().text = fragenList[i].getAntwort();
-            ScrollFragenContent.transform.GetChild(index).GetChild(3).GetComponent<TMP_InputField>().text = fragenList[i].getInfo();
-            ScrollFragenContent.transform.GetChild(index).gameObject.SetActive(true);
+            Logging.log(Logging.LogType.Error, "CCT-Quiz", "ReloadFragen", "");
         }
     }
     /// <summary>
@@ -321,12 +330,12 @@ public class ContentCreationTerminalQuiz : MonoBehaviour
         string antwort = FrageHinzufügen.transform.GetChild(2).GetComponent<TMP_InputField>().text.Replace("\n", "\\n");
         string info = FrageHinzufügen.transform.GetChild(3).GetComponent<TMP_InputField>().text.Replace("\n", "\\n");
 
+        if (frage.Length == 0 || antwort.Length == 0)
+            return;
+
         FrageHinzufügen.transform.GetChild(1).GetComponent<TMP_InputField>().text = "";
         FrageHinzufügen.transform.GetChild(2).GetComponent<TMP_InputField>().text = "";
         FrageHinzufügen.transform.GetChild(3).GetComponent<TMP_InputField>().text = "";
-
-        if (frage.Length == 0 || antwort.Length == 0)
-            return;
 
         string lines = File.ReadAllText(datapath + "/" + AusgewaehlterTitel.transform.GetChild(1).GetComponentInChildren<TMP_InputField>().text + ".txt");
 

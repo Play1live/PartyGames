@@ -291,7 +291,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
                     {
                         names.Add(Playerlist[i].GetComponentInChildren<TMP_Text>().text);
                         bots.Add(false);
-                        sprites.Add(Config.SERVER_PLAYER.icon);
+                        sprites.Add(Config.SERVER_PLAYER.icon2.icon);
                     }
                 }
                 else if (Playerlist[i].name.StartsWith("P "))
@@ -299,7 +299,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
                     string playername = Playerlist[i].GetComponentInChildren<TMP_Text>().text;
                     names.Add(playername);
                     bots.Add(false);
-                    sprites.Add(Config.PLAYERLIST[Player.getPosByName(playername)].icon);
+                    sprites.Add(Config.PLAYERLIST[Player.getPosByName(playername)].icon2.icon);
                 }
                 else if (Playerlist[i].name.StartsWith("Bot "))
                 {
@@ -512,7 +512,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
         if (!player.isBot)
         {
             // Server
-            if (player.PlayerImage == Config.SERVER_PLAYER.icon)
+            if (player.PlayerImage == Config.SERVER_PLAYER.icon2.icon)
             {
                 StartTurnServer();
                 TurnSelectbelegt = false;
@@ -523,7 +523,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
             {
                 foreach (Player p in Config.PLAYERLIST)
                 {
-                    if (p.icon == player.PlayerImage && p.name == player.name)
+                    if (p.icon2.icon == player.PlayerImage && p.name == player.name)
                     {
                         StartTurnClient(p);
                         TurnSelectbelegt = false;
@@ -763,7 +763,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
         else
         {
             // Ist Server
-            if (Config.SERVER_PLAYER.icon == board.GetPlayerTurn().PlayerImage)
+            if (Config.SERVER_PLAYER.icon2.icon == board.GetPlayerTurn().PlayerImage)
             {
                 // Spieler kann nicht laufen
                 if (board.GetPlayerTurn().GetAvailableMoves().Count == 0)
@@ -856,7 +856,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
         if (!ServerAllowZugWahl)
             return;
         // Server ist aktuell nicht dran
-        if (board.GetPlayerTurn().isBot || Config.SERVER_PLAYER.icon != board.GetPlayerTurn().PlayerImage)
+        if (board.GetPlayerTurn().isBot || Config.SERVER_PLAYER.icon2.icon != board.GetPlayerTurn().PlayerImage)
             return;
         Logging.log(Logging.LogType.Debug, "MenschAergerDichNicht", "ServerWähltFeld", "Server wählt: " + FeldName.name);
         
@@ -873,7 +873,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
         if (clientCanPickField == false)
             return;
         // Prüft ob der Sendende Spieler auch dran ist
-        if (board.GetPlayerTurn().isBot || p.icon != board.GetPlayerTurn().PlayerImage || p.name != board.GetPlayerTurn().name)
+        if (board.GetPlayerTurn().isBot || p.icon2.icon != board.GetPlayerTurn().PlayerImage || p.name != board.GetPlayerTurn().name)
             return;
         Logging.log(Logging.LogType.Debug, "MenschAergerDichNicht", "ServerWähltFeld", "Client " + p.name + " wählt: " + data);
 
@@ -1082,7 +1082,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
     {
         ServerUtils.AddBroadcast("#PlayerMergesBot " + p.name);
         // Der Spieler ist gerade dran
-        if (board.GetPlayerTurn().name == p.name && board.GetPlayerTurn().PlayerImage == p.icon)
+        if (board.GetPlayerTurn().name == p.name && board.GetPlayerTurn().PlayerImage == p.icon2.icon)
         {
             AddMSGToProtokoll(board.TEAM_COLORS[board.GetPlayerTurn().gamerid] + p.name + "</color></b> hat das Spiel verlassen.");
             AddMSGToProtokoll(board.TEAM_COLORS[board.GetPlayerTurn().gamerid] + p.name + "</color></b> wird nun von einem <b>Bot</b> übernommen!");
@@ -1106,7 +1106,7 @@ public class MenschAergerDichNichtServer : MonoBehaviour
         {
             foreach (MenschAergerDichNichtPlayer player in board.GetPlayerList())
             {
-                if (player.name == p.name && player.PlayerImage == p.icon)
+                if (player.name == p.name && player.PlayerImage == p.icon2.icon)
                 {
                     AddMSGToProtokoll(board.TEAM_COLORS[player.gamerid] + p.name + "</color></b> hat das Spiel verlassen.");
                     AddMSGToProtokoll(board.TEAM_COLORS[player.gamerid] + p.name + "</color></b> wird nun von einem <b>Bot</b> übernommen!");

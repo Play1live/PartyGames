@@ -17,6 +17,11 @@ public class ContentCreationTerminalScene : MonoBehaviour
 
     void Start()
     {
+        if (!Config.APPLICATION_INITED)
+        {
+            SceneManager.LoadScene("Startup");
+            return;
+        }
         Utils.EinstellungenStartSzene(Einstellungen, audiomixer, Utils.EinstellungsKategorien.Audio, Utils.EinstellungsKategorien.Grafik);
         Utils.EinstellungenGrafikApply(false);
 

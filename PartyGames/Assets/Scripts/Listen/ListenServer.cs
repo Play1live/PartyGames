@@ -539,7 +539,7 @@ public class ListenServer : MonoBehaviour
                 TeamZuschauer[i, 0].SetActive(true);
                 TeamZuschauer[i, 1].SetActive(true);
                 TeamZuschauer[i, 2].SetActive(false);
-                TeamZuschauer[i, 3].GetComponent<Image>().sprite = Config.PLAYERLIST[Player.getPosInLists(id)].icon;
+                TeamZuschauer[i, 3].GetComponent<Image>().sprite = Config.PLAYERLIST[Player.getPosInLists(id)].icon2.icon;
                 TeamZuschauer[i, 4].SetActive(false);
                 TeamZuschauer[i, 5].GetComponent<TMP_Text>().text = Config.PLAYERLIST[Player.getPosInLists(id)].name;
                 TeamZuschauer[i, 6].GetComponent<TMP_Text>().text = Config.PLAYERLIST[Player.getPosInLists(id)].points + "";
@@ -558,7 +558,7 @@ public class ListenServer : MonoBehaviour
                 TeamRot[i, 0].SetActive(true);
                 TeamRot[i, 1].SetActive(true);
                 TeamRot[i, 2].SetActive(false);
-                TeamRot[i, 3].GetComponent<Image>().sprite = Config.PLAYERLIST[Player.getPosInLists(id)].icon;
+                TeamRot[i, 3].GetComponent<Image>().sprite = Config.PLAYERLIST[Player.getPosInLists(id)].icon2.icon;
                 TeamRot[i, 4].SetActive(false);
                 TeamRot[i, 5].GetComponent<TMP_Text>().text = Config.PLAYERLIST[Player.getPosInLists(id)].name;
                 TeamRot[i, 6].GetComponent<TMP_Text>().text = Config.PLAYERLIST[Player.getPosInLists(id)].points + "";
@@ -577,7 +577,7 @@ public class ListenServer : MonoBehaviour
                 TeamBlau[i, 0].SetActive(true);
                 TeamBlau[i, 1].SetActive(true);
                 TeamBlau[i, 2].SetActive(false);
-                TeamBlau[i, 3].GetComponent<Image>().sprite = Config.PLAYERLIST[Player.getPosInLists(id)].icon;
+                TeamBlau[i, 3].GetComponent<Image>().sprite = Config.PLAYERLIST[Player.getPosInLists(id)].icon2.icon;
                 TeamBlau[i, 4].SetActive(false);
                 TeamBlau[i, 5].GetComponent<TMP_Text>().text = Config.PLAYERLIST[Player.getPosInLists(id)].name;
                 TeamBlau[i, 6].GetComponent<TMP_Text>().text = Config.PLAYERLIST[Player.getPosInLists(id)].points + "";
@@ -596,7 +596,7 @@ public class ListenServer : MonoBehaviour
                 TeamGruen[i, 0].SetActive(true);
                 TeamGruen[i, 1].SetActive(true);
                 TeamGruen[i, 2].SetActive(false);
-                TeamGruen[i, 3].GetComponent<Image>().sprite = Config.PLAYERLIST[Player.getPosInLists(id)].icon;
+                TeamGruen[i, 3].GetComponent<Image>().sprite = Config.PLAYERLIST[Player.getPosInLists(id)].icon2.icon;
                 TeamGruen[i, 4].SetActive(false);
                 TeamGruen[i, 5].GetComponent<TMP_Text>().text = Config.PLAYERLIST[Player.getPosInLists(id)].name;
                 TeamGruen[i, 6].GetComponent<TMP_Text>().text = Config.PLAYERLIST[Player.getPosInLists(id)].points + "";
@@ -615,7 +615,7 @@ public class ListenServer : MonoBehaviour
                 TeamLila[i, 0].SetActive(true);
                 TeamLila[i, 1].SetActive(true);
                 TeamLila[i, 2].SetActive(false);
-                TeamLila[i, 3].GetComponent<Image>().sprite = Config.PLAYERLIST[Player.getPosInLists(id)].icon;
+                TeamLila[i, 3].GetComponent<Image>().sprite = Config.PLAYERLIST[Player.getPosInLists(id)].icon2.icon;
                 TeamLila[i, 4].SetActive(false);
                 TeamLila[i, 5].GetComponent<TMP_Text>().text = Config.PLAYERLIST[Player.getPosInLists(id)].name;
                 TeamLila[i, 6].GetComponent<TMP_Text>().text = Config.PLAYERLIST[Player.getPosInLists(id)].points + "";
@@ -696,7 +696,7 @@ public class ListenServer : MonoBehaviour
             {
                 int id = teamZuschauerIds[i];
                 KeinTeamSpielGrid[i].SetActive(true);
-                KeinTeamSpielGrid[i].transform.GetChild(2).GetComponent<Image>().sprite = Config.PLAYERLIST[id - 1].icon;
+                KeinTeamSpielGrid[i].transform.GetChild(2).GetComponent<Image>().sprite = Config.PLAYERLIST[id - 1].icon2.icon;
                 KeinTeamSpielGrid[i].transform.GetChild(4).GetChild(1).GetComponent<TMP_Text>().text = Config.PLAYERLIST[id - 1].name;
                 KeinTeamSpielGrid[i].transform.GetChild(4).GetChild(2).GetComponent<TMP_Text>().text = Config.PLAYERLIST[id - 1].points + "";
             }
@@ -712,7 +712,7 @@ public class ListenServer : MonoBehaviour
             {
                 int id = teamRotIds[i];
                 TeamRotSpielGrid[i].SetActive(true);
-                TeamRotSpielGrid[i].transform.GetChild(2).GetComponent<Image>().sprite = Config.PLAYERLIST[id - 1].icon;
+                TeamRotSpielGrid[i].transform.GetChild(2).GetComponent<Image>().sprite = Config.PLAYERLIST[id - 1].icon2.icon;
                 TeamRotSpielGrid[i].transform.GetChild(4).GetChild(1).GetComponent<TMP_Text>().text = Config.PLAYERLIST[id - 1].name;
                 TeamRotSpielGrid[i].transform.GetChild(4).GetChild(2).GetComponent<TMP_Text>().text = Config.PLAYERLIST[id - 1].points + "";
             }
@@ -728,7 +728,7 @@ public class ListenServer : MonoBehaviour
             {
                 int id = teamBlauIds[i];
                 TeamBlauSpielGrid[i].SetActive(true);
-                TeamBlauSpielGrid[i].transform.GetChild(2).GetComponent<Image>().sprite = Config.PLAYERLIST[id - 1].icon;
+                TeamBlauSpielGrid[i].transform.GetChild(2).GetComponent<Image>().sprite = Config.PLAYERLIST[id - 1].icon2.icon;
                 TeamBlauSpielGrid[i].transform.GetChild(4).GetChild(1).GetComponent<TMP_Text>().text = Config.PLAYERLIST[id - 1].name;
                 TeamBlauSpielGrid[i].transform.GetChild(4).GetChild(2).GetComponent<TMP_Text>().text = Config.PLAYERLIST[id - 1].points + "";
             }
@@ -744,7 +744,7 @@ public class ListenServer : MonoBehaviour
             {
                 int id = teamGruenIds[i];
                 TeamGruenSpielGrid[i].SetActive(true);
-                TeamGruenSpielGrid[i].transform.GetChild(2).GetComponent<Image>().sprite = Config.PLAYERLIST[id - 1].icon;
+                TeamGruenSpielGrid[i].transform.GetChild(2).GetComponent<Image>().sprite = Config.PLAYERLIST[id - 1].icon2.icon;
                 TeamGruenSpielGrid[i].transform.GetChild(4).GetChild(1).GetComponent<TMP_Text>().text = Config.PLAYERLIST[id - 1].name;
                 TeamGruenSpielGrid[i].transform.GetChild(4).GetChild(2).GetComponent<TMP_Text>().text = Config.PLAYERLIST[id - 1].points + "";
             }
@@ -760,7 +760,7 @@ public class ListenServer : MonoBehaviour
             {
                 int id = teamLilaIds[i];
                 TeamLilaSpielGrid[i].SetActive(true);
-                TeamLilaSpielGrid[i].transform.GetChild(2).GetComponent<Image>().sprite = Config.PLAYERLIST[id - 1].icon;
+                TeamLilaSpielGrid[i].transform.GetChild(2).GetComponent<Image>().sprite = Config.PLAYERLIST[id - 1].icon2.icon;
                 TeamLilaSpielGrid[i].transform.GetChild(4).GetChild(1).GetComponent<TMP_Text>().text = Config.PLAYERLIST[id - 1].name;
                 TeamLilaSpielGrid[i].transform.GetChild(4).GetChild(2).GetComponent<TMP_Text>().text = Config.PLAYERLIST[id - 1].points + "";
             }

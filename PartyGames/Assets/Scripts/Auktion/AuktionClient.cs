@@ -199,7 +199,7 @@ public class AuktionClient : MonoBehaviour
             // Update PlayerInfos
             Config.PLAYERLIST[pos].points = Int32.Parse(sp.Replace("[PUNKTE]", "|").Split('|')[1]);
             // Display PlayerInfos                
-            SpielerAnzeige[pos, 2].GetComponent<Image>().sprite = Config.PLAYERLIST[pos].icon;
+            SpielerAnzeige[pos, 2].GetComponent<Image>().sprite = Config.PLAYERLIST[pos].icon2.icon;
             SpielerAnzeige[pos, 4].GetComponent<TMP_Text>().text = Config.PLAYERLIST[pos].name;
             SpielerAnzeige[pos, 5].GetComponent<TMP_Text>().text = Config.PLAYERLIST[pos].points+"";
             SpielerAnzeige[pos, 7].GetComponent<TMP_InputField>().text = sp.Replace("[KONTO]", "|").Split('|')[1];

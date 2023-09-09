@@ -479,7 +479,7 @@ public class StartupClient : MonoBehaviour
         {
             int pos = Player.getPosInLists(p.id);
             // Display PlayerInfos                
-            SpielerAnzeigeLobby[p.id].GetComponentsInChildren<Image>()[1].sprite = Config.PLAYERLIST[pos].icon;
+            SpielerAnzeigeLobby[p.id].GetComponentsInChildren<Image>()[1].sprite = Config.PLAYERLIST[pos].icon2.icon;
             SpielerAnzeigeLobby[p.id].GetComponentInChildren<TMP_Text>().text = Config.PLAYERLIST[pos].name;
             if (Config.PLAYERLIST[pos].name != "")
             {
@@ -518,9 +518,10 @@ public class StartupClient : MonoBehaviour
             // Display ServerInfos
             if (id == 0)
             {
-                Config.SERVER_PLAYER.icon = Resources.Load<Sprite>("Images/ProfileIcons/" + sp.Replace("[ICON]", "|").Split('|')[1]);
+                Config.SERVER_PLAYER.icon2 = PlayerIcon.getIconById(sp.Replace("[ICON]", "|").Split('|')[1]);
+                Config.SERVER_PLAYER.name = sp.Replace("[NAME]", "|").Split('|')[1];
                 SpielerAnzeigeLobby[0].SetActive(true);
-                SpielerAnzeigeLobby[0].GetComponentsInChildren<Image>()[1].sprite = Resources.Load<Sprite>("Images/ProfileIcons/" + sp.Replace("[ICON]", "|").Split('|')[1]);
+                SpielerAnzeigeLobby[0].GetComponentsInChildren<Image>()[1].sprite = Config.SERVER_PLAYER.icon2.icon;
                 SpielerAnzeigeLobby[0].GetComponentsInChildren<TMP_Text>()[0].text = sp.Replace("[NAME]", "|").Split('|')[1];
             }
             // Display ClientInfos
@@ -534,9 +535,9 @@ public class StartupClient : MonoBehaviour
                 // Update PlayerInfos
                 Config.PLAYERLIST[pos].name = sp.Replace("[NAME]", "|").Split('|')[1];
                 Config.PLAYERLIST[pos].points = Int32.Parse(sp.Replace("[PUNKTE]", "|").Split('|')[1]);
-                Config.PLAYERLIST[pos].icon = Resources.Load<Sprite>("Images/ProfileIcons/" + sp.Replace("[ICON]", "|").Split('|')[1]);
+                Config.PLAYERLIST[pos].icon2 = PlayerIcon.getIconById(sp.Replace("[ICON]", "|").Split('|')[1]);
                 // Display PlayerInfos                
-                SpielerAnzeigeLobby[id].GetComponentsInChildren<Image>()[1].sprite = Config.PLAYERLIST[pos].icon;
+                SpielerAnzeigeLobby[id].GetComponentsInChildren<Image>()[1].sprite = Config.PLAYERLIST[pos].icon2.icon;
                 SpielerAnzeigeLobby[id].GetComponentInChildren<TMP_Text>().text = Config.PLAYERLIST[pos].name;
                 if (Config.PLAYERLIST[pos].name != "")
                 {
@@ -835,11 +836,11 @@ public class StartupClient : MonoBehaviour
     /// </summary>
     /// <param name="name">Name des neuen Icons</param>
     /// <returns>Sprite, null</returns>
-    private Sprite FindIconByName(string name)
+    private PlayerIcon FindIconByName(string name)
     {
-        foreach (Sprite sprite in Config.PLAYER_ICONS)
+        foreach (PlayerIcon sprite in Config.PLAYER_ICONS)
         {
-            if (sprite.name.Equals(name))
+            if (sprite.displayname.Equals(name))
                 return sprite;
         }
         Logging.log(Logging.LogType.Warning, "StartupServer", "FindIconByName", "Icon " + name + " konnte nicht gefunden werden.");
@@ -888,7 +889,7 @@ public class StartupClient : MonoBehaviour
             }
             else if (feld == "O")
             {
-                MiniGames[0].transform.GetChild(1).GetChild(i - 1).GetComponent<Image>().sprite = Config.PLAYERLIST[Player.getPosInLists(Config.PLAYER_ID)].icon;
+                MiniGames[0].transform.GetChild(1).GetChild(i - 1).GetComponent<Image>().sprite = Config.PLAYERLIST[Player.getPosInLists(Config.PLAYER_ID)].icon2.icon;
             }
             else
             {
@@ -952,7 +953,7 @@ public class StartupClient : MonoBehaviour
             if (Int32.Parse(content.GetChild(contentId).name.Split('*')[0]) < Int32.Parse(daten[i].Split('*')[0]))
             {
                 Player player = new Player(-1);
-                player.icon = FindIconByName(daten[i].Split('*')[1]);
+                player.icon2 = FindIconByName(daten[i].Split('*')[1]);
                 AddMSG(player, daten[i].Split('*')[2], content);
             }
         }
@@ -961,9 +962,9 @@ public class StartupClient : MonoBehaviour
     {
         GameObject newObject = GameObject.Instantiate(content.GetChild(0).gameObject, content, false);
         newObject.transform.localScale = new Vector3(1, 1, 1);
-        newObject.name = (content.childCount+1) + "*" + player.icon.name;
+        newObject.name = (content.childCount+1) + "*" + player.icon2.displayname;
         newObject.SetActive(true);
-        newObject.GetComponentInChildren<Image>().sprite = player.icon;
+        newObject.GetComponentInChildren<Image>().sprite = player.icon2.icon;
         StartCoroutine(ChangeMSGText(newObject, msg));
     }
     private IEnumerator ChangeMSGText(GameObject go, string data)

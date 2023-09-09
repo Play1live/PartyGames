@@ -279,7 +279,7 @@ public class SloxikonClient : MonoBehaviour
                 GameObject child = grid.transform.GetChild(j).gameObject;
                 if (Config.PLAYERLIST[j].name.Length > 1)
                 {
-                    child.GetComponent<Image>().sprite = Config.PLAYERLIST[j].icon;
+                    child.GetComponent<Image>().sprite = Config.PLAYERLIST[j].icon2.icon;
                     child.GetComponent<Image>().color = new Color(255, 255, 255, 1f);
                     child.gameObject.SetActive(false);
                 }
@@ -357,7 +357,7 @@ public class SloxikonClient : MonoBehaviour
         {
             for (int i = 0; i < Config.PLAYERLIST.Length + 1; i++)
             {
-                Antworten[i].transform.GetChild(3).GetChild(j).GetComponent<Button>().image.sprite = Config.PLAYERLIST[j].icon;
+                Antworten[i].transform.GetChild(3).GetChild(j).GetComponent<Button>().image.sprite = Config.PLAYERLIST[j].icon2.icon;
                 Antworten[i].transform.GetChild(3).GetChild(j).GetComponent<Button>().image.color = new Color(255, 255, 255, 1f);
                 Antworten[i].transform.GetChild(3).GetChild(j).GetComponent<Button>().interactable = false;
                 Antworten[i].transform.GetChild(3).GetChild(j).gameObject.SetActive(false);
@@ -484,7 +484,7 @@ public class SloxikonClient : MonoBehaviour
 
         for (int i = 0; i < Config.PLAYERLIST.Length + 1; i++)
         {
-            Antworten[i].transform.GetChild(3).GetChild(pid).GetComponent<Button>().image.sprite = Config.PLAYERLIST[pid].icon;
+            Antworten[i].transform.GetChild(3).GetChild(pid).GetComponent<Button>().image.sprite = Config.PLAYERLIST[pid].icon2.icon;
             Antworten[i].transform.GetChild(3).GetChild(pid).GetComponent<Button>().image.color = new Color(255, 255, 255, 0.5f);
             Antworten[i].transform.GetChild(3).GetChild(pid).GetComponent<Button>().interactable = false;
             Antworten[i].transform.GetChild(3).GetChild(pid).gameObject.SetActive(false);
@@ -517,7 +517,7 @@ public class SloxikonClient : MonoBehaviour
                 Config.PLAYERLIST[pos].points = Int32.Parse(sp.Replace("[PUNKTE]", "|").Split('|')[1]);
                 //Config.PLAYERLIST[pos].icon = Resources.Load<Sprite>("Images/ProfileIcons/" + sp.Replace("[ICON]", "|").Split('|')[1]);
                 // Display PlayerInfos                
-                SpielerAnzeige[pos, 2].GetComponent<Image>().sprite = Config.PLAYERLIST[pos].icon;
+                SpielerAnzeige[pos, 2].GetComponent<Image>().sprite = Config.PLAYERLIST[pos].icon2.icon;
                 SpielerAnzeige[pos, 4].GetComponent<TMP_Text>().text = Config.PLAYERLIST[pos].name;
                 SpielerAnzeige[pos, 5].GetComponent<TMP_Text>().text = Config.PLAYERLIST[pos].points+"";
                 // Verbundene Spieler anzeigen

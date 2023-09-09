@@ -228,7 +228,7 @@ public class KniffelPlayer
 
     public override string ToString()
     {
-        return this.gamerid + "*" + this.name + "*" + this.PlayerImage.name + "*" + this.Einsen.ToString() + "*" + this.Zweien.ToString() + "*" + 
+        return this.gamerid + "*" + this.name + "*" + PlayerIcon.getIdByName(this.PlayerImage.name) + "*" + this.Einsen.ToString() + "*" + this.Zweien.ToString() + "*" + 
             this.Dreien.ToString() + "*" + this.Vieren.ToString() + "*" +this.Fuenfen.ToString() + "*" +this.Sechsen.ToString() + "*" + 
             this.ObenSummeOhneBonus.ToString() + "*" +this.Bonus.ToString() + "*" + this.ObenSumme.ToString() + "*" +this.Dreierpasch.ToString() + "*" + 
             this.Viererpasch.ToString() + "*" + this.FullHouse.ToString() + "*" + this.KleineStraﬂe.ToString() + "*" + this.GroﬂeStraﬂe.ToString() + "*" + 

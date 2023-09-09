@@ -187,7 +187,7 @@ public class MosaikServer : MonoBehaviour
             if (p.isConnected && PlayerConnected[i])
             {
                 SpielerAnzeige[i, 0].SetActive(true);
-                SpielerAnzeige[i, 2].GetComponent<Image>().sprite = p.icon;
+                SpielerAnzeige[i, 2].GetComponent<Image>().sprite = p.icon2.icon;
                 SpielerAnzeige[i, 4].GetComponent<TMP_Text>().text = p.name;
                 SpielerAnzeige[i, 5].GetComponent<TMP_Text>().text = p.points+"";
             }
@@ -242,7 +242,7 @@ public class MosaikServer : MonoBehaviour
         GameObject SpielerGeladenAnzeige = GameObject.Find("SpielerGeladenAnzeige");
         for (int i = 0; i < Config.SERVER_MAX_CONNECTIONS; i++)
         {
-            SpielerGeladenAnzeige.transform.GetChild(i).GetComponent<Image>().sprite = Config.PLAYERLIST[i].icon;
+            SpielerGeladenAnzeige.transform.GetChild(i).GetComponent<Image>().sprite = Config.PLAYERLIST[i].icon2.icon;
             SpielerGeladenAnzeige.transform.GetChild(i).gameObject.SetActive(false);
         }
     }

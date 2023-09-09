@@ -10,7 +10,7 @@ public class Player
     public bool isDisconnected;
     public TcpClient tcp;
     public string name;
-    public Sprite icon;
+    public PlayerIcon icon2;
     public int crowns;
     public int points;
 
@@ -23,7 +23,7 @@ public class Player
         this.name = "";
         this.crowns = 0;
         this.points = 0;
-        this.icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
+        this.icon2 = new PlayerIcon();
     }
 
     public static int getPosInLists(int id)
@@ -62,15 +62,88 @@ public class Player
         return -1;
     }
     
-    public static Sprite getSpriteByPlayerName(string name)
+    /*public static Sprite getSpriteByPlayerName(string name)
     {
         for (int i = 0; i < Config.PLAYERLIST.Length; i++)
         {
             if (Config.PLAYERLIST[i].name == name)
             {
-                return Config.PLAYERLIST[i].icon;
+                return Config.PLAYERLIST[i].icon2.icon;
             }
         }
         return Resources.Load<Sprite>("Images/ProfileIcons/empty");
+    }*/
+    public static PlayerIcon getPlayerIconByPlayerName(string name)
+    {
+        for (int i = 0; i < Config.PLAYERLIST.Length; i++)
+        {
+            if (Config.PLAYERLIST[i].name == name)
+            {
+                return Config.PLAYERLIST[i].icon2;
+            }
+        }
+        return new PlayerIcon();
+    }
+}
+
+public class PlayerIcon
+{
+    public int id;
+    public Sprite icon;
+    public string displayname;
+    public List<string> names;
+
+    public PlayerIcon(int id, Sprite icon)
+    {
+        this.id = id;
+        this.icon = icon;
+        this.names = new List<string>();
+        this.names.AddRange(icon.name.Split('_'));
+        this.displayname = this.names[0];
+    }
+    public PlayerIcon()
+    {
+        this.id = 0;
+        this.icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
+        this.names = new List<string>();
+        this.names.Add("empty");
+        this.displayname = this.names[0];
+    }
+
+    public static int getIdByName(string name)
+    {
+        foreach (var item in Config.PLAYER_ICONS)
+        {
+            if (item.icon.name == name)
+                return item.id;
+        }
+        return 0;
+    }
+    public static PlayerIcon getIconById(int id)
+    {
+        foreach (var item in Config.PLAYER_ICONS)
+        {
+            if (item.id == id)
+                return item;
+        }
+        return new PlayerIcon();
+    }
+    public static PlayerIcon getIconById(string id)
+    {
+        foreach (var item in Config.PLAYER_ICONS)
+        {
+            if (id.Equals(item.id+""))
+                return item;
+        }
+        return new PlayerIcon();
+    }
+    public static PlayerIcon getIconByDisplayName(string name)
+    {
+        foreach (var item in Config.PLAYER_ICONS)
+        {
+            if (item.displayname == name)
+                return item;
+        }
+        return new PlayerIcon();
     }
 }

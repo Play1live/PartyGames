@@ -31,7 +31,7 @@ public class TabuSpiel
 
         foreach (string item in packnames)
         {
-            tabus.Add(new Tabu(item, Resources.Load<TextAsset>("Spiele/Tabu/" + item).text.Replace("\n", "")));
+            tabus.Add(new Tabu(item, Resources.Load<TextAsset>("Spiele/Tabu/" + item).text.Replace("\n", "").Replace("\\n", "")));
         }
 
         foreach (Tabu item in tabus)
@@ -40,30 +40,37 @@ public class TabuSpiel
         if (tabus.Count > 0)
             setSelected(tabus[0]);
 
-        
+        /*
         //Erstelle Liste mit allen Worten die nicht verwendet werden
-        /*List<string> verwendete = new List<string>();
+        List<string> verwendete = new List<string>();
         List<string> nichtverwendete = new List<string>();
         foreach (Tabu item in tabus)
-            foreach (TabuItem i in item.getGeheimwörter())
-                verwendete.Add(i.geheimwort);
-        foreach (Tabu item in tabus)
-            foreach (TabuItem i in item.getGeheimwörter())
-                foreach (string worte in i.tabuworte.Replace("\\n", "-").Split("-"))
-                    if (!verwendete.Contains(worte))
-                        nichtverwendete.Add(worte);
+            if (item.getTitel().Equals("Schwer"))
+                foreach (TabuItem i in item.getGeheimwörter())
+                {
+                    if (!verwendete.Contains(i.geheimwort))
+                        verwendete.Add(i.geheimwort);
+                    foreach (string worte in i.tabuworte.Replace("\\n", "-").Split("-"))
+                        if (!worte.Contains(" ") && worte.Length < 10)
+                            if (!nichtverwendete.Contains(worte) && !verwendete.Contains(worte))
+                                nichtverwendete.Add(worte);
+                }
         foreach (string item in verwendete)
             while (nichtverwendete.Contains(item))
                 nichtverwendete.Remove(item);
-        
-        Debug.LogWarning(nichtverwendete.Count);
+        foreach (string item in nichtverwendete)
+            while (verwendete.Contains(item))
+                nichtverwendete.Remove(item);
+
+        Debug.LogWarning("Nicht verwendete Worte: " + nichtverwendete.Count);
         string ausgabe = "";
         foreach (string item in nichtverwendete)
         {
             if (!ausgabe.Contains(item))
                 ausgabe += item + "\n";
         }
-        File.WriteAllText(Application.persistentDataPath + "/NichtverwendeteWorte.txt", ausgabe);*/
+        File.WriteAllText(Application.persistentDataPath + "/NichtverwendeteWorte.txt", ausgabe);
+        */
     }
 
     public int getMinPlayer() { return minPlayer; }
@@ -167,14 +174,15 @@ public class Tabu
                 else
                 {
                     Logging.log(Logging.LogType.Warning, "Tabu", "Tabu", name + " -> Dopplung: " + temp);
-                    foreach (var dopplungswort in worte)
+                    // TODO: Temporär werden Tabuworte nicht zusammengefügt
+                    /*foreach (var dopplungswort in worte)
                     {
                         if (dopplungswort.geheimwort.Equals(temp.Split('|')[0]))
                         {
                             dopplungswort.AddTabuWorte(temp.Split('|')[1]);
                             break;
                         }
-                    }
+                    }*/
 
                     needToSafe = true;
                 }
@@ -307,7 +315,7 @@ public class TabuData
     public static List<int> P_1WORT = new List<int> { 1, 0, 0 };
     public static List<int> P_NORMAL = new List<int> { 1, -1, 0 };
     public static List<int> P_TIMER = new List<int> { 20, -10, -5 };
-    public static List<int> P_BATTLE_ROYALE = new List<int> { 5, -10, -5 };
+    public static List<int> P_BATTLE_ROYALE = new List<int> { 10, -15, -5 };
 
     private static List<string> TimerDecPoints = new List<string>{ "Timer", "Battle Royale" };
 

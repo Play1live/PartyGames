@@ -188,7 +188,7 @@ public class SloxikonServer : MonoBehaviour
             {
                 connectedplayer++;
                 SpielerAnzeige[i, 0].SetActive(true);
-                SpielerAnzeige[i, 2].GetComponent<Image>().sprite = p.icon;
+                SpielerAnzeige[i, 2].GetComponent<Image>().sprite = p.icon2.icon;
                 SpielerAnzeige[i, 4].GetComponent<TMP_Text>().text = p.name;
                 SpielerAnzeige[i, 5].GetComponent<TMP_Text>().text = p.points+"";
             }
@@ -269,7 +269,7 @@ public class SloxikonServer : MonoBehaviour
                 GameObject child = grid.transform.GetChild(j).gameObject;
                 if (Config.SERVER_MAX_CONNECTIONS > j && Config.PLAYERLIST[j].isConnected)
                 {
-                    child.GetComponent<Image>().sprite = Config.PLAYERLIST[j].icon;
+                    child.GetComponent<Image>().sprite = Config.PLAYERLIST[j].icon2.icon;
                     child.GetComponent<Image>().color = new Color(255, 255, 255, 0.5f);
                     child.gameObject.SetActive(true);
                 }
@@ -381,7 +381,7 @@ public class SloxikonServer : MonoBehaviour
                 Antworten[pos].transform.GetChild(0).GetChild(0).GetComponent<Button>().interactable = true; // ShowTXT
                 Antworten[pos].transform.GetChild(0).GetChild(1).GetComponent<Button>().interactable = true; // ShowOwner
                 // Source
-                Antworten[pos].transform.GetChild(1).GetComponent<Image>().sprite = Config.PLAYERLIST[Player.getPosInLists(pid)].icon;
+                Antworten[pos].transform.GetChild(1).GetComponent<Image>().sprite = Config.PLAYERLIST[Player.getPosInLists(pid)].icon2.icon;
                 Antworten[pos].transform.GetChild(1).GetComponentInChildren<TMP_Text>().text = pid + "";
                 Antworten[pos].transform.GetChild(1).GetComponent<Image>().color = new Color(255, 255, 255, 0.5f);
                 Antworten[pos].SetActive(true);
@@ -396,7 +396,7 @@ public class SloxikonServer : MonoBehaviour
             {
                 for (int i = 0; i < Config.PLAYERLIST.Length; i++)
                 {
-                    Antworten[i].transform.GetChild(3).GetChild(j).GetComponent<Button>().image.sprite = Config.PLAYERLIST[j].icon;
+                    Antworten[i].transform.GetChild(3).GetChild(j).GetComponent<Button>().image.sprite = Config.PLAYERLIST[j].icon2.icon;
                     Antworten[i].transform.GetChild(3).GetChild(j).GetComponent<Button>().image.color = new Color(255, 255, 255, 0.5f);
                     Antworten[i].transform.GetChild(3).GetChild(j).GetComponent<Button>().interactable = true;
                     Antworten[i].transform.GetChild(3).GetChild(j).gameObject.SetActive(true);
@@ -426,7 +426,7 @@ public class SloxikonServer : MonoBehaviour
         {
             int random = ids[UnityEngine.Random.Range(0, ids.Count)];
             ids.Remove(random);
-            parent.transform.GetChild(i).GetComponent<Button>().image.sprite = Config.PLAYERLIST[Player.getPosInLists(random)].icon;
+            parent.transform.GetChild(i).GetComponent<Button>().image.sprite = Config.PLAYERLIST[Player.getPosInLists(random)].icon2.icon;
             parent.transform.GetChild(i).gameObject.SetActive(true);
         }
     }
@@ -439,7 +439,7 @@ public class SloxikonServer : MonoBehaviour
 
         foreach (Player p in Config.PLAYERLIST)
         {
-            if (sprite == p.icon)
+            if (sprite == p.icon2.icon)
             {
                 ServerUtils.AddBroadcast("#SpielersTurn " + p.id);
                 for (int i = 0; i < Config.SERVER_MAX_CONNECTIONS; i++)

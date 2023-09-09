@@ -37,6 +37,7 @@ public class TabuClient : MonoBehaviour
     private Coroutine SkipCoroutine;
     private int timerseconds;
     private Coroutine HideRichtigFalschSecCoroutine;
+    private GameObject HistoryContentElement;
 
     private List<string> teamrotList;
     private List<string> teamblauList;
@@ -261,6 +262,7 @@ public class TabuClient : MonoBehaviour
         Skip = GameObject.Find("Spielbrett/Skip");
         Skip.SetActive(false);
         started = false;
+        HistoryContentElement = GameObject.Find("WortHistory/Viewport/Content/Object*0");
 
         teamblauList.Add(Config.PLAYER_NAME);
         foreach (Player item in Config.PLAYERLIST)
@@ -360,7 +362,7 @@ public class TabuClient : MonoBehaviour
             {
                 PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = temp[index].Split("~")[0];
                 teamrotList.Add(temp[index].Split("~")[0]);
-                PlayerObject.GetChild(0).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/ProfileIcons/" + temp[index].Split("~")[1]);
+                PlayerObject.GetChild(0).GetComponent<Image>().sprite = PlayerIcon.getIconById(temp[index].Split("~")[1]).icon;
                 PlayerObject.gameObject.SetActive(true);
             }
         }
@@ -376,7 +378,7 @@ public class TabuClient : MonoBehaviour
             {
                 PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = temp[index].Split("~")[0];
                 teamblauList.Add(temp[index].Split("~")[0]);
-                PlayerObject.GetChild(0).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/ProfileIcons/" + temp[index].Split("~")[1]);
+                PlayerObject.GetChild(0).GetComponent<Image>().sprite = PlayerIcon.getIconById(temp[index].Split("~")[1]).icon;
                 PlayerObject.gameObject.SetActive(true);
             }
         }
@@ -506,10 +508,97 @@ public class TabuClient : MonoBehaviour
             Skip.SetActive(true);
         yield break;
     }
+    private void StartRunde(string data)
+    {
+        erklaerer = data.Split('|')[0];
+        TeamTurn = data.Split('|')[1];
+        TabuSpiel.GameType = data.Split('|')[2];
+        timerseconds = Int32.Parse(data.Split('|')[3]);
+        teamrotPunkte = Int32.Parse(data.Split('|')[4]);
+        teamblauPunkte = Int32.Parse(data.Split('|')[5]);
+        wzahlenstring = data.Split('|')[6];
+        selectedItem.geheimwort = data.Split('|')[7];
+        selectedItem.tabuworte = data.Split('|')[8];
+        DisplayKarte(true, selectedItem.geheimwort, TabuSpiel.getStringArrayToString(selectedItem.tabuworte, wzahlenstring));
+        started = true;
+
+        Skip.SetActive(false);
+        if (TabuSpiel.GameType.Equals("Normal") && erklaerer.Equals(Config.PLAYER_NAME))
+            Skip.SetActive(true);
+        else if (TabuSpiel.GameType.Equals("Timer") && erklaerer.Equals(Config.PLAYER_NAME))
+            Skip.SetActive(true);
+        else if (TabuSpiel.GameType.Equals("Battle Royale") && erklaerer.Equals(Config.PLAYER_NAME))
+            Skip.SetActive(true);
+
+        RundeStarten.SetActive(false);
+        JoinTeamRot.SetActive(false);
+        JoinTeamBlau.SetActive(false);
+        for (int i = 0; i < Kreuze.transform.childCount; i++)
+            Kreuze.transform.GetChild(i).gameObject.SetActive(false);
+        Kreuze.SetActive(true);
+        if (erklaerer == Config.PLAYER_NAME)
+        {
+            Richtig.SetActive(true);
+            Falsch.SetActive(true);
+        }
+        else if (TeamTurn.Equals("ROT") && teamblauList.Contains(Config.PLAYER_NAME))
+        {
+            Richtig.SetActive(false);
+            Falsch.SetActive(true);
+        }
+        else if (TeamTurn.Equals("BLAU") && teamrotList.Contains(Config.PLAYER_NAME))
+        {
+            Richtig.SetActive(false);
+            Falsch.SetActive(true);
+        }
+        else
+        {
+            Richtig.SetActive(false);
+            Falsch.SetActive(false);
+        }
+        // Blende Karte für Spieler der dran ist ein
+        if (erklaerer == Config.PLAYER_NAME)
+        {
+            DisplayKarte(true, selectedItem.geheimwort, TabuSpiel.getStringArrayToString(selectedItem.tabuworte, wzahlenstring));
+        }
+        else
+        {
+            Karte.transform.GetChild(0).GetChild(1).GetComponent<TMP_Text>().text = erklaerer;
+            if (TeamTurn.Equals("BLAU") && teamrotList.Contains(Config.PLAYER_NAME))
+            {
+                DisplayKarte(true, selectedItem.geheimwort, TabuSpiel.getStringArrayToString(selectedItem.tabuworte, wzahlenstring));
+            }
+            else if (TeamTurn.Equals("ROT") && teamblauList.Contains(Config.PLAYER_NAME))
+            {
+                DisplayKarte(true, selectedItem.geheimwort, TabuSpiel.getStringArrayToString(selectedItem.tabuworte, wzahlenstring));
+            }
+            else if (TeamTurn.Equals("BLAU") && teamblauList.Contains(Config.PLAYER_NAME))
+            {
+                DisplayKarte(true, erklaerer, "");
+                SpielerIstDran.Play();
+            }
+            else if (TeamTurn.Equals("ROT") && teamrotList.Contains(Config.PLAYER_NAME))
+            {
+                DisplayKarte(true, erklaerer, "");
+                SpielerIstDran.Play();
+            }
+            else
+            {
+                Karte.transform.GetChild(0).GetChild(3).GetComponent<TMP_Text>().text = "";
+            }
+            Karte.SetActive(true);
+        }
+        MarkErklaerer();
+
+        StartTimer(timerseconds);
+    }
     private void RundeEnde(string data)
     {
         TeamTurn = data.Split('|')[0];
         string indicator = data.Split('|')[1];
+        #region WortHistory
+        AddWortHistory(erklaerer, indicator, selectedItem.geheimwort, selectedItem.tabuworte);
+        #endregion
         TabuSpiel.GameType = data.Split('|')[2];
         teamrotPunkte = Int32.Parse(data.Split('|')[3]);
         int teamrot = teamrotPunkte;
@@ -521,6 +610,7 @@ public class TabuClient : MonoBehaviour
         selectedItem.geheimwort = data.Split('|')[8];
         selectedItem.tabuworte = data.Split('|')[9];
         wzahlenstring = data.Split('|')[7];
+
 
         if (TabuSpiel.GameType.Equals("1 Wort"))
         {
@@ -724,9 +814,6 @@ public class TabuClient : MonoBehaviour
             RundeStarten.SetActive(true);
         else if (TeamTurn.Equals("BLAU") && teamblauList.Contains(Config.PLAYER_NAME))
             RundeStarten.SetActive(true);
-
-        if (TabuSpiel.GameType.Equals("Battle Royale"))
-            RundeStarten.SetActive(false);
     }
     private void KreuzAn(string data)
     {
@@ -740,88 +827,6 @@ public class TabuClient : MonoBehaviour
         if (!Config.CLIENT_STARTED)
             return;
         ClientUtils.SendToServer("#ClientStartRunde");
-    }
-    private void StartRunde(string data)
-    {
-        erklaerer = data.Split('|')[0];
-        TeamTurn = data.Split('|')[1];
-        TabuSpiel.GameType = data.Split('|')[2];
-        timerseconds = Int32.Parse(data.Split('|')[3]);
-        wzahlenstring = data.Split('|')[4];
-        selectedItem.geheimwort = data.Split('|')[5];
-        selectedItem.tabuworte = data.Split('|')[6];
-        DisplayKarte(true, selectedItem.geheimwort, TabuSpiel.getStringArrayToString(selectedItem.tabuworte, wzahlenstring));
-        started = true;
-
-        Skip.SetActive(false);
-        if (TabuSpiel.GameType.Equals("Normal") && erklaerer.Equals(Config.PLAYER_NAME))
-            Skip.SetActive(true);
-        else if (TabuSpiel.GameType.Equals("Timer") && erklaerer.Equals(Config.PLAYER_NAME))
-            Skip.SetActive(true);
-        else if (TabuSpiel.GameType.Equals("Battle Royale") && erklaerer.Equals(Config.PLAYER_NAME))
-            Skip.SetActive(true);
-
-        RundeStarten.SetActive(false);
-        JoinTeamRot.SetActive(false);
-        JoinTeamBlau.SetActive(false);
-        for (int i = 0; i < Kreuze.transform.childCount; i++)
-            Kreuze.transform.GetChild(i).gameObject.SetActive(false);
-        Kreuze.SetActive(true);
-        if (erklaerer == Config.PLAYER_NAME)
-        {
-            Richtig.SetActive(true);
-            Falsch.SetActive(true);
-        }
-        else if (TeamTurn.Equals("ROT") && teamblauList.Contains(Config.PLAYER_NAME))
-        {
-            Richtig.SetActive(false);
-            Falsch.SetActive(true);
-        }
-        else if (TeamTurn.Equals("BLAU") && teamrotList.Contains(Config.PLAYER_NAME))
-        {
-            Richtig.SetActive(false);
-            Falsch.SetActive(true);
-        }
-        else
-        {
-            Richtig.SetActive(false);
-            Falsch.SetActive(false);
-        }
-        // Blende Karte für Spieler der dran ist ein
-        if (erklaerer == Config.PLAYER_NAME)
-        {
-            DisplayKarte(true, selectedItem.geheimwort, TabuSpiel.getStringArrayToString(selectedItem.tabuworte, wzahlenstring));
-        }
-        else
-        {
-            Karte.transform.GetChild(0).GetChild(1).GetComponent<TMP_Text>().text = erklaerer;
-            if (TeamTurn.Equals("BLAU") && teamrotList.Contains(Config.PLAYER_NAME))
-            {
-                DisplayKarte(true, selectedItem.geheimwort, TabuSpiel.getStringArrayToString(selectedItem.tabuworte, wzahlenstring));
-            }
-            else if (TeamTurn.Equals("ROT") && teamblauList.Contains(Config.PLAYER_NAME))
-            {
-                DisplayKarte(true, selectedItem.geheimwort, TabuSpiel.getStringArrayToString(selectedItem.tabuworte, wzahlenstring));
-            }
-            else if (TeamTurn.Equals("BLAU") && teamblauList.Contains(Config.PLAYER_NAME))
-            {
-                DisplayKarte(true, erklaerer, "");
-                SpielerIstDran.Play();
-            }
-            else if (TeamTurn.Equals("ROT") && teamrotList.Contains(Config.PLAYER_NAME))
-            {
-                DisplayKarte(true, erklaerer, "");
-                SpielerIstDran.Play();
-            }
-            else
-            {
-                Karte.transform.GetChild(0).GetChild(3).GetComponent<TMP_Text>().text = "";
-            }
-            Karte.SetActive(true);
-        }
-        MarkErklaerer();
-
-        StartTimer(timerseconds);
     }
     #endregion
     private void MarkErklaerer()
@@ -849,5 +854,50 @@ public class TabuClient : MonoBehaviour
                     PlayerObject.GetChild(1).GetComponent<TMP_Text>().text = "<color=green>" + teamblauList[index];
             }
         }
+    }
+    private void AddWortHistory(string icon, string index, string wort, string tabus)
+    {
+        Transform content = HistoryContentElement.transform.parent;
+
+        GameObject newObject = GameObject.Instantiate(content.GetChild(0).gameObject, content, false);
+        newObject.transform.localScale = new Vector3(1, 1, 1);
+        newObject.name = "Object" + "*" + content.childCount;
+        newObject.SetActive(true);
+        if (icon == Config.SERVER_PLAYER.name)
+        {
+            newObject.transform.GetChild(0).GetComponent<Image>().sprite = Config.SERVER_PLAYER.icon2.icon;
+        }
+        else
+        {
+            newObject.transform.GetChild(0).GetComponent<Image>().sprite = Player.getPlayerIconByPlayerName(icon).icon;
+        }
+        newObject.transform.GetChild(1).GetComponent<TMP_Text>().text = wort;
+        newObject.transform.GetChild(1).GetChild(0).GetComponent<TMP_Text>().text = tabus.Replace("-", "\n");
+        if (index == "-3") // Skip
+        {
+            newObject.transform.GetChild(2).GetChild(0).gameObject.SetActive(true);
+        }
+        else if (index == "-2") // Falsch
+        {
+            newObject.transform.GetChild(2).GetChild(2).gameObject.SetActive(true);
+        }
+        else if (index == "-1") // Zeit
+        {
+            //newObject.transform.GetChild(2).GetChild(2).gameObject.SetActive(true);
+        }
+        else if (index == "1") // Richtig
+        {
+            newObject.transform.GetChild(2).GetChild(1).gameObject.SetActive(true);
+
+        }
+        StartCoroutine(ChangeWortHistoryText(newObject, wort));
+    }
+    private IEnumerator ChangeWortHistoryText(GameObject go, string data)
+    {
+        yield return null;
+        go.transform.GetChild(1).GetComponent<TMP_Text>().text = data + " ";
+        yield return null;
+        go.transform.GetChild(1).GetComponent<TMP_Text>().text = data;
+        yield break;
     }
 }

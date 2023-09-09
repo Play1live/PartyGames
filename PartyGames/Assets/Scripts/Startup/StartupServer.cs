@@ -196,7 +196,7 @@ public class StartupServer : MonoBehaviour
             return;
         }
         // Sucht ein passendes Icon für den Serverhost
-        Config.SERVER_PLAYER.icon = FindFittingIconByName(Config.PLAYER_NAME);
+        Config.SERVER_PLAYER.icon2 = FindFittingIconByName(Config.PLAYER_NAME);
 
         // Verbindung erfolgreich
         Config.HAUPTMENUE_FEHLERMELDUNG = "";
@@ -388,18 +388,18 @@ public class StartupServer : MonoBehaviour
     {
         string msg = "#UpdateSpieler [ID]0[ID][NAME]" + Config.PLAYER_NAME + "[NAME][PUNKTE]" + 
             Config.SERVER_PLAYER.points + "[PUNKTE][ICON]" + 
-            Config.SERVER_PLAYER.icon.name + "[ICON]";
+            Config.SERVER_PLAYER.icon2.id + "[ICON]";
         int connectedplayer = 1;
         List<string> spielerIDNameList = new List<string>();
         spielerIDNameList.Add("");
         foreach (Player player in Config.PLAYERLIST)
         {
-            msg += "[TRENNER][ID]" + player.id + "[ID][NAME]" + player.name + "[NAME][PUNKTE]" + player.points + "[PUNKTE][ICON]" + player.icon.name + "[ICON]";
+            msg += "[TRENNER][ID]" + player.id + "[ID][NAME]" + player.name + "[NAME][PUNKTE]" + player.points + "[PUNKTE][ICON]" + player.icon2.id + "[ICON]";
             if (player.isConnected)
             {
                 connectedplayer++;
                 SpielerAnzeigeLobby[player.id].SetActive(true);
-                SpielerAnzeigeLobby[player.id].GetComponentsInChildren<Image>()[1].sprite = player.icon;
+                SpielerAnzeigeLobby[player.id].GetComponentsInChildren<Image>()[1].sprite = player.icon2.icon;
                 SpielerAnzeigeLobby[player.id].GetComponentsInChildren<TMP_Text>()[0].text = player.name;
 
                 spielerIDNameList.Add(player.id + "| " + player.name);
@@ -410,7 +410,7 @@ public class StartupServer : MonoBehaviour
 
         GameObject.Find("Lobby/Title_LBL/Spieleranzahl").GetComponent<TMP_Text>().text = connectedplayer + "/" + (Config.PLAYERLIST.Length + 1);
         SpielerAnzeigeLobby[0].SetActive(true);
-        SpielerAnzeigeLobby[0].GetComponentsInChildren<Image>()[1].sprite = Config.SERVER_PLAYER.icon;
+        SpielerAnzeigeLobby[0].GetComponentsInChildren<Image>()[1].sprite = Config.SERVER_PLAYER.icon2.icon;
         SpielerAnzeigeLobby[0].GetComponentsInChildren<TMP_Text>()[0].text = Config.PLAYER_NAME;
 
         if (ServerControlControlField.activeInHierarchy)
@@ -425,9 +425,9 @@ public class StartupServer : MonoBehaviour
             GameObject.Find("ServerControl/ControlField/SpielerIconWechseln/Bilder").GetComponent<TMP_Dropdown>().ClearOptions();
             List<string> bilderliste = new List<string>();
             bilderliste.Add("empty");
-            foreach (Sprite sprite in Config.PLAYER_ICONS)
-                if (sprite.name != "empty")
-                bilderliste.Add(sprite.name);
+            foreach (PlayerIcon picons in Config.PLAYER_ICONS)
+                if (picons.icon.name != "empty")
+                    bilderliste.Add(picons.displayname);
             GameObject.Find("ServerControl/ControlField/SpielerIconWechseln/Bilder").GetComponent<TMP_Dropdown>().AddOptions(bilderliste);
         }
         Logging.log(Logging.LogType.Debug, "StartupServer", "UpdateSpieler", msg);
@@ -822,14 +822,14 @@ public class StartupServer : MonoBehaviour
         TMP_Dropdown drop = GameObject.Find("ServerControl/ControlField/SpielerIconWechseln/Dropdown").GetComponent<TMP_Dropdown>();
         if (drop.options[drop.value].text == "")
         {
-            Config.SERVER_PLAYER.icon = Resources.Load<Sprite>("Images/ProfileIcons/" + Icon.options[Icon.value].text);
-            Logging.log(Logging.LogType.Normal, "StartupServer", "SpielerIconWechsel", "Server hat nun das Icon: "+ Config.SERVER_PLAYER.icon.name);
+            Config.SERVER_PLAYER.icon2 = PlayerIcon.getIconByDisplayName(Icon.options[Icon.value].text);
+            Logging.log(Logging.LogType.Normal, "StartupServer", "SpielerIconWechsel", "Server hat nun das Icon: "+ Config.SERVER_PLAYER.icon2.displayname);
             UpdateSpielerBroadcast();
             return;
         }
         int id = Int32.Parse(drop.options[drop.value].text.Split('|')[0]);
-        Config.PLAYERLIST[id - 1].icon = Resources.Load<Sprite>("Images/ProfileIcons/" + Icon.options[Icon.value].text);
-        Logging.log(Logging.LogType.Normal, "StartupServer", "SpielerIconWechsel", "Spieler " + Config.PLAYERLIST[id - 1].name + " hat nun das Icon: " + Config.PLAYERLIST[id - 1].icon.name);
+        Config.PLAYERLIST[id - 1].icon2 = PlayerIcon.getIconByDisplayName(Icon.options[Icon.value].text);
+        Logging.log(Logging.LogType.Normal, "StartupServer", "SpielerIconWechsel", "Spieler " + Config.PLAYERLIST[id - 1].name + " hat nun das Icon: " + Config.PLAYERLIST[id - 1].icon2.displayname);
         UpdateSpielerBroadcast();
     }
     /// <summary>
@@ -839,7 +839,7 @@ public class StartupServer : MonoBehaviour
     /// <param name="data">Name des geforderten Icons</param>
     private void SpielerIconChange(Player p, string data)
     {
-        Sprite neuesIcon;
+        PlayerIcon neuesIcon;
         if (data.Equals("0")) // Initial Änderung Icon
         {
             Logging.log(Logging.LogType.Normal, "StartupServer", "SpielerIconChange", "Spieler " + p.name + " bekommt sein initial Icon.");
@@ -853,8 +853,8 @@ public class StartupServer : MonoBehaviour
         if (!Config.ALLOW_ICON_CHANGE)
             return;
 
-        neuesIcon = Config.PLAYER_ICONS[(Config.PLAYER_ICONS.IndexOf(p.icon) + 1) % Config.PLAYER_ICONS.Count];
-        Logging.log(Logging.LogType.Normal, "StartupServer", "SpielerIconChange", "Spieler " + p.name + " hat nun das Icon: "+ neuesIcon.name);
+        neuesIcon = Config.PLAYER_ICONS[(Config.PLAYER_ICONS.IndexOf(p.icon2) + 1) % Config.PLAYER_ICONS.Count];
+        Logging.log(Logging.LogType.Normal, "StartupServer", "SpielerIconChange", "Spieler " + p.name + " hat nun das Icon: "+ neuesIcon.displayname);
         IconFestlegen(p, neuesIcon);
     }
     /// <summary>
@@ -862,8 +862,27 @@ public class StartupServer : MonoBehaviour
     /// </summary>
     /// <param name="name"></param>
     /// <returns>null wenn kein Name passt</returns>
-    private Sprite FindFittingIconByName(string name)
+    private PlayerIcon FindFittingIconByName(string name)
     {
+        foreach (PlayerIcon playericon in Config.PLAYER_ICONS)
+        {
+            foreach (var item in playericon.names)    
+                if (name.ToLower().Contains(item))
+                    return playericon;
+        }
+
+        Logging.log(Logging.LogType.Warning, "StartupServer", "SpielerIconChange", "Spielername für Icons ist unbekannt: " + name);
+        PlayerIcon neuesIcon = Config.PLAYER_ICONS[1];
+        for (int i = 1; i < Config.PLAYER_ICONS.Count; i++)
+        {
+            if (IconWirdGeradeGenutzt(neuesIcon))
+                neuesIcon = Config.PLAYER_ICONS[(Config.PLAYER_ICONS.IndexOf(neuesIcon) + 1) % Config.PLAYER_ICONS.Count];
+            else
+                break;
+        }
+        return neuesIcon;
+
+        /*
         if (name.ToLower().Contains("spieler"))
             return FindIconByName("Discord");
         else if (name.ToLower().Contains("alan"))
@@ -912,18 +931,18 @@ public class StartupServer : MonoBehaviour
                     break;
             }
             return neuesIcon;
-        }
+        }*/
     }
     /// <summary>
     /// Gibt ein Sprite eines Icons zurück das per Name gesucht wird
     /// </summary>
     /// <param name="name">Name des neuen Icons</param>
     /// <returns>Sprite, null</returns>
-    private Sprite FindIconByName(string name)
+    private PlayerIcon FindIconByName(string name)
     {
-        foreach (Sprite sprite in Config.PLAYER_ICONS)
+        foreach (PlayerIcon sprite in Config.PLAYER_ICONS)
         {
-            if (sprite.name.Equals(name))
+            if (sprite.displayname.Equals(name))
                 return sprite;
         }
         Logging.log(Logging.LogType.Warning, "StartupServer", "FindIconByName", "Icon " + name + " konnte nicht gefunden werden.");
@@ -934,7 +953,7 @@ public class StartupServer : MonoBehaviour
     /// </summary>
     /// <param name="p">Spieler</param>
     /// <param name="neuesIcon">Neues Icon für den Spieler</param>
-    private void IconFestlegen(Player p, Sprite neuesIcon)
+    private void IconFestlegen(Player p, PlayerIcon neuesIcon)
     {
         if (neuesIcon == null)
             neuesIcon = Config.PLAYER_ICONS[(Config.PLAYER_ICONS.IndexOf(neuesIcon) + 1) % Config.PLAYER_ICONS.Count];
@@ -947,7 +966,7 @@ public class StartupServer : MonoBehaviour
                 break;
         }
         // Lege Icon fest
-        p.icon = neuesIcon;
+        p.icon2 = neuesIcon;
         // Update an alle
         UpdateSpielerBroadcast();
     }
@@ -956,12 +975,12 @@ public class StartupServer : MonoBehaviour
     /// </summary>
     /// <param name="icon">Icon</param>
     /// <returns>true, false</returns>
-    private bool IconWirdGeradeGenutzt(Sprite icon)
+    private bool IconWirdGeradeGenutzt(PlayerIcon icon)
     {
-        if (Config.SERVER_PLAYER.icon == icon)
+        if (Config.SERVER_PLAYER.icon2 == icon)
             return true;
         for (int i = 0; i < Config.PLAYERLIST.Length; i++)
-            if (icon == Config.PLAYERLIST[i].icon || icon.name == "empty")
+            if (icon == Config.PLAYERLIST[i].icon2 || icon.displayname == "empty")
                 return true;
         return false;
     }
@@ -972,8 +991,8 @@ public class StartupServer : MonoBehaviour
     {
         if (!Config.isServer)
             return;
-        Config.SERVER_PLAYER.icon = Config.PLAYER_ICONS[(Config.PLAYER_ICONS.IndexOf(Config.SERVER_PLAYER.icon) + 1) % Config.PLAYER_ICONS.Count];
-        Logging.log(Logging.LogType.Normal, "StartupServer", "ServerIconChange", "Server hat nun das Icon: " + Config.SERVER_PLAYER.icon.name);
+        Config.SERVER_PLAYER.icon2 = Config.PLAYER_ICONS[(Config.PLAYER_ICONS.IndexOf(Config.SERVER_PLAYER.icon2) + 1) % Config.PLAYER_ICONS.Count];
+        Logging.log(Logging.LogType.Normal, "StartupServer", "ServerIconChange", "Server hat nun das Icon: " + Config.SERVER_PLAYER.icon2.displayname);
         UpdateSpielerBroadcast();
     }
     #endregion
@@ -1372,7 +1391,7 @@ public class StartupServer : MonoBehaviour
         string lastmsgs = "";
         for (int i = content.childCount-1; i > Mathf.Max(0, content.childCount-10); i--)
         {
-            lastmsgs += "|" + content.GetChild(i).name + "*" + content.GetChild(i).GetComponentInChildren<TMP_Text>().text;
+            lastmsgs += "|" + PlayerIcon.getIdByName(content.GetChild(i).name) + "*" + content.GetChild(i).GetComponentInChildren<TMP_Text>().text;
         }
         if (lastmsgs.Length > 1)
             lastmsgs = lastmsgs.Substring(1);
@@ -1383,9 +1402,9 @@ public class StartupServer : MonoBehaviour
     {
         GameObject newObject = GameObject.Instantiate(content.GetChild(0).gameObject, content, false);
         newObject.transform.localScale = new Vector3(1, 1, 1);
-        newObject.name = (content.childCount+1) + "*" + player.icon.name;
+        newObject.name = (content.childCount+1) + "*" + player.icon2.displayname;
         newObject.SetActive(true);
-        newObject.GetComponentInChildren<Image>().sprite = player.icon;
+        newObject.GetComponentInChildren<Image>().sprite = player.icon2.icon;
         newObject.GetComponentInChildren<TMP_Text>().text = msg;
         StartCoroutine(ChangeMSGText(newObject, msg));
     }

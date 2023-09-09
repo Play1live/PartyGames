@@ -139,7 +139,7 @@ public class KniffelServer : MonoBehaviour
                 string plist = "";
                 foreach (KniffelPlayer item in board.GetPlayerList())
                 {
-                    plist += "[#]" + item.gamerid + "*" + item.name + "*" + item.PlayerImage.name;
+                    plist += "[#]" + item.gamerid + "*" + item.name + "*" + PlayerIcon.getIdByName(item.PlayerImage.name);
                 }
                 if (plist.Length > 3)
                     plist = plist.Substring("[#]".Length);
@@ -167,7 +167,7 @@ public class KniffelServer : MonoBehaviour
     {
         string playername = player.name;
 
-        player.icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
+        player.icon2 = new PlayerIcon();
         player.name = "";
         player.points = 0;
         player.isConnected = false;
@@ -215,18 +215,18 @@ public class KniffelServer : MonoBehaviour
     {
         List<KniffelPlayer> player = new List<KniffelPlayer>();
         int playercounter = 0;
-        player.Add(new KniffelPlayer(playercounter++, Config.PLAYER_NAME, Config.SERVER_PLAYER.icon, Punkteliste.transform.GetChild(2 + player.Count).gameObject));
+        player.Add(new KniffelPlayer(playercounter++, Config.PLAYER_NAME, Config.SERVER_PLAYER.icon2.icon, Punkteliste.transform.GetChild(2 + player.Count).gameObject));
         foreach (Player p in Config.PLAYERLIST)
         {
             if (p.isConnected && p.name.Length > 0)
             {
-                player.Add(new KniffelPlayer(playercounter++, p.name, p.icon, Punkteliste.transform.GetChild(2 + player.Count).gameObject));
+                player.Add(new KniffelPlayer(playercounter++, p.name, p.icon2.icon, Punkteliste.transform.GetChild(2 + player.Count).gameObject));
             }
         }
         string plist = "";
         foreach (KniffelPlayer item in player)
         {
-            plist += "[#]" + item.gamerid + "*" + item.name + "*" + item.PlayerImage.name;
+            plist += "[#]" + item.gamerid + "*" + item.name + "*" + PlayerIcon.getIdByName(item.PlayerImage.name);
         }
         if (plist.Length > 3)
             plist = plist.Substring("[#]".Length);

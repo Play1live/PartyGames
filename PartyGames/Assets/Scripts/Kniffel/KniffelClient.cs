@@ -224,7 +224,7 @@ public class KniffelClient : MonoBehaviour
         List<KniffelPlayer> players = new List<KniffelPlayer>();
         foreach (string item in data.Replace("[#]", "|").Split('|'))
         {
-            players.Add(new KniffelPlayer(Int32.Parse(item.Split('*')[0]), item.Split('*')[1], Resources.Load<Sprite>("Images/ProfileIcons/" + item.Split('*')[2]), Punkteliste.transform.GetChild(2 + players.Count).gameObject));
+            players.Add(new KniffelPlayer(Int32.Parse(item.Split('*')[0]), item.Split('*')[1], PlayerIcon.getIconById(item.Split('*')[2]).icon, Punkteliste.transform.GetChild(2 + players.Count).gameObject));
         }
 
         SafeWuerfel = new List<Image>();

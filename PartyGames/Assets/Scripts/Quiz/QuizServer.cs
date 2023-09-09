@@ -164,7 +164,7 @@ public class QuizServer : MonoBehaviour
     /// </summary>
     private void UpdateSpielerBroadcast()
     {
-        ServerUtils.BroadcastImmediate(Config.GAME_TITLE + UpdateSpieler());
+        ServerUtils.AddBroadcast(Config.GAME_TITLE + UpdateSpieler());
     }
     /// <summary>
     /// Aktualisiert die Spieler Anzeige Informationen & gibt diese als Text zurück
@@ -182,7 +182,7 @@ public class QuizServer : MonoBehaviour
             {
                 connectedplayer++;
                 SpielerAnzeige[i, 0].SetActive(true);
-                SpielerAnzeige[i, 2].GetComponent<Image>().sprite = p.icon;
+                SpielerAnzeige[i, 2].GetComponent<Image>().sprite = p.icon2.icon;
                 SpielerAnzeige[i, 4].GetComponent<TMP_Text>().text = p.name;
                 SpielerAnzeige[i, 5].GetComponent<TMP_Text>().text = p.points+"";
             }
@@ -299,7 +299,7 @@ public class QuizServer : MonoBehaviour
         {
             if (p.isConnected)
             {
-                GameObject.Find("SchaetzfragenAnimation/Spieler/Spieler (" + p.id + ")").GetComponent<Image>().sprite = p.icon;
+                GameObject.Find("SchaetzfragenAnimation/Spieler/Spieler (" + p.id + ")").GetComponent<Image>().sprite = p.icon2.icon;
             }
             else
             {
@@ -591,9 +591,9 @@ public class QuizServer : MonoBehaviour
     /// <param name="player">Spieler</param>
     public void PunkteRichtigeAntwort(GameObject player)
     {
-        ServerUtils.BroadcastImmediate(Config.GAME_TITLE +"#AudioRichtigeAntwort");
-        RichtigeAntwortSound.Play();
         int pId = Int32.Parse(player.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
+        ServerUtils.AddBroadcast(Config.GAME_TITLE +"#AudioRichtigeAntwort " + pId + "*" + PunkteProRichtige);
+        RichtigeAntwortSound.Play();
         int pIndex = Player.getPosInLists(pId);
         Config.PLAYERLIST[pIndex].points += PunkteProRichtige;
         UpdateSpielerBroadcast();
@@ -604,9 +604,9 @@ public class QuizServer : MonoBehaviour
     /// <param name="player">Spieler</param>
     public void PunkteFalscheAntwort(GameObject player)
     {
-        ServerUtils.BroadcastImmediate(Config.GAME_TITLE +"#AudioFalscheAntwort");
-        FalscheAntwortSound.Play();
         int pId = Int32.Parse(player.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
+        ServerUtils.AddBroadcast(Config.GAME_TITLE + "#AudioFalscheAntwort "+ pId + "*" + PunkteProFalsche);
+        FalscheAntwortSound.Play();
         foreach (Player p in Config.PLAYERLIST)
         {
             if (pId != p.id && p.isConnected)
@@ -724,7 +724,7 @@ public class QuizServer : MonoBehaviour
 
                 SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].transform.GetChild(1).GetComponent<TMP_Text>().text = schaetzung + GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text;
                 SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].transform.GetChild(3).gameObject.SetActive(false);
-                SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].GetComponent<Image>().sprite = p.icon;
+                SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].GetComponent<Image>().sprite = p.icon2.icon;
 
             }
         }
