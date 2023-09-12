@@ -185,9 +185,9 @@ public class Utils
         foreach (var item in BildschirmeListe)
             BildschirmeDropOptions.Add(new OptionData(item.name + " - " + item.refreshRate.value + "Hz"));
         BildschirmVollbildDrop.options = BildschirmeDropOptions;
-        string BildschirmWanted = Config.APPLICATION_CONFIG.GetString("GAME_DISPLAY_SELECTION", "**ERROR**");
+        string BildschirmWanted = Config.APPLICATION_CONFIG.GetString("GAME_DISPLAY_SELECTION", "*<#>*~ERROR~*<#>*|*").Replace(" - ", "|").Split('|')[0];
         for (int i = 0; i < BildschirmVollbildDrop.options.Count; i++)
-            if (BildschirmWanted.Equals(BildschirmeListe[i].name + " - " + BildschirmeListe[i].refreshRate.value + "Hz"))
+            if (BildschirmWanted.Equals(BildschirmeListe[i].name))
             {
                 BildschirmVollbildDrop.value = i;
                 break;
@@ -215,9 +215,9 @@ public class Utils
                     Screen.GetDisplayLayout(displays);
                     if (displays?.Count > 1) // don't bother running if only one display exists...
                     {
-                        string wantedDisplay = Config.APPLICATION_CONFIG.GetString("GAME_DISPLAY_SELECTION", "**ERROR**");
+                        string wantedDisplay = Config.APPLICATION_CONFIG.GetString("GAME_DISPLAY_SELECTION", "*<#>*~ERROR~*<#>*|*").Replace(" - ", "|").Split('|')[0];
                         foreach (var item in displays)
-                            if (wantedDisplay.Equals(item.name + " - " + item.refreshRate.value + "Hz"))
+                            if (wantedDisplay.Equals(item.name))
                             {
                                 Screen.MoveMainWindowTo(item, new Vector2Int(item.width / 2, item.height / 2));
                                 Screen.SetResolution(item.width, item.height, true);
@@ -246,9 +246,9 @@ public class Utils
                 Screen.fullScreenMode = FullScreenMode.ExclusiveFullScreen;
                 List<DisplayInfo> displays = new List<DisplayInfo>();
                 Screen.GetDisplayLayout(displays);
-                string wantedDisplay = Config.APPLICATION_CONFIG.GetString("GAME_DISPLAY_SELECTION", "**ERROR**");
+                string wantedDisplay = Config.APPLICATION_CONFIG.GetString("GAME_DISPLAY_SELECTION", "*<#>*~ERROR~*<#>*|*").Replace(" - ", "|").Split('|')[0];
                 foreach (var item in displays)
-                    if (wantedDisplay.Equals(item.name + " - " + item.refreshRate.value + "Hz"))
+                    if (wantedDisplay.Equals(item.name))
                     {
                         Screen.MoveMainWindowTo(item, new Vector2Int(item.width / 2, item.height / 2));
                         Screen.SetResolution(item.width, item.height, true);
@@ -262,9 +262,9 @@ public class Utils
                 Screen.fullScreenMode = FullScreenMode.ExclusiveFullScreen;
                 List<DisplayInfo> displays = new List<DisplayInfo>();
                 Screen.GetDisplayLayout(displays);
-                string wantedDisplay = Config.APPLICATION_CONFIG.GetString("GAME_DISPLAY_SELECTION", "**ERROR**");
+                string wantedDisplay = Config.APPLICATION_CONFIG.GetString("GAME_DISPLAY_SELECTION", "*<#>*~ERROR~*<#>*|*").Replace(" - ", "|").Split('|')[0];
                 foreach (var item in displays)
-                    if (wantedDisplay.Equals(item.name + " - " + item.refreshRate.value + "Hz"))
+                    if (wantedDisplay.Equals(item.name))
                     {
                         Screen.MoveMainWindowTo(item, new Vector2Int(item.width / 2, item.height / 2));
                         Screen.SetResolution(item.width, item.height, true);

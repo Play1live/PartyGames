@@ -46,34 +46,8 @@ public class LoadConfigs
     }
     private static void ApplyRemoteSettings()
     {
-        MoveToPrimaryDisplayFullscreen(); // Schiebt das Programm auf den Primären Monitor
-    }
-    /// <summary>
-    /// Bewegt das Spiel auf den 1. Bildschirm & legt Vollbild fest
-    /// </summary>
-    public static void MoveToPrimaryDisplayFullscreen()
-    {
-        /* 
-        if (Config.FULLSCREEN == true)
-        {
-            Logging.log(Logging.LogType.Debug, "LoadConfigs", "MoveToPrimaryDisplay", "Bewege Programm auf den primären Bildschirm.");
-            List<DisplayInfo> displays = new List<DisplayInfo>();
-            Screen.GetDisplayLayout(displays);
-            Logging.log(Logging.LogType.Debug, "LoadConfigs", "MoveToPrimaryDisplay", displays.Count + " Bildschirme erkannt.");
-            if (displays?.Count > 1) // don't bother running if only one display exists...
-            {
-                Screen.MoveMainWindowTo(displays[0], new Vector2Int(displays[0].width / 2, displays[0].height / 2));
-            }
 
-            Screen.SetResolution(Display.displays[0].renderingWidth, Display.displays[0].renderingHeight, true);
-            Screen.fullScreenMode = FullScreenMode.ExclusiveFullScreen;
-        }
-        else
-        {
-            Screen.fullScreenMode = FullScreenMode.Windowed;
-        }*/
-
-        //Utils.EinstellungenGrafikApply(true);
     }
+
     #endregion
 }

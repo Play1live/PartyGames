@@ -62,7 +62,7 @@ public class EinstellungsmenueUtils : MonoBehaviour
             return;
         if (drop.options.Count == 0 || drop.value > drop.options.Count)
             return;
-        Config.APPLICATION_CONFIG.SetString("GAME_DISPLAY_SELECTION", drop.options[drop.value].text);
+        Config.APPLICATION_CONFIG.SetString("GAME_DISPLAY_SELECTION", drop.options[drop.value].text.Replace(" - ", "|").Split('|')[0]);
         Utils.EinstellungenGrafikApply(ForceFullscreen);
     }
 }
