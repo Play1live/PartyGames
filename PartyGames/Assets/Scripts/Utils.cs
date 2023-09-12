@@ -8,6 +8,7 @@ using TMPro;
 using UnityEngine.Audio;
 using UnityEngine.UI;
 using System.Net.Sockets;
+using static TMPro.TMP_Dropdown;
 
 public class Utils
 {
@@ -176,6 +177,22 @@ public class Utils
     {
         Transform GrafikContent = EinstellungenGetKategorie(EinstellungsParent, EinstellungsKategorien.Grafik).transform;
 
+        EinstellungsmenueUtils.blockDebugMode = true;
+        TMP_Dropdown BildschirmVollbildDrop = GrafikContent.GetChild(4).GetChild(1).GetComponent<TMP_Dropdown>();
+        List<DisplayInfo> BildschirmeListe = new List<DisplayInfo>();
+        Screen.GetDisplayLayout(BildschirmeListe);
+        List<OptionData> BildschirmeDropOptions = new List<OptionData>();
+        foreach (var item in BildschirmeListe)
+            BildschirmeDropOptions.Add(new OptionData(item.name + " - " + item.refreshRate.value + "Hz"));
+        BildschirmVollbildDrop.options = BildschirmeDropOptions;
+        string BildschirmWanted = Config.APPLICATION_CONFIG.GetString("GAME_DISPLAY_SELECTION", "**ERROR**");
+        for (int i = 0; i < BildschirmVollbildDrop.options.Count; i++)
+            if (BildschirmWanted.Equals(BildschirmeListe[i].name + " - " + BildschirmeListe[i].refreshRate.value + "Hz"))
+            {
+                BildschirmVollbildDrop.value = i;
+                break;
+            }
+        EinstellungsmenueUtils.blockDebugMode = false;
         GrafikContent.GetChild(2).GetChild(1).GetComponent<TMP_Dropdown>().value = Config.APPLICATION_CONFIG.GetInt("GAME_DISPLAY_RESOLUTION", 2);
         GrafikContent.GetChild(3).GetChild(1).GetComponent<Toggle>().isOn = Config.APPLICATION_CONFIG.GetBool("GAME_DISPLAY_FULLSCREEN", true);
     }
@@ -198,12 +215,20 @@ public class Utils
                     Screen.GetDisplayLayout(displays);
                     if (displays?.Count > 1) // don't bother running if only one display exists...
                     {
+                        string wantedDisplay = Config.APPLICATION_CONFIG.GetString("GAME_DISPLAY_SELECTION", "**ERROR**");
+                        foreach (var item in displays)
+                            if (wantedDisplay.Equals(item.name + " - " + item.refreshRate.value + "Hz"))
+                            {
+                                Screen.MoveMainWindowTo(item, new Vector2Int(item.width / 2, item.height / 2));
+                                Screen.SetResolution(item.width, item.height, true);
+                                Screen.fullScreenMode = FullScreenMode.ExclusiveFullScreen;
+                                return;
+                            }
                         Screen.MoveMainWindowTo(displays[0], new Vector2Int(displays[0].width / 2, displays[0].height / 2));
                     }
 
-                    Screen.SetResolution(Display.displays[0].systemWidth, Display.displays[0].systemWidth, true);
+                    Screen.SetResolution(Display.displays[0].systemWidth, Display.displays[0].systemHeight, true);
                     Screen.fullScreenMode = FullScreenMode.ExclusiveFullScreen;
-                    
                     return;
                 }
             }
@@ -219,7 +244,33 @@ public class Utils
             if (Screen.fullScreenMode != FullScreenMode.ExclusiveFullScreen)
             {
                 Screen.fullScreenMode = FullScreenMode.ExclusiveFullScreen;
-                Screen.SetResolution(Display.displays[0].systemWidth, Display.displays[0].systemWidth, true);
+                List<DisplayInfo> displays = new List<DisplayInfo>();
+                Screen.GetDisplayLayout(displays);
+                string wantedDisplay = Config.APPLICATION_CONFIG.GetString("GAME_DISPLAY_SELECTION", "**ERROR**");
+                foreach (var item in displays)
+                    if (wantedDisplay.Equals(item.name + " - " + item.refreshRate.value + "Hz"))
+                    {
+                        Screen.MoveMainWindowTo(item, new Vector2Int(item.width / 2, item.height / 2));
+                        Screen.SetResolution(item.width, item.height, true);
+                        Screen.fullScreenMode = FullScreenMode.ExclusiveFullScreen;
+                        return;
+                    }
+                Screen.SetResolution(Display.displays[0].systemWidth, Display.displays[0].systemHeight, true);
+            }
+            else
+            {
+                Screen.fullScreenMode = FullScreenMode.ExclusiveFullScreen;
+                List<DisplayInfo> displays = new List<DisplayInfo>();
+                Screen.GetDisplayLayout(displays);
+                string wantedDisplay = Config.APPLICATION_CONFIG.GetString("GAME_DISPLAY_SELECTION", "**ERROR**");
+                foreach (var item in displays)
+                    if (wantedDisplay.Equals(item.name + " - " + item.refreshRate.value + "Hz"))
+                    {
+                        Screen.MoveMainWindowTo(item, new Vector2Int(item.width / 2, item.height / 2));
+                        Screen.SetResolution(item.width, item.height, true);
+                        Screen.fullScreenMode = FullScreenMode.ExclusiveFullScreen;
+                        return;
+                    }
             }
         }
         else
@@ -274,7 +325,7 @@ public class Utils
         else
         {
             Logging.log(Logging.LogType.Warning, "Utils", "ParseCMDGameTitle", "Server: " + isServer + " Command format: " + data);
-            /*´TODO
+            /*TODO
             if (isServer)
                 ServerUtils.BroadcastImmediate("");
             else
@@ -505,4 +556,3 @@ public class ClientUtils
         SceneManager.LoadSceneAsync("Startup");
     }
 }
-

@@ -180,7 +180,7 @@ public class ContentCreationTerminalQuiz : MonoBehaviour
         }
         
         Logging.log(Logging.LogType.Normal, "ContentCreationTerminalQuiz", "CreateFile", "Erstelle neue Datei.");
-        File.Create(datapath + "/" + input.text + ".txt");
+        File.Create(datapath + "/" + input.text + ".txt").Close();
         displayedGames++;
         GameObject go = Instantiate(SpieldateienTemplate, SpieldateienTemplate.transform.position, SpieldateienTemplate.transform.rotation);
         go.name = "File_active_" + displayedGames + "_" + UnityEngine.Random.Range(0, 99999) + "*********" + input.text;

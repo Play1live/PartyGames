@@ -47,7 +47,6 @@ public class WerBietetMehrServer : MonoBehaviour
 
     void OnEnable()
     {
-        StartCoroutine(ServerUtils.Broadcast());
         PlayerConnected = new bool[Config.SERVER_MAX_CONNECTIONS];
         InitAnzeigen();
         InitWerBietetMehr();
@@ -198,7 +197,7 @@ public class WerBietetMehrServer : MonoBehaviour
     /// </summary>
     private void UpdateSpielerBroadcast()
     {
-        ServerUtils.AddBroadcast(UpdateSpieler());
+        ServerUtils.BroadcastImmediate(UpdateSpieler());
     }
     /// <summary>
     /// Aktualisiert die Spieler Anzeige Informationen & gibt diese als Text zurück
@@ -241,7 +240,7 @@ public class WerBietetMehrServer : MonoBehaviour
     {
         Logging.log(Logging.LogType.Normal, "WerBietetMehrServer", "SpielVerlassenButton", "Spiel wird verlassen. Lade ins Hauptmenü.");
         //SceneManager.LoadScene("Startup");
-        ServerUtils.AddBroadcast("#ZurueckInsHauptmenue");
+        ServerUtils.BroadcastImmediate("#ZurueckInsHauptmenue");
     }
     /// <summary>
     /// Initialisiert die Anzeigen zu beginn
@@ -314,7 +313,7 @@ public class WerBietetMehrServer : MonoBehaviour
         }
         Logging.log(Logging.LogType.Warning, "WerBietetMehrServer", "SpielerBuzzered", "B: " + p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
         buzzerIsOn = false;
-        ServerUtils.AddBroadcast("#AudioBuzzerPressed " + p.id);
+        ServerUtils.BroadcastImmediate("#AudioBuzzerPressed " + p.id);
         BuzzerSound.Play();
         SpielerAnzeige[p.id - 1, 1].SetActive(true);
     }
@@ -327,7 +326,7 @@ public class WerBietetMehrServer : MonoBehaviour
             SpielerAnzeige[i, 1].SetActive(false);
         buzzerIsOn = BuzzerAnzeige.activeInHierarchy;
         Logging.log(Logging.LogType.Warning, "WerBietetMehrServer", "SpielerBuzzerFreigeben", "Buzzer freigegeben");
-        ServerUtils.AddBroadcast("#BuzzerFreigeben");
+        ServerUtils.BroadcastImmediate("#BuzzerFreigeben");
     }
     #endregion
     #region Spieler Ausgetabt Anzeige
@@ -340,7 +339,7 @@ public class WerBietetMehrServer : MonoBehaviour
         Logging.log(Logging.LogType.Debug, "WerBietetMehrServer", "AustabenAllenZeigenToggle", "Angeige: " + toggle.isOn);
         AustabbenAnzeigen.SetActive(toggle.isOn);
         if (toggle.isOn == false)
-            ServerUtils.AddBroadcast("#SpielerAusgetabt 0");
+            ServerUtils.BroadcastImmediate("#SpielerAusgetabt 0");
     }
     /// <summary>
     /// Spieler Tabt aus, wird ggf allen gezeigt
@@ -353,7 +352,7 @@ public class WerBietetMehrServer : MonoBehaviour
         bool ausgetabt = !Boolean.Parse(data);
         SpielerAnzeige[(player.id - 1), 3].SetActive(ausgetabt); // Ausgetabt Einblednung
         if (AustabbenAnzeigen.activeInHierarchy)
-            ServerUtils.AddBroadcast("#SpielerAusgetabt " + player.id + " " + ausgetabt);
+            ServerUtils.BroadcastImmediate("#SpielerAusgetabt " + player.id + " " + ausgetabt);
     }
     #endregion
     #region Textantworten der Spieler
@@ -365,7 +364,7 @@ public class WerBietetMehrServer : MonoBehaviour
     {
         Logging.log(Logging.LogType.Debug, "WerBietetMehrServer", "TexteingabeAnzeigenToggle", "Blendet Texteingabefeld ein: " + toggle.isOn);
         TextEingabeAnzeige.SetActive(toggle.isOn);
-        ServerUtils.AddBroadcast("#TexteingabeAnzeigen " + toggle.isOn);
+        ServerUtils.BroadcastImmediate("#TexteingabeAnzeigen " + toggle.isOn);
     }
     /// <summary>
     /// Aktualisiert die Antwort die der Spieler eingibt
@@ -402,14 +401,12 @@ public class WerBietetMehrServer : MonoBehaviour
     /// <param name="player"></param>
     public void PunkteRichtigeAntwort(GameObject player)
     {
-        ServerUtils.AddBroadcast("#AudioRichtigeAntwort");
-        RichtigeAntwortSound.Play();
         int pId = Int32.Parse(player.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
+        ServerUtils.BroadcastImmediate(Config.GAME_TITLE + "#AudioRichtigeAntwort " + pId + "*" + PunkteProRichtige);
+        RichtigeAntwortSound.Play();
         int pIndex = Player.getPosInLists(pId);
-
-        Logging.log(Logging.LogType.Debug, "WerBietetMehrServer", "PunkteRichtigeAntwort", "Spieler " + Config.PLAYERLIST[pIndex].name + " hat richtig geantwortet.");
         Config.PLAYERLIST[pIndex].points += PunkteProRichtige;
-        UpdateSpielerBroadcast();
+        UpdateSpieler();
     }
     /// <summary>
     /// Vergibt an alle anderen Spieler Punkte bei einer falschen Antwort
@@ -417,18 +414,16 @@ public class WerBietetMehrServer : MonoBehaviour
     /// <param name="player">Spieler, der keine Punkte bekommen soll</param>
     public void PunkteFalscheAntwort(GameObject player)
     {
-        ServerUtils.AddBroadcast("#AudioFalscheAntwort");
-        FalscheAntwortSound.Play();
         int pId = Int32.Parse(player.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
-
-        Logging.log(Logging.LogType.Debug, "WerBietetMehrServer", "PunkteFalscheAntwort", "Spieler " + Config.PLAYERLIST[Player.getPosInLists(pId)].name + " hat falsch geantwortet.");
+        ServerUtils.BroadcastImmediate(Config.GAME_TITLE + "#AudioFalscheAntwort " + pId + "*" + PunkteProFalsche);
+        FalscheAntwortSound.Play();
         foreach (Player p in Config.PLAYERLIST)
         {
             if (pId != p.id && p.isConnected)
                 p.points += PunkteProFalsche;
         }
         Config.SERVER_PLAYER.points += PunkteProFalsche;
-        UpdateSpielerBroadcast();
+        UpdateSpieler();
     }
     /// <summary>
     /// Ändert die Punkte des Spielers (+-1)
@@ -479,7 +474,7 @@ public class WerBietetMehrServer : MonoBehaviour
             SpielerAnzeige[(pId - 1), 1].SetActive(false);
         SpielerAnzeige[(pId - 1), 1].SetActive(true);
         buzzerIsOn = false;
-        ServerUtils.AddBroadcast("#SpielerIstDran " + pId);
+        ServerUtils.BroadcastImmediate("#SpielerIstDran " + pId);
     }
     /// <summary>
     /// Versteckt den Icon Rand beim Spieler
@@ -495,7 +490,7 @@ public class WerBietetMehrServer : MonoBehaviour
             if (SpielerAnzeige[i, 1].activeInHierarchy)
                 return;
         buzzerIsOn = BuzzerAnzeige.activeInHierarchy; // Buzzer wird erst aktiviert wenn keiner mehr dran ist
-        ServerUtils.AddBroadcast("#SpielerIstNichtDran " + pId);
+        ServerUtils.BroadcastImmediate("#SpielerIstNichtDran " + pId);
     }
     #endregion
     #region WerBietetMehr
@@ -546,7 +541,7 @@ public class WerBietetMehrServer : MonoBehaviour
     public void KreuzeEinblenden(Toggle toggle)
     {
         Logging.log(Logging.LogType.Debug, "WerBietetMehrServer", "KreuzeEinblenden", "Blendet alle Kreuze ein");
-        ServerUtils.AddBroadcast("#WMBKreuzeEinblenden " + toggle.isOn);
+        ServerUtils.BroadcastImmediate("#WMBKreuzeEinblenden " + toggle.isOn);
         Kreuz1.SetActive(toggle.isOn);
         Kreuz1.transform.GetChild(0).gameObject.SetActive(toggle.isOn);
         Kreuz2.SetActive(toggle.isOn);
@@ -573,7 +568,7 @@ public class WerBietetMehrServer : MonoBehaviour
         }
         if (msg.Length > 2)
             msg = msg.Substring("<>".Length);
-        ServerUtils.AddBroadcast("#WBMAnzahl " + msg);
+        ServerUtils.BroadcastImmediate("#WBMAnzahl " + msg);
     }
     /// <summary>
     /// Blendet die Anzeige an, die besagt, wieviele Elemente aufgezählt werden müssen
@@ -585,7 +580,7 @@ public class WerBietetMehrServer : MonoBehaviour
         Anzahl.transform.GetChild(0).gameObject.GetComponent<TMP_Text>().text = "" + aufgezähleElemente;
         Anzahl.transform.GetChild(1).gameObject.GetComponent<TMP_Text>().text = "von " + GameObject.Find("WerBietetMehr/Outline/Server/AnsagenAnzahl").GetComponent<TMP_InputField>().text;
 
-        ServerUtils.AddBroadcast("#WBMAnsagen "+ GameObject.Find("WerBietetMehr/Outline/Server/AnsagenAnzahl").GetComponent<TMP_InputField>().text);
+        ServerUtils.BroadcastImmediate("#WBMAnsagen "+ GameObject.Find("WerBietetMehr/Outline/Server/AnsagenAnzahl").GetComponent<TMP_InputField>().text);
     }
     /// <summary>
     /// Blendet den Titel des Spiels ein
@@ -596,7 +591,7 @@ public class WerBietetMehrServer : MonoBehaviour
         Titel.GetComponent<TMP_Text>().text = Config.WERBIETETMEHR_SPIEL.getSelected().getTitel();
         Titel.SetActive(true);
 
-        ServerUtils.AddBroadcast("#WBMTitel " + Config.WERBIETETMEHR_SPIEL.getSelected().getTitel());
+        ServerUtils.BroadcastImmediate("#WBMTitel " + Config.WERBIETETMEHR_SPIEL.getSelected().getTitel());
     }
     /// <summary>
     /// Startet den Timer und bricht den alten, falls dieser noch läuft, ab
@@ -607,7 +602,7 @@ public class WerBietetMehrServer : MonoBehaviour
         if (TimerSekunden.text.Length == 0)
             return;
         int sekunden = Int32.Parse(TimerSekunden.text);
-        ServerUtils.AddBroadcast("#WBMTimerStarten " + (sekunden));
+        ServerUtils.BroadcastImmediate("#WBMTimerStarten " + (sekunden));
 
         if (timerCoroutine != null)
             StopCoroutine(timerCoroutine);
@@ -621,7 +616,7 @@ public class WerBietetMehrServer : MonoBehaviour
     {
         Logging.log(Logging.LogType.Debug, "WerBietetMehrServer", "KreuzeAusgrauen", "Wechselt die Anzeige der Kreuze: " + go.GetComponentInChildren<TMP_Text>().text);
         string txt = go.GetComponentInChildren<TMP_Text>().text;
-        ServerUtils.AddBroadcast("#WBMKreuzAusgrauen " + txt);
+        ServerUtils.BroadcastImmediate("#WBMKreuzAusgrauen " + txt);
 
         if (txt == "1")
         {
@@ -658,7 +653,7 @@ public class WerBietetMehrServer : MonoBehaviour
         aufgezähleElemente += anz;
         Anzahl.transform.GetChild(0).gameObject.GetComponent<TMP_Text>().text = aufgezähleElemente + "";
 
-        ServerUtils.AddBroadcast("#WBMAnsagenAnzahl " + aufgezähleElemente);
+        ServerUtils.BroadcastImmediate("#WBMAnsagenAnzahl " + aufgezähleElemente);
     }
     /// <summary>
     /// Wechselt das Spiel und blendet alte Anzeigen aus und aktualisiert diese
@@ -671,7 +666,7 @@ public class WerBietetMehrServer : MonoBehaviour
         Config.WERBIETETMEHR_SPIEL.setSelected(Config.WERBIETETMEHR_SPIEL.getQuizByIndex(drop.value));
         Logging.log(Logging.LogType.Normal, "WerBietetMehrServer", "ChangeListe", "WerBietetMehr starts: " + Config.WERBIETETMEHR_SPIEL.getSelected().getTitel());
         // Aktualisiert die Anzeigen
-        ServerUtils.AddBroadcast("#WBMNew");
+        ServerUtils.BroadcastImmediate("#WBMNew");
         aufgezähleElemente = 0;
         Titel.GetComponent<TMP_Text>().text = "";
         Timer.SetActive(false);
@@ -711,7 +706,7 @@ public class WerBietetMehrServer : MonoBehaviour
         }
         go.transform.GetChild(3).gameObject.SetActive(true); // Blau Anzeigen
 
-        ServerUtils.AddBroadcast("#WBMElement [ANZ]"+aufgezähleElemente+"[ANZ][INDEX]" + go.name.Replace("Element (","").Replace(")","") + "[INDEX][BOOL]" + aufloesen.isOn+"[BOOL]");
+        ServerUtils.BroadcastImmediate("#WBMElement [ANZ]"+aufgezähleElemente+"[ANZ][INDEX]" + go.name.Replace("Element (","").Replace(")","") + "[INDEX][BOOL]" + aufloesen.isOn+"[BOOL]");
     }
     #endregion
 }

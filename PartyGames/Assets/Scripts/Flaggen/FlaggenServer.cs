@@ -42,7 +42,6 @@ public class FlaggenServer : MonoBehaviour
 
     void OnEnable()
     {
-        StartCoroutine(ServerUtils.Broadcast());
         PlayerConnected = new bool[Config.SERVER_MAX_CONNECTIONS];
         InitAnzeigen();
         InitFlaggen();
@@ -163,14 +162,14 @@ public class FlaggenServer : MonoBehaviour
     public void SpielVerlassenButton()
     {
         //SceneManager.LoadScene("Startup");
-        ServerUtils.AddBroadcast("#ZurueckInsHauptmenue");
+        ServerUtils.BroadcastImmediate("#ZurueckInsHauptmenue");
     }
     /// <summary>
     /// Sendet aktualisierte Spielerinfos an alle Spieler
     /// </summary>
     private void UpdateSpielerBroadcast()
     {
-        ServerUtils.AddBroadcast(UpdateSpieler());
+        ServerUtils.BroadcastImmediate(UpdateSpieler());
     }
     /// <summary>
     /// Aktualisiert die Spieler Anzeige Informationen & gibt diese als Text zurück
@@ -293,7 +292,7 @@ public class FlaggenServer : MonoBehaviour
         }
         Logging.log(Logging.LogType.Warning, "FlaggenServer", "SpielerBuzzered", "B: " + p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
         buzzerIsOn = false;
-        ServerUtils.AddBroadcast("#AudioBuzzerPressed " + p.id);
+        ServerUtils.BroadcastImmediate("#AudioBuzzerPressed " + p.id);
         BuzzerSound.Play();
         SpielerAnzeige[p.id - 1, 1].SetActive(true);
     }
@@ -306,7 +305,7 @@ public class FlaggenServer : MonoBehaviour
             SpielerAnzeige[i, 1].SetActive(false);
         buzzerIsOn = BuzzerAnzeige.activeInHierarchy;
         Logging.log(Logging.LogType.Warning, "FlaggenServer", "SpielerBuzzerFreigeben", "Buzzer wurde freigegeben");
-        ServerUtils.AddBroadcast("#BuzzerFreigeben");
+        ServerUtils.BroadcastImmediate("#BuzzerFreigeben");
     }
     #endregion
     #region Spieler Ausgetabt Anzeige
@@ -318,7 +317,7 @@ public class FlaggenServer : MonoBehaviour
     {
         AustabbenAnzeigen.SetActive(toggle.isOn);
         if (toggle.isOn == false)
-            ServerUtils.AddBroadcast("#SpielerAusgetabt 0");
+            ServerUtils.BroadcastImmediate("#SpielerAusgetabt 0");
     }
     /// <summary>
     /// Spieler Tabt aus, wird ggf allen gezeigt
@@ -330,7 +329,7 @@ public class FlaggenServer : MonoBehaviour
         bool ausgetabt = !Boolean.Parse(data);
         SpielerAnzeige[(player.id - 1), 3].SetActive(ausgetabt); // Ausgetabt Einblednung
         if (AustabbenAnzeigen.activeInHierarchy)
-            ServerUtils.AddBroadcast("#SpielerAusgetabt " + player.id + " " + ausgetabt);
+            ServerUtils.BroadcastImmediate("#SpielerAusgetabt " + player.id + " " + ausgetabt);
     }
     #endregion
     #region Textantworten der Spieler
@@ -341,7 +340,7 @@ public class FlaggenServer : MonoBehaviour
     public void TexteingabeAnzeigenToggle(Toggle toggle)
     {
         TextEingabeAnzeige.SetActive(toggle.isOn);
-        ServerUtils.AddBroadcast("#TexteingabeAnzeigen " + toggle.isOn);
+        ServerUtils.BroadcastImmediate("#TexteingabeAnzeigen " + toggle.isOn);
     }
     /// <summary>
     /// Aktualisiert die Antwort die der Spieler eingibt
@@ -361,7 +360,7 @@ public class FlaggenServer : MonoBehaviour
         TextAntwortenAnzeige.SetActive(toggle.isOn);
         if (!toggle.isOn)
         {
-            ServerUtils.AddBroadcast("#TextantwortenAnzeigen [BOOL]" + toggle.isOn + "[BOOL]");
+            ServerUtils.BroadcastImmediate("#TextantwortenAnzeigen [BOOL]" + toggle.isOn + "[BOOL]");
             return;
         }
         string msg = "";
@@ -369,7 +368,7 @@ public class FlaggenServer : MonoBehaviour
         {
             msg = msg + "[ID" + (i + 1) + "]" + SpielerAnzeige[i, 6].GetComponentInChildren<TMP_InputField>().text + "[ID" + (i + 1) + "]";
         }
-        ServerUtils.AddBroadcast("#TextantwortenAnzeigen [BOOL]" + toggle.isOn + "[BOOL][TEXT]" + msg);
+        ServerUtils.BroadcastImmediate("#TextantwortenAnzeigen [BOOL]" + toggle.isOn + "[BOOL][TEXT]" + msg);
     }
     #endregion
     #region Punkte
@@ -395,12 +394,12 @@ public class FlaggenServer : MonoBehaviour
     /// <param name="player"></param>
     public void PunkteRichtigeAntwort(GameObject player)
     {
-        ServerUtils.AddBroadcast("#AudioRichtigeAntwort");
-        RichtigeAntwortSound.Play();
         int pId = Int32.Parse(player.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
+        ServerUtils.BroadcastImmediate(Config.GAME_TITLE + "#AudioRichtigeAntwort " + pId + "*" + PunkteProRichtige);
+        RichtigeAntwortSound.Play();
         int pIndex = Player.getPosInLists(pId);
         Config.PLAYERLIST[pIndex].points += PunkteProRichtige;
-        UpdateSpielerBroadcast();
+        UpdateSpieler();
     }
     /// <summary>
     /// Vergibt an alle anderen Spieler Punkte bei einer falschen Antwort
@@ -408,16 +407,16 @@ public class FlaggenServer : MonoBehaviour
     /// <param name="player"></param>
     public void PunkteFalscheAntwort(GameObject player)
     {
-        ServerUtils.AddBroadcast("#AudioFalscheAntwort");
-        FalscheAntwortSound.Play();
         int pId = Int32.Parse(player.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
+        ServerUtils.BroadcastImmediate(Config.GAME_TITLE + "#AudioFalscheAntwort " + pId + "*" + PunkteProFalsche);
+        FalscheAntwortSound.Play();
         foreach (Player p in Config.PLAYERLIST)
         {
             if (pId != p.id && p.isConnected)
                 p.points += PunkteProFalsche;
         }
         Config.SERVER_PLAYER.points += PunkteProFalsche;
-        UpdateSpielerBroadcast();
+        UpdateSpieler();
     }
     /// <summary>
     /// Ändert die Punkte des Spielers (+-1)
@@ -463,7 +462,7 @@ public class FlaggenServer : MonoBehaviour
         int pId = Int32.Parse(button.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
         SpielerAnzeige[(pId - 1), 1].SetActive(true);
         buzzerIsOn = false;
-        ServerUtils.AddBroadcast("#SpielerIstDran " + pId);
+        ServerUtils.BroadcastImmediate("#SpielerIstDran " + pId);
     }
     /// <summary>
     /// Versteckt den Icon Rand beim Spieler
@@ -478,7 +477,7 @@ public class FlaggenServer : MonoBehaviour
             if (SpielerAnzeige[i, 1].activeInHierarchy)
                 return;
         buzzerIsOn = BuzzerAnzeige.activeInHierarchy; // Buzzer wird erst aktiviert wenn keiner mehr dran ist
-        ServerUtils.AddBroadcast("#SpielerIstNichtDran " + pId);
+        ServerUtils.BroadcastImmediate("#SpielerIstNichtDran " + pId);
     }
     #endregion
     #region Flaggen Anzeige
@@ -573,12 +572,12 @@ public class FlaggenServer : MonoBehaviour
         if (KategorieAuswahl.GetComponent<TMP_Dropdown>().value == 1 || FlaggenName.GetComponent<TMP_Text>().text.Equals("#Fragezeichen"))
         {
             // Fragezeichen Flagge zeigen
-            ServerUtils.AddBroadcast("#FlaggenSpielAnzeige #Fragezeichen");
+            ServerUtils.BroadcastImmediate("#FlaggenSpielAnzeige #Fragezeichen");
             FlaggenImage.GetComponent<Image>().sprite = Config.FLAGGEN_SPIEL.getFragezeichenFlagge();
         }
         else
         {
-            ServerUtils.AddBroadcast("#FlaggenSpielAnzeige " + Config.FLAGGEN_SPIEL.getFlagge(FlaggenName.GetComponent<TMP_Text>().text).getName());
+            ServerUtils.BroadcastImmediate("#FlaggenSpielAnzeige " + Config.FLAGGEN_SPIEL.getFlagge(FlaggenName.GetComponent<TMP_Text>().text).getName());
             FlaggenImage.GetComponent<Image>().sprite = Config.FLAGGEN_SPIEL.getFlagge(FlaggenName.GetComponent<TMP_Text>().text).getBild();
         }
         Antwort.SetActive(false); // Antwort ausblenden
@@ -643,7 +642,7 @@ public class FlaggenServer : MonoBehaviour
             Logging.log(Logging.LogType.Error, "FlaggenServer", "FlaggenShowAntwort", "Unbekannte Kategorie: " + KategorieAuswahl.GetComponent<TMP_Dropdown>().options[KategorieAuswahl.GetComponent<TMP_Dropdown>().value]);
         }
 
-        ServerUtils.AddBroadcast("#FlaggenSpielShowAntwort " + antwort);
+        ServerUtils.BroadcastImmediate("#FlaggenSpielShowAntwort " + antwort);
         Antwort.GetComponent<TMP_Text>().text = antwort;
         Antwort.SetActive(true);
     }

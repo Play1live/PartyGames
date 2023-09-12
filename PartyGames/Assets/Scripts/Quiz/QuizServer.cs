@@ -36,7 +36,6 @@ public class QuizServer : MonoBehaviour
 
     void OnEnable()
     {
-        StartCoroutine(ServerUtils.Broadcast());
         PlayerConnected = new bool[Config.SERVER_MAX_CONNECTIONS];
         InitAnzeigen();
         InitQuiz();
@@ -164,7 +163,7 @@ public class QuizServer : MonoBehaviour
     /// </summary>
     private void UpdateSpielerBroadcast()
     {
-        ServerUtils.AddBroadcast(Config.GAME_TITLE + UpdateSpieler());
+        ServerUtils.BroadcastImmediate(Config.GAME_TITLE + UpdateSpieler());
     }
     /// <summary>
     /// Aktualisiert die Spieler Anzeige Informationen & gibt diese als Text zurück
@@ -592,11 +591,11 @@ public class QuizServer : MonoBehaviour
     public void PunkteRichtigeAntwort(GameObject player)
     {
         int pId = Int32.Parse(player.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
-        ServerUtils.AddBroadcast(Config.GAME_TITLE +"#AudioRichtigeAntwort " + pId + "*" + PunkteProRichtige);
+        ServerUtils.BroadcastImmediate(Config.GAME_TITLE +"#AudioRichtigeAntwort " + pId + "*" + PunkteProRichtige);
         RichtigeAntwortSound.Play();
         int pIndex = Player.getPosInLists(pId);
         Config.PLAYERLIST[pIndex].points += PunkteProRichtige;
-        UpdateSpielerBroadcast();
+        UpdateSpieler();
     }
     /// <summary>
     /// Vergibt an alle anderen Spieler Punkte bei einer falschen Antwort
@@ -605,7 +604,7 @@ public class QuizServer : MonoBehaviour
     public void PunkteFalscheAntwort(GameObject player)
     {
         int pId = Int32.Parse(player.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
-        ServerUtils.AddBroadcast(Config.GAME_TITLE + "#AudioFalscheAntwort "+ pId + "*" + PunkteProFalsche);
+        ServerUtils.BroadcastImmediate(Config.GAME_TITLE + "#AudioFalscheAntwort "+ pId + "*" + PunkteProFalsche);
         FalscheAntwortSound.Play();
         foreach (Player p in Config.PLAYERLIST)
         {
@@ -613,7 +612,7 @@ public class QuizServer : MonoBehaviour
                 p.points += PunkteProFalsche;
         }
         Config.SERVER_PLAYER.points += PunkteProFalsche;
-        UpdateSpielerBroadcast();
+        UpdateSpieler();
     }
     /// <summary>
     /// Ändert die Punkte des Spielers (+-1)

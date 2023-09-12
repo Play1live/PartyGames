@@ -150,6 +150,28 @@ public class Tabu
         this.name = name;
         needToSafe = false;
         this.worte = new List<TabuItem>();
+        /*
+#if UNITY_EDITOR
+        string fileinhalt = Resources.Load<TextAsset>("Spiele/Tabu/" + name).text;
+        List<string> filezeilen = new List<string>();
+        for (int i = 0; i < fileinhalt.Split('\n').Length; i++)
+        {
+            if (fileinhalt.Split('\n')[i].StartsWith("-"))
+                filezeilen[filezeilen.Count - 1] += fileinhalt.Split('\n')[i];
+            else
+                filezeilen.Add(fileinhalt.Split('\n')[i]);
+        }
+        if (filezeilen.Count != fileinhalt.Split('\n').Length)
+        {
+            string newFile = "";
+            foreach (var item in filezeilen)
+                newFile += "\n" + item;
+            if (newFile.Length > 0)
+                newFile = newFile.Substring(1);
+            File.WriteAllText(Application.dataPath + "/Resources/Spiele/Tabu/" + name + ".txt", newFile);
+        }
+#endif*/
+
         List<string> wort = new List<string>();
         foreach (string item in inhalt.Split('~'))
         {
@@ -192,8 +214,9 @@ public class Tabu
                 Logging.log(Logging.LogType.Warning, "Tabu", "Tabu", "Fehler beim laden: " + name + " -> " + temp + " >>" + worte.Count);
             }
         }
+
+#if UNITY_EDITOR
         Debug.LogWarning(worte.Count);
-        
         // Save Files
         if (needToSafe)
         {
@@ -217,6 +240,7 @@ public class Tabu
             File.WriteAllText(Application.dataPath + "/Resources/Spiele/Tabu/" + name + ".txt", newFile);
             Logging.log(Logging.LogType.Normal, "Tabu", "Tabu", "File: " + name + " wurde gespeichert.");
         }
+#endif
     }
     public string getTitel() { return this.name; }
     public List<TabuItem> getGeheimwörter() { return this.worte; }

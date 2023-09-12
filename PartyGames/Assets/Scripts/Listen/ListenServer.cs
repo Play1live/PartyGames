@@ -70,7 +70,6 @@ public class ListenServer : MonoBehaviour
 
     void OnEnable()
     {
-        StartCoroutine(ServerUtils.Broadcast());
         PlayerConnected = new bool[Config.SERVER_MAX_CONNECTIONS];
         InitAnzeigen();
     }
@@ -180,6 +179,9 @@ public class ListenServer : MonoBehaviour
                     JoinTeam(data, player.id);
                     UpdateSpielerBroadcast();
                 }
+                break;
+            case "#GetSpielerUpdate":
+                ServerUtils.SendMSG(UpdateSpieler(), player, false);
                 break;
         }
     }
@@ -439,7 +441,7 @@ public class ListenServer : MonoBehaviour
     /// </summary>
     private void UpdateSpielerBroadcast() 
     {
-        ServerUtils.AddBroadcast(UpdateSpieler());
+        ServerUtils.BroadcastImmediate(UpdateSpieler());
     }
     /// <summary>
     /// Aktualisiert die Spieler Anzeige Informationen & gibt diese als Text zurück
@@ -1106,7 +1108,7 @@ public class ListenServer : MonoBehaviour
             }
         }
 
-        UpdateSpielerBroadcast();
+        UpdateSpieler();
 
         // Zeigt Lösung
         LoesungGrid[0].SetActive(true);
@@ -1123,7 +1125,7 @@ public class ListenServer : MonoBehaviour
                 LoesungGrid[2 + i].transform.GetChild(2).GetComponentInChildren<TMP_Text>().text = "";// + (i+1);
             }
         }
-        ServerUtils.AddBroadcast("#ListenStart");
+        ServerUtils.BroadcastImmediate("#ListenStart");
     }
     /// <summary>
     /// Blendet Titel bei allen ein
@@ -1133,7 +1135,7 @@ public class ListenServer : MonoBehaviour
         ListenAnzeigen.SetActive(true);
         Titel.SetActive(true);
         Titel.GetComponent<TMP_Text>().text = Config.LISTEN_SPIEL.getSelected().getTitel();
-        ServerUtils.AddBroadcast("#ListenTitel "+ Config.LISTEN_SPIEL.getSelected().getTitel());
+        ServerUtils.BroadcastImmediate("#ListenTitel "+ Config.LISTEN_SPIEL.getSelected().getTitel());
     }
     /// <summary>
     /// Blendet Grenzen bei allen ein
@@ -1146,7 +1148,7 @@ public class ListenServer : MonoBehaviour
         SortierungUnten.SetActive(true);
         SortierungUnten.GetComponentInChildren<TMP_Text>().text = "▼ " + Config.LISTEN_SPIEL.getSelected().getSortByDisplay().Replace(" - ", "|").Split('|')[1];
 
-        ServerUtils.AddBroadcast("#ListenGrenzen [OBEN]"+ Config.LISTEN_SPIEL.getSelected().getSortByDisplay().Replace(" - ", "|").Split('|')[0] + "[OBEN][UNTEN]"+ Config.LISTEN_SPIEL.getSelected().getSortByDisplay().Replace(" - ", "|").Split('|')[1]+"[UNTEN]");
+        ServerUtils.BroadcastImmediate("#ListenGrenzen [OBEN]"+ Config.LISTEN_SPIEL.getSelected().getSortByDisplay().Replace(" - ", "|").Split('|')[0] + "[OBEN][UNTEN]"+ Config.LISTEN_SPIEL.getSelected().getSortByDisplay().Replace(" - ", "|").Split('|')[1]+"[UNTEN]");
     }
     /// <summary>
     /// Blendet die Auswahlelemente bei allen ein
@@ -1168,7 +1170,7 @@ public class ListenServer : MonoBehaviour
             }
         }
 
-        ServerUtils.AddBroadcast("#ListenAuswahl "+ Config.LISTEN_SPIEL.getSelected().getAuswahlElemente().Count + "<#!#>" + msg);
+        ServerUtils.BroadcastImmediate("#ListenAuswahl "+ Config.LISTEN_SPIEL.getSelected().getAuswahlElemente().Count + "<#!#>" + msg);
     }
     /// <summary>
     /// Löst die bereits gewählten Elemente mit details auf
@@ -1186,12 +1188,12 @@ public class ListenServer : MonoBehaviour
                 GridElemente[i].GetComponentInChildren<TMP_Text>().text = element.getItem() + " - " + element.getDisplay();
                 GridElemente[i].transform.GetChild(0).gameObject.SetActive(true);
 
-                msg += "[]"+i+"[TRENNER]" + element.getItem() + " - " + element.getDisplay();
+                msg += "<#!#>" + i+"[TRENNER]" + element.getItem() + " - " + element.getDisplay();
             }
         }
-        if (msg.Length > 2)
-            msg = msg.Substring(2);
-        ServerUtils.AddBroadcast("#ListenAufloesen " + msg);
+        if (msg.Length > 5)
+            msg = msg.Substring(5);
+        ServerUtils.BroadcastImmediate("#ListenAufloesen " + msg);
     }
     /// <summary>
     /// Fügt ein Element aus der Auswahl in die Sortierung ein
@@ -1215,9 +1217,9 @@ public class ListenServer : MonoBehaviour
         ListenElementIdsAktualisieren();
 
         if (listewirdaufgeloest)
-            ServerUtils.AddBroadcast("#ListenElementEinfuegen [INDEX]" + loesIndex + "[INDEX][ELEMENT]" + loesElement.getItem() + " - " + loesElement.getDisplay() + "[ELEMENT][AUSWAHLINDEX]"+ auswahlIndex+"[AUSWAHLINDEX]");
+            ServerUtils.BroadcastImmediate("#ListenElementEinfuegen [INDEX]" + loesIndex + "[INDEX][ELEMENT]" + loesElement.getItem() + " - " + loesElement.getDisplay() + "[ELEMENT][AUSWAHLINDEX]"+ auswahlIndex+"[AUSWAHLINDEX]");
         else
-            ServerUtils.AddBroadcast("#ListenElementEinfuegen [INDEX]" + loesIndex + "[INDEX][ELEMENT]" + loesElement.getItem() + "[ELEMENT][AUSWAHLINDEX]"+ auswahlIndex + "[AUSWAHLINDEX]");
+            ServerUtils.BroadcastImmediate("#ListenElementEinfuegen [INDEX]" + loesIndex + "[INDEX][ELEMENT]" + loesElement.getItem() + "[ELEMENT][AUSWAHLINDEX]"+ auswahlIndex + "[AUSWAHLINDEX]");
     }
     /// <summary>
     /// Gibt bei einem Eingefügen Element die Sortdisplay an
@@ -1246,7 +1248,7 @@ public class ListenServer : MonoBehaviour
         element.transform.GetChild(0).gameObject.SetActive(true);
         element.transform.GetChild(1).GetComponentInChildren<TMP_Text>().text = e.getItem() + " - " + e.getDisplay();
 
-        ServerUtils.AddBroadcast("#ListenElementShowDisplay "+index+"[!#!]"+ e.getItem() + " - " + e.getDisplay());
+        ServerUtils.BroadcastImmediate("#ListenElementShowDisplay "+index+"[!#!]"+ e.getItem() + " - " + e.getDisplay());
     }
     /// <summary>
     /// ID der Listen werden aktualisiert
@@ -1306,7 +1308,7 @@ public class ListenServer : MonoBehaviour
 
         if (button.name.Equals("IstNichtDran"))
         {
-            ServerUtils.AddBroadcast("#SpielerIstDran 0");
+            ServerUtils.BroadcastImmediate("#SpielerIstDran 0");
             return;
         }
 
@@ -1317,7 +1319,7 @@ public class ListenServer : MonoBehaviour
         string spielername = button.transform.parent.parent.GetChild(4).GetChild(1).GetComponent<TMP_Text>().text;
         int index = Player.getPosInLists(Player.getIdByName(spielername));
 
-        ServerUtils.AddBroadcast("#SpielerIstDran [TEAM]"+team+"[TEAM][NAME]"+spielername);
+        ServerUtils.BroadcastImmediate("#SpielerIstDran [TEAM]"+team+"[TEAM][NAME]"+spielername);
 
         if (team.Equals("KeinTeam"))
         {
@@ -1372,7 +1374,7 @@ public class ListenServer : MonoBehaviour
         LobbyTeamWahl.SetActive(true);
         InGameAnzeige.SetActive(false);
 
-        ServerUtils.AddBroadcast("#ZurueckZurTeamWahl");
+        ServerUtils.BroadcastImmediate("#ZurueckZurTeamWahl");
     }
     #region Herzen
     /// <summary>
@@ -1523,7 +1525,7 @@ public class ListenServer : MonoBehaviour
         if (lilateam.Length > 1)
             lilateam = lilateam.Substring("[]".Length);
 
-        ServerUtils.AddBroadcast("#HerzenEinblenden [BOOL]" + toggle.isOn + "[BOOL][ZAHL]"+ GameObject.Find("Einstellungen/HerzenAnzahl").GetComponent<TMP_InputField>().text + "[ZAHL][KEINTEAM]"+keinteam+"[KEINTEAM][TEAMROT]"+rotteam+"[TEAMROT][TEAMBLAU]"+blauteam+"[TEAMBLAU][TEAMGRUEN]"+gruenteam+"[TEAMGRUEN][TEAMLILA]"+lilateam+"[TEAMLILA]");
+        ServerUtils.BroadcastImmediate("#HerzenEinblenden [BOOL]" + toggle.isOn + "[BOOL][ZAHL]"+ GameObject.Find("Einstellungen/HerzenAnzahl").GetComponent<TMP_InputField>().text + "[ZAHL][KEINTEAM]"+keinteam+"[KEINTEAM][TEAMROT]"+rotteam+"[TEAMROT][TEAMBLAU]"+blauteam+"[TEAMBLAU][TEAMGRUEN]"+gruenteam+"[TEAMGRUEN][TEAMLILA]"+lilateam+"[TEAMLILA]");
     }
     /// <summary>
     /// Ändert die Anzahl der Herzen
@@ -1574,7 +1576,7 @@ public class ListenServer : MonoBehaviour
                             KeinTeamSpielGrid[i].transform.GetChild(5).GetChild(j).GetChild(0).GetChild(0).gameObject.SetActive(true);
                         }
                     }
-                    ServerUtils.AddBroadcast("#HerzenFuellen [TEAM]KEINTEAM[TEAM][ID]"+ playerid + "[ID][ZAHL]"+spielerherzenzahl[Player.getPosInLists(playerid)]+"[ZAHL]");
+                    ServerUtils.BroadcastImmediate("#HerzenFuellen [TEAM]KEINTEAM[TEAM][ID]"+ playerid + "[ID][ZAHL]"+spielerherzenzahl[Player.getPosInLists(playerid)]+"[ZAHL]");
                     break;
                 }
             }
@@ -1596,7 +1598,7 @@ public class ListenServer : MonoBehaviour
                             TeamRotSpielGrid[i].transform.GetChild(5).GetChild(j).GetChild(0).GetChild(0).gameObject.SetActive(true);
                         }
                     }
-                    ServerUtils.AddBroadcast("#HerzenFuellen [TEAM]TEAMROT[TEAM][ID]" + playerid + "[ID][ZAHL]" + spielerherzenzahl[Player.getPosInLists(playerid)] + "[ZAHL]");
+                    ServerUtils.BroadcastImmediate("#HerzenFuellen [TEAM]TEAMROT[TEAM][ID]" + playerid + "[ID][ZAHL]" + spielerherzenzahl[Player.getPosInLists(playerid)] + "[ZAHL]");
                     break;
                 }
             }
@@ -1618,7 +1620,7 @@ public class ListenServer : MonoBehaviour
                             TeamBlauSpielGrid[i].transform.GetChild(5).GetChild(j).GetChild(0).GetChild(0).gameObject.SetActive(true);
                         }
                     }
-                    ServerUtils.AddBroadcast("#HerzenFuellen [TEAM]TEAMBLAU[TEAM][ID]" + playerid + "[ID][ZAHL]" + spielerherzenzahl[Player.getPosInLists(playerid)] + "[ZAHL]");
+                    ServerUtils.BroadcastImmediate("#HerzenFuellen [TEAM]TEAMBLAU[TEAM][ID]" + playerid + "[ID][ZAHL]" + spielerherzenzahl[Player.getPosInLists(playerid)] + "[ZAHL]");
                     break;
                 }
             }
@@ -1640,7 +1642,7 @@ public class ListenServer : MonoBehaviour
                             TeamGruenSpielGrid[i].transform.GetChild(5).GetChild(j).GetChild(0).GetChild(0).gameObject.SetActive(true);
                         }
                     }
-                    ServerUtils.AddBroadcast("#HerzenFuellen [TEAM]TEAMGRUEN[TEAM][ID]" + playerid + "[ID][ZAHL]" + spielerherzenzahl[Player.getPosInLists(playerid)] + "[ZAHL]");
+                    ServerUtils.BroadcastImmediate("#HerzenFuellen [TEAM]TEAMGRUEN[TEAM][ID]" + playerid + "[ID][ZAHL]" + spielerherzenzahl[Player.getPosInLists(playerid)] + "[ZAHL]");
                     break;
                 }
             }
@@ -1662,7 +1664,7 @@ public class ListenServer : MonoBehaviour
                             TeamLilaSpielGrid[i].transform.GetChild(5).GetChild(j).GetChild(0).GetChild(0).gameObject.SetActive(true);
                         }
                     }
-                    ServerUtils.AddBroadcast("#HerzenFuellen [TEAM]TEAMLILA[TEAM][ID]" + playerid + "[ID][ZAHL]" + spielerherzenzahl[Player.getPosInLists(playerid)] + "[ZAHL]");
+                    ServerUtils.BroadcastImmediate("#HerzenFuellen [TEAM]TEAMLILA[TEAM][ID]" + playerid + "[ID][ZAHL]" + spielerherzenzahl[Player.getPosInLists(playerid)] + "[ZAHL]");
                     break;
                 }
             }
@@ -1684,7 +1686,7 @@ public class ListenServer : MonoBehaviour
         string spielername = button.transform.parent.parent.GetChild(4).GetChild(1).GetComponent<TMP_Text>().text;
         int index = Player.getPosInLists(Player.getIdByName(spielername));
         spielerherzenzahl[index]--;
-        ServerUtils.AddBroadcast("#HerzenAbziehen [TEAM]"+team+"[TEAM][NAME]"+spielername+"[NAME][HERZID]"+spielerherzenzahl[index]+"[HERZID]");
+        ServerUtils.BroadcastImmediate("#HerzenAbziehen [TEAM]"+team+"[TEAM][NAME]"+spielername+"[NAME][HERZID]"+spielerherzenzahl[index]+"[HERZID]");
 
         if (team.Equals("KeinTeam"))
         {
@@ -1737,7 +1739,7 @@ public class ListenServer : MonoBehaviour
     public void SpielVerlassenButton()
     {
         //SceneManager.LoadScene("Startup");
-        ServerUtils.AddBroadcast("#ZurueckInsHauptmenue");
+        ServerUtils.BroadcastImmediate("#ZurueckInsHauptmenue");
     }
     /// <summary>
     /// Toggelt die Anzeige für alle ob jemand austabt
@@ -1747,7 +1749,7 @@ public class ListenServer : MonoBehaviour
     {
         AusgetabtAnzeige.SetActive(toggle.isOn);
         if (toggle.isOn == false)
-            ServerUtils.AddBroadcast("#SpielerAusgetabt 0");
+            ServerUtils.BroadcastImmediate("#SpielerAusgetabt 0");
     }
     /// <summary>
     /// Spieler Tabt aus, wird ggf allen gezeigt
@@ -1759,7 +1761,7 @@ public class ListenServer : MonoBehaviour
         bool ausgetabt = !Boolean.Parse(data);
         // Update Client Anzeige
         if (GameObject.Find("Einstellungen/AusgetabtSpielernZeigenToggle").GetComponent<Toggle>().isOn)
-            ServerUtils.AddBroadcast("#SpielerAusgetabt " + player.name + "[]" + ausgetabt);
+            ServerUtils.BroadcastImmediate("#SpielerAusgetabt " + player.name + "[]" + ausgetabt);
         // Update Server Anzeige
         // KeinTeam
         for (int i = 0; i < 8; i++)
@@ -1818,7 +1820,7 @@ public class ListenServer : MonoBehaviour
         int tindex = Player.getPosInLists(Player.getIdByName(spielername));
         Config.PLAYERLIST[tindex].points += punkte;
         input.text = "";
-        ServerUtils.AddBroadcast("#UpdateSpielerPunkte " + spielername +"[]"+ Config.PLAYERLIST[tindex].points);
+        ServerUtils.BroadcastImmediate("#UpdateSpielerPunkte " + spielername +"[]"+ Config.PLAYERLIST[tindex].points);
 
         // KeinTeam InGame
         for (int i = 0; i < 8; i++)
@@ -1906,7 +1908,7 @@ public class ListenServer : MonoBehaviour
     /// </summary>
     public void PlayRichtigeAntwort()
     {
-        ServerUtils.AddBroadcast("#AudioRichtigeAntwort");
+        ServerUtils.BroadcastImmediate("#AudioRichtigeAntwort");
         RichtigeAntwortSound.Play();
     }
     /// <summary>
@@ -1914,7 +1916,7 @@ public class ListenServer : MonoBehaviour
     /// </summary>
     public void PlayFalscheAntwort()
     {
-        ServerUtils.AddBroadcast("#AudioFalscheAntwort");
+        ServerUtils.BroadcastImmediate("#AudioFalscheAntwort");
         FalscheAntwortSound.Play();
     }
     #endregion
@@ -1929,7 +1931,7 @@ public class ListenServer : MonoBehaviour
 
         GameObject.Find("Einstellungen/Quelle").GetComponent<TMP_InputField>().text = Config.LISTEN_SPIEL.getSelected().getQuelle();
 
-        ServerUtils.AddBroadcast("#ZurueckZurTeamWahl");
+        ServerUtils.BroadcastImmediate("#ZurueckZurTeamWahl");
 
         LobbyTeamWahl.SetActive(true);
         InGameAnzeige.SetActive(false);

@@ -29,7 +29,6 @@ public class AuktionServer : MonoBehaviour
 
     void OnEnable()
     {
-        StartCoroutine(ServerUtils.Broadcast());
         initReady = false;
         PlayerConnected = new bool[Config.SERVER_MAX_CONNECTIONS];
         InitAnzeigen();
@@ -188,7 +187,7 @@ public class AuktionServer : MonoBehaviour
     public void SpielVerlassenButton()
     {
         //SceneManager.LoadScene("Startup");
-        ServerUtils.AddBroadcast("#ZurueckInsHauptmenue");
+        ServerUtils.BroadcastImmediate("#ZurueckInsHauptmenue");
     }
     /// <summary>
     /// Sendet aktualisierte Spielerinfos an alle Spieler
@@ -197,7 +196,7 @@ public class AuktionServer : MonoBehaviour
     {
         if (!initReady)
             return;
-        ServerUtils.AddBroadcast(UpdateSpieler());
+        ServerUtils.BroadcastImmediate(UpdateSpieler());
     }
     /// <summary>
     /// Aktualisiert die Spieler Anzeige Informationen & gibt diese als Text zurück
@@ -467,7 +466,7 @@ public class AuktionServer : MonoBehaviour
     {
         AustabbenAnzeigen.SetActive(toggle.isOn);
         if (toggle.isOn == false)
-            ServerUtils.AddBroadcast("#SpielerAusgetabt 0");
+            ServerUtils.BroadcastImmediate("#SpielerAusgetabt 0");
     }
     /// <summary>
     /// Spieler Tabt aus, wird ggf allen gezeigt
@@ -479,7 +478,7 @@ public class AuktionServer : MonoBehaviour
         bool ausgetabt = !Boolean.Parse(data);
         SpielerAnzeige[(player.id - 1), 3].SetActive(ausgetabt); // Ausgetabt Einblednung
         if (AustabbenAnzeigen.activeInHierarchy)
-            ServerUtils.AddBroadcast("#SpielerAusgetabt " + player.id + " " + ausgetabt);
+            ServerUtils.BroadcastImmediate("#SpielerAusgetabt " + player.id + " " + ausgetabt);
     }
     #endregion
     #region Punkte
@@ -526,7 +525,7 @@ public class AuktionServer : MonoBehaviour
     {
         int pId = Int32.Parse(button.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
         SpielerAnzeige[(pId - 1), 1].SetActive(true);
-        ServerUtils.AddBroadcast("#SpielerIstDran " + pId);
+        ServerUtils.BroadcastImmediate("#SpielerIstDran " + pId);
     }
     /// <summary>
     /// Versteckt den Icon Rand beim Spieler
@@ -541,7 +540,7 @@ public class AuktionServer : MonoBehaviour
             if (SpielerAnzeige[i, 1].activeInHierarchy)
                 return;
 
-        ServerUtils.AddBroadcast("#SpielerIstNichtDran " + pId);
+        ServerUtils.BroadcastImmediate("#SpielerIstNichtDran " + pId);
     }
     #endregion
     #region Auktion Anzeige
@@ -553,7 +552,7 @@ public class AuktionServer : MonoBehaviour
     {
         if (input.text.Length == 0)
             return;
-        ServerUtils.AddBroadcast("#ShowCustomImage "+input.text);
+        ServerUtils.BroadcastImmediate("#ShowCustomImage "+input.text);
         StartCoroutine(LoadImageIntoScene(input.text));
     }
     /// <summary>
@@ -561,7 +560,7 @@ public class AuktionServer : MonoBehaviour
     /// </summary>
     public void HideImage()
     {
-        ServerUtils.AddBroadcast("#HideImage");
+        ServerUtils.BroadcastImmediate("#HideImage");
         BildAnzeige.gameObject.SetActive(false);
     }
     /// <summary>
@@ -603,7 +602,7 @@ public class AuktionServer : MonoBehaviour
         if (input.text.Length == 0)
             return;
         UpdateKonten();
-        ServerUtils.AddBroadcast("#SpielerKonto "+ input.text);
+        ServerUtils.BroadcastImmediate("#SpielerKonto "+ input.text);
     }
     /// <summary>
     /// Ändert den Preis eines Produktes
@@ -641,7 +640,7 @@ public class AuktionServer : MonoBehaviour
         int bild = Int32.Parse(go.name.Replace("Bild (", "").Replace(")", "")) - 1;
         BildAnzeige.sprite = Config.AUKTION_SPIEL.getSelected().getElemente()[item].getBilder()[bild];
         BildAnzeige.gameObject.SetActive(true);
-        ServerUtils.AddBroadcast("#ShowItemImage " + item + "|" + bild);
+        ServerUtils.BroadcastImmediate("#ShowItemImage " + item + "|" + bild);
     }
     /// <summary>
     /// Verkauft ein Produkt an einen Spieler
@@ -650,7 +649,7 @@ public class AuktionServer : MonoBehaviour
     public void SellItemToPlayer(TMP_Dropdown drop)
     {
         int item = Int32.Parse(drop.transform.parent.name.Replace("Element (", "").Replace(")", "")) - 1;
-        //ServerUtils.AddBroadcast("#SellItemToPlayer " + drop.value + "|" + item);
+        //ServerUtils.BroadcastImmediate("#SellItemToPlayer " + drop.value + "|" + item);
         // Verkauf wird zurückgenommen
         if (drop.value == 0)
         {
@@ -673,7 +672,7 @@ public class AuktionServer : MonoBehaviour
     /// <param name="toggle"></param>
     public void ShowAllKonten(Toggle toggle)
     {
-        ServerUtils.AddBroadcast("#ShowAllKonten " + toggle.isOn);
+        ServerUtils.BroadcastImmediate("#ShowAllKonten " + toggle.isOn);
     }
     /// <summary>
     /// Zeigt allen Spielern alle GUVs an
@@ -681,7 +680,7 @@ public class AuktionServer : MonoBehaviour
     /// <param name="toggle"></param>
     public void ShowAllGUV(Toggle toggle)
     {
-        ServerUtils.AddBroadcast("#ShowAllGUV " + toggle.isOn);
+        ServerUtils.BroadcastImmediate("#ShowAllGUV " + toggle.isOn);
     }
     #endregion
 }

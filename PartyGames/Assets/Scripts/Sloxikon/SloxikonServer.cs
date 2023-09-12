@@ -41,7 +41,6 @@ public class SloxikonServer : MonoBehaviour
 
     void OnEnable()
     {
-        StartCoroutine(ServerUtils.Broadcast());
         PlayerConnected = new bool[Config.SERVER_MAX_CONNECTIONS];
         if (!Config.SERVER_STARTED)
             return;
@@ -163,14 +162,14 @@ public class SloxikonServer : MonoBehaviour
     /// </summary>
     public void SpielVerlassenButton()
     {
-        ServerUtils.AddBroadcast("#ZurueckInsHauptmenue");
+        ServerUtils.BroadcastImmediate("#ZurueckInsHauptmenue");
     }
     /// <summary>
     /// Sendet aktualisierte Spielerinfos an alle Spieler
     /// </summary>
     private void UpdateSpielerBroadcast()
     {
-        ServerUtils.AddBroadcast(UpdateSpieler());
+        ServerUtils.BroadcastImmediate(UpdateSpieler());
     }
     /// <summary>
     /// Aktualisiert die Spieler Anzeige Informationen & gibt diese als Text zurück
@@ -309,7 +308,7 @@ public class SloxikonServer : MonoBehaviour
     public void ShowTitel()
     {
         Logging.log(Logging.LogType.Debug, "SloxikonServer", "ShowTitel", "Zeige Titel des Games an. " + Config.SLOXIKON_SPIEL.getSelected().getTitel());
-        ServerUtils.AddBroadcast("#SloxikonShowTitel " + Config.SLOXIKON_SPIEL.getSelected().getTitel());
+        ServerUtils.BroadcastImmediate("#SloxikonShowTitel " + Config.SLOXIKON_SPIEL.getSelected().getTitel());
         GameObject.Find("Sloxikon/Titel").GetComponent<TMP_Text>().text = Config.SLOXIKON_SPIEL.getSelected().getTitel();
     }
     /// <summary>
@@ -318,7 +317,7 @@ public class SloxikonServer : MonoBehaviour
     public void HideAll()
     {
         Logging.log(Logging.LogType.Debug, "SloxikonServer", "HideAll", "Blendet Anzeigen aus");
-        ServerUtils.AddBroadcast("#SloxikonHideAll");
+        ServerUtils.BroadcastImmediate("#SloxikonHideAll");
         Thema.SetActive(false);
         // Falls jemand disconnected alle Anzeigen ausblenden
         for (int i = 0; i < Config.PLAYERLIST.Length + 1; i++)
@@ -343,7 +342,7 @@ public class SloxikonServer : MonoBehaviour
         List<int> positionList = new List<int>();
         positionList.AddRange(playerList);
 
-        ServerUtils.AddBroadcast("#SloxikonShowThema " + Config.SLOXIKON_SPIEL.getSelected().getThemen()[aktuellesThema] + "|" + playerList.Count);
+        ServerUtils.BroadcastImmediate("#SloxikonShowThema " + Config.SLOXIKON_SPIEL.getSelected().getThemen()[aktuellesThema] + "|" + playerList.Count);
         Thema.SetActive(true);
         Thema.GetComponentInChildren<TMP_InputField>().text = Config.SLOXIKON_SPIEL.getSelected().getThemen()[aktuellesThema];
 
@@ -441,7 +440,7 @@ public class SloxikonServer : MonoBehaviour
         {
             if (sprite == p.icon2.icon)
             {
-                ServerUtils.AddBroadcast("#SpielersTurn " + p.id);
+                ServerUtils.BroadcastImmediate("#SpielersTurn " + p.id);
                 for (int i = 0; i < Config.SERVER_MAX_CONNECTIONS; i++)
                     SpielerAnzeige[i, 1].SetActive(false);
                 SpielerAnzeige[(p.id - 1), 1].SetActive(true);
@@ -470,7 +469,7 @@ public class SloxikonServer : MonoBehaviour
             // Blendet ShowTXT button aus
             Antworten[i].transform.GetChild(0).GetChild(0).GetComponent<Button>().interactable = false;
         }
-        ServerUtils.AddBroadcast("#SloxikonShowAllAntworten " + anz + "|" + msg);
+        ServerUtils.BroadcastImmediate("#SloxikonShowAllAntworten " + anz + "|" + msg);
     }
     /// <summary>
     /// Blendet bestimmte Antwort ein
@@ -483,7 +482,7 @@ public class SloxikonServer : MonoBehaviour
         string msg = antwortindex + "| " + Antworten[antwortindex].transform.GetChild(2).GetComponentInChildren<TMP_InputField>().text;
         // Blendet ShowTXT button aus
         Antworten[antwortindex].transform.GetChild(0).GetChild(0).GetComponent<Button>().interactable = false;
-        ServerUtils.AddBroadcast("#SloxikonShowAntwort " + msg);       
+        ServerUtils.BroadcastImmediate("#SloxikonShowAntwort " + msg);       
     }
     /// <summary>
     /// Blendet den Autor der Antwortmöglichkeit ein
@@ -496,7 +495,7 @@ public class SloxikonServer : MonoBehaviour
         Antworten[ownerindex].transform.GetChild(1).GetComponent<Image>().color = new Color(255, 255, 255, 1f);
         // Blendet ShowTXT button aus
         Antworten[ownerindex].transform.GetChild(0).GetChild(1).GetComponent<Button>().interactable = false;
-        ServerUtils.AddBroadcast("#SloxikonShowOwner " + ownerindex + "|" + Antworten[ownerindex].transform.GetChild(1).GetComponent<Image>().sprite.name);
+        ServerUtils.BroadcastImmediate("#SloxikonShowOwner " + ownerindex + "|" + Antworten[ownerindex].transform.GetChild(1).GetComponent<Image>().sprite.name);
     }
     /// <summary>
     /// Wählt für Spieler eine Antwortmöglichkeit aus
@@ -508,7 +507,7 @@ public class SloxikonServer : MonoBehaviour
         int pid = Int32.Parse(Player.name.Replace("P (", "").Replace(")", "")) - 1;
         int answer = Int32.Parse(Player.transform.parent.parent.name.Replace("Answer (", "").Replace(")", "")) - 1;
 
-        ServerUtils.AddBroadcast("#SloxikonPlayerSelectedAnswer " + answer + "|" + pid);
+        ServerUtils.BroadcastImmediate("#SloxikonPlayerSelectedAnswer " + answer + "|" + pid);
 
         for (int i = 0; i < Config.PLAYERLIST.Length + 1; i++)
         {
@@ -569,7 +568,7 @@ public class SloxikonServer : MonoBehaviour
             TimerCoroutine = null;
         }
         int sekunden = Int32.Parse(TimerSekunden.text);
-        ServerUtils.AddBroadcast("#SloxikonTimerStarten " + (sekunden));
+        ServerUtils.BroadcastImmediate("#SloxikonTimerStarten " + (sekunden));
         TimerCoroutine = StartCoroutine(RunTimer(sekunden));
     }
     /// <summary>
@@ -580,7 +579,7 @@ public class SloxikonServer : MonoBehaviour
         Logging.log(Logging.LogType.Debug, "SloxikonServer", "TimerStop", "Beendet den Timer");
         if (TimerSekunden.text.Length == 0)
             return;
-        ServerUtils.AddBroadcast("#SloxikonTimerStop");
+        ServerUtils.BroadcastImmediate("#SloxikonTimerStop");
         Timer.SetActive(false);
         StopCoroutine(TimerCoroutine);
     }
@@ -636,7 +635,7 @@ public class SloxikonServer : MonoBehaviour
         }
         Logging.log(Logging.LogType.Warning, "SloxikonServer", "SpielerBuzzered", "B: " + p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
         buzzerIsOn = false;
-        ServerUtils.AddBroadcast("#AudioBuzzerPressed " + p.id);
+        ServerUtils.BroadcastImmediate("#AudioBuzzerPressed " + p.id);
         BuzzerSound.Play();
         SpielerAnzeige[p.id - 1, 1].SetActive(true);
     }
@@ -649,7 +648,7 @@ public class SloxikonServer : MonoBehaviour
             SpielerAnzeige[i, 1].SetActive(false);
         buzzerIsOn = BuzzerAnzeige.activeInHierarchy;
         Logging.log(Logging.LogType.Warning, "SloxikonServer", "SpielerBuzzerFreigeben", "Buzzer wurde freigegeben.");
-        ServerUtils.AddBroadcast("#BuzzerFreigeben");
+        ServerUtils.BroadcastImmediate("#BuzzerFreigeben");
     }
     #endregion
     #region Spieler Ausgetabt Anzeige
@@ -661,7 +660,7 @@ public class SloxikonServer : MonoBehaviour
     {
         AustabbenAnzeigen.SetActive(toggle.isOn);
         if (toggle.isOn == false)
-            ServerUtils.AddBroadcast("#SpielerAusgetabt 0");
+            ServerUtils.BroadcastImmediate("#SpielerAusgetabt 0");
     }
     /// <summary>
     /// Spieler Tabt aus, wird ggf allen gezeigt
@@ -673,7 +672,7 @@ public class SloxikonServer : MonoBehaviour
         bool ausgetabt = !Boolean.Parse(data);
         SpielerAnzeige[(player.id - 1), 3].SetActive(ausgetabt); // Ausgetabt Einblednung
         if (AustabbenAnzeigen.activeInHierarchy)
-            ServerUtils.AddBroadcast("#SpielerAusgetabt " + player.id + " " + ausgetabt);
+            ServerUtils.BroadcastImmediate("#SpielerAusgetabt " + player.id + " " + ausgetabt);
     }
     #endregion
     #region Textantworten der Spieler
@@ -684,7 +683,7 @@ public class SloxikonServer : MonoBehaviour
     public void TexteingabeAnzeigenToggle(Toggle toggle)
     {
         TextEingabeAnzeige.SetActive(toggle.isOn);
-        ServerUtils.AddBroadcast("#TexteingabeAnzeigen "+ toggle.isOn);
+        ServerUtils.BroadcastImmediate("#TexteingabeAnzeigen "+ toggle.isOn);
     }
     /// <summary>
     /// Aktualisiert die Antwort die der Spieler eingibt
@@ -707,7 +706,7 @@ public class SloxikonServer : MonoBehaviour
         TextAntwortenAnzeige.SetActive(toggle.isOn);
         if (!toggle.isOn)
         {
-            ServerUtils.AddBroadcast("#TextantwortenAnzeigen [BOOL]" + toggle.isOn + "[BOOL]");
+            ServerUtils.BroadcastImmediate("#TextantwortenAnzeigen [BOOL]" + toggle.isOn + "[BOOL]");
             return;
         }
         string msg = "";
@@ -715,7 +714,7 @@ public class SloxikonServer : MonoBehaviour
         {
             msg = msg + "[ID" + (i + 1) + "]" + SpielerAnzeige[i, 6].GetComponentInChildren<TMP_InputField>().text + "[ID" + (i + 1) + "]";
         }
-        ServerUtils.AddBroadcast("#TextantwortenAnzeigen [BOOL]"+toggle.isOn+"[BOOL][TEXT]"+ msg);
+        ServerUtils.BroadcastImmediate("#TextantwortenAnzeigen [BOOL]"+toggle.isOn+"[BOOL][TEXT]"+ msg);
     }
     #endregion
     #region Punkte
@@ -781,7 +780,7 @@ public class SloxikonServer : MonoBehaviour
             SpielerAnzeige[(pId - 1), 1].SetActive(false);
         SpielerAnzeige[(pId - 1), 1].SetActive(true);
         buzzerIsOn = false;
-        ServerUtils.AddBroadcast("#SpielerIstDran "+pId);
+        ServerUtils.BroadcastImmediate("#SpielerIstDran "+pId);
     }
     /// <summary>
     /// Versteckt den Icon Rand beim Spieler
@@ -796,7 +795,7 @@ public class SloxikonServer : MonoBehaviour
             if (SpielerAnzeige[i, 1].activeInHierarchy)
                 return;
         buzzerIsOn = BuzzerAnzeige.activeInHierarchy; // Buzzer wird erst aktiviert wenn keiner mehr dran ist
-        ServerUtils.AddBroadcast("#SpielerIstNichtDran " + pId);
+        ServerUtils.BroadcastImmediate("#SpielerIstNichtDran " + pId);
     }
     #endregion
 }

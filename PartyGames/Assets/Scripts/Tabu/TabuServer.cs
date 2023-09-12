@@ -499,7 +499,7 @@ public class TabuServer : MonoBehaviour
         wortzahlen = TabuSpiel.genWorteList(selectedItem);
         displayworte = TabuSpiel.getKartenWorte(selectedItem.tabuworte, wortzahlen);
 
-        ServerUtils.AddBroadcast("#StartRunde " + playername + "|" + TeamTurn + "|" + TabuSpiel.GameType + "|" + timerseconds + "|" + teamrotPunkte + "|" + teamblauPunkte + "|" + TabuSpiel.getIntArrayToString(wortzahlen) + "|" + selectedItem.geheimwort + "|" + selectedItem.tabuworte);
+        ServerUtils.AddBroadcast("#StartRunde " + playername + "|" + TeamTurn + "|" + TabuSpiel.GameType + "|" + timerseconds + "|" + teamrotPunkte + "|" + teamblauPunkte + "|" + TabuSpiel.getIntArrayToString(wortzahlen) + "|" + selectedItem.geheimwort + "|" + displayworte);
 
         MarkErklaerer();
 
@@ -547,12 +547,12 @@ public class TabuServer : MonoBehaviour
             }
             else if (TeamTurn.Equals("BLAU") && teamblauList.Contains(Config.PLAYER_NAME))
             {
-                DisplayKarte(true, playername, "");
+                DisplayKarte(true, playername, "muss erklären");
                 SpielerIstDran.Play();
             }
             else if (TeamTurn.Equals("ROT") && teamrotList.Contains(Config.PLAYER_NAME))
             {
-                DisplayKarte(true, playername, "");
+                DisplayKarte(true, playername, "muss erklären");
                 SpielerIstDran.Play();
             }
             else
@@ -631,7 +631,7 @@ public class TabuServer : MonoBehaviour
             + " Rot: " + teamrotPunkte);
 
         #region WortHistory
-        AddWortHistory(erklaerer, indicator, selectedItem.geheimwort, selectedItem.tabuworte);
+        AddWortHistory(erklaerer, indicator, selectedItem.geheimwort, displayworte);
         #endregion
 
         if (TabuSpiel.GameType.Equals("1 Wort"))
@@ -873,10 +873,10 @@ public class TabuServer : MonoBehaviour
             else if (teamblauList.Contains(Config.PLAYER_NAME) && TeamTurn.Equals("ROT"))
                 DisplayKarte(true, selectedItem.geheimwort, displayworte);
             else
-                DisplayKarte(true, erklaerer, "");
+                DisplayKarte(true, erklaerer, "muss erklären");
         }
 
-        ServerUtils.AddBroadcast("#RundeEnde " + TeamTurn + "|" + indicator + "|" + TabuSpiel.GameType + "|" + teamrotPunkte + "|" + teamblauPunkte + "|" + erklaerer + "|" + true + "|" + TabuSpiel.getIntArrayToString(wortzahlen) + "|" + selectedItem.geheimwort + "|" + selectedItem.tabuworte);
+        ServerUtils.AddBroadcast("#RundeEnde " + TeamTurn + "|" + indicator + "|" + TabuSpiel.GameType + "|" + teamrotPunkte + "|" + teamblauPunkte + "|" + erklaerer + "|" + true + "|" + TabuSpiel.getIntArrayToString(wortzahlen) + "|" + selectedItem.geheimwort + "|" + displayworte);
     }
     private void EndTurn(int rotpoints, int blaupoints)
     {

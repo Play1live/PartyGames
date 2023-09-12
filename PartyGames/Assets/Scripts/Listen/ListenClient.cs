@@ -226,6 +226,13 @@ public class ListenClient : MonoBehaviour
                 HerzenAbziehen(data);
                 break;
 
+            case "#AudioFalscheAntwort":
+                FalscheAntwortSound.Play();
+                break;
+            case "#AudioRichtigeAntwort":
+                RichtigeAntwortSound.Play();
+                break;
+
             case "#UpdateSpielerPunkte":
                 UpdateSpielerPunkte(data);
                 break;
@@ -866,6 +873,7 @@ public class ListenClient : MonoBehaviour
     /// </summary>
     private void ListenStart()
     {
+        ClientUtils.SendToServer("#GetSpielerUpdate");
         LobbyTeamWahl.SetActive(false);
         InGameAnzeige.SetActive(true);
 

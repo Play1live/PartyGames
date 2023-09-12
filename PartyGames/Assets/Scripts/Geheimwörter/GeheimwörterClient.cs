@@ -182,10 +182,10 @@ public class GeheimwörterClient : MonoBehaviour
                 AudioBuzzerPressed(data);
                 break;
             case "#AudioRichtigeAntwort":
-                AudioRichtigeAntwort();
+                AudioRichtigeAntwort(data);
                 break;
             case "#AudioFalscheAntwort":
-                AudioFalscheAntwort();
+                AudioFalscheAntwort(data);
                 break;
             case "#BuzzerFreigeben":
                 BuzzerFreigeben();
@@ -313,16 +313,30 @@ public class GeheimwörterClient : MonoBehaviour
     /// <summary>
     /// Spielt den Sound für eine richtige Antwort ab
     /// </summary>
-    private void AudioRichtigeAntwort()
+    private void AudioRichtigeAntwort(string data)
     {
         RichtigeAntwortSound.Play();
+        int pIndex = Player.getPosInLists(Int32.Parse(data.Split('*')[0]));
+        Config.PLAYERLIST[pIndex].points += Int32.Parse(data.Split('*')[1]);
+        SpielerAnzeige[pIndex, 5].GetComponent<TMP_Text>().text = Config.PLAYERLIST[pIndex].points + "";
     }
     /// <summary>
     /// Spielt den Sound für eine falsche Antwort ab
     /// </summary>
-    private void AudioFalscheAntwort()
+    private void AudioFalscheAntwort(string data)
     {
         FalscheAntwortSound.Play();
+        int pId = Int32.Parse(data.Split('*')[0]);
+        int pPunkte = Int32.Parse(data.Split('*')[1]);
+        foreach (Player p in Config.PLAYERLIST)
+        {
+            if (pId != p.id)
+            {
+                p.points += pPunkte;
+                SpielerAnzeige[Player.getPosInLists(p.id), 5].GetComponent<TMP_Text>().text = p.points + "";
+            }
+        }
+        Config.SERVER_PLAYER.points += pPunkte;
     }
     /// <summary>
     /// Zeigt an, ob ein Spieler austabt
