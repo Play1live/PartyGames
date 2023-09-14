@@ -49,12 +49,12 @@ public class StartupScene : MonoBehaviour
                 Client.SetActive(false);
                 Server.SetActive(false);
                 Utils.EinstellungenStartSzene(Einstellungen, audiomixer, Utils.EinstellungsKategorien.Audio, Utils.EinstellungsKategorien.Grafik, Utils.EinstellungsKategorien.Server, Utils.EinstellungsKategorien.Sonstiges);
-                GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(1).gameObject.SetActive(false);
+                //GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(2).gameObject.SetActive(false);
             }
             else
             {
                 Utils.EinstellungenStartSzene(Einstellungen, audiomixer, Utils.EinstellungsKategorien.Audio, Utils.EinstellungsKategorien.Grafik);
-                GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(1).gameObject.SetActive(true);
+                GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(2).gameObject.SetActive(true);
             }
             // Zeigt den temporären Spielernamen an
             if (Hauptmenue.activeInHierarchy)
@@ -124,7 +124,7 @@ public class StartupScene : MonoBehaviour
             Config.APPLICATION_INITED = true;
 
             SettingsAktualisiereAnzeigen();
-            GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(1).gameObject.SetActive(true);
+            GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(2).gameObject.SetActive(true);
 
             if (!Config.CLIENT_STARTED && !Config.SERVER_STARTED)
             {
@@ -132,7 +132,7 @@ public class StartupScene : MonoBehaviour
                 Server.SetActive(false);
                 Utils.EinstellungenStartSzene(Einstellungen, audiomixer, Utils.EinstellungsKategorien.Audio, Utils.EinstellungsKategorien.Grafik, Utils.EinstellungsKategorien.Server, Utils.EinstellungsKategorien.Sonstiges);
                 //Utils.EinstellungenGrafikApply(false);
-                GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(1).gameObject.SetActive(false);
+                GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(2).gameObject.SetActive(false);
             }
             // Zeigt den temporären Spielernamen an
             if (Hauptmenue.activeInHierarchy)
@@ -360,7 +360,7 @@ public class StartupScene : MonoBehaviour
         if (Config.CLIENT_STARTED || Config.SERVER_STARTED)
             return;
         Hauptmenue.transform.GetChild(4).gameObject.GetComponent<Button>().interactable = false; // Server/Client StartButton
-        GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(1).gameObject.SetActive(true);
+        GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(2).gameObject.SetActive(true);
         Utils.EinstellungenToggle(Einstellungen, Utils.EinstellungsKategorien.Audio, Utils.EinstellungsKategorien.Grafik);
 
         if (Config.isServer)
@@ -597,7 +597,7 @@ public class StartupScene : MonoBehaviour
     {
         if (Config.CLIENT_STARTED || Config.SERVER_STARTED)
             return;
-        GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(1).gameObject.SetActive(true);
+        GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(2).gameObject.SetActive(true);
         Utils.EinstellungenToggle(Einstellungen, Utils.EinstellungsKategorien.Audio, Utils.EinstellungsKategorien.Grafik, Utils.EinstellungsKategorien.Sonstiges);
 
         Config.PLAYER_NAME = "";
@@ -628,7 +628,7 @@ public class StartupScene : MonoBehaviour
     {
         Logging.log(Logging.LogType.Normal, "StartupScene", "EinzelspielerStartScene", "Starte das Einzelspieler Spiel: " + szeneName);
         Utils.EinstellungenToggle(Einstellungen, Utils.EinstellungsKategorien.Audio, Utils.EinstellungsKategorien.Grafik);
-        GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(1).gameObject.SetActive(true);
+        GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(2).gameObject.SetActive(true);
         switch (szeneName)
         {
             default:

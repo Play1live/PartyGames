@@ -29,7 +29,7 @@ public class JeopardyServer : MonoBehaviour
     TMP_Text Thema;
     TMP_InputField BildUrl;
     GameObject SpielerHabenGeladen;
-
+    Coroutine loadImageCoroutine;
 
     bool buzzerIsOn = false;
     GameObject BuzzerAnzeige;
@@ -147,6 +147,9 @@ public class JeopardyServer : MonoBehaviour
                 ServerUtils.ClientClosed(player);
                 UpdateSpielerBroadcast();
                 PlayDisconnectSound();
+                SchaetzSpielerAnzeige.transform.GetChild(Player.getPosInLists(player.id)).gameObject.SetActive(false);
+                SchaetzSpielerAnzeige.transform.GetChild(Player.getPosInLists(player.id)).GetChild(0).GetComponent<TMP_InputField>().text = "";
+                UpdateSieger();
                 break;
             case "#TestConnection":
                 break;
@@ -413,12 +416,8 @@ public class JeopardyServer : MonoBehaviour
     /// <param name="player">Spieler</param>
     public void PunkteRichtigeAntwort(GameObject player)
     {
-        int pId = Int32.Parse(player.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
-        ServerUtils.BroadcastImmediate(Config.GAME_TITLE + "#AudioRichtigeAntwort " + pId + "*" + PunkteProRichtige);
+        ServerUtils.BroadcastImmediate(Config.GAME_TITLE + "#AudioRichtigeAntwort");
         RichtigeAntwortSound.Play();
-        int pIndex = Player.getPosInLists(pId);
-        Config.PLAYERLIST[pIndex].points += PunkteProRichtige;
-        UpdateSpieler();
     }
     /// <summary>
     /// Vergibt an alle anderen Spieler Punkte bei einer falschen Antwort
@@ -426,16 +425,8 @@ public class JeopardyServer : MonoBehaviour
     /// <param name="player">Spieler</param>
     public void PunkteFalscheAntwort(GameObject player)
     {
-        int pId = Int32.Parse(player.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
-        ServerUtils.BroadcastImmediate(Config.GAME_TITLE + "#AudioFalscheAntwort " + pId + "*" + PunkteProFalsche);
+        ServerUtils.BroadcastImmediate(Config.GAME_TITLE + "#AudioFalscheAntwort");
         FalscheAntwortSound.Play();
-        foreach (Player p in Config.PLAYERLIST)
-        {
-            if (pId != p.id && p.isConnected)
-                p.points += PunkteProFalsche;
-        }
-        Config.SERVER_PLAYER.points += PunkteProFalsche;
-        UpdateSpieler();
     }
     /// <summary>
     /// Ändert die Punkte des Spielers, variable Punkte
@@ -443,6 +434,8 @@ public class JeopardyServer : MonoBehaviour
     /// <param name="input">Punkteeingabe</param>
     public void PunkteManuellAendern(TMP_InputField input)
     {
+        if (input.text.Length == 0)
+            return;
         int pId = Int32.Parse(input.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
         int pIndex = Player.getPosInLists(pId);
         int punkte = Int32.Parse(input.text);
@@ -534,7 +527,8 @@ public class JeopardyServer : MonoBehaviour
             SpielerHabenGeladen.transform.GetChild(i + 1).gameObject.SetActive(false);
         }
         Bild.SetActive(false);
-        StartCoroutine(LoadImageFromWeb(input.text));
+        StopCoroutine(loadImageCoroutine);
+        loadImageCoroutine = StartCoroutine(LoadImageFromWeb(input.text));
     }
     private void ServerBildGeladen(Sprite sprite)
     {
@@ -667,7 +661,7 @@ public class JeopardyServer : MonoBehaviour
                 continue;
             double temp;
             if (SchaetzSpielerAnzeige.transform.GetChild(i).GetChild(0).GetComponent<TMP_InputField>().text.Length == 0)
-                temp = 0;
+                temp = double.MinValue;
             else
                 temp = double.Parse(SchaetzSpielerAnzeige.transform.GetChild(i).GetChild(0).GetComponent<TMP_InputField>().text);
             if (Math.Abs(siegzahl - temp) < Math.Abs(siegzahl - closest))
