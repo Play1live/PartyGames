@@ -621,6 +621,14 @@ public class TabuServer : MonoBehaviour
             Skip.SetActive(true);
         yield break;
     }
+    private IEnumerator HideSkipAfterWrong()
+    {
+        Skip.SetActive(false);
+        yield return new WaitForSeconds(1);
+        if (erklaerer.Equals(Config.PLAYER_NAME))
+            Skip.SetActive(true);
+        yield break;
+    }
     private void RundeEnde(int indicator, string playername)
     {
         Logging.log(Logging.LogType.Normal, "TabuServer", "RundeEnde", 
@@ -789,6 +797,7 @@ public class TabuServer : MonoBehaviour
                 StartCoroutine(AnimateBackground("LOSE"));
                 if (HideRichtigFalschSecCoroutine != null)
                     StopCoroutine(HideRichtigFalschSecCoroutine);
+                StartCoroutine(HideSkipAfterWrong());
                 HideRichtigFalschSecCoroutine = StartCoroutine(HideRichtigFalschSec());
                 if (TeamTurn.Equals("ROT"))
                     SetTeamPoints("ROT", teamrotPunkte += TabuData.P_BATTLE_ROYALE[1]);

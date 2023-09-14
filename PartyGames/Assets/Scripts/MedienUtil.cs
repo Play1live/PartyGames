@@ -12,7 +12,7 @@ public class MedienUtil
     {
         Logging.log(Logging.LogType.Debug, "MediaUtil", "CreateMediaDirectory", "Erstelle benötigte Ordner für Spieldateien");
         // Erstellt die Spiele Ordner
-        string[] spielOrdner = { "Quiz", "Listen", "Geheimwörter", "WerBietetMehr", "Auktion", "Mosaik", "Sloxikon" };
+        string[] spielOrdner = { "Quiz", "Listen", "Geheimwörter", "WerBietetMehr", "Auktion", "Mosaik", "Sloxikon", "Jeopardy" };
         foreach (string game in spielOrdner)
         {
             if (!Directory.Exists(Config.MedienPath + @"/Spiele/" + game))
@@ -160,6 +160,19 @@ public class MedienUtil
             using (FileStream fs = File.Create(sloxikonvorlage))
             {
                 byte[] info = new UTF8Encoding(true).GetBytes("- Thema [!#!] Antwort\n- Thema [!#!] Antwort");
+                // Add some information to the file.
+                fs.Write(info, 0, info.Length);
+            }
+        }
+        #endregion
+
+        #region Jeopardy
+        string jeopardyvorlage = Config.MedienPath + @"/Spiele/Jeopardy/#Vorlage.txt";
+        if (!File.Exists(jeopardyvorlage))
+        {
+            using (FileStream fs = File.Create(jeopardyvorlage))
+            {
+                byte[] info = new UTF8Encoding(true).GetBytes("|~~~|~~~|~~~|~~~|~~~\n|~~~|~~~|~~~|~~~|~~~\n|~~~|~~~|~~~|~~~|~~~\n|~~~|~~~|~~~|~~~|~~~\n|~~~|~~~|~~~|~~~|~~~\n|~~~|~~~|~~~|~~~|~~~"); 
                 // Add some information to the file.
                 fs.Write(info, 0, info.Length);
             }

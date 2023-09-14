@@ -199,9 +199,9 @@ public class Utils
     /// <summary>
     /// Wendet die Grafik Einstellungen an, mit der Bedingung ob vollbild pflicht ist
     /// </summary>
-    public static void EinstellungenGrafikApply(bool ignoreSettings)
+    public static void EinstellungenGrafikApply(bool forceFullscreen)
     {
-        if (ignoreSettings == true)
+        if (forceFullscreen == true)
         {
             if (Config.FULLSCREEN == true)
             {
@@ -382,6 +382,8 @@ public class ServerUtils
     public static void BroadcastImmediate(string msg)
     {
         blockBroadcastMsgs = true;
+        if (!msg.StartsWith(Config.GAME_TITLE) && !msg.StartsWith(Config.GLOBAL_TITLE))
+            msg = Config.GAME_TITLE + msg;
         foreach (Player sc in Config.PLAYERLIST)
             if (sc.isConnected)
                 SendMSG(msg, sc);

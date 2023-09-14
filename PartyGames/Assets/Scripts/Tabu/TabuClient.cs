@@ -508,6 +508,14 @@ public class TabuClient : MonoBehaviour
             Skip.SetActive(true);
         yield break;
     }
+    private IEnumerator HideSkipAfterWrong()
+    {
+        Skip.SetActive(false);
+        yield return new WaitForSeconds(1);
+        if (erklaerer.Equals(Config.PLAYER_NAME))
+            Skip.SetActive(true);
+        yield break;
+    }
     private void StartRunde(string data)
     {
         erklaerer = data.Split('|')[0];
@@ -743,6 +751,7 @@ public class TabuClient : MonoBehaviour
                 StartCoroutine(AnimateBackground("LOSE"));
                 if (HideRichtigFalschSecCoroutine != null)
                     StopCoroutine(HideRichtigFalschSecCoroutine);
+                StartCoroutine(HideSkipAfterWrong());
                 HideRichtigFalschSecCoroutine = StartCoroutine(HideRichtigFalschSec());
 
                 if (teamblauPunkte <= 0 || teamrotPunkte <= 0)

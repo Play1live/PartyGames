@@ -881,57 +881,6 @@ public class StartupServer : MonoBehaviour
                 break;
         }
         return neuesIcon;
-
-        /*
-        if (name.ToLower().Contains("spieler"))
-            return FindIconByName("Discord");
-        else if (name.ToLower().Contains("alan"))
-            return FindIconByName("Alan");
-        else if (name.ToLower().Contains("fiona"))
-            return FindIconByName("Fiona");
-        else if (name.ToLower().Contains("hannah")
-            || (name.ToLower().StartsWith("ha") && name.ToLower().EndsWith("nah"))
-            || (name.ToLower().StartsWith("han") && name.ToLower().EndsWith("ah"))
-            || (name.ToLower().StartsWith("haa") && name.ToLower().EndsWith("aah") && name.ToLower().Substring(3, name.Length - 3).Contains("nn")))
-            return FindIconByName("Hannah");
-        else if (name.ToLower().Contains("henryk")
-            || name.ToLower().Contains("play1live"))
-            return FindIconByName("Henryk");
-        else if (name.ToLower().Contains("maxe"))
-            return FindIconByName("Maxe");
-        else if (name.ToLower().Contains("michi")
-            || name.ToLower().Contains("michelle"))
-            return  FindIconByName("Michi");
-        else if (name.ToLower().Contains("munck"))
-            return FindIconByName("Munk");
-        else if (name.ToLower().Contains("nils")
-            || name.ToLower().Contains("nille")
-            || name.ToLower().Contains("kater")
-            || name.ToLower().Contains("katerjunge"))
-            return FindIconByName ("Nils");
-        else if (name.ToLower().Contains("ronald")
-            || name.ToLower().Contains("ron")
-            || name.ToLower().Contains("sterni")
-            || name.ToLower().Contains("sternfaust"))
-            return FindIconByName("Ronald");
-        else if (name.ToLower().Contains("nookie")
-            || name.ToLower().Contains("nicoruessel"))
-            return FindIconByName("Nookie");
-        else if (name.ToLower().Contains("piet"))
-            return FindIconByName("Piet");
-        else
-        {
-            Logging.log(Logging.LogType.Warning, "StartupServer", "SpielerIconChange", "Spielername für Icons ist unbekannt: " + name);
-            Sprite neuesIcon = Config.PLAYER_ICONS[1];
-            for (int i = 1; i < Config.PLAYER_ICONS.Count; i++)
-            {
-                if (IconWirdGeradeGenutzt(neuesIcon))
-                    neuesIcon = Config.PLAYER_ICONS[(Config.PLAYER_ICONS.IndexOf(neuesIcon) + 1) % Config.PLAYER_ICONS.Count];
-                else
-                    break;
-            }
-            return neuesIcon;
-        }*/
     }
     /// <summary>
     /// Gibt ein Sprite eines Icons zurück das per Name gesucht wird
@@ -1046,6 +995,8 @@ public class StartupServer : MonoBehaviour
         gamelist.Add("[SPIELER-ANZ]" + AuktionSpiel.minPlayer + "-" + AuktionSpiel.maxPlayer + "[SPIELER-ANZ][MIN]" + AuktionSpiel.minPlayer + "[MIN][MAX]" + AuktionSpiel.maxPlayer + "[MAX][TITEL]Auktion[TITEL][AVAILABLE]" + Config.AUKTION_SPIEL.getAuktionen().Count + "[AVAILABLE]");
         // Sloxikon
         gamelist.Add("[SPIELER-ANZ]" + SloxikonSpiel.minPlayer + "-" + SloxikonSpiel.maxPlayer + "[SPIELER-ANZ][MIN]" + SloxikonSpiel.minPlayer + "[MIN][MAX]" + SloxikonSpiel.maxPlayer + "[MAX][TITEL]Sloxikon[TITEL][AVAILABLE]" + Config.SLOXIKON_SPIEL.getGames().Count + "[AVAILABLE]");
+        // Jeopardy
+        gamelist.Add("[SPIELER-ANZ]" + JeopardySpiel.minPlayer + "-" + JeopardySpiel.maxPlayer + "[SPIELER-ANZ][MIN]" + JeopardySpiel.minPlayer + "[MIN][MAX]" + JeopardySpiel.maxPlayer + "[MAX][TITEL]Jeopardy[TITEL][AVAILABLE]" + Config.JEOPARDY_SPIEL.getJeopardy().Count + "[AVAILABLE]");
         // Unmoderierte Games
         gamelist.Add("[SPIELER-ANZ]0[SPIELER-ANZ][MIN]0[MIN][MAX]" + (Config.SERVER_MAX_CONNECTIONS + 1) + "[MAX][TITEL]<b><i>Unmoderierte Spiele</i></b>[TITEL][AVAILABLE]-1[AVAILABLE]");
         // MenschÄrgerDichNicht
@@ -1268,9 +1219,14 @@ public class StartupServer : MonoBehaviour
         SloxikonDropdown.ClearOptions();
         SloxikonDropdown.AddOptions(Config.SLOXIKON_SPIEL.getGamesAsStringList());
 
+        TMP_Dropdown JeopardyDropdown = GameObject.Find("Jeopardy/Jeopardy").GetComponent<TMP_Dropdown>();
+        JeopardyDropdown.ClearOptions();
+        JeopardyDropdown.AddOptions(Config.JEOPARDY_SPIEL.getGamesAsStringList());
+
         TMP_Dropdown TabuDropdown = GameObject.Find("Tabu/Tabu").GetComponent<TMP_Dropdown>();
         TabuDropdown.ClearOptions();
         TabuDropdown.AddOptions(Config.TABU_SPIEL.getGamesAsStringList());
+
     }
     #region Starte Spiele
     /// <summary>
@@ -1295,6 +1251,8 @@ public class StartupServer : MonoBehaviour
             return;
         else if (spieltitel == "Sloxikon" && Config.SLOXIKON_SPIEL.getSelected() == null)
             return;
+        // TODO: Für jeopardy aktivieren else if (spieltitel == "Jeopardy" && Config.JEOPARDY_SPIEL.getSelected() == null)
+          //  return;
         else if (spieltitel == "Tabu" && Config.TABU_SPIEL.getSelected() == null)
             return;
 
@@ -1346,6 +1304,9 @@ public class StartupServer : MonoBehaviour
                 break;
             case "Sloxikon":
                 Config.SLOXIKON_SPIEL.setSelected(Config.SLOXIKON_SPIEL.getQuizByIndex(drop.value));
+                break;
+            case "Jeopardy":
+                Config.JEOPARDY_SPIEL.setSelected(Config.JEOPARDY_SPIEL.getJeopardy(drop.value));
                 break;
             case "Tabu":
                 Config.TABU_SPIEL.setSelected(Config.TABU_SPIEL.getListe(drop.value));

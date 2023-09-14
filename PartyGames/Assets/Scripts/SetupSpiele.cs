@@ -23,7 +23,10 @@ public class SetupSpiele
         yield return null;
         Config.SLOXIKON_SPIEL = new SloxikonSpiel();
         yield return null;
+        Config.JEOPARDY_SPIEL = new JeopardySpiel();
+        yield return null;
         Config.TABU_SPIEL = new TabuSpiel();
+        yield return null;
         Logging.log(Logging.LogType.Normal, "SetupSpiele", "LoadGameFiles", "Games are ready!");
         yield break;
     }

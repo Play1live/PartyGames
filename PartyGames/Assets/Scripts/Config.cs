@@ -48,6 +48,7 @@ public class Config
     public static WerBietetMehrSpiel WERBIETETMEHR_SPIEL;
     public static AuktionSpiel AUKTION_SPIEL;
     public static SloxikonSpiel SLOXIKON_SPIEL;
+    public static JeopardySpiel JEOPARDY_SPIEL;
     public static TabuSpiel TABU_SPIEL;
 
     // Scenenspezifisches
