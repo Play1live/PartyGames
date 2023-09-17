@@ -527,7 +527,8 @@ public class JeopardyServer : MonoBehaviour
             SpielerHabenGeladen.transform.GetChild(i + 1).gameObject.SetActive(false);
         }
         Bild.SetActive(false);
-        StopCoroutine(loadImageCoroutine);
+        if (loadImageCoroutine != null)
+            StopCoroutine(loadImageCoroutine);
         loadImageCoroutine = StartCoroutine(LoadImageFromWeb(input.text));
     }
     private void ServerBildGeladen(Sprite sprite)
