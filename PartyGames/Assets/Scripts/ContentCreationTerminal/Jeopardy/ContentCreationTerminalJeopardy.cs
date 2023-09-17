@@ -166,12 +166,13 @@ public class ContentCreationTerminalJeopardy : MonoBehaviour
 
         if (File.Exists(datapath + "/" + input.text + ".txt"))
         {
-            input.text = "|~~~|~~~|~~~|~~~|~~~\n|~~~|~~~|~~~|~~~|~~~\n|~~~|~~~|~~~|~~~|~~~\n|~~~|~~~|~~~|~~~|~~~\n|~~~|~~~|~~~|~~~|~~~\n|~~~|~~~|~~~|~~~|~~~";
+            input.text = "";
             return;
         }
 
         Logging.log(Logging.LogType.Normal, "ContentCreationTerminalJeopardy", "CreateFile", "Erstelle neue Datei.");
         File.Create(datapath + "/" + input.text + ".txt").Close();
+        File.WriteAllText(datapath + "/" + input.text + ".txt", "|0~~~|0~~~|0~~~|0~~~|0~~~\n|0~~~|0~~~|0~~~|0~~~|0~~~\n|0~~~|0~~~|0~~~|0~~~|0~~~\n|0~~~|0~~~|0~~~|0~~~|0~~~\n|0~~~|0~~~|0~~~|0~~~|0~~~\n|0~~~|0~~~|0~~~|0~~~|0~~~");
         displayedGames++;
         GameObject go = Instantiate(SpieldateienTemplate, SpieldateienTemplate.transform.position, SpieldateienTemplate.transform.rotation);
         go.name = "File_active_" + displayedGames + "_" + UnityEngine.Random.Range(0, 99999) + "*********" + input.text;
@@ -210,6 +211,17 @@ public class ContentCreationTerminalJeopardy : MonoBehaviour
 
         if (jeopardy == null)
             return;
+        for (int i = 0; i < 6; i++)
+            {
+                Grid.transform.GetChild(i).GetChild(0).GetChild(0).GetComponent<TMP_InputField>().text = "";
+                for (int j = 1; j < 5 + 1; j++)
+                {
+                    Grid.transform.GetChild(i).GetChild(j).GetChild(0).GetComponent<TMP_InputField>().text = "";
+                    Grid.transform.GetChild(i).GetChild(j).GetChild(1).GetComponent<TMP_InputField>().text = "";
+                    Grid.transform.GetChild(i).GetChild(j).GetChild(2).GetComponent<TMP_InputField>().text = "";
+                    Grid.transform.GetChild(i).GetChild(j).GetChild(3).GetComponent<TMP_InputField>().text = "";
+                }
+            }
         for (int i = 0; i < jeopardy.getThemen().Count; i++)
         {
             Grid.transform.GetChild(i).GetChild(0).GetChild(0).GetComponent<TMP_InputField>().text = jeopardy.getThemen()[i].thema;
@@ -231,13 +243,13 @@ public class ContentCreationTerminalJeopardy : MonoBehaviour
         string lines = "";
         for (int i = 0; i < jeopardy.getThemen().Count; i++)
         {
-            lines += "\n" + Grid.transform.GetChild(i).GetChild(0).GetChild(0).GetComponent<TMP_InputField>().text.Replace("~", "").Replace("|", "").Replace("\n", "\\n");
+            lines += "\n" + Grid.transform.GetChild(i).GetChild(0).GetChild(0).GetComponent<TMP_InputField>().text.Replace("~", "").Replace("|", "");
             for (int j = 1; j < jeopardy.getThemen()[i].items.Count + 1; j++)
             {
-                lines += "|" + Grid.transform.GetChild(i).GetChild(j).GetChild(0).GetComponent<TMP_InputField>().text.Replace("~", "").Replace("|", "").Replace("\n", "\\n");
-                lines += "~" + Grid.transform.GetChild(i).GetChild(j).GetChild(1).GetComponent<TMP_InputField>().text.Replace("~", "").Replace("|", "").Replace("\n", "\\n");
-                lines += "~" + Grid.transform.GetChild(i).GetChild(j).GetChild(2).GetComponent<TMP_InputField>().text.Replace("~", "").Replace("|", "").Replace("\n", "\\n");
-                lines += "~" + Grid.transform.GetChild(i).GetChild(j).GetChild(3).GetComponent<TMP_InputField>().text.Replace("~", "").Replace("|", "").Replace("\n", "\\n");
+                lines += "|" + Grid.transform.GetChild(i).GetChild(j).GetChild(0).GetComponent<TMP_InputField>().text.Replace("~", "").Replace("|", "");
+                lines += "~" + Grid.transform.GetChild(i).GetChild(j).GetChild(1).GetComponent<TMP_InputField>().text.Replace("~", "").Replace("|", "");
+                lines += "~" + Grid.transform.GetChild(i).GetChild(j).GetChild(2).GetComponent<TMP_InputField>().text.Replace("~", "").Replace("|", "");
+                lines += "~" + Grid.transform.GetChild(i).GetChild(j).GetChild(3).GetComponent<TMP_InputField>().text.Replace("~", "").Replace("|", "");
             }
         }
         if (lines.Length > 0)

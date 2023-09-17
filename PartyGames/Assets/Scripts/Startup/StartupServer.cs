@@ -1251,8 +1251,8 @@ public class StartupServer : MonoBehaviour
             return;
         else if (spieltitel == "Sloxikon" && Config.SLOXIKON_SPIEL.getSelected() == null)
             return;
-        // TODO: Für jeopardy aktivieren else if (spieltitel == "Jeopardy" && Config.JEOPARDY_SPIEL.getSelected() == null)
-          //  return;
+        else if (spieltitel == "Jeopardy" && Config.JEOPARDY_SPIEL.getSelected() == null)
+            return;
         else if (spieltitel == "Tabu" && Config.TABU_SPIEL.getSelected() == null)
             return;
 

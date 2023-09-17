@@ -49,7 +49,7 @@ public class StartupScene : MonoBehaviour
                 Client.SetActive(false);
                 Server.SetActive(false);
                 Utils.EinstellungenStartSzene(Einstellungen, audiomixer, Utils.EinstellungsKategorien.Audio, Utils.EinstellungsKategorien.Grafik, Utils.EinstellungsKategorien.Server, Utils.EinstellungsKategorien.Sonstiges);
-                //GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(2).gameObject.SetActive(false);
+                GameObject.Find("AlwaysActive/TopButtons").transform.GetChild(2).gameObject.SetActive(false);
             }
             else
             {

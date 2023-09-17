@@ -19,6 +19,8 @@ public class Jeopardy
         {
             this.themen.Add(new JeopardyThema(zeile));
         }
+        for (int i = this.themen.Count; i < 6; i++)
+            this.themen.Add(new JeopardyThema());
     }
 
     public string getTitel() { return this.titel; }
@@ -36,6 +38,15 @@ public class JeopardyThema
         this.items = new List<JeopardyItem>();
         for (int i = 1; i < line.Split('|').Length; i++)
             this.items.Add(new JeopardyItem(line.Split('|')[i], this));
+        for (int i = this.items.Count; i < 5; i++)
+            this.items.Add(new JeopardyItem(this));
+    }
+    public JeopardyThema()
+    {
+        this.thema = "";
+        this.items = new List<JeopardyItem>();
+        for (int i = this.items.Count; i < 5; i++)
+            this.items.Add(new JeopardyItem(this));
     }
 }
 public class JeopardyItem
@@ -48,10 +59,31 @@ public class JeopardyItem
 
     public JeopardyItem(string line, JeopardyThema thema)
     {
+        try
+        {
+            this.thema = thema;
+            if (line.Split('~')[0].Length != 0)
+                this.points = Int32.Parse(line.Split('~')[0]);
+            else
+                this.points = 0;
+            this.frage = line.Split('~')[1];
+            this.antwort = line.Split('~')[2];
+            if (!(line.Split('~').Length < 4))
+                this.imageurl = line.Split('~')[3];
+            else
+                this.imageurl = "";
+        }
+        catch
+        {
+            Logging.log(Logging.LogType.Error, "Jeopardy", "JeopardyItem", "Item konnte nicht geladen werden: " + line);
+        }        
+    }
+    public JeopardyItem(JeopardyThema thema)
+    {
         this.thema = thema;
-        this.points = Int32.Parse(line.Split('~')[0]);
-        this.frage = line.Split('~')[1];
-        this.antwort = line.Split('~')[2];
-        this.imageurl = line.Split('~')[3];
+        this.points = 0;
+        this.frage = "";
+        this.antwort = "";
+        this.imageurl = "";
     }
 }

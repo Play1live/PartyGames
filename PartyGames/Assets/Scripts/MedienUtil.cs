@@ -172,7 +172,7 @@ public class MedienUtil
         {
             using (FileStream fs = File.Create(jeopardyvorlage))
             {
-                byte[] info = new UTF8Encoding(true).GetBytes("|~~~|~~~|~~~|~~~|~~~\n|~~~|~~~|~~~|~~~|~~~\n|~~~|~~~|~~~|~~~|~~~\n|~~~|~~~|~~~|~~~|~~~\n|~~~|~~~|~~~|~~~|~~~\n|~~~|~~~|~~~|~~~|~~~"); 
+                byte[] info = new UTF8Encoding(true).GetBytes("|0~~~|0~~~|0~~~|0~~~|0~~~\n|0~~~|0~~~|0~~~|0~~~|0~~~\n|0~~~|0~~~|0~~~|0~~~|0~~~\n|0~~~|0~~~|0~~~|0~~~|0~~~\n|0~~~|0~~~|0~~~|0~~~|0~~~\n|0~~~|0~~~|0~~~|0~~~|0~~~"); 
                 // Add some information to the file.
                 fs.Write(info, 0, info.Length);
             }
