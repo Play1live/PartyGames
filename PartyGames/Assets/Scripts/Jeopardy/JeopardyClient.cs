@@ -24,10 +24,15 @@ public class JeopardyClient : MonoBehaviour
     GameObject[,] SpielerAnzeige;
     bool pressingbuzzer = false;
 
+    Coroutine timerCoroutine;
+    GameObject TimerDisplay;
+
     [SerializeField] AudioSource BuzzerSound;
     [SerializeField] AudioSource RichtigeAntwortSound;
     [SerializeField] AudioSource FalscheAntwortSound;
     [SerializeField] AudioSource DisconnectSound;
+    [SerializeField] AudioSource Moeoep;
+    [SerializeField] AudioSource Beeep;
 
     void OnEnable()
     {
@@ -219,6 +224,13 @@ public class JeopardyClient : MonoBehaviour
             case "#EingabefeldToggle":
                 EingabefeldToggle(data);
                 break;
+
+            case "#StartTimer":
+                StartTimer(data);
+                break;
+            case "#StopTimer":
+                StopTimer();
+                break;
         }
     }
     /// <summary>
@@ -394,6 +406,9 @@ public class JeopardyClient : MonoBehaviour
         JeopardyAuswahlAnzeige = GameObject.Find("JeopardyAuswahl");
         JeopardyAuswahlAnzeige.SetActive(true);
 
+        // Timer
+        TimerDisplay = GameObject.Find("JeopardyElementAnzeige/Grid/Timer");
+        TimerDisplay.SetActive(false);
         // AnzeigeFrage
         AnzeigeFrage = GameObject.Find("JeopardyElementAnzeige/Grid/Frage");
         // AnzeigeBild   
@@ -519,4 +534,52 @@ public class JeopardyClient : MonoBehaviour
     {
         ClientUtils.SendToServer("#AntwortEingabeUpdate " + input.text);
     }
+    #region Timer
+    private void StartTimer(string data)
+    {
+        try
+        {
+            int seconds = Int32.Parse(data);
+            if (timerCoroutine != null)
+                StopCoroutine(timerCoroutine);
+            timerCoroutine = StartCoroutine(RunTimer(seconds));
+            TimerDisplay.SetActive(true);
+        }
+        catch
+        {
+            Logging.log(Logging.LogType.Error, "JeopardyClient", "RunTimer", "Timer konnte nicht gestartet werden: " + data);
+        }
+        
+    }
+    private void StopTimer()
+    {
+        if (timerCoroutine != null)
+            StopCoroutine(timerCoroutine);
+        TimerDisplay.SetActive(false);
+    }
+    private IEnumerator RunTimer(int seconds)
+    {
+        Logging.log(Logging.LogType.Debug, "JeopardyClient", "RunTimer", "Timer läuft: " + seconds);
+        TimerDisplay.SetActive(true);
+
+        while (seconds >= 0)
+        {
+            TimerDisplay.GetComponentInChildren<TMP_Text>().text = "" + seconds;
+
+            if (seconds == 0)
+            {
+                Beeep.Play();
+            }
+            // Moep Sound bei sekunden
+            if (seconds == 1 || seconds == 2 || seconds == 3 || seconds == 10) // 10-0
+            {
+                Moeoep.Play();
+            }
+            seconds--;
+            yield return new WaitForSecondsRealtime(1);
+        }
+        TimerDisplay.GetComponentInChildren<TMP_Text>().text = "0";
+        yield break;
+    }
+    #endregion
 }

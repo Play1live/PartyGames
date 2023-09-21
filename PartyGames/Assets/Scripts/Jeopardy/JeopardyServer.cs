@@ -30,6 +30,9 @@ public class JeopardyServer : MonoBehaviour
     TMP_InputField BildUrl;
     GameObject SpielerHabenGeladen;
     Coroutine loadImageCoroutine;
+    Coroutine timerCoroutine;
+    int timerseconds;
+    GameObject TimerDisplay;
 
     bool buzzerIsOn = false;
     GameObject BuzzerAnzeige;
@@ -45,6 +48,8 @@ public class JeopardyServer : MonoBehaviour
     [SerializeField] AudioSource RichtigeAntwortSound;
     [SerializeField] AudioSource FalscheAntwortSound;
     [SerializeField] AudioSource DisconnectSound;
+    [SerializeField] AudioSource Moeoep;
+    [SerializeField] AudioSource Beeep;
 
     void OnEnable()
     {
@@ -297,6 +302,9 @@ public class JeopardyServer : MonoBehaviour
         JeopardyAuswahlAnzeige = GameObject.Find("JeopardyAuswahl");
         JeopardyAuswahlAnzeige.SetActive(true);
 
+        // Timer
+        TimerDisplay = GameObject.Find("JeopardyElementAnzeige/Grid/Timer");
+        TimerDisplay.SetActive(true);
         // AnzeigeFrage
         AnzeigeFrage = GameObject.Find("JeopardyElementAnzeige/Grid/Frage");
         // AnzeigeBild   
@@ -681,6 +689,61 @@ public class JeopardyServer : MonoBehaviour
                 Logging.log(Logging.LogType.Normal, "JeopardyServer", "UpdateSieger", "Sieger: Spieler" + i + "Tipp: " + SchaetzSpielerAnzeige.transform.GetChild(i).GetChild(0).GetComponent<TMP_InputField>().text + " Differenz: " + Math.Abs(siegzahl - double.Parse(SchaetzSpielerAnzeige.transform.GetChild(i).GetChild(0).GetComponent<TMP_InputField>().text)));
             }
         }
+    }
+    #endregion
+    #region Timer
+    public void SetTimerSeconds(TMP_InputField input)
+    {
+        if (input.text.Length == 0)
+            return;
+        try
+        {
+            int seconds = Int32.Parse(input.text);
+            timerseconds = seconds;
+        }
+        catch
+        {
+            Logging.log(Logging.LogType.Warning, "JeopardyServer", "SetTimerSeconds", "Timer konnte nicht gestellt werden, bitte prüfe die Eingabe: " + input.text);
+        }
+    }
+    public void StartTimer()
+    {
+        ServerUtils.BroadcastImmediate("#StartTimer " + timerseconds);
+        if (timerCoroutine != null)
+            StopCoroutine(timerCoroutine);
+        timerCoroutine = StartCoroutine(RunTimer(timerseconds));
+        TimerDisplay.SetActive(true);
+    }
+    public void StopTimer()
+    {
+        ServerUtils.BroadcastImmediate("#StopTimer");
+        if (timerCoroutine != null)
+            StopCoroutine(timerCoroutine);
+        TimerDisplay.SetActive(true);
+    }
+    private IEnumerator RunTimer(int seconds)
+    {
+        Logging.log(Logging.LogType.Debug, "JeopardyServer", "RunTimer", "Timer läuft: " + seconds);
+        TimerDisplay.SetActive(true);
+
+        while (seconds >= 0)
+        {
+            TimerDisplay.GetComponentInChildren<TMP_Text>().text = "" + seconds;
+
+            if (seconds == 0)
+            {
+                Beeep.Play();
+            }
+            // Moep Sound bei sekunden
+            if (seconds == 1 || seconds == 2 || seconds == 3 || seconds == 10) // 10-0
+            {
+                Moeoep.Play();
+            }
+            seconds--;
+            yield return new WaitForSecondsRealtime(1);
+        }
+        TimerDisplay.GetComponentInChildren<TMP_Text>().text = "0";
+        yield break;
     }
     #endregion
 }
