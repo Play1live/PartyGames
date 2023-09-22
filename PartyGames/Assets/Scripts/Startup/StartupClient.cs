@@ -921,12 +921,13 @@ public class StartupClient : MonoBehaviour
     /// <param name="button">Ausgewähltes Feld</param>
     public void TicTacToeButtonPress(GameObject button)
     {
-        Logging.log(Logging.LogType.Normal, "StartupClient", "TicTacToeButtonPress", "Spieler zieht.");
+        Logging.log(Logging.LogType.Normal, "StartupClient", "TicTacToeButtonPress", "Spieler zieht. Button: " + button.name);
+        // Felb bereits belegt (besser?)
+        if (!ticktacktoe.Contains("[" + button.name + "][" + button.name + "]"))
+            return;
         // Feld bereits belegt
         if (ticktacktoe.Replace("["+button.name+"]","|").Split('|')[1] != "")
-        {
             return;
-        }
         MiniGames[0].transform.GetChild(2).gameObject.SetActive(true);
 
         ticktacktoe = ticktacktoe.Replace("[" + button.name + "][" + button.name + "]", "["+ button.name + "]O[" + button.name + "]");
@@ -953,7 +954,7 @@ public class StartupClient : MonoBehaviour
             if (Int32.Parse(content.GetChild(contentId).name.Split('*')[0]) < Int32.Parse(daten[i].Split('*')[0]))
             {
                 Player player = new Player(-1);
-                player.icon2 = FindIconByName(daten[i].Split('*')[1]);
+                player.icon2 = Player.getPlayerIconById(daten[i].Split('*')[1]);
                 AddMSG(player, daten[i].Split('*')[2], content);
             }
         }
@@ -962,7 +963,7 @@ public class StartupClient : MonoBehaviour
     {
         GameObject newObject = GameObject.Instantiate(content.GetChild(0).gameObject, content, false);
         newObject.transform.localScale = new Vector3(1, 1, 1);
-        newObject.name = (content.childCount+1) + "*" + player.icon2.displayname;
+        newObject.name = (content.childCount+1) + "*" + player.icon2.id;
         newObject.SetActive(true);
         newObject.GetComponentInChildren<Image>().sprite = player.icon2.icon;
         StartCoroutine(ChangeMSGText(newObject, msg));

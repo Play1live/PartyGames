@@ -68,6 +68,7 @@ public class StartupScene : MonoBehaviour
         Lobby.SetActive(false);
         Einzelspieler.SetActive(false);
         ServerControl.SetActive(false);
+        GameObject.Find("Version_LBL").gameObject.GetComponent<TMP_Text>().text = "Version: " + Config.APPLICATION_VERSION;
 
         if (Config.isServer)
         {
@@ -120,7 +121,6 @@ public class StartupScene : MonoBehaviour
                 ServerControl.SetActive(false);
             }
 
-            GameObject.Find("Version_LBL").gameObject.GetComponent<TMP_Text>().text = "Version: " + Config.APPLICATION_VERSION;
             Config.APPLICATION_INITED = true;
 
             SettingsAktualisiereAnzeigen();

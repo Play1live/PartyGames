@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net.Sockets;
@@ -84,6 +85,17 @@ public class Player
         }
         return new PlayerIcon();
     }
+    public static PlayerIcon getPlayerIconById(string id)
+    {
+        try
+        {
+            return Config.PLAYER_ICONS[Int32.Parse(id)];
+        }
+        catch
+        {
+            return new PlayerIcon();
+        }
+    }
 }
 
 public class PlayerIcon
@@ -103,7 +115,7 @@ public class PlayerIcon
     }
     public PlayerIcon()
     {
-        this.id = 0;
+        this.id = -1;
         this.icon = Resources.Load<Sprite>("Images/ProfileIcons/empty");
         this.names = new List<string>();
         this.names.Add("empty");

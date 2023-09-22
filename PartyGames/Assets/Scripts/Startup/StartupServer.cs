@@ -1352,7 +1352,7 @@ public class StartupServer : MonoBehaviour
         string lastmsgs = "";
         for (int i = content.childCount-1; i > Mathf.Max(0, content.childCount-10); i--)
         {
-            lastmsgs += "|" + PlayerIcon.getIdByName(content.GetChild(i).name) + "*" + content.GetChild(i).GetComponentInChildren<TMP_Text>().text;
+            lastmsgs += "|" + content.GetChild(i).name + "*" + content.GetChild(i).GetComponentInChildren<TMP_Text>().text;
         }
         if (lastmsgs.Length > 1)
             lastmsgs = lastmsgs.Substring(1);
@@ -1363,7 +1363,7 @@ public class StartupServer : MonoBehaviour
     {
         GameObject newObject = GameObject.Instantiate(content.GetChild(0).gameObject, content, false);
         newObject.transform.localScale = new Vector3(1, 1, 1);
-        newObject.name = (content.childCount+1) + "*" + player.icon2.displayname;
+        newObject.name = (content.childCount+1) + "*" + player.icon2.id;
         newObject.SetActive(true);
         newObject.GetComponentInChildren<Image>().sprite = player.icon2.icon;
         newObject.GetComponentInChildren<TMP_Text>().text = msg;
