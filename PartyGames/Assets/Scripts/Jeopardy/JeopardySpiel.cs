@@ -6,7 +6,7 @@ using UnityEngine;
 public class JeopardySpiel
 {
     public static int minPlayer = 3;
-    public static int maxPlayer = 9;
+    public static int maxPlayer = 6;
     public static string path = "/Spiele/Jeopardy";
     private List<Jeopardy> jeopardy;
     private Jeopardy selected;
