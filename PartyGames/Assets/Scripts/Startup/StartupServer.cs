@@ -32,7 +32,6 @@ public class StartupServer : MonoBehaviour
     {
         Config.GAME_TITLE = "Startup";
         UpdateSpieler();
-        StartCoroutine(ServerUtils.Broadcast());
     }
 
     void OnEnable()
@@ -140,7 +139,6 @@ public class StartupServer : MonoBehaviour
     {
         ServerUtils.BroadcastImmediate(Config.GLOBAL_TITLE + "#ServerClosed");
         Logging.log(Logging.LogType.Normal, "StartupServer", "OnApplicationQuit", "Server wird geschlossen.");
-        //Config.SERVER_TCP.Server.Close();
         Config.SERVER_TCP.Stop();
     }
 
@@ -300,7 +298,7 @@ public class StartupServer : MonoBehaviour
     /// </summary>
     public void UpdateRemoteConfig()
     {
-        ServerUtils.AddBroadcast("#UpdateRemoteConfig");
+        ServerUtils.BroadcastImmediate("#UpdateRemoteConfig");
         LoadConfigs.FetchRemoteConfig();
         StartCoroutine(LoadGameFilesAsync());
         UpdateGameVorschau();
@@ -378,7 +376,7 @@ public class StartupServer : MonoBehaviour
     /// </summary>
     private void UpdateSpielerBroadcast()
     {
-        ServerUtils.AddBroadcast(UpdateSpieler());
+        ServerUtils.BroadcastImmediate(UpdateSpieler());
     }
     /// <summary>
     /// Updatet die Spieler Informationsanzeigen und gibt diese als String zurück
@@ -444,7 +442,7 @@ public class StartupServer : MonoBehaviour
             msg += "[" + player.id + "]" + SpielerAnzeigeLobby[player.id].transform.GetChild(3).GetComponent<Image>().sprite.name + "[" + player.id + "]";
         }
         Logging.log(Logging.LogType.Debug, "StartupServer", "UpdatePing", msg);
-        ServerUtils.AddBroadcast(msg);
+        ServerUtils.BroadcastImmediate(msg);
     }
     IEnumerator UpdatePingOnTime()
     {
@@ -592,7 +590,7 @@ public class StartupServer : MonoBehaviour
             msg += "[" + player.id + "]" + player.crowns + "[" + player.id + "]";
         }
         Logging.log(Logging.LogType.Debug, "StartupServer", "UpdateCrowns", msg);
-        ServerUtils.AddBroadcast(msg);
+        ServerUtils.BroadcastImmediate(msg);
     }
     #region Spieler Namen Ändern
     /// <summary>
@@ -675,7 +673,7 @@ public class StartupServer : MonoBehaviour
     {
         Logging.log(Logging.LogType.Normal, "StartupServer", "SpielerUmbenennenToggle", "Spieler dürfen sich umbenennen: "+ toggle.isOn);
         Config.ALLOW_PLAYERNAME_CHANGE = toggle.isOn;
-        ServerUtils.AddBroadcast("#AllowNameChange " + toggle.isOn);
+        ServerUtils.BroadcastImmediate("#AllowNameChange " + toggle.isOn);
     }
     /// <summary>
     /// Spieler ändert Namen
@@ -952,7 +950,7 @@ public class StartupServer : MonoBehaviour
     /// <param name="data">Pingdaten</param>
     public void PlayerPing(Player p, string data)
     {
-        Logging.log(Logging.LogType.Normal, "StartupServer", "PlayerPing", "PlayerPing: " + p.name + " -> " + data);
+        Logging.log(Logging.LogType.Debug, "StartupServer", "PlayerPing", "PlayerPing: " + p.name + " -> " + data);
         int ping = Int32.Parse(data);
         if (ping <= 10)
         {
@@ -1006,7 +1004,6 @@ public class StartupServer : MonoBehaviour
         // Tabu
         gamelist.Add("[SPIELER-ANZ]" + TabuSpiel.minPlayer + "-" + TabuSpiel.maxPlayer + "[SPIELER-ANZ][MIN]" + TabuSpiel.minPlayer + "[MIN][MAX]" + TabuSpiel.maxPlayer + "[MAX][TITEL]Tabu[TITEL][AVAILABLE]" + Config.TABU_SPIEL.wortcounter + "[AVAILABLE]");
 
-
         string msg = "";
         for (int i = 0; i < gamelist.Count; i++)
         {
@@ -1043,7 +1040,7 @@ public class StartupServer : MonoBehaviour
     private void SwitchToTicTacToe()
     {
         SpielerMiniGames[0].SetActive(true);
-        ServerUtils.AddBroadcast("#SwitchToTicTacToe");
+        ServerUtils.BroadcastImmediate("#SwitchToTicTacToe");
     }
     /// <summary>
     /// Bestimmt den ersten Zug gegen einen Spieler
@@ -1226,7 +1223,6 @@ public class StartupServer : MonoBehaviour
         TMP_Dropdown TabuDropdown = GameObject.Find("Tabu/Tabu").GetComponent<TMP_Dropdown>();
         TabuDropdown.ClearOptions();
         TabuDropdown.AddOptions(Config.TABU_SPIEL.getGamesAsStringList());
-
     }
     #region Starte Spiele
     /// <summary>
@@ -1259,7 +1255,7 @@ public class StartupServer : MonoBehaviour
         // Lädt Spiel & Senden an Clients, falls das Spiel nicht existiert, wird der Server geschlossen
         try
         {
-            ServerUtils.AddBroadcast("#StarteSpiel " + spieltitel); // oder BroadcastImmediate
+            ServerUtils.BroadcastImmediate("#StarteSpiel " + spieltitel); // oder BroadcastImmediate
             //SceneManager.LoadScene(spieltitel);
             //Config.GAME_TITLE = spieltitel;
         }
@@ -1357,7 +1353,7 @@ public class StartupServer : MonoBehaviour
         if (lastmsgs.Length > 1)
             lastmsgs = lastmsgs.Substring(1);
 
-        ServerUtils.AddBroadcast("#ChatMSGs " + lastmsgs);
+        ServerUtils.BroadcastImmediate("#ChatMSGs " + lastmsgs);
     }
     private void AddMSG(Player player, string msg, Transform content)
     {

@@ -340,10 +340,16 @@ public class QuizClient : MonoBehaviour
     {
         DisconnectSound.Play();
     }
+    /// <summary>
+    /// Zeigt Buzzerdelay an, wenn andere vorher gebuzzert haben
+    /// </summary>
+    /// <param name="time"></param>
     public void BuzzeredTime(string time)
     {
         if (BuzzerDelay.text.Length == 0)
             BuzzerDelay.text = time.Split(',')[0] + "ms";
+        if (SpielerAnzeige[Player.getPosInLists(Config.PLAYER_ID), 1].activeInHierarchy)
+            BuzzerDelay.text = "";
     }
     /// <summary>
     /// Sendet eine Buzzer Anfrage an den Server
