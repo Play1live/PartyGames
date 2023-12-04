@@ -260,6 +260,7 @@ public class StartupScene : MonoBehaviour
                     "Bitte starte das Programm neu und versuche es erneut.\n\n" +
                     "Falls der Fehler bestehen bleibt, entpacke die \"Updater.zip\" im Ordner: \n\"" + UpdaterVersionPath + "\"";
                 Logging.log(Logging.LogType.Warning, "StartupScene", "DownloadUpdater", "Updaterdateien konnten nicht entpackt werden.", e);
+                UpdaterIsUpToDate = true; // Weil sonst nicht gespielt werden kann wenns buggt
                 yield break;
             }
             Logging.log(Logging.LogType.Normal, "StartupScene", "DownloadUpdater", "Updaterdateien wurden erfolgreich entpackt.");
@@ -323,6 +324,8 @@ public class StartupScene : MonoBehaviour
         foreach (Sprite sprite in Resources.LoadAll<Sprite>("Images/ProfileIcons/"))
         {
             if (sprite.name.Equals("empty"))
+                continue;
+            if (sprite.name.StartsWith("#"))
                 continue;
             Config.PLAYER_ICONS.Add(new PlayerIcon(Config.PLAYER_ICONS.Count, sprite));
         }

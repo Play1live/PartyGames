@@ -16,6 +16,7 @@ public class QuizClient : MonoBehaviour
     GameObject[] SchaetzfragenAnzeige;
     [SerializeField] GameObject SchaetzfragenAnimationController;
     bool pressingbuzzer = false;
+    TMP_Text BuzzerDelay;
 
     [SerializeField] AudioSource BuzzerSound;
     [SerializeField] AudioSource RichtigeAntwortSound;
@@ -196,6 +197,9 @@ public class QuizClient : MonoBehaviour
             case "#BuzzerFreigeben":
                 BuzzerFreigeben();
                 break;
+            case "#BuzzeredTime":
+                BuzzeredTime(data);
+                break;
 
             case "#AnimationInfo":
                 AnimationAnzeigen(data);
@@ -280,6 +284,9 @@ public class QuizClient : MonoBehaviour
         SchaetzfragenAnzeige[19] = GameObject.Find("SchaetzfragenAnimation/Grid/Icon (8)/Data");
         SchaetzfragenAnzeige[19].SetActive(false);
         SchaetzfragenAnzeige[0].SetActive(false);
+
+        BuzzerDelay = GameObject.Find("BuzzerDelay").GetComponent<TMP_Text>();
+        BuzzerDelay.text = "";
     }
     /// <summary>
     /// Aktualisiert die Spieler Anzeigen
@@ -333,6 +340,11 @@ public class QuizClient : MonoBehaviour
     {
         DisconnectSound.Play();
     }
+    public void BuzzeredTime(string time)
+    {
+        if (BuzzerDelay.text.Length == 0)
+            BuzzerDelay.text = time.Split(',')[0] + "ms";
+    }
     /// <summary>
     /// Sendet eine Buzzer Anfrage an den Server
     /// </summary>
@@ -346,6 +358,7 @@ public class QuizClient : MonoBehaviour
     private void BuzzerFreigeben()
     {
         Logging.log(Logging.LogType.Debug, "QuizClient", "BuzzerFreigeben", "Buzzer wurde freigegeben");
+        BuzzerDelay.text = "";
         for (int i = 0; i < Config.SERVER_MAX_CONNECTIONS; i++)
             SpielerAnzeige[i, 1].SetActive(false);
     }

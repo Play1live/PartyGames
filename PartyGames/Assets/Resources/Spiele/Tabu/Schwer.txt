@@ -482,7 +482,7 @@
 ~fit|gesund-k#oe#rperlich fit-in Form-sportlich-leistungsf#ae#hig
 ~Ausdauer|Durchhalteverm#oe#gen-Kondition-Belastbarkeit-Standhaftigkeit-Ersch#oe#pfung-St#ae#rke-Training-Fitne#ss#-Durchhalten-Puste
 ~Schl#ae#ger|Schlaginstrument-Pr#ue#gel-Schlagwerkzeug-Schlagstock-Kn#ue#ppel-Schlagwaffe
-~wehtun|schmerzen-verletzen-weh tun
+~wehtun|schmerzen-verletzen-schlagen-hauen-Gef#ue#hle
 ~Tablette|Medikament-Pille-Arzneimittel-Tablettenform-Medizin
 ~kaufen|erwerben-anschaffen-einkaufen-erstehen-besorgen
 ~Funk|Ger#ae#t-Technologie-Radio-Kommunikation-#UE#bertragung-Empfang-Sender-Empf#ae#nger
@@ -509,7 +509,7 @@
 ~hart|fest-robust-stabil-steinhart-widerstandsf#ae#hig
 ~schreiben|verfassen-niederschreiben-abfassen-formulieren-notieren-aufschreiben
 ~davor|vorher-zuvor-vorhin-vorab-vorhergehend-voranstehend-voraus-vorangehend
-~schmeissen|werfen-schleudern-katapultieren-hinschmei#ss#en-wegwerfen
+~schmei#ss#en|werfen-schleudern-katapultieren-hinschmei#ss#en-wegwerfen
 ~Zopf|Haarknoten-Haarzopf-Geflecht-Flechtwerk-Haargewirr-Haarstr#ae#hne
 ~Frisur|Haarstyling-Haarpracht-Haarschnitt-Haarfrisur-Haarkreation-Haarstylings-Haarmode
 ~pl#ae#tschern|rauschen-fliessen-murmeln-str#oe#men-rieseln
@@ -2696,7 +2696,7 @@
 ~Schreiben|Text-Worte-Stift-Sprechen-Schweigen-Reden-Diktieren-Sprache
 ~Schreibger#ae#t|Stift-Kugelschreiber-Bleistift-Radiergummi-L#oe#schen-Papier-Schreiben-Sprache
 ~Kappe|Hut-M#ue#tze-Offen-Nackt-Haare-Kopf-Oben-Unter
-~Medikamente|Arznei-Heilmittel-Krankheit-Gesundheit-Nat#ue#rlich-Pr#ae#vention-Hausmittel-Alternativ
+~Medikamente|Arznei-Heilmittel-Krankheit-Gesundheit-Nat#ue#rlich-Pr#ae#vention-Hausmittel-Apotheke
 ~Arzneimittel|Medikament-Heilmittel-Pflanzenheilkunde-Naturheilkunde-Placebo-Symptom-Krankheit-Gesundheit
 ~Wandern|Spazieren-Natur-Berge-St#ae#dte-Zuhause-Sitzen-Faulenzen-Stillstand-laufen
 ~Gipfel|Berg-H#oe#hepunkt-Tiefpunkt-Tal-Ebene-Abstieg-Aufstieg-Basis
@@ -2775,7 +2775,7 @@
 ~Herausziehen|Ziehen-Einstecken-Einlegen-Verstecken-Stecken-Festhalten-Halten-Fest
 ~Ordnung|Chaos-Unordnung-Durcheinander-Unorganisiert-Verwirrung-Verwirrtheit-Unklarheit-Unsicherheit
 ~Trocken|Na#ss#-Feucht-N#ae##ss#e-Feuchtigkeit-Regen-Wasser-Durchn#ae##ss#t-Durchtr#ae#nkt
-~N#ae#ssen|Trocknen-Feuchtigkeit-Regen-Sonne-Wolken-Wasser-Tropfen
+~N#ae#sse|Trocknen-Feuchtigkeit-Regen-Sonne-Wolken-Wasser-Tropfen
 ~Sturm|Wind-Ruhe-Stille-Frieden-Sonnenschein-Klarheit-Ruhig
 ~Sonnenstrahlen|Sonne-Licht-Strahlen-Dunkelheit-Schatten-Finsternis-D#ae#mmerung-Nacht
 ~Vergr#oe##ss#erung|Vergr#oe##ss#ern-Zoom-Verkleinerung-Verkleinern-Detail-Au#ss#chnitt-Schrumpfen-Verringern
@@ -4696,7 +4696,6 @@
 ~entscheiden|w#ae#hlen-bestimmen-beschlie#ss#en-Auswahl treffen-entscheidend-Wahl-Urteil f#ae#llen-entscheidungsfreudig
 ~Urteil|Entscheidung-Meinung-Bewertung-Gericht-Richter-Verbrechen-Vergehen
 ~bieten|anbieten-Angebot-verkaufen-Auktion-Preis-Gebot-M#oe#glichkeit
-~schmei#ss#en|werfen-schleudern-auswerfen-hineinwerfen-katapultieren
 ~w#ue#nsche|Tr#ae#ume-Hoffnungen-Vorstellungen-Sehnsucht-Erwartungen-Begehren-Verlangen
 ~Ku#ss#|K#ue##ss#en-Z#ae#rtlichkeit-Lippen-Leidenschaft-Intimit#ae#t-Zuneigung-Zungenspiel-Ku#ss#mund
 ~Taste|Knopf-Druckknopf-Schalter-Bedienung-Keyboard-Tastatur-Eingabe
@@ -5067,7 +5066,7 @@
 ~R#oe#ten|err#oe#ten-rot werden-sch#ae#men-verlegen
 ~Lochen|stanzen-durchl#oe#chern-perforieren-ausstanzen-einschlagen
 ~Locher|Stanzer-L#oe#cherer-Perforierer-Stanzger#ae#t-Lochenwerkzeug
-~Doppel|zweifach-doppelt-dual-paarweise-zweimalig
+~Doppelt|zweifach-dual-paarweise-zweimalig-einfach-mehr-Schuhe
 ~Trend|Mode-Entwicklung-Tendenz-Str#oe#mung-Richtung
 ~Obdach|Unterkunft-Heim-Bleibe-Wohnst#ae#tte-Zuhause
 ~Villa|Landhaus-Herrenhaus-Anwesen-Residenz-Domizil

@@ -28,6 +28,7 @@ public class QuizServer : MonoBehaviour
     bool[] PlayerConnected;
     int PunkteProRichtige = 3;
     int PunkteProFalsche = 1;
+    TMP_Text BuzzerDelay;
 
     [SerializeField] AudioSource BuzzerSound;
     [SerializeField] AudioSource RichtigeAntwortSound;
@@ -306,6 +307,9 @@ public class QuizServer : MonoBehaviour
             }
         }
 
+        BuzzerDelay = GameObject.Find("BuzzerDelay").GetComponent<TMP_Text>();
+        BuzzerDelay.text = "";
+
         SchaetzfragenSpielerInput = new TMP_InputField[Config.PLAYERLIST.Length];
         for (int i = 0; i < Config.PLAYERLIST.Length; i++)
         {
@@ -419,18 +423,22 @@ public class QuizServer : MonoBehaviour
     /// Spielt Sound ab, sperrt den Buzzer und zeigt den Spieler an
     /// </summary>
     /// <param name="p">Spieler</param>
+    private DateTime BuzzeredTime;
     private void SpielerBuzzered(Player p)
     {
         if (!buzzerIsOn)
         {
             Logging.log(Logging.LogType.Normal, "QuizServer", "SpielerBuzzered", p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
+            ServerUtils.SendMSG("#BuzzeredTime " + (DateTime.Now - BuzzeredTime).TotalMilliseconds, p, false);
             return;
         }
         Logging.log(Logging.LogType.Warning, "QuizServer", "SpielerBuzzered", "B: " + p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
         buzzerIsOn = false;
         ServerUtils.BroadcastImmediate(Config.GAME_TITLE +"#AudioBuzzerPressed " + p.id);
+        ServerUtils.BroadcastImmediate(Config.GAME_TITLE + "#SpielerIstDran " + p.id);
         BuzzerSound.Play();
         SpielerAnzeige[p.id - 1, 1].SetActive(true);
+        BuzzeredTime = DateTime.Now;
     }
     /// <summary>
     /// Gibt den Buzzer für alle Spieler frei
