@@ -118,6 +118,9 @@ public class Utils
     /// <param name="audiomixer"></param>
     public static void EinstellungenAudioUpdateVolume(GameObject EinstellungsParent, AudioMixer audiomixer)
     {
+        if (Config.APPLICATION_CONFIG == null)
+            return;
+
         Transform AudioContent = EinstellungenGetKategorie(EinstellungsParent, EinstellungsKategorien.Audio).transform;
 
         float master = Config.APPLICATION_CONFIG.GetFloat("GAME_MASTER_VOLUME", 0f);
@@ -175,6 +178,9 @@ public class Utils
     /// <param name="EinstellungsParent"></param>
     public static void EinstellungenGrafikUpdate(GameObject EinstellungsParent)
     {
+        if (Config.APPLICATION_CONFIG == null)
+            return;
+
         Transform GrafikContent = EinstellungenGetKategorie(EinstellungsParent, EinstellungsKategorien.Grafik).transform;
 
         EinstellungsmenueUtils.blockDebugMode = true;
@@ -185,7 +191,8 @@ public class Utils
         foreach (var item in BildschirmeListe)
             BildschirmeDropOptions.Add(new OptionData(item.name + " - " + item.refreshRate.value + "Hz"));
         BildschirmVollbildDrop.options = BildschirmeDropOptions;
-        string BildschirmWanted = Config.APPLICATION_CONFIG.GetString("GAME_DISPLAY_SELECTION", "*<#>*~ERROR~*<#>*|*").Replace(" - ", "|").Split('|')[0];
+        string BildschirmWanted = Config.APPLICATION_CONFIG.GetString("GAME_DISPLAY_SELECTION", "*<#>*~ERROR~*<#>");
+        
         for (int i = 0; i < BildschirmVollbildDrop.options.Count; i++)
             if (BildschirmWanted.Equals(BildschirmeListe[i].name))
             {
@@ -201,6 +208,9 @@ public class Utils
     /// </summary>
     public static void EinstellungenGrafikApply(bool forceFullscreen)
     {
+        if (Config.APPLICATION_CONFIG == null)
+            return;
+
         if (forceFullscreen == true)
         {
             if (Config.FULLSCREEN == true)

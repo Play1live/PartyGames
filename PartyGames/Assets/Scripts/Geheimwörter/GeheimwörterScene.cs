@@ -59,7 +59,8 @@ public class GeheimwörterScene : MonoBehaviour
     private void OnDisable()
     {
         StopAllCoroutines();
-        Config.APPLICATION_CONFIG.Save();
+        if (Config.APPLICATION_CONFIG != null)
+            Config.APPLICATION_CONFIG.Save();
     }
 
 

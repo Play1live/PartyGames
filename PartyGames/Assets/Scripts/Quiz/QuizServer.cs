@@ -711,6 +711,19 @@ public class QuizServer : MonoBehaviour
     /// </summary>
     public void zeigeAnimationAn()
     {
+        if (GameObject.Find("SchaetzfragenAnimation/MinGrenzeFestlegen").GetComponent<TMP_InputField>().text == "")
+            return;
+        if (GameObject.Find("SchaetzfragenAnimation/ZielGrenzeFestlegen").GetComponent<TMP_InputField>().text == "")
+            return;
+        if (GameObject.Find("SchaetzfragenAnimation/MaxGrenzeFestlegen").GetComponent<TMP_InputField>().text == "")
+            return;
+
+        if (GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text == "")
+            GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text = " ";
+
+        if (GameObject.Find("SchaetzfragenAnimation/KommastellenFestlegen").GetComponent<TMP_InputField>().text == "")
+            GameObject.Find("SchaetzfragenAnimation/KommastellenFestlegen").GetComponent<TMP_InputField>().text = "0";
+
         SchaetzfragenAnzeige[0].SetActive(true);
         SchaetzfragenAnimationController.SetActive(false);
         int komma = Int32.Parse(GameObject.Find("SchaetzfragenAnimation/KommastellenFestlegen").GetComponent<TMP_InputField>().text);
@@ -721,15 +734,19 @@ public class QuizServer : MonoBehaviour
             if (p.isConnected)
             {
                 // Schneidet zuviele Kommastellen ab
+                if (SchaetzfragenSpielerInput[Player.getPosInLists(p.id)].text.Length == 0)
+                    SchaetzfragenSpielerInput[Player.getPosInLists(p.id)].text = "0";
+
                 string schaetzung = SchaetzfragenSpielerInput[Player.getPosInLists(p.id)].text;
                 if (schaetzung.Contains(","))
                 {
-                    string kommas = schaetzung.Split(',')[1]+"00000000000";
+                    string kommas = schaetzung.Split(',')[1] + "00000000000";
                     kommas = kommas.Substring(0, komma);
-                    schaetzung = schaetzung.Split(',')[0]+ "," + kommas;
+                    schaetzung = schaetzung.Split(',')[0] + "," + kommas;
                 }
 
                 SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].transform.GetChild(1).GetComponent<TMP_Text>().text = schaetzung + GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text;
+                SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].transform.GetChild(1).GetComponent<TMP_Text>().text = "";
                 SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].transform.GetChild(3).gameObject.SetActive(false);
                 SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].GetComponent<Image>().sprite = p.icon2.icon;
 
@@ -774,6 +791,9 @@ public class QuizServer : MonoBehaviour
         if (GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text == "")
             GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text = " ";
 
+        if (GameObject.Find("SchaetzfragenAnimation/KommastellenFestlegen").GetComponent<TMP_InputField>().text == "")
+            GameObject.Find("SchaetzfragenAnimation/KommastellenFestlegen").GetComponent<TMP_InputField>().text = " ";
+
         float StartWert = float.Parse(SchaetzfragenAnzeige[1].GetComponentInChildren<TMP_Text>().text.Replace(GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text, ""));
         float ZielWert = float.Parse(SchaetzfragenAnzeige[2].GetComponentInChildren<TMP_Text>().text.Replace(GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text, ""));
         float MaxWert = float.Parse(SchaetzfragenAnzeige[3].GetComponentInChildren<TMP_Text>().text.Replace(GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text, ""));
@@ -806,9 +826,15 @@ public class QuizServer : MonoBehaviour
         foreach (Player p in Config.PLAYERLIST)
         {
             SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].transform.localPosition = new Vector3(StartPosition, SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].transform.localPosition.y, 0);
-            if (p.isConnected)
+            if (p.isConnected && p.name.Length > 0)
             {
-                spielerwert = double.Parse(GameObject.Find("SchaetzfragenAnimation/Grid/Icon (" + p.id + ")").GetComponentInChildren<TMP_Text>().text.Replace(GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text, ""));
+                if (SchaetzfragenSpielerInput[Player.getPosInLists(p.id)].text.Length == 0)
+                    SchaetzfragenSpielerInput[Player.getPosInLists(p.id)].text = "0";
+                if (SchaetzfragenAnzeige[2 + p.id * 2].GetComponentInChildren<TMP_Text>().text.Length == 0)
+                    SchaetzfragenAnzeige[2 + p.id * 2].GetComponentInChildren<TMP_Text>().text = "0";
+                
+                string temp = GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text;
+                spielerwert = double.Parse(GameObject.Find("SchaetzfragenAnimation/Grid/Icon (" + p.id + ")").GetComponentInChildren<TMP_Text>().text.Replace(temp, ""));
                 data_text = data_text.Replace("[SPIELER_WERT]", "|").Split('|')[0] + "[SPIELER_WERT]" + spielerwert + "[SPIELER_WERT]";
                 SchaetzfragenAnzeige[(5 + 2 * (p.id - 1))].GetComponent<TMP_Text>().text = data_text;
                 broadcastmsg += "[" + p.id + "]"+spielerwert+"[" + p.id + "]";
@@ -838,6 +864,13 @@ public class QuizServer : MonoBehaviour
         ServerUtils.BroadcastImmediate(Config.GAME_TITLE +"#AnimationBeenden");
         SchaetzfragenAnzeige[0].SetActive(false);
         SchaetzfragenAnimationController.SetActive(false);
+
+        GameObject.Find("SchaetzfragenAnimation/ZielAnzeigen").GetComponent<Toggle>().isOn = false;
+        GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text = "";
+        GameObject.Find("SchaetzfragenAnimation/KommastellenFestlegen").GetComponent<TMP_InputField>().text = "";
+        GameObject.Find("SchaetzfragenAnimation/MinGrenzeFestlegen").GetComponent<TMP_InputField>().text = "";
+        GameObject.Find("SchaetzfragenAnimation/ZielGrenzeFestlegen").GetComponent<TMP_InputField>().text = "";
+        GameObject.Find("SchaetzfragenAnimation/MaxGrenzeFestlegen").GetComponent<TMP_InputField>().text = "";
     }
     #endregion
 }

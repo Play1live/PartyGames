@@ -42,7 +42,7 @@ public class StartupScene : MonoBehaviour
         if (Config.APPLICATION_INITED == true)
         {
             SettingsAktualisiereAnzeigen();
-            //Utils.EinstellungenGrafikApply(false);
+            Utils.EinstellungenGrafikApply(false);
 
             if (!Config.CLIENT_STARTED && !Config.SERVER_STARTED)
             {
