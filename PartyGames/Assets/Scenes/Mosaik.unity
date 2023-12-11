@@ -51746,17 +51746,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54da84531b5555b4f8d7ebf5ea209aa4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IntroGo: {fileID: 0}
+  IntroGo: {fileID: 1344173003}
   IntroSound: {fileID: 1071451266}
   Client: {fileID: 419669815}
   Server: {fileID: 310990666}
   ServerSided:
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 1247237376}
+  - {fileID: 1813888252}
   DeactivateForServer:
-  - {fileID: 0}
+  - {fileID: 2007842696}
   DeactivateForClient: []
-  Einstellungen: {fileID: 0}
+  Einstellungen: {fileID: 849039724}
   audiomixer: {fileID: 24100000, guid: 5683138d93ac20247829b8896c7a9c37, type: 2}
   imageUrl: https://www.tasso.net/tasso/media/Tierrregister/HP_Slider_Tier-vermisst_Katze-Nora-Bock.jpg?ext=.jpg
   imageObject: {fileID: 0}
