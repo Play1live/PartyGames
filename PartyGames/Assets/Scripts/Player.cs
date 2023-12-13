@@ -83,6 +83,8 @@ public class Player
                 return Config.PLAYERLIST[i].icon2;
             }
         }
+        if (Config.SERVER_PLAYER.name == name)
+            return Config.SERVER_PLAYER.icon2;
         return new PlayerIcon();
     }
     public static PlayerIcon getPlayerIconById(string id)

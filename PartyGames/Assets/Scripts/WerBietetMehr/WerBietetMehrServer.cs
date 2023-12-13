@@ -240,6 +240,7 @@ public class WerBietetMehrServer : MonoBehaviour
     {
         Logging.log(Logging.LogType.Normal, "WerBietetMehrServer", "SpielVerlassenButton", "Spiel wird verlassen. Lade ins Hauptmenü.");
         //SceneManager.LoadScene("Startup");
+        ServerUtils.LoadKronen(Config.PLAYERLIST);
         ServerUtils.BroadcastImmediate("#ZurueckInsHauptmenue");
     }
     /// <summary>

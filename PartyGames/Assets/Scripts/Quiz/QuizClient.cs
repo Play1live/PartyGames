@@ -189,11 +189,30 @@ public class QuizClient : MonoBehaviour
                 AudioBuzzerPressed(data);
                 break;
             case "#AudioRichtigeAntwort":
+                RichtigeAntwortSound.Play();
+                AudioRichtigeAntwort(data);
+                break;
+            case "#AudioRichtigeAntwortSpecial":
+                AudioSource ass0 = GetComponent<AudioSource>();
+                if (ass0 == null)
+                    ass0 = gameObject.AddComponent<AudioSource>();
+                ass0.clip = Resources.Load<AudioClip>("Sounds/RichtigeAntwort_Special_Munck");
+                ass0.Play();
                 AudioRichtigeAntwort(data);
                 break;
             case "#AudioFalscheAntwort":
+                FalscheAntwortSound.Play();
                 AudioFalscheAntwort(data);
                 break;
+            case "#AudioFalscheAntwortSpecial":
+                AudioSource ass1 = GetComponent<AudioSource>();
+                if (ass1 == null)
+                    ass1 = gameObject.AddComponent<AudioSource>();
+                ass1.clip = Resources.Load<AudioClip>("Sounds/FalscheAntwort_Special_Munck");
+                ass1.Play();
+                AudioFalscheAntwort(data);
+                break;
+
             case "#BuzzerFreigeben":
                 BuzzerFreigeben();
                 break;
@@ -401,7 +420,6 @@ public class QuizClient : MonoBehaviour
     /// </summary>
     private void AudioRichtigeAntwort(string data)
     {
-        RichtigeAntwortSound.Play(); 
         int pIndex = Player.getPosInLists(Int32.Parse(data.Split('*')[0]));
         Config.PLAYERLIST[pIndex].points += Int32.Parse(data.Split('*')[1]);
         SpielerAnzeige[pIndex, 5].GetComponent<TMP_Text>().text = Config.PLAYERLIST[pIndex].points + "";
@@ -411,7 +429,6 @@ public class QuizClient : MonoBehaviour
     /// </summary>
     private void AudioFalscheAntwort(string data)
     {
-        FalscheAntwortSound.Play();
         int pId = Int32.Parse(data.Split('*')[0]);
         int pPunkte = Int32.Parse(data.Split('*')[1]);
         foreach (Player p in Config.PLAYERLIST)

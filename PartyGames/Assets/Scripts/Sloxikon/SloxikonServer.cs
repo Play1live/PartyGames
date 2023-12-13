@@ -162,6 +162,7 @@ public class SloxikonServer : MonoBehaviour
     /// </summary>
     public void SpielVerlassenButton()
     {
+        ServerUtils.LoadKronen(Config.PLAYERLIST);
         ServerUtils.BroadcastImmediate("#ZurueckInsHauptmenue");
     }
     /// <summary>

@@ -194,7 +194,7 @@ public class Tabu
         }
 
 #if UNITY_EDITOR
-        Debug.LogWarning(worte.Count);
+        //Debug.LogWarning(worte.Count);
         // Save Files
         if (needToSafe)
         {

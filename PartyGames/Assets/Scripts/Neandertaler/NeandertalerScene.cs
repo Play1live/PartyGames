@@ -1,12 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
-public class TabuScene : MonoBehaviour
+public class NeandertalerScene : MonoBehaviour
 {
     [SerializeField] GameObject IntroGo;
     [SerializeField] AudioSource IntroSound;
@@ -73,7 +71,7 @@ public class TabuScene : MonoBehaviour
     /// </summary>
     IEnumerator IntroAnimation()
     {
-        Logging.log(Logging.LogType.Debug, "TabuScene", "IntroAnimation", "Spielt die Introanimation ab");
+        Logging.log(Logging.LogType.Debug, "NeandertalerScene", "IntroAnimation", "Spielt die Introanimation ab");
         IntroSound.Play();
         IntroGo.SetActive(true);
 

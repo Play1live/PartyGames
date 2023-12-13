@@ -11,6 +11,7 @@ using UnityEngine.UI;
 
 public class AuktionServer : MonoBehaviour
 {
+    int[] guvs;
     GameObject AustabbenAnzeigen;
     bool initReady = false;
     GameObject[,] SpielerAnzeige;
@@ -187,6 +188,9 @@ public class AuktionServer : MonoBehaviour
     public void SpielVerlassenButton()
     {
         //SceneManager.LoadScene("Startup");
+        foreach (var item in Config.PLAYERLIST)
+            item.points = guvs[item.id - 1];
+        ServerUtils.LoadKronen(Config.PLAYERLIST);
         ServerUtils.BroadcastImmediate("#ZurueckInsHauptmenue");
     }
     /// <summary>
@@ -395,6 +399,7 @@ public class AuktionServer : MonoBehaviour
     /// </summary>
     private void UpdateKonten()
     {
+        guvs = new int[Config.PLAYERLIST.Length];
         float preissumme = 0;
         foreach (AuktionElement element in Config.AUKTION_SPIEL.getSelected().getElemente())
         {
@@ -427,6 +432,7 @@ public class AuktionServer : MonoBehaviour
                     konto -= element.getVerkaufspreis();
                 }
             }
+            guvs[p.id - 1] = (int)(guv * 1000) + 10000000;
             // Konto
             SpielerAnzeige[Player.getPosInLists(p.id), 7].GetComponent<TMP_InputField>().text = konto + " €";
             // GUV

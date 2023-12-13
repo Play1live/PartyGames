@@ -157,6 +157,7 @@ public class QuizServer : MonoBehaviour
     {
         Logging.log(Logging.LogType.Debug, "QuizServer", "SpielVerlassenButton", "Spiel wird beendet. Lädt ins Hauptmenü.");
         //SceneManager.LoadScene("Startup");
+        ServerUtils.LoadKronen(Config.PLAYERLIST);
         ServerUtils.BroadcastImmediate(Config.GLOBAL_TITLE + "#ZurueckInsHauptmenue");
     }
     /// <summary>
@@ -597,10 +598,22 @@ public class QuizServer : MonoBehaviour
     /// </summary>
     /// <param name="player">Spieler</param>
     public void PunkteRichtigeAntwort(GameObject player)
-    {
+    { 
         int pId = Int32.Parse(player.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
-        ServerUtils.BroadcastImmediate(Config.GAME_TITLE +"#AudioRichtigeAntwort " + pId + "*" + PunkteProRichtige);
-        RichtigeAntwortSound.Play();
+        if (UnityEngine.Random.Range(0, 25) == 0)
+        {
+            ServerUtils.BroadcastImmediate(Config.GAME_TITLE + "#AudioRichtigeAntwortSpecial " + pId + "*" + PunkteProRichtige);
+            AudioSource ass = GetComponent<AudioSource>();
+            if (ass == null)
+                ass = gameObject.AddComponent<AudioSource>();
+            ass.clip = Resources.Load<AudioClip>("Sounds/RichtigeAntwort_Special_Munck");
+            ass.Play();
+        }
+        else
+        {
+            ServerUtils.BroadcastImmediate(Config.GAME_TITLE + "#AudioRichtigeAntwort " + pId + "*" + PunkteProRichtige);
+            RichtigeAntwortSound.Play();
+        }
         int pIndex = Player.getPosInLists(pId);
         Config.PLAYERLIST[pIndex].points += PunkteProRichtige;
         UpdateSpieler();
@@ -612,8 +625,20 @@ public class QuizServer : MonoBehaviour
     public void PunkteFalscheAntwort(GameObject player)
     {
         int pId = Int32.Parse(player.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
-        ServerUtils.BroadcastImmediate(Config.GAME_TITLE + "#AudioFalscheAntwort "+ pId + "*" + PunkteProFalsche);
-        FalscheAntwortSound.Play();
+        if (UnityEngine.Random.Range(0, 25) == 0)
+        {
+            ServerUtils.BroadcastImmediate(Config.GAME_TITLE + "#AudioFalscheAntwortSpecial " + pId + "*" + PunkteProFalsche);
+            AudioSource ass = GetComponent<AudioSource>();
+            if (ass == null)
+                ass = gameObject.AddComponent<AudioSource>();
+            ass.clip = Resources.Load<AudioClip>("Sounds/FalscheAntwort_Special_Munck");
+            ass.Play();
+        }
+        else
+        {
+            ServerUtils.BroadcastImmediate(Config.GAME_TITLE + "#AudioFalscheAntwort " + pId + "*" + PunkteProFalsche);
+            FalscheAntwortSound.Play();
+        }
         foreach (Player p in Config.PLAYERLIST)
         {
             if (pId != p.id && p.isConnected)

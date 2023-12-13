@@ -410,6 +410,50 @@ public class ServerUtils
         blockBroadcastMsgs = false;
     }
     /// <summary>
+    /// Vergibt Kronen je nach Platzierung der Spieler
+    /// </summary>
+    public static void LoadKronen(Player[] playerlist)
+    {
+        Player p1 = new Player(-2);
+        Player p2 = new Player(-3);
+        Player p3 = new Player(-4);
+
+        foreach (var item in playerlist)
+        {
+            if (item.points > p1.points)
+                p1 = item;
+        }
+
+        foreach (var item in playerlist)
+        {
+            if (item.points > p2.points && item.points <= p1.points && item != p1)
+                p2 = item;
+        }
+
+        foreach (var item in playerlist)
+        {
+            if (item.points > p3.points && item.points <= p2.points && item != p1 && item != p2)
+                p3 = item;
+        }
+
+        p1.crowns += 3;
+
+        if (p2.points == p1.points)
+            p2.crowns += 3;
+        else
+            p2.crowns += 2;
+
+        if (p3.points == p1.points)
+            p3.crowns += 3;
+        else if (p3.points == p2.points)
+            p3.crowns += 2;
+        else
+            p3.crowns += 1;
+
+        foreach (var item in Config.PLAYERLIST)
+            item.points = 0;
+    }
+    /// <summary>
     /// Sendet eine Nachricht an den angegebenen Spieler.
     /// </summary>
     /// <param name="data">Nachricht</param>
@@ -564,7 +608,10 @@ public class ClientUtils
             Config.CLIENT_TCP.Close();
             Config.CLIENT_STARTED = false;
         }
-        catch { }
+        catch 
+        {
+            Config.CLIENT_TCP = null;
+        }
         SceneManager.LoadSceneAsync("Startup");
     }
 }

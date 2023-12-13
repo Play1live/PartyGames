@@ -53,7 +53,8 @@ public class StartupServer : MonoBehaviour
             DisplayGameFiles();
         UpdateGameVorschau();
         UpdateSpieler();
-        UpdateCrowns();
+        StartCoroutine(UpdateCrownsDelayed());
+        //UpdateCrowns();
 
         if (Config.SERVER_STARTED)
         {
@@ -453,6 +454,11 @@ public class StartupServer : MonoBehaviour
                 UpdatePing();
         }
     }
+    IEnumerator UpdateCrownsDelayed()
+    {
+        yield return new WaitForSeconds(0.5f);
+        UpdateCrowns();
+    }
     /// <summary>
     /// Sendet ein Kronenupdate an alle Spieler
     /// </summary>
@@ -589,7 +595,7 @@ public class StartupServer : MonoBehaviour
         {
             msg += "[" + player.id + "]" + player.crowns + "[" + player.id + "]";
         }
-        Logging.log(Logging.LogType.Debug, "StartupServer", "UpdateCrowns", msg);
+        Logging.log(Logging.LogType.Normal, "StartupServer", "UpdateCrowns", msg);
         ServerUtils.BroadcastImmediate(msg);
     }
     #region Spieler Namen Ändern
@@ -648,6 +654,7 @@ public class StartupServer : MonoBehaviour
             player.name = name;
             ServerUtils.SendMSG("#SpielerChangeName " + name, player, false);
             UpdateSpielerBroadcast();
+            StartCoroutine(UpdateCrownsDelayed());
             return;
         }
         for (int i = 0; i < 10; i++)
@@ -664,6 +671,7 @@ public class StartupServer : MonoBehaviour
         ServerUtils.SendMSG("#SpielerChangeName " + name, player, false);
         // Sendet Update an alle Spieler & Updatet Spieler Anzeigen
         UpdateSpielerBroadcast();
+        StartCoroutine(UpdateCrownsDelayed());
     }
     /// <summary>
     /// Erlaubt/Verbietet Namenswechsel von Spielern
@@ -1003,6 +1011,8 @@ public class StartupServer : MonoBehaviour
         gamelist.Add("[SPIELER-ANZ]" + KniffelBoard.minPlayer + "-" + KniffelBoard.maxPlayer + "[SPIELER-ANZ][MIN]" + KniffelBoard.minPlayer + "[MIN][MAX]" + KniffelBoard.maxPlayer + "[MAX][TITEL]Kniffel[TITEL][AVAILABLE]-1[AVAILABLE]");
         // Tabu
         gamelist.Add("[SPIELER-ANZ]" + TabuSpiel.minPlayer + "-" + TabuSpiel.maxPlayer + "[SPIELER-ANZ][MIN]" + TabuSpiel.minPlayer + "[MIN][MAX]" + TabuSpiel.maxPlayer + "[MAX][TITEL]Tabu[TITEL][AVAILABLE]" + Config.TABU_SPIEL.wortcounter + "[AVAILABLE]");
+        // Neandertaler
+        gamelist.Add("[SPIELER-ANZ]" + NeandertalerSpiel.minPlayer + "-" + NeandertalerSpiel.maxPlayer + "[SPIELER-ANZ][MIN]" + NeandertalerSpiel.minPlayer + "[MIN][MAX]" + NeandertalerSpiel.maxPlayer + "[MAX][TITEL]Neandertaler[TITEL][AVAILABLE]" + Config.NEANDERTALER_SPIEL.wortcounter + "[AVAILABLE]");
 
         string msg = "";
         for (int i = 0; i < gamelist.Count; i++)

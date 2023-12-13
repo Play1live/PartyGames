@@ -163,6 +163,7 @@ public class MosaikServer : MonoBehaviour
     public void SpielVerlassenButton()
     {
         //SceneManager.LoadScene("Startup");
+        ServerUtils.LoadKronen(Config.PLAYERLIST);
         ServerUtils.BroadcastImmediate("#ZurueckInsHauptmenue");
     }
     /// <summary>

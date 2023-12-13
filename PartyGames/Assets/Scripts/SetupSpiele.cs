@@ -27,6 +27,8 @@ public class SetupSpiele
         yield return null;
         Config.TABU_SPIEL = new TabuSpiel();
         yield return null;
+        Config.NEANDERTALER_SPIEL = new NeandertalerSpiel();
+        yield return null;
         Logging.log(Logging.LogType.Normal, "SetupSpiele", "LoadGameFiles", "Games are ready!");
         yield break;
     }
