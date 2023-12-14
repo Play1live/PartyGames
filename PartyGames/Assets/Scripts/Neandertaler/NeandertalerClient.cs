@@ -22,6 +22,8 @@ public class NeandertalerClient : MonoBehaviour
     private GameObject[] TurnPlayer;
     private GameObject Skip;
     private GameObject Abbrechen;
+    private GameObject KlongButton;
+    private AudioSource KlongSound;
     private GameObject RundeStarten;
     private GameObject HistoryContentElement;
     private GameObject[,] PlayerAnzeige;
@@ -166,6 +168,9 @@ public class NeandertalerClient : MonoBehaviour
             case "#SkipWord":
                 SkipWord(data);
                 break;
+            case "#PlayKlong":
+                PlayKlong();
+                break;
 
         }
     }
@@ -187,6 +192,11 @@ public class NeandertalerClient : MonoBehaviour
 
         Abbrechen = GameObject.Find("Spielbrett/Abbrechen");
         Abbrechen.SetActive(false);
+
+        KlongButton = GameObject.Find("Spielbrett/KlongButton");
+        KlongButton.SetActive(false);
+
+        KlongSound = GameObject.Find("GameSFX/Klong").GetComponent<AudioSource>();
 
         TurnPlayer = new GameObject[3];
         TurnPlayer[0] = GameObject.Find("Spielbrett/TurnPlayer");
@@ -266,6 +276,9 @@ public class NeandertalerClient : MonoBehaviour
         // Bei jedem
         TurnPlayer[2].GetComponent<Image>().sprite = PlayerAnzeige[id, 2].GetComponent<Image>().sprite;
         TurnPlayer[0].SetActive(true);
+        KlongButton.SetActive(true);
+        if (id == Config.PLAYER_ID)
+            KlongButton.SetActive(false);
         for (int i = 0; i < Config.PLAYERLIST.Length + 1; i++)
         {
             PlayerAnzeige[i, 0].SetActive(false);
@@ -360,6 +373,9 @@ public class NeandertalerClient : MonoBehaviour
         // Bei jedem
         TurnPlayer[2].GetComponent<Image>().sprite = nextp.icon2.icon;
         TurnPlayer[0].SetActive(true);
+        KlongButton.SetActive(true);
+        if (nextp.id == Config.PLAYER_ID)
+            KlongButton.SetActive(false);
         if (nextp.id == Config.PLAYER_ID)
         {
             for (int i = 0; i < Config.PLAYERLIST.Length + 1; i++)
@@ -382,6 +398,14 @@ public class NeandertalerClient : MonoBehaviour
         AddWortHistory(TurnPlayer[2].GetComponent<Image>().sprite, 0, Karte.GetComponentInChildren<TMP_Text>().text);
 
         Karte.GetComponentInChildren<TMP_Text>().text = data;
+    }
+    public void ClientKlong()
+    {
+        ClientUtils.SendToServer("#ClientKlong");
+    }
+    private void PlayKlong()
+    {
+        KlongSound.Play();
     }
 
     private void AddWortHistory(Sprite icon, int index, string wort)

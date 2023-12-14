@@ -24,6 +24,8 @@ public class NeandertalerServer : MonoBehaviour
     private GameObject Skip;
     private GameObject Abbrechen;
     private GameObject RundeStarten;
+    private GameObject KlongButton;
+    private AudioSource KlongSound;
     private GameObject HistoryContentElement;
     private GameObject[,] PlayerAnzeige;
 
@@ -157,6 +159,9 @@ public class NeandertalerServer : MonoBehaviour
             case "#Skip":
                 SkipWord();
                 break;
+            case "#ClientKlong":
+                ClientKlong();
+                break;
         }
     }
     #endregion
@@ -186,6 +191,12 @@ public class NeandertalerServer : MonoBehaviour
 
         Abbrechen = GameObject.Find("Spielbrett/Abbrechen");
         Abbrechen.SetActive(false);
+
+        KlongButton = GameObject.Find("Spielbrett/KlongButton");
+        KlongButton.SetActive(false);
+
+        KlongSound = GameObject.Find("GameSFX/Klong").GetComponent<AudioSource>();
+        klongable = true;
 
         TurnPlayer = new GameObject[3];
         TurnPlayer[0] = GameObject.Find("Spielbrett/TurnPlayer");
@@ -295,6 +306,9 @@ public class NeandertalerServer : MonoBehaviour
         // Bei jedem
         TurnPlayer[2].GetComponent<Image>().sprite = p.icon2.icon;
         TurnPlayer[0].SetActive(true);
+        KlongButton.SetActive(true);
+        if (p.id == Config.SERVER_PLAYER.id)
+            KlongButton.SetActive(false);
         for (int i = 0; i < Config.PLAYERLIST.Length + 1; i++)
         {
             PlayerAnzeige[i, 0].SetActive(false);
@@ -381,6 +395,9 @@ public class NeandertalerServer : MonoBehaviour
         // Bei jedem
         TurnPlayer[2].GetComponent<Image>().sprite = next.icon2.icon;
         TurnPlayer[0].SetActive(true);
+        KlongButton.SetActive(true);
+        if (next.id == Config.PLAYER_ID)
+            KlongButton.SetActive(false);
         if (next == Config.SERVER_PLAYER)
         {
             for (int i = 0; i < Config.PLAYERLIST.Length + 1; i++)
@@ -393,7 +410,31 @@ public class NeandertalerServer : MonoBehaviour
 
         ServerUtils.BroadcastImmediate("#RundeEnde " + p.id + "~" + name + "~" + index + "~" + next.id + "~" + selectedItem);
     }
-
+    public void ServerKlong()
+    {
+        if (!Config.SERVER_STARTED)
+            return;
+        PlayKlong();
+    }
+    private void ClientKlong()
+    {
+        PlayKlong();
+    }
+    private bool klongable;
+    private void PlayKlong()
+    {
+        if (!klongable)
+            return;
+        klongable = false;
+        ServerUtils.BroadcastImmediate("#PlayKlong");
+        StartCoroutine(KlongableDelay());
+    }
+    private IEnumerator KlongableDelay()
+    {
+        yield return new WaitForSeconds(1);
+        klongable = true;
+        yield break;
+    }
     public void ServerSkip()
     {
         if (!Config.SERVER_STARTED)
