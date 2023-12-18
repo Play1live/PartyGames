@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class NeandertalerScene : MonoBehaviour
 {
@@ -21,19 +22,11 @@ public class NeandertalerScene : MonoBehaviour
 
     private void Start()
     {
-        Application.targetFrameRate = 120;
-#if UNITY_EDITOR
-        Application.targetFrameRate = 200;
-#endif
+        Utils.LoadStartGameInitiations(GameObject.Find("Canvas/GameObject/Background").GetComponent<Image>());
     }
 
     void OnEnable()
     {
-        if (!Config.APPLICATION_INITED)
-        {
-            SceneManager.LoadScene("Startup");
-            return;
-        }
         Utils.EinstellungenStartSzene(Einstellungen, audiomixer, Utils.EinstellungsKategorien.Audio, Utils.EinstellungsKategorien.Grafik);
         Utils.EinstellungenGrafikApply(false);
 

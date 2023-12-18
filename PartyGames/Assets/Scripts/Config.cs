@@ -13,6 +13,8 @@ public class Config
     public static bool REMOTECONFIG_FETCHTED = false;
     public static bool FULLSCREEN = false;
     public static bool APPLICATION_INITED = false;
+    public static List<RemoteBackground> SAISONAL_BACKGROUNDS;
+    public static RemoteBackground TEMP_BACKGROUND;
     // Updater Data
     public static string UPDATER_DOWNLOAD_URL;
     public static string UPDATER_LATEST_VERSION;

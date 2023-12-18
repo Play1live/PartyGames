@@ -23,19 +23,11 @@ public class JeopardyScene : MonoBehaviour
 
     private void Start()
     {
-        if (!Config.CLIENT_STARTED && !Config.SERVER_STARTED)
-            SceneManager.LoadScene("Startup");
-
-        Application.targetFrameRate = 120;
-#if UNITY_EDITOR
-        Application.targetFrameRate = 200;
-#endif
+        Utils.LoadStartGameInitiations(GameObject.Find("Canvas/Background").GetComponent<Image>());
     }
 
     void OnEnable()
     {
-        if (!Config.CLIENT_STARTED && !Config.SERVER_STARTED)
-            return;
         Utils.EinstellungenStartSzene(Einstellungen, audiomixer, Utils.EinstellungsKategorien.Audio);
         Utils.EinstellungenGrafikApply(true);
 

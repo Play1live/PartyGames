@@ -301,8 +301,10 @@ public class StartupServer : MonoBehaviour
     {
         ServerUtils.BroadcastImmediate("#UpdateRemoteConfig");
         LoadConfigs.FetchRemoteConfig();
+        Config.REMOTECONFIG_FETCHTED = false;
         StartCoroutine(LoadGameFilesAsync());
         UpdateGameVorschau();
+        StartCoroutine(StartupScene.DownloadTempBackground());
     }
     /// <summary>
     /// Lädt die vorbereiteten Spieldateien

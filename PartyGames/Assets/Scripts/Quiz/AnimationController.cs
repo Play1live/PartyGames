@@ -36,7 +36,7 @@ public class AnimationController : MonoBehaviour
     {
         MaxTime = DateTime.Now.AddSeconds(10);
         StartTime = DateTime.Now;
-        Logging.log(Logging.LogType.Debug, "AnimationController", "OnEnable", StartTime + " " + MaxTime);
+        Logging.log(Logging.LogType.Normal, "AnimationController", "OnEnable", StartTime + " " + MaxTime);
 
         Player = new GameObject[8];
         Player[0] = Player1;
@@ -61,6 +61,7 @@ public class AnimationController : MonoBehaviour
             if (getSPIELER_WERT(i) < getSTART_WERT(i))
             {
                 Player[i].transform.GetChild(1).gameObject.GetComponent<TMP_Text>().text = getSPIELER_WERT(i) + getEINHEIT(i);
+                Player[i].transform.GetChild(1).gameObject.SetActive(true);
                 ismoving[i] = false;
                 israising[i] = false;
             }
@@ -73,6 +74,12 @@ public class AnimationController : MonoBehaviour
         }
 
         started = true;
+        Logging.log(Logging.LogType.Debug, "AnimationController", "OnEnbale", "Start inited");
+    }
+
+    private void OnDisable()
+    {
+        Logging.log(Logging.LogType.Normal, "AnimationController", "OnDisable", "Beendet");
     }
 
     void Update()

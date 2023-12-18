@@ -22,13 +22,10 @@ public class WerBietetMehrScene : MonoBehaviour
 
     void OnEnable()
     {
+        Utils.LoadStartGameInitiations(GameObject.Find("Canvas/Background").GetComponent<Image>());
+
         Utils.EinstellungenStartSzene(Einstellungen, audiomixer, Utils.EinstellungsKategorien.Audio);
         Utils.EinstellungenGrafikApply(true);
-
-        Application.targetFrameRate = 120;
-#if UNITY_EDITOR
-        Application.targetFrameRate = 200;
-#endif
 
         if (Config.isServer)
         {

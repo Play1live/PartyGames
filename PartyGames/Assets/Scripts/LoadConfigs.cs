@@ -1,11 +1,13 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.RemoteConfig;
 using UnityEngine;
+using System.Runtime.Serialization;
+using static Utils;
 
 public class LoadConfigs
 {
-    #region RemoteConfig Stuff
 #pragma warning disable CS0618 // Typ oder Element ist veraltet
     public struct userAttributes { }
     public struct appAttriutes { }
@@ -39,6 +41,10 @@ public class LoadConfigs
         Config.UPDATER_DOWNLOAD_URL = ConfigManager.appConfig.GetString("Updater_Download_Link");
         Config.UPDATER_DOWNLOAD_URL.Replace("<version>", Config.UPDATER_LATEST_VERSION);
         Logging.log(Logging.LogType.Normal, "LoadConfigs", "SaveRemoteSettings", "Updater URL: " + Config.UPDATER_DOWNLOAD_URL);
+        // Remote Background
+        Config.TEMP_BACKGROUND = new RemoteBackground();
+        Config.TEMP_BACKGROUND = new RemoteBackground(ConfigManager.appConfig.GetString("Temporary_Background"));
+        Logging.log(Logging.LogType.Normal, "LoadConfigs", "SaveRemoteSettings", "TempBackground URL: " + Config.TEMP_BACKGROUND.GetUrl());
 
         ApplyRemoteSettings();
         Logging.log(Logging.LogType.Normal, "LoadConfigs", "SaveRemoteSettings", "Fetching Config completed...");
@@ -46,8 +52,8 @@ public class LoadConfigs
     }
     private static void ApplyRemoteSettings()
     {
-
+        
     }
-
-    #endregion
 }
+
+

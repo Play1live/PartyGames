@@ -301,6 +301,8 @@ public class StartupClient : MonoBehaviour
 
             case "#UpdateRemoteConfig":
                 LoadConfigs.FetchRemoteConfig();
+                Config.REMOTECONFIG_FETCHTED = false;
+                StartCoroutine(StartupScene.DownloadTempBackground());
                 break;
             case "#SetID":
                 SetID(data);

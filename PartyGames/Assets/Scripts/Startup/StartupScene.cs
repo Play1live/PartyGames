@@ -28,6 +28,7 @@ public class StartupScene : MonoBehaviour
     [SerializeField] AudioMixer audiomixer;
     private Coroutine UpdateIPCoroutine;
     private bool UpdaterIsUpToDate = false;
+    private static bool TempDownloadLoaded = false;
 
     void Start()
     {
@@ -43,6 +44,7 @@ public class StartupScene : MonoBehaviour
         {
             SettingsAktualisiereAnzeigen();
             Utils.EinstellungenGrafikApply(false);
+            Utils.LoadStartGameInitiations(GameObject.Find("Canvas/GameObject/Background").GetComponent<Image>(), false);
 
             if (!Config.CLIENT_STARTED && !Config.SERVER_STARTED)
             {
@@ -104,14 +106,13 @@ public class StartupScene : MonoBehaviour
             MedienUtil.CreateMediaDirectory();
             StartCoroutine(UpdateGameUpdater());
 
-
             if (Config.isServer)
-            {
                 UpdateIPCoroutine = StartCoroutine(UpdateIpAddress.UpdateNoIP_DNS());
-            }
             StartCoroutine(SetupSpiele.LoadGameFiles());
             StartCoroutine(EnableConnectionButton());
-
+            Utils.LoadSaisonalBackgrounds();
+            Utils.LoadStartGameInitiations(GameObject.Find("Canvas/GameObject/Background").GetComponent<Image>(), false);
+            
             // Init PlayerlistZeigt die geladenen Spiele in der GameÜbersicht an
             if (Config.PLAYERLIST == null)
             {
@@ -157,6 +158,59 @@ public class StartupScene : MonoBehaviour
         Config.APPLICATION_CONFIG.Save();
     }
 
+    /// <summary>
+    /// Lädt das TempImage herunter, wenn eins vorhanden ist
+    /// </summary>
+    /// <returns></returns>
+    public static IEnumerator DownloadTempBackground()
+    {
+        TempDownloadLoaded = false;
+        yield return new WaitUntil(() => Config.REMOTECONFIG_FETCHTED == true);
+        if (Config.TEMP_BACKGROUND.GetStart() == -1)
+            yield break;
+
+        Logging.log(Logging.LogType.Normal, "StartupSzene", "DownloadTempBackground", "TempBackground wird geladen...");
+
+        using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(Config.TEMP_BACKGROUND.GetUrl()))
+        {
+            // Sende die Anfrage und warte auf die Antwort
+            yield return www.SendWebRequest();
+
+            // Überprüfe auf Fehler
+            if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
+            {
+                Logging.log(Logging.LogType.Warning, "StartupSzene", "DownloadTempBackground", "Fehler beim Herunterladen des Bildes: " + www.error);
+                Config.TEMP_BACKGROUND.ClearImage();
+            }
+            else
+            {
+                // Das Bild wurde erfolgreich heruntergeladen
+                Texture2D texture = DownloadHandlerTexture.GetContent(www);
+
+                if (texture == null)
+                {
+                    Logging.log(Logging.LogType.Warning, "StartupSzene", "DownloadTempBackground", "Fehler beim Herunterladen des Bildes: Url enthält kein Bild");
+                    Config.TEMP_BACKGROUND.ClearImage();
+                }
+                else
+                {
+                    // Erstelle einen Sprite aus der Textur
+                    Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+
+                    Config.TEMP_BACKGROUND.SetImage(sprite);
+                    Logging.log(Logging.LogType.Normal, "StartupSzene", "DownloadTempBackground", "TempBackground wurde erfolgreich geladen");
+                }
+            }
+
+            // Hier für Startup checken
+            Utils.LoadStartGameInitiations(GameObject.Find("Canvas/GameObject/Background").GetComponent<Image>(), false);
+           // if (Config.TEMP_BACKGROUND.IsNow(Config.GAME_TITLE))
+             //   GameObject.Find("Canvas/GameObject/Background").GetComponent<Image>().sprite = Config.TEMP_BACKGROUND.GetImage();
+
+            TempDownloadLoaded = true;
+        }
+        yield break;
+    }
     /// <summary>
     /// Aktualisiert den Updater sofern dieser veraltet ist
     /// </summary>
@@ -302,8 +356,8 @@ public class StartupScene : MonoBehaviour
         Hauptmenue.transform.GetChild(4).gameObject.SetActive(false);// Server/Client StartButton
         Hauptmenue.transform.GetChild(5).gameObject.SetActive(false); // Einzelspieler StartButton
         yield return new WaitUntil(() => Config.REMOTECONFIG_FETCHTED == true);
-        //if (Config.isServer)
-          //  UpdateIPCoroutine = StartCoroutine(UpdateIpAddress.UpdateNoIP_DNS());
+        StartCoroutine(DownloadTempBackground());
+        yield return new WaitUntil(() => TempDownloadLoaded == true); // Warte das TempImage geladen wurde
         Utils.EinstelungenServerUpdatePortIP(Einstellungen, Config.isServer, Config.SERVER_CONNECTION_IP, Config.SERVER_CONNECTION_PORT + "");
         yield return new WaitUntil(() => UpdaterIsUpToDate == true); // Warte bis die Version des Updater aktualisiert wurde
         Logging.log(Logging.LogType.Debug, "StartupScene", "EnableConnectionButton", "Spieler darf sich nun verbinden.");

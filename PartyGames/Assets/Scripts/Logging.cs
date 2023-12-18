@@ -56,9 +56,32 @@ public class Logging
     private static void generate(LogType type, string klasse, string methode, string msg)
     {
 #if UNITY_EDITOR
-        print(type, "[" + methode + "] " + msg);
+        //print(type, "[" + methode + "] " + msg);
+        string message = "[" + methode + "] " + msg;
+        if (type == LogType.Debug && Config.DEBUG_MODE)
+            Debug.Log("DEBUG " + message);
+        else if (type == LogType.Normal)
+            Debug.Log(message);
+        else if (type == LogType.Warning)
+            Debug.LogWarning(message);
+        else if (type == LogType.Error)
+            Debug.LogError(message);
+        else if (type == LogType.Fatal)
+            Debug.LogError(message);
 #else
-        print(type, "[" + klasse + " - " + methode + "] " + msg); 
+        //print(type, "[" + klasse + " - " + methode + "] " + msg); 
+        string message = "[" + methode + "] " + msg;
+        message = DateTime.Now + " " + message;
+        if (type == LogType.Debug || Config.DEBUG_MODE)
+            Debug.Log("DEBUG >> " + message);
+        else if (type == LogType.Normal)
+            Debug.Log("NORMAL >> " + message);
+        else if (type == LogType.Warning)
+            Debug.LogWarning("WARNING >> " + message);
+        else if (type == LogType.Error)
+            Debug.LogError("ERROR >> " + message);
+        else if (type == LogType.Fatal)
+            Debug.LogError("FATAL >> " + message);
 #endif
     }
     /// <summary>

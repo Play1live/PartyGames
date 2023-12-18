@@ -403,9 +403,9 @@ public class QuizServer : MonoBehaviour
     private void LoadQuestionIntoScene(int index)
     {
         Logging.log(Logging.LogType.Debug, "QuizServer", "LoadQuestionIntoScene", "Lädt die Frage: " + Config.QUIZ_SPIEL.getSelected().getFrage(index).getFrage() + " in die Scene.");
-        GameObject.Find("QuizAnzeigen/FragenVorschau").GetComponent<TMP_Text>().text = "Frage:\n"+Config.QUIZ_SPIEL.getSelected().getFrage(index).getFrage().Replace("\\n", "\n");
-        GameObject.Find("QuizAnzeigen/AntwortVorschau").GetComponent<TMP_Text>().text = "Antwort:\n"+ Config.QUIZ_SPIEL.getSelected().getFrage(index).getAntwort().Replace("\\n", "\n");
-        GameObject.Find("QuizAnzeigen/InfoVorschau").GetComponent<TMP_Text>().text = "Info:\n"+Config.QUIZ_SPIEL.getSelected().getFrage(index).getInfo().Replace("\\n", "\n");
+        GameObject.Find("QuizAnzeigen/FragenVorschau").GetComponent<TMP_InputField>().text = "Frage:\n"+Config.QUIZ_SPIEL.getSelected().getFrage(index).getFrage().Replace("\\n", "\n");
+        GameObject.Find("QuizAnzeigen/AntwortVorschau").GetComponent<TMP_InputField>().text = "Antwort:\n"+ Config.QUIZ_SPIEL.getSelected().getFrage(index).getAntwort().Replace("\\n", "\n");
+        GameObject.Find("QuizAnzeigen/InfoVorschau").GetComponent<TMP_InputField>().text = "Info:\n"+Config.QUIZ_SPIEL.getSelected().getFrage(index).getInfo().Replace("\\n", "\n");
         GameObject.Find("QuizAnzeigen/FragenIndex2").GetComponentInChildren<TMP_Text>().text = (aktuelleFrage+1)+"/" + Config.QUIZ_SPIEL.getSelected().getFragenCount();
     }
     #endregion
@@ -742,7 +742,7 @@ public class QuizServer : MonoBehaviour
             return;
         if (GameObject.Find("SchaetzfragenAnimation/MaxGrenzeFestlegen").GetComponent<TMP_InputField>().text == "")
             return;
-
+            
         if (GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text == "")
             GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text = " ";
 
@@ -771,7 +771,7 @@ public class QuizServer : MonoBehaviour
                 }
 
                 SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].transform.GetChild(1).GetComponent<TMP_Text>().text = schaetzung + GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text;
-                SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].transform.GetChild(1).GetComponent<TMP_Text>().text = "";
+                SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].transform.GetChild(1).gameObject.SetActive(false);
                 SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].transform.GetChild(3).gameObject.SetActive(false);
                 SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].GetComponent<Image>().sprite = p.icon2.icon;
 
@@ -782,7 +782,7 @@ public class QuizServer : MonoBehaviour
 
         // Zeigt Sieger für Server an
         string einheit = GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text;
-        double schatung = double.Parse(SchaetzfragenAnzeige[4].GetComponentInChildren<TMP_Text>().text.Replace(einheit , ""));
+        double schatung = double.Parse(SchaetzfragenAnzeige[4].transform.GetChild(1).GetComponent<TMP_Text>().text.Replace(einheit , ""));
         double ziel = double.Parse(SchaetzfragenAnzeige[2].GetComponentInChildren<TMP_Text>().text.Replace(einheit, ""));
         double diff = Math.Abs(schatung - ziel);
         foreach (Player p in Config.PLAYERLIST)
@@ -790,7 +790,7 @@ public class QuizServer : MonoBehaviour
             if (!SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].activeInHierarchy)
                 continue;
 
-            double spieler = double.Parse(SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].GetComponentInChildren<TMP_Text>().text.Replace(einheit, ""));
+            double spieler = double.Parse(SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].transform.GetChild(1).GetComponent<TMP_Text>().text.Replace(einheit, ""));
             double spielerdiff = Math.Abs(spieler - ziel);
             if (spielerdiff < diff)
             {
@@ -802,7 +802,7 @@ public class QuizServer : MonoBehaviour
         {
             if (!SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].activeInHierarchy)
                 continue;
-            double spieler = double.Parse(SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].GetComponentInChildren<TMP_Text>().text.Replace(einheit, ""));
+            double spieler = double.Parse(SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].transform.GetChild(1).GetComponent<TMP_Text>().text.Replace(einheit, ""));
             double spielerdiff = Math.Abs(spieler - ziel);
             if (spielerdiff == diff)
                 SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].transform.GetChild(3).gameObject.SetActive(true);
@@ -813,12 +813,6 @@ public class QuizServer : MonoBehaviour
     /// </summary>
     public void BerechneSchritteProEinheit()
     {
-        if (GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text == "")
-            GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text = " ";
-
-        if (GameObject.Find("SchaetzfragenAnimation/KommastellenFestlegen").GetComponent<TMP_InputField>().text == "")
-            GameObject.Find("SchaetzfragenAnimation/KommastellenFestlegen").GetComponent<TMP_InputField>().text = " ";
-
         float StartWert = float.Parse(SchaetzfragenAnzeige[1].GetComponentInChildren<TMP_Text>().text.Replace(GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text, ""));
         float ZielWert = float.Parse(SchaetzfragenAnzeige[2].GetComponentInChildren<TMP_Text>().text.Replace(GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text, ""));
         float MaxWert = float.Parse(SchaetzfragenAnzeige[3].GetComponentInChildren<TMP_Text>().text.Replace(GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text, ""));
@@ -855,11 +849,11 @@ public class QuizServer : MonoBehaviour
             {
                 if (SchaetzfragenSpielerInput[Player.getPosInLists(p.id)].text.Length == 0)
                     SchaetzfragenSpielerInput[Player.getPosInLists(p.id)].text = "0";
-                if (SchaetzfragenAnzeige[2 + p.id * 2].GetComponentInChildren<TMP_Text>().text.Length == 0)
-                    SchaetzfragenAnzeige[2 + p.id * 2].GetComponentInChildren<TMP_Text>().text = "0";
+                if (SchaetzfragenAnzeige[2 + p.id * 2].transform.GetChild(1).GetComponent<TMP_Text>().text.Length == 0)
+                    SchaetzfragenAnzeige[2 + p.id * 2].transform.GetChild(1).GetComponent<TMP_Text>().text = "0";
                 
                 string temp = GameObject.Find("SchaetzfragenAnimation/EinheitAngeben").GetComponent<TMP_InputField>().text;
-                spielerwert = double.Parse(GameObject.Find("SchaetzfragenAnimation/Grid/Icon (" + p.id + ")").GetComponentInChildren<TMP_Text>().text.Replace(temp, ""));
+                spielerwert = double.Parse(SchaetzfragenAnzeige[(4 + 2 * (p.id - 1))].transform.GetChild(1).GetComponent<TMP_Text>().text.Replace(temp, ""));
                 data_text = data_text.Replace("[SPIELER_WERT]", "|").Split('|')[0] + "[SPIELER_WERT]" + spielerwert + "[SPIELER_WERT]";
                 SchaetzfragenAnzeige[(5 + 2 * (p.id - 1))].GetComponent<TMP_Text>().text = data_text;
                 broadcastmsg += "[" + p.id + "]"+spielerwert+"[" + p.id + "]";

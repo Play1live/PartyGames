@@ -22,22 +22,13 @@ public class SloxikonScene : MonoBehaviour
 
     private void Start()
     {
-        Application.targetFrameRate = 120;
-#if UNITY_EDITOR
-        Application.targetFrameRate = 200;
-#endif
+        Utils.LoadStartGameInitiations(GameObject.Find("Canvas/Background").GetComponent<Image>());
     }
 
     void OnEnable()
     {
         Utils.EinstellungenStartSzene(Einstellungen, audiomixer, Utils.EinstellungsKategorien.Audio);
         Utils.EinstellungenGrafikApply(true);
-
-        if (!Config.SERVER_STARTED && !Config.CLIENT_STARTED)
-        {
-            SceneManager.LoadScene("Startup");
-            return;
-        }
 
         if (Config.isServer)
         {

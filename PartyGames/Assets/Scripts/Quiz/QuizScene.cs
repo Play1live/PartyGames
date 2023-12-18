@@ -22,12 +22,7 @@ public class QuizScene : MonoBehaviour
 
     private void Start()
     {
-        Application.targetFrameRate = 120;
-#if UNITY_EDITOR
-        Application.targetFrameRate = 200;
-#endif
-        if (!Config.CLIENT_STARTED && !Config.SERVER_STARTED)
-            SceneManager.LoadScene("Startup");
+        Utils.LoadStartGameInitiations(GameObject.Find("Canvas/Background").GetComponent<Image>());
     }
 
     void OnEnable()
