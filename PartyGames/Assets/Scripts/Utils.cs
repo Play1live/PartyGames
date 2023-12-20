@@ -390,9 +390,10 @@ public class Utils
         {
             try
             {
-                string classname = item.name.Split('_')[0];
-                int start = int.Parse(item.name.Split('_')[1]);
-                int end = int.Parse(item.name.Split('_')[2]);
+                string notiz = item.name.Split('_')[0];
+                string classname = item.name.Split('_')[1];
+                int start = int.Parse(item.name.Split('_')[2]);
+                int end = int.Parse(item.name.Split('_')[3]);
 
                 Config.SAISONAL_BACKGROUNDS.Add(new RemoteBackground(start, end, classname, item));
             }
@@ -729,6 +730,8 @@ public class RemoteBackground
             this.end = int.Parse(content.Split('|')[1]);
             this.klasse = content.Split('|')[2];
             this.url = content.Split('|')[3];
+            if (this.url.Length == 0)
+                this.start = -1;
         }
         catch (Exception e)
         {

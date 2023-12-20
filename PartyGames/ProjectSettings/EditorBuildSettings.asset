@@ -51,6 +51,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Neandertaler.unity
     guid: 59f6d6d8a787f0e4db9e4009fd565b85
   - enabled: 1
+    path: Assets/Scenes/WerBinIch.unity
+    guid: 21892ec014e41da4ea662e5784b81637
+  - enabled: 1
     path: Assets/Scenes/Einzelspieler/CS_StratRoulette.unity
     guid: fc3176d137027124cab6b693b8edcd90
   m_configObjects: {}

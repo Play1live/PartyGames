@@ -38,7 +38,6 @@ public class StartupScene : MonoBehaviour
             Config.isServer = true;
         }
 #endif
-        /*Testzwecke*/
         Config.GAME_TITLE = "Startup";
         if (Config.APPLICATION_INITED == true)
         {

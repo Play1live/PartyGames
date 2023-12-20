@@ -2256,7 +2256,7 @@ GameObject:
   - component: {fileID: 405104263934355218}
   - component: {fileID: 3251479170818192120}
   m_Layer: 5
-  m_Name: 1.8c
+  m_Name: 1.8
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2275,11 +2275,11 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4623905835498856015}
-  m_RootOrder: 0
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 200, y: -2439.815}
+  m_AnchoredPosition: {x: 200, y: -2582.275}
   m_SizeDelta: {x: 400, y: 170.39}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &405104263934355218
@@ -2310,7 +2310,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "<size=25><b><u>1.8c</u></b></size>\n<b><size=19>neue Spiele</size></b>\n-
+  m_text: "<size=25><b><u>1.8</u></b></size>\n<b><size=19>neue Spiele</size></b>\n-
     Auktion\r\n- Flaggen\r\n- Geheimw\xF6rter\r\n- Listen\r\n- Mosaik\r\n- Quiz\r\n-
     WerBietetMehr"
   m_isRightToLeft: 0
@@ -2771,11 +2771,11 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4623905835498856015}
-  m_RootOrder: 7
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 200, y: -753.775}
+  m_AnchoredPosition: {x: 200, y: -896.235}
   m_SizeDelta: {x: 400, y: 252.79}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &890449631304497023
@@ -7385,11 +7385,11 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4623905835498856015}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 200, y: -1271.595}
+  m_AnchoredPosition: {x: 200, y: -1414.055}
   m_SizeDelta: {x: 400, y: 179.33}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3462778356305671273
@@ -7673,16 +7673,16 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 5641913017095022420}
-  - {fileID: 4289514221314503878}
-  - {fileID: 7064409154406332648}
-  - {fileID: 3238234074129663024}
-  - {fileID: 4017890928871864563}
-  - {fileID: 4567998571338229490}
-  - {fileID: 5903878756403582083}
-  - {fileID: 1431674122220648654}
-  - {fileID: 4357238279649093721}
   - {fileID: 5536303513262402598}
+  - {fileID: 4357238279649093721}
+  - {fileID: 1431674122220648654}
+  - {fileID: 5903878756403582083}
+  - {fileID: 4567998571338229490}
+  - {fileID: 4017890928871864563}
+  - {fileID: 3238234074129663024}
+  - {fileID: 7064409154406332648}
+  - {fileID: 4289514221314503878}
+  - {fileID: 5641913017095022420}
   m_Father: {fileID: 3471820996346051175}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -7716,7 +7716,7 @@ MonoBehaviour:
   m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 1
-  m_ReverseArrangement: 1
+  m_ReverseArrangement: 0
 --- !u!114 &1996614078051403198
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9075,11 +9075,11 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4623905835498856015}
-  m_RootOrder: 3
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 200, y: -1856.4899}
+  m_AnchoredPosition: {x: 200, y: -1998.95}
   m_SizeDelta: {x: 400, y: 317.94}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2839264564179520000
@@ -9478,11 +9478,11 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4623905835498856015}
-  m_RootOrder: 6
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 200, y: -1031.05}
+  m_AnchoredPosition: {x: 200, y: -1173.51}
   m_SizeDelta: {x: 400, y: 291.76}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4004941906984112247
@@ -9867,11 +9867,11 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4623905835498856015}
-  m_RootOrder: 8
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 200, y: -437.85}
+  m_AnchoredPosition: {x: 200, y: -580.31}
   m_SizeDelta: {x: 400, y: 369.06}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4055599504415733440
@@ -10007,11 +10007,11 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4623905835498856015}
-  m_RootOrder: 2
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 200, y: -2053.91}
+  m_AnchoredPosition: {x: 200, y: -2196.3699}
   m_SizeDelta: {x: 400, y: 66.9}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8884966488016875277
@@ -10493,12 +10493,12 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4623905835498856015}
-  m_RootOrder: 9
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 200, y: -124.16}
-  m_SizeDelta: {x: 400, y: 248.32}
+  m_AnchoredPosition: {x: 200, y: -195.39}
+  m_SizeDelta: {x: 400, y: 390.78}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1649393978229555291
 CanvasRenderer:
@@ -10528,13 +10528,16 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "<size=25><b><u>1.18</u></b></size>\n<b><size=19>Hintergr\xFCnde</size></b>\n-
-    Saisonale Hintergr\xFCnde k\xF6nnen nun korrekt geladen und in allen Szenen eingeblendet
-    werden\n- Tempor\xE4re (contentbezogene) Hintergr\xFCnde k\xF6nnen nun ohne neue
-    Updates, sondern nur durch Spielneustarts geladen werden\n<b><size=19>Quiz</size></b>\n-
-    F\xFCr den Quizmaster werden die Fragen, Antworten und Infos nun in einem Textfeld
-    angezeigt. Erm\xF6glicht kopieren und Scrollen\n<b><size=19>Bugfixes</size></b>\n-
-    Reload RemoteConfig aktualisiert nun auch die Daten"
+  m_text: "<size=25><b><u>1.18</u></b></size>\n<b><size=19>WerBinIch</size></b>\n-
+    neues Spiel\n- 2-9 Spieler\n- Jeder kann jedem eine Person geben\n- Private Notizen
+    f\xFCr jeden\n<b><size=19>Hintergr\xFCnde</size></b>\n- Saisonale Hintergr\xFCnde
+    k\xF6nnen nun korrekt geladen und in allen Szenen eingeblendet werden\n- Tempor\xE4re
+    (contentbezogene) Hintergr\xFCnde k\xF6nnen nun ohne neue Updates, sondern nur
+    durch Spielneustarts geladen werden\n- neue Hintergr\xFCnde f\xFCr \n\t+ Lobby\n\t+
+    Quiz\n<b><size=19>Quiz</size></b>\n- F\xFCr den Quizmaster werden die Fragen,
+    Antworten und Infos nun in einem Textfeld angezeigt. Erm\xF6glicht kopieren und
+    Scrollen\n<b><size=19>Bugfixes</size></b>\n- Reload RemoteConfig aktualisiert
+    nun auch die Daten"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -13497,11 +13500,11 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4623905835498856015}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 200, y: -1529.3899}
+  m_AnchoredPosition: {x: 200, y: -1671.85}
   m_SizeDelta: {x: 400, y: 326.26}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7132371184655555623
@@ -15485,11 +15488,11 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4623905835498856015}
-  m_RootOrder: 1
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 200, y: -2220.9897}
+  m_AnchoredPosition: {x: 200, y: -2363.4497}
   m_SizeDelta: {x: 400, y: 257.26}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6331834520709822051

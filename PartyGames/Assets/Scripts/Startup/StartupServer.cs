@@ -1015,6 +1015,8 @@ public class StartupServer : MonoBehaviour
         gamelist.Add("[SPIELER-ANZ]" + TabuSpiel.minPlayer + "-" + TabuSpiel.maxPlayer + "[SPIELER-ANZ][MIN]" + TabuSpiel.minPlayer + "[MIN][MAX]" + TabuSpiel.maxPlayer + "[MAX][TITEL]Tabu[TITEL][AVAILABLE]" + Config.TABU_SPIEL.wortcounter + "[AVAILABLE]");
         // Neandertaler
         gamelist.Add("[SPIELER-ANZ]" + NeandertalerSpiel.minPlayer + "-" + NeandertalerSpiel.maxPlayer + "[SPIELER-ANZ][MIN]" + NeandertalerSpiel.minPlayer + "[MIN][MAX]" + NeandertalerSpiel.maxPlayer + "[MAX][TITEL]Neandertaler[TITEL][AVAILABLE]" + Config.NEANDERTALER_SPIEL.wortcounter + "[AVAILABLE]");
+        // WerBinIch
+        gamelist.Add("[SPIELER-ANZ]" + WerBinIchSpiel.minPlayer + "-" + WerBinIchSpiel.maxPlayer + "[SPIELER-ANZ][MIN]" + WerBinIchSpiel.minPlayer + "[MIN][MAX]" + WerBinIchSpiel.maxPlayer + "[MAX][TITEL]WerBinIch[TITEL][AVAILABLE]-1[AVAILABLE]");
 
         string msg = "";
         for (int i = 0; i < gamelist.Count; i++)
