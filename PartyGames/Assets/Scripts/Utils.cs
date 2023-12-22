@@ -708,7 +708,7 @@ public class RemoteBackground
     [DataMember]
     private int end; // Monat Tag 1204
     [DataMember]
-    private string klasse;
+    private List<string> klassen;
     [DataMember]
     private string url;
     [IgnoreDataMember]
@@ -718,7 +718,7 @@ public class RemoteBackground
     {
         this.start = -1;
         this.end = -1;
-        this.klasse = "";
+        this.klassen = new List<string>();
         this.url = "";
         this.image = null;
     }
@@ -728,7 +728,8 @@ public class RemoteBackground
         {
             this.start = int.Parse(content.Split('|')[0]);
             this.end = int.Parse(content.Split('|')[1]);
-            this.klasse = content.Split('|')[2];
+            this.klassen = new List<string>();
+            this.klassen.AddRange(content.Split('|')[2].Split('*'));
             this.url = content.Split('|')[3];
             if (this.url.Length == 0)
                 this.start = -1;
@@ -743,7 +744,7 @@ public class RemoteBackground
     {
         this.start = start;
         this.end = end;
-        this.klasse = klasse;
+        this.klassen = new List<string>();
         this.url = "";
         this.image = sprite;
     }
@@ -752,9 +753,9 @@ public class RemoteBackground
     public int GetEnd() { return end; }
     public bool IsNow(string classname)
     {
-        if (this.klasse.Length == 0 || (this.image == null && this.url.Length == 0))
+        if (this.klassen.Count == 0 || (this.image == null && this.url.Length == 0))
             return false;
-        if (this.klasse != classname)
+        if (!this.klassen.Contains(classname) && !this.klassen.Contains("ALL"))
             return false;
 
         int today = DateTime.Now.Month * 100 + DateTime.Now.Day;
@@ -764,13 +765,13 @@ public class RemoteBackground
             return false;
     }
     public string GetUrl() { return this.url; }
-    public string GetClass() { return klasse; }
+    public List<string> GetClass() { return klassen; }
     public Sprite GetImage() { return image; }
     public void SetImage(Sprite sprite) { image = sprite; } 
     public void ClearImage()
     {
         this.start = -1;
-        this.klasse = "";
+        this.klassen = new List<string>();
         this.url = "";
         this.image = null;
     }
