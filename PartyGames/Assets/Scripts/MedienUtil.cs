@@ -12,7 +12,7 @@ public class MedienUtil
     {
         Logging.log(Logging.LogType.Debug, "MediaUtil", "CreateMediaDirectory", "Erstelle benötigte Ordner für Spieldateien");
         // Erstellt die Spiele Ordner
-        string[] spielOrdner = { "Quiz", "Listen", "Geheimwörter", "WerBietetMehr", "Auktion", "Mosaik", "Sloxikon", "Jeopardy" };
+        string[] spielOrdner = { "Quiz", "Listen", "Geheimwörter", "WerBietetMehr", "Auktion", "Mosaik", "Sloxikon", "Jeopardy", "Sabotage" };
         foreach (string game in spielOrdner)
         {
             if (!Directory.Exists(Config.MedienPath + @"/Spiele/" + game))

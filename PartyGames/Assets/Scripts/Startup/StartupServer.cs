@@ -1005,6 +1005,9 @@ public class StartupServer : MonoBehaviour
         gamelist.Add("[SPIELER-ANZ]" + SloxikonSpiel.minPlayer + "-" + SloxikonSpiel.maxPlayer + "[SPIELER-ANZ][MIN]" + SloxikonSpiel.minPlayer + "[MIN][MAX]" + SloxikonSpiel.maxPlayer + "[MAX][TITEL]Sloxikon[TITEL][AVAILABLE]" + Config.SLOXIKON_SPIEL.getGames().Count + "[AVAILABLE]");
         // Jeopardy
         gamelist.Add("[SPIELER-ANZ]" + JeopardySpiel.minPlayer + "-" + JeopardySpiel.maxPlayer + "[SPIELER-ANZ][MIN]" + JeopardySpiel.minPlayer + "[MIN][MAX]" + JeopardySpiel.maxPlayer + "[MAX][TITEL]Jeopardy[TITEL][AVAILABLE]" + Config.JEOPARDY_SPIEL.getJeopardy().Count + "[AVAILABLE]");
+        // Sabotage
+        gamelist.Add("[SPIELER-ANZ]" + SabotageSpiel.minPlayer + "-" + SabotageSpiel.maxPlayer + "[SPIELER-ANZ][MIN]" + SabotageSpiel.minPlayer + "[MIN][MAX]" + SabotageSpiel.maxPlayer + "[MAX][TITEL]Sabotage[TITEL][AVAILABLE]-1[AVAILABLE]");
+
         // Unmoderierte Games
         gamelist.Add("[SPIELER-ANZ]0[SPIELER-ANZ][MIN]0[MIN][MAX]" + (Config.SERVER_MAX_CONNECTIONS + 1) + "[MAX][TITEL]<b><i>Unmoderierte Spiele</i></b>[TITEL][AVAILABLE]-1[AVAILABLE]");
         // MenschÄrgerDichNicht
