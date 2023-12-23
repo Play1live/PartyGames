@@ -745,6 +745,7 @@ public class RemoteBackground
         this.start = start;
         this.end = end;
         this.klassen = new List<string>();
+        this.klassen.Add(klasse);
         this.url = "";
         this.image = sprite;
     }

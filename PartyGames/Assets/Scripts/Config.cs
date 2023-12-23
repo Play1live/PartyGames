@@ -53,6 +53,7 @@ public class Config
     public static JeopardySpiel JEOPARDY_SPIEL;
     public static TabuSpiel TABU_SPIEL;
     public static NeandertalerSpiel NEANDERTALER_SPIEL;
+    public static SabotageSpiel SABOTAGE_SPIEL;
 
     // Scenenspezifisches
     public static string GAME_TITLE = "Startup";

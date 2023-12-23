@@ -36,6 +36,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Jeopardy.unity
     guid: 66f588267cc3e9f4b9ad97924f4e7cf6
   - enabled: 1
+    path: Assets/Scenes/Sabotage.unity
+    guid: 60dcecca005792c47a96c1ef3d7fc0cc
+  - enabled: 1
     path: Assets/Scenes/ContentCreationTerminal.unity
     guid: d35b7b6fb5cd75546b787e28bcf61f9f
   - enabled: 1
