@@ -322,7 +322,7 @@ public class StartupServer : MonoBehaviour
     /// </summary>
     private void SperreGameSelection()
     {
-        allowedStartTime = DateTime.Now.AddSeconds(3);
+        allowedStartTime = DateTime.Now.AddSeconds(2);
         for (int i = 0; i < ServerControlGameSelection.transform.childCount; i++)
         {
             ServerControlGameSelection.transform.GetChild(i).gameObject.SetActive(false);
