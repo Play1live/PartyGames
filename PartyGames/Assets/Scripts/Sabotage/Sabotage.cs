@@ -13,11 +13,10 @@ public class Sabotage
     public Sabotage()
     {
         Logging.log(Logging.LogType.Debug, "SabotageSpiel", "SabotageSpiel", "Spiel wird geladen: " + path);
-        
     }
-
     public string getPath() { return this.path; }
 }
+
 public class SabotageDiktat
 {
     public int index;
@@ -114,4 +113,126 @@ public class SabotageDiktat
 
         return allCorrect + resultBuilder.ToString();
     }
+}
+
+public class SabotageSortieren
+{
+    public int index;
+    public int punkteProEinsortierung = 10;
+    //     Runde Elemente  
+    public List<string> sortby;
+    public List<List<string>> runden;
+    public string erklaerung = "10 Runden, nach einander, nur 1 kann einsortieren. Alle dürfen reden" +
+        " Jede Liste enthält 5 Einzusortierende Elemente und 1 Vorgegebenes." +
+        "\nPunkteverteilung: jede korrekte Einsortierung gibt 10p, jede falsche 10p"+
+        " Nach einer falschen, wird aber das falsche automatisch richtig einsortiert, damit es nicht zu viele Punkte geben kann";
+
+    public SabotageSortieren()
+    {
+        this.index = -1;
+        this.sortby = new List<string>();
+        for (int i = 0; i < 10; i++)
+            this.sortby.Add("Leer-Leer");
+        this.runden = new List<List<string>>();
+        while (this.runden.Count < 10)
+            this.runden.Add(new List<string>());
+        if (!File.Exists(Config.MedienPath + @"/Spiele/Sabotage/Sortieren.txt"))
+            File.Create(Config.MedienPath + @"/Spiele/Sabotage/Sortieren.txt").Close();
+
+        
+
+        foreach (var item in File.ReadAllLines(Config.MedienPath + @"/Spiele/Sabotage/Sortieren.txt"))
+        {
+            string line = item;
+            int index = int.Parse(line.Substring(0, 1));
+            line = line.Substring("X_".Length);
+            if (line.StartsWith("SortBy:"))
+            {
+                sortby[index] = line.Substring("SortBy:".Length);
+            }
+            else if (line.StartsWith("-"))
+            {
+                runden[index].Add(line.Substring(1));
+            }
+        }
+        
+        for (int i = 0; i < this.runden.Count; i++)
+        {
+            while (this.runden[i].Count < 6)
+                this.runden[i].Add("Leer");
+        }
+
+    }
+    
+    public int ChangeIndex(int change)
+    {
+        if (this.index <= 0 && change == -1)
+            return 0;
+        else if (this.index == this.runden.Count - 1 && change == 1)
+            return this.runden.Count-1;
+        this.index += change;
+        return this.index;
+    }
+    public List<string> GetInhalt()
+    {
+        return this.runden[index];
+    }
+    public string GetSortBy()
+    {
+        return this.sortby[index];
+    }
+}
+
+public class SabotageMemory
+{
+    List<Sprite> sprites;
+    public string erklaerung = "Punkteverteilung: Start bei 500 und -5 pro falsches Paar" +
+        " Immer nach einander dran ";
+
+    public SabotageMemory() 
+    {
+        this.sprites = new List<Sprite>();
+
+        List<Sprite> temp = new List<Sprite>();
+        temp.AddRange(Resources.LoadAll<Sprite>("Spiele/Sabotage/Memory/"));
+        temp.AddRange(Resources.LoadAll<Sprite>("Spiele/Sabotage/Memory/"));
+        while (temp.Count > 0)
+        {
+            Sprite sprite = temp[UnityEngine.Random.Range(0, temp.Count)];
+            temp.Remove(sprite);
+            this.sprites.Add(sprite);
+        }
+    }
+
+    public List<Sprite> getIcons()
+    {
+        return this.sprites;
+    }
+
+    public string getSequence()
+    {
+        string sequence = "";
+        foreach (Sprite sprite in this.sprites)
+            sequence += "~" + sprite.name;
+        if (sequence.Length > 0)
+            sequence = sequence.Substring(1);
+        return sequence;
+    }
+}
+
+public class SabotageDerZugLuegt
+{
+
+}
+
+// Spieler Nach einander Reinziehen
+public class SabotageTabu
+{
+
+}
+
+// Spieler rein ziehen
+public class SabotageAuswahlstrategie
+{
+
 }
