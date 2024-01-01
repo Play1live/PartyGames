@@ -50,7 +50,8 @@ public class SabotageScene : MonoBehaviour
                 go.SetActive(false);
         }
 
-        StartCoroutine(IntroAnimation());
+        StartCoroutine(SabotageVideoClipIntro());
+        //StartCoroutine(IntroAnimation());
     }
 
     private void OnDisable()
@@ -75,5 +76,19 @@ public class SabotageScene : MonoBehaviour
         yield return new WaitForSeconds(10);
         IntroGODefault.SetActive(true);
         IntroGO.SetActive(false);
+    }
+
+    IEnumerator SabotageVideoClipIntro()
+    {
+        IntroGO.SetActive(false);
+        IntroGODefault.SetActive(false);
+        GameObject.Find("GameAnimations/GameIntroAnimation").transform.GetChild(1).gameObject.SetActive(true);
+        yield return new WaitForSeconds(15f);
+        try
+        {
+            GameObject.Find("GameAnimations/GameIntroAnimation").transform.GetChild(1).gameObject.SetActive(false);
+        }
+        catch {}
+        IntroGODefault.SetActive(true);
     }
 }
