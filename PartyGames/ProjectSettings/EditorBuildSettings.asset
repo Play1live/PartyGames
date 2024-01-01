@@ -8,55 +8,55 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Startup.unity
     guid: 2cda990e2423bbf4892e6590ba056729
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/Flaggen.unity
     guid: e08a4f75e37fb2f40bbd23765af20d49
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/Quiz.unity
     guid: 37d510f6fec717b48a4ac7d3c47eed52
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/Listen.unity
     guid: 5193030ef3118a44193f16bafc6b435a
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/Mosaik.unity
     guid: 0275f50fcd77c82449246f1e54374ac8
-  - enabled: 0
+  - enabled: 1
     path: "Assets/Scenes/Geheimw\xF6rter.unity"
     guid: beefacfc062f31e48854921b0923e894
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/WerBietetMehr.unity
     guid: 62269886a5ba883418929a8995ba6121
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/Auktion.unity
     guid: d492a18db80f29f49831396bf7411f76
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/Sloxikon.unity
     guid: 6c20ab13ebd09e34f83ac73aae7f67be
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/Jeopardy.unity
     guid: 66f588267cc3e9f4b9ad97924f4e7cf6
   - enabled: 1
     path: Assets/Scenes/Sabotage.unity
     guid: 60dcecca005792c47a96c1ef3d7fc0cc
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/ContentCreationTerminal.unity
     guid: d35b7b6fb5cd75546b787e28bcf61f9f
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/MenschAergerDichNicht.unity
     guid: abc65c988ee069c4eb036727bd596356
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/Kniffel.unity
     guid: 3f38dafb16643b549afa2f491729d23f
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/Tabu.unity
     guid: a3c12608d051512429889c288096979f
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/Neandertaler.unity
     guid: 59f6d6d8a787f0e4db9e4009fd565b85
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/WerBinIch.unity
     guid: 21892ec014e41da4ea662e5784b81637
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/Einzelspieler/CS_StratRoulette.unity
     guid: fc3176d137027124cab6b693b8edcd90
   m_configObjects: {}

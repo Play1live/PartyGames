@@ -9,6 +9,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine.Windows;
 
 public class SabotageServer : MonoBehaviour
 {
@@ -17,6 +18,9 @@ public class SabotageServer : MonoBehaviour
     [SerializeField] AudioSource Beeep;
     [SerializeField] AudioSource Moeoop;
     [SerializeField] AudioSource DisconnectSound;
+    [SerializeField] AudioSource Buzzer;
+    [SerializeField] AudioSource Correct;
+    [SerializeField] AudioSource Wrong;
 
     SabotagePlayer[] sabotagePlayers;
     GameObject WerIstSabo;
@@ -42,6 +46,16 @@ public class SabotageServer : MonoBehaviour
     GameObject MemoryGrid;
     Image MemoryTap1;
     Image MemoryTap2;
+
+    GameObject DerZugLuegt;
+    GameObject DerZugLuegtAnzeigen;
+
+    GameObject Tabu;
+    Slider TabuTimer;
+
+    GameObject Auswahlstrategie;
+    Transform AuswahlstrategieGrid;
+    Slider AuswahlstrategieTimer;
 
     void OnEnable()
     {
@@ -160,6 +174,10 @@ public class SabotageServer : MonoBehaviour
 
             case "#DiktatPlayerInput":
                 DiktatPlayerInput(player, data);
+                break;
+
+            case "#DerZugLuegtBuzzer":
+                DerZugLuegtClientBuzzer(player);
                 break;
 
             case "#ClientStimmtFuer":
@@ -296,6 +314,30 @@ public class SabotageServer : MonoBehaviour
         MemoryGrid.gameObject.SetActive(false);
         Memory = GameObject.Find("Modi/Memory");
         Memory.gameObject.SetActive(false);
+
+        // DerZugLuegt
+        DerZugLuegtAnzeigen = GameObject.Find("DerZugLuegt/GameObject");
+        DerZugLuegtAnzeigen.SetActive(false);
+        DerZugLuegt = GameObject.Find("Modi/DerZugLuegt");
+        DerZugLuegt.gameObject.SetActive(false);
+
+        // Tabu
+        TabuTimer = GameObject.Find("Tabu/Timer").GetComponent<Slider>();
+        TabuTimer.maxValue = 1;
+        TabuTimer.minValue = 0;
+        TabuTimer.value = 0;
+        Tabu = GameObject.Find("Modi/Tabu");
+        Tabu.gameObject.SetActive(false);
+
+        // Auswahlstrategie
+        AuswahlstrategieTimer = GameObject.Find("Auswahlstrategie/Timer").GetComponent<Slider>();
+        AuswahlstrategieTimer.maxValue = 1;
+        AuswahlstrategieTimer.minValue = 0;
+        AuswahlstrategieTimer.value = 0;
+        AuswahlstrategieGrid = GameObject.Find("Auswahlstrategie/Grid").transform;
+        AuswahlstrategieGrid.gameObject.SetActive(false);
+        Auswahlstrategie = GameObject.Find("Modi/Auswahlstrategie");
+        Auswahlstrategie.gameObject.SetActive(false);
     }
 
     #region Lobby
@@ -991,6 +1033,506 @@ public class SabotageServer : MonoBehaviour
     public void MemoryZurAuflösung()
     {
         ServerUtils.BroadcastImmediate("#MemoryZurAuflösung");
+        StartWahlAbstimmung();
+    }
+    #endregion
+    #region DerZugLuegt
+    Coroutine derzugluegtRunElement;
+    public void StartDerZugLuegt()
+    {
+        derzugluegtBlockBuzzer = true;
+        ServerUtils.BroadcastImmediate("#StartDerZugLuegt");
+        Lobby.SetActive(false);
+        DerZugLuegt.SetActive(true);
+        DerZugLuegtAnzeigen.SetActive(false);
+        GameObject.Find("DerZugLuegt/ClientBuzzer").SetActive(false);
+        GameObject.Find("DerZugLuegt/ServerSide/Freigeben").GetComponentInChildren<TMP_Text>().text = "Freigeben";
+    }
+    public void DerZugLuegtChangeText(int change)
+    {
+        DerZugLuegtAnzeigen.SetActive(true);
+        int newIndex = Config.SABOTAGE_SPIEL.derzugluegt.ChangeIndex(change);
+        GameObject.Find("DerZugLuegt/ServerSide/Index").GetComponent<TMP_Text>().text = "Text: " + (newIndex + 1) + "/" + Config.SABOTAGE_SPIEL.derzugluegt.rounds.Count;
+
+        Transform Elements = GameObject.Find("DerZugLuegt/ServerSide/Elements").transform;
+        for (int i = 0; i < Elements.childCount; i++)
+        {
+            Elements.GetChild(i).GetComponentInChildren<TMP_Text>().text = Config.SABOTAGE_SPIEL.derzugluegt.GetElementType(i).ToString().Replace("True", "<color=red>Drücken</color>").Replace("False", "") + ": " + Config.SABOTAGE_SPIEL.derzugluegt.GetElement(i);
+            Elements.GetChild(i).GetComponent<Button>().interactable = true;
+        }
+        GameObject.Find("DerZugLuegt/ServerSide/Thema").GetComponent<TMP_Text>().text = Config.SABOTAGE_SPIEL.derzugluegt.GetThema();
+    }
+    public void DerZugLuegtShowRound()
+    {
+        string thema = Config.SABOTAGE_SPIEL.derzugluegt.GetThema();
+        string elements = "Lösungen:";
+        for (int i = 0; i < 10; i++)
+        {
+            if (Config.SABOTAGE_SPIEL.derzugluegt.GetElementType(i))
+                elements += "~" + Config.SABOTAGE_SPIEL.derzugluegt.GetElement(i);
+        }
+
+        ServerUtils.BroadcastImmediate("#DerZugLuegtShowRound " + thema + "|" + elements);
+
+        GameObject.Find("DerZugLuegt/GameObject/Title").GetComponent<TMP_Text>().text = thema;
+        GameObject.Find("DerZugLuegt/ServerSide/Freigeben").GetComponentInChildren<TMP_Text>().text = "Freigeben";
+    }
+    public void DerZugLuegtStartElement(GameObject ob)
+    {
+        string element = ob.GetComponentInChildren<TMP_Text>().text;
+        ob.GetComponent<Button>().interactable = false;
+        ServerUtils.BroadcastImmediate("#DerZugLuegtStartElement " + element);
+        derzugluegtBlockBuzzer = false;
+
+        if (derzugluegtRunElement != null)
+            StopCoroutine(derzugluegtRunElement);
+        derzugluegtRunElement = StartCoroutine(DerZugLuegtRunElement(element));
+    }
+    bool derzugluegtBlockBuzzer;
+    IEnumerator DerZugLuegtRunElement(string element)
+    {
+        try
+        {
+            GameObject.Find("DerZugLuegt/GameObject/Grid/Image (0)").SetActive(true);
+            GameObject.Find("DerZugLuegt/GameObject/Grid/Image (1)").SetActive(true);
+            GameObject.Find("DerZugLuegt/GameObject/Grid/Image (2)").SetActive(true);
+            GameObject.Find("DerZugLuegt/GameObject/Grid/Image (3)").SetActive(true);
+            GameObject.Find("DerZugLuegt/GameObject/Grid/Image (4)").SetActive(true);
+            GameObject.Find("DerZugLuegt/GameObject/Grid/Image (5)").SetActive(true);
+            
+            GameObject.Find("DerZugLuegt/GameObject/Element").GetComponent<TMP_Text>().text = element;
+        }
+        catch 
+        {
+        }
+        yield return new WaitForSeconds(1f);
+        try
+        {
+            GameObject.Find("DerZugLuegt/GameObject/Grid/Image (5)").SetActive(false);
+        }
+        catch
+        {
+        }
+        yield return new WaitForSeconds(1f);
+        try
+        {
+            GameObject.Find("DerZugLuegt/GameObject/Grid/Image (4)").SetActive(false);
+        }
+        catch
+        {
+        }
+        yield return new WaitForSeconds(1f);
+        try
+        {
+            GameObject.Find("DerZugLuegt/GameObject/Grid/Image (3)").SetActive(false);
+        }
+        catch
+        {
+        }
+        yield return new WaitForSeconds(1f);
+        try
+        {
+            GameObject.Find("DerZugLuegt/GameObject/Grid/Image (2)").SetActive(false);
+        }
+        catch
+        {
+        }
+        yield return new WaitForSeconds(1f);
+        try
+        {
+            GameObject.Find("DerZugLuegt/GameObject/Grid/Image (1)").SetActive(false);
+        }
+        catch
+        {
+        }
+        yield return new WaitForSeconds(1f);
+        try
+        {
+            GameObject.Find("DerZugLuegt/GameObject/Grid/Image (0)").SetActive(false);
+        }
+        catch
+        {
+        }
+        yield return new WaitForSeconds(1f);
+        try
+        {
+            GameObject.Find("DerZugLuegt/GameObject/Element").GetComponent<TMP_Text>().text = "";
+        }
+        catch
+        {
+        }
+        
+        yield break;
+    }
+    public void DerZugLuegtRichtig()
+    {
+        AddTeamPoints(50);
+        ServerUtils.BroadcastImmediate("#DerZugLuegtRichtig " + GetTeamPoints());
+        GameObject.Find("DerZugLuegt/ServerSide/Freigeben").GetComponentInChildren<TMP_Text>().text = "Freigeben";
+        Correct.Play();
+        derzugluegtBlockBuzzer = false;
+    }
+    public void DerZugLuegtFalsch()
+    {
+        AddSaboteurPoints(50);
+        ServerUtils.BroadcastImmediate("#DerZugLuegtFalsch " + GetSaboteurPoints());
+        GameObject.Find("DerZugLuegt/ServerSide/Freigeben").GetComponentInChildren<TMP_Text>().text = "Freigeben";
+        Wrong.Play();
+        derzugluegtBlockBuzzer = false;
+    }
+    public void DerZugLuegtFreigeben()
+    {
+        GameObject.Find("DerZugLuegt/ServerSide/Freigeben").GetComponentInChildren<TMP_Text>().text = "Freigeben";
+        derzugluegtBlockBuzzer = false;
+    }
+    private void DerZugLuegtClientBuzzer(Player p)
+    {
+        if (derzugluegtBlockBuzzer)
+            return;
+        derzugluegtBlockBuzzer = true;
+
+        ServerUtils.BroadcastImmediate("#DerZugLuegtBuzzer");
+        GameObject.Find("DerZugLuegt/ServerSide/Freigeben").GetComponentInChildren<TMP_Text>().text = "Freigeben\nP:" + p.name;
+        Buzzer.Play();
+    }
+    public void DerZugLuegtGenSabos()
+    {
+        foreach (var item in sabotagePlayers)
+            item.SetSaboteur(false);
+
+        GenSaboteurForRound(2);
+        string names = "";
+        foreach (var item in sabotagePlayers)
+        {
+            if (item.isSaboteur)
+                names += "\n" + item.player.name;
+        }
+        if (names.Length > 0)
+            names = names.Substring("\n".Length);
+        WerIstSabo.transform.GetChild(0).GetComponent<TMP_Text>().text = names;
+
+        ServerUtils.BroadcastImmediate("#DuBistSaboteur " + names.Replace("\n", "~"));
+    }
+    public void DerZugLuegtZurAuflösung()
+    {
+        ServerUtils.BroadcastImmediate("#DerZugLuegtZurAuflösung");
+        StartWahlAbstimmung();
+    }
+    #endregion
+    #region Tabu
+    public void StartTabu()
+    {
+        ServerUtils.BroadcastImmediate("#StartTabu");
+        Lobby.SetActive(false);
+        Tabu.SetActive(true);
+        TabuTimer.gameObject.SetActive(false);
+        GameObject.Find("Tabu/GameObject/SaboTipp").SetActive(false);
+
+        tabuRichtigePunkte = 0;
+    }
+    Coroutine tabutimer;
+    int tabuRichtigePunkte;
+    public void TabuRunTimer(TMP_InputField input)
+    {
+        ServerUtils.BroadcastImmediate("#TabuRunTimer " + input.text);
+        if (tabutimer != null)
+            StopCoroutine(tabutimer);
+        tabutimer = StartCoroutine(TabuRunTimer(int.Parse(input.text)));
+    }
+    public void TabuStopTimer()
+    {
+        ServerUtils.BroadcastImmediate("#TabuStopTimer");
+        if (tabutimer != null)
+            StopCoroutine(tabutimer);
+        TabuTimer.gameObject.SetActive(false);
+    }
+    IEnumerator TabuRunTimer(int seconds)
+    {
+        yield return null;
+        TabuTimer.minValue = 0;
+        TabuTimer.maxValue = seconds * 1000; // Umrechnung in Millisekunden
+        TabuTimer.gameObject.SetActive(true);
+        int milis = seconds * 1000;
+
+        Debug.Log("Timer startet: " + DateTime.Now.ToString("HH:mm:ss:ffff"));
+        while (milis >= 0)
+        {
+            TabuTimer.GetComponentInChildren<Slider>().value = milis;
+
+            if (milis <= 0)
+            {
+                Beeep.Play();
+            }
+            // Moep Sound bei Sekunden
+            if (milis == 1000 || milis == 2000 || milis == 3000)
+            {
+                Moeoop.Play();
+            }
+            yield return new WaitForSecondsRealtime(0.1f); // Alle 100 Millisekunden warten
+            milis -= 100;
+        }
+        Debug.Log("Timer ended: " + DateTime.Now.ToString("HH:mm:ss:ffff"));
+
+        TabuTimer.gameObject.SetActive(false);
+        yield break;
+    }
+    public void TabuRichtig()
+    {
+        tabuRichtigePunkte += 50;
+        AddTeamPoints(50);
+
+        ServerUtils.BroadcastImmediate("#TabuRichtig " + GetTeamPoints() + "|" + GetSaboteurPoints());
+    }
+    public void TabuFalsch()
+    {
+        AddTeamPoints(-tabuRichtigePunkte);
+        tabuRichtigePunkte = 0;
+        AddSaboteurPoints(500);
+        
+        ServerUtils.BroadcastImmediate("#TabuFalsch " + GetTeamPoints() + "|" + GetSaboteurPoints());
+
+        if (tabutimer != null)
+            StopCoroutine(tabutimer);
+        TabuTimer.gameObject.SetActive(false);
+    }
+    public void TabuShowKarteToPlayer(GameObject go)
+    {
+        int index = int.Parse(go.name);
+        string tabu = Config.SABOTAGE_SPIEL.tabu.GetWort() + "|" + Config.SABOTAGE_SPIEL.tabu.GetTabus();
+        ServerUtils.SendMSG("#TabuShowKarteToPlayer " + tabu, sabotagePlayers[index].player, false);
+    }
+    public void TabuChangeText(int change)
+    {
+        tabuRichtigePunkte = 0;
+        int index = Config.SABOTAGE_SPIEL.tabu.ChangeIndex(change);
+        GameObject.Find("Tabu/ServerSide/Index").GetComponent<TMP_Text>().text = "Text: " + (Config.SABOTAGE_SPIEL.tabu.index + 1) + "/" + Config.SABOTAGE_SPIEL.tabu.tabus.Count;
+
+        string tabu = Config.SABOTAGE_SPIEL.tabu.GetWort() + "|" + Config.SABOTAGE_SPIEL.tabu.GetTabus();
+        ServerUtils.BroadcastImmediate("#TabuSaboTipp " + tabu.Split('|')[0]);
+
+        GameObject.Find("Tabu/GameObject/Wort").GetComponent<TMP_Text>().text = "Start: " +sabotagePlayers[index].player.name + " - " + tabu.Split('|')[0];
+        GameObject.Find("Tabu/GameObject/Tabu").GetComponent<TMP_Text>().text = "<color=red>No-Go: </color>" + tabu.Split('|')[1];
+    }
+    public void TabuGenSabos()
+    {
+        foreach (var item in sabotagePlayers)
+            item.SetSaboteur(false);
+
+        GenSaboteurForRound(2);
+        string names = "";
+        foreach (var item in sabotagePlayers)
+        {
+            if (item.isSaboteur)
+                names += "\n" + item.player.name;
+        }
+        if (names.Length > 0)
+            names = names.Substring("\n".Length);
+        WerIstSabo.transform.GetChild(0).GetComponent<TMP_Text>().text = names;
+
+        ServerUtils.BroadcastImmediate("#DuBistSaboteur " + names.Replace("\n", "~"));
+    }
+    public void TabuZurAuflösung()
+    {
+        ServerUtils.BroadcastImmediate("#TabuZurAuflösung");
+        StartWahlAbstimmung();
+    }
+    #endregion
+    #region Auswahlstrategie
+    public void StartAuswahlstrategie()
+    {
+        ServerUtils.BroadcastImmediate("#StartAuswahlstrategie");
+        Lobby.SetActive(false);
+        Auswahlstrategie.SetActive(true);
+        AuswahlstrategieTimer.gameObject.SetActive(false);
+        AuswahlstrategieGrid.gameObject.SetActive(false);
+    }
+    List<Sprite> auswahlstrategieAuswahl1;
+    List<Sprite> auswahlstrategieAuswahl2;
+    Coroutine auswahlstrategietimer;
+    string auswahlstrategieGewaehltesBild;
+    public void AuswahlstrategieRunTimer(TMP_InputField input)
+    {
+        ServerUtils.BroadcastImmediate("#AuswahlstrategieRunTimer " + input.text);
+        if (auswahlstrategietimer != null)
+            StopCoroutine(auswahlstrategietimer);
+        auswahlstrategietimer = StartCoroutine(AuswahlstrategieRunTimer(int.Parse(input.text)));
+    }
+    public void AuswahlstrategieStopTimer()
+    {
+        ServerUtils.BroadcastImmediate("#AuswahlstrategieStopTimer");
+        if (auswahlstrategietimer != null)
+            StopCoroutine(auswahlstrategietimer);
+        AuswahlstrategieTimer.gameObject.SetActive(false);
+    }
+    IEnumerator AuswahlstrategieRunTimer(int seconds)
+    {
+        yield return null;
+        AuswahlstrategieTimer.minValue = 0;
+        AuswahlstrategieTimer.maxValue = seconds * 1000; // Umrechnung in Millisekunden
+        AuswahlstrategieTimer.gameObject.SetActive(true);
+        int milis = seconds * 1000;
+
+        Debug.Log("Timer startet: " + DateTime.Now.ToString("HH:mm:ss:ffff"));
+        while (milis >= 0)
+        {
+            AuswahlstrategieTimer.GetComponentInChildren<Slider>().value = milis;
+
+            if (milis <= 0)
+            {
+                Beeep.Play();
+            }
+            // Moep Sound bei Sekunden
+            if (milis == 1000 || milis == 2000 || milis == 3000)
+            {
+                Moeoop.Play();
+            }
+            yield return new WaitForSecondsRealtime(0.1f); // Alle 100 Millisekunden warten
+            milis -= 100;
+        }
+        Debug.Log("Timer ended: " + DateTime.Now.ToString("HH:mm:ss:ffff"));
+
+        AuswahlstrategieTimer.gameObject.SetActive(false);
+        yield break;
+    }
+    public void AuswahlstrategieChangeText(int change)
+    {
+        int index = Config.SABOTAGE_SPIEL.auswahlstrategie.ChangeIndex(change);
+        GameObject.Find("Auswahlstrategie/ServerSide/Index").GetComponent<TMP_Text>().text = "Text: " + (Config.SABOTAGE_SPIEL.auswahlstrategie.index + 1) + "/" + Config.SABOTAGE_SPIEL.auswahlstrategie.runden.Count;
+
+        GameObject.Find("Auswahlstrategie/ServerSide/SpielerErsteAuswahl").GetComponent<TMP_Text>().text =
+            sabotagePlayers[int.Parse(Config.SABOTAGE_SPIEL.auswahlstrategie.playerturn[index].Split("~")[0])].player.name + "\n" +
+            sabotagePlayers[int.Parse(Config.SABOTAGE_SPIEL.auswahlstrategie.playerturn[index].Split("~")[1])].player.name;
+        
+        List<Sprite> temp = new List<Sprite>();
+        temp.AddRange(Config.SABOTAGE_SPIEL.auswahlstrategie.GetList());
+        auswahlstrategieAuswahl1 = new List<Sprite>();
+        while (temp.Count > 0)
+        {
+            Sprite sp = temp[UnityEngine.Random.Range(0, temp.Count)];
+            temp.Remove(sp);
+            auswahlstrategieAuswahl1.Add(sp);
+        }
+        auswahlstrategieAuswahl2 = new List<Sprite>();
+        temp = new List<Sprite>();
+        temp.AddRange(Config.SABOTAGE_SPIEL.auswahlstrategie.GetList());
+        while (temp.Count > 0)
+        {
+            Sprite sp = temp[UnityEngine.Random.Range(0, temp.Count)];
+            temp.Remove(sp);
+            auswahlstrategieAuswahl2.Add(sp);
+        }
+
+        AuswahlstrategieGrid.gameObject.SetActive(true);
+        for (int i = 0; i < 7; i++)
+        {
+            AuswahlstrategieGrid.GetChild(i).GetChild(0).GetComponent<Image>().sprite = auswahlstrategieAuswahl1[i];
+            AuswahlstrategieGrid.GetChild(i).GetComponent<Image>().enabled = false;
+        }
+
+        string list = "";
+        foreach (var item in auswahlstrategieAuswahl1)
+            list += "~" + item.name;
+        if (list.Length > 0)
+            list = list.Substring(1);
+
+        ServerUtils.BroadcastImmediate("#AuswahlstrategieShowSaboTipp " + list);
+    }
+    public void AuswahlstrategieSelectItem(Button go)
+    {
+        if (!Config.SERVER_STARTED)
+            return;
+
+        if (go.gameObject.GetComponent<Image>().enabled)
+        {
+            go.gameObject.GetComponent<Image>().enabled = false;
+        }
+        else
+        {
+            for (int i = 0; i < 7;i++)
+                AuswahlstrategieGrid.GetChild(i).GetComponent<Image>().enabled = false;
+            go.gameObject.GetComponent<Image>().enabled = true;
+            auswahlstrategieGewaehltesBild = go.transform.GetChild(0).GetComponent<Image>().sprite.name;
+        }
+    }
+    public void AuswahlstrategieShowFirstAuswahl()
+    {
+        string list = "";
+        foreach (var item in auswahlstrategieAuswahl1)
+            list += "~" + item.name;
+        if (list.Length > 0)
+            list = list.Substring(1);
+        AuswahlstrategieGrid.gameObject.SetActive(true);
+        for (int i = 0; i < 7; i++)
+            AuswahlstrategieGrid.GetChild(i).GetChild(0).GetComponent<Image>().sprite = auswahlstrategieAuswahl1[i];
+
+        ServerUtils.BroadcastImmediate("#AuswahlstrategieShowFirstAuswahl " + list + "|" + Config.SABOTAGE_SPIEL.auswahlstrategie.GetPlayerTurn());
+    }
+    public void AuswahlstrategieShowSecondAuswahl()
+    {
+        string list = "";
+        foreach (var item in auswahlstrategieAuswahl2)
+            list += "~" + item.name;
+        if (list.Length > 0)
+            list = list.Substring(1);
+        AuswahlstrategieGrid.gameObject.SetActive(true);
+        for (int i = 0; i < 7; i++)
+            AuswahlstrategieGrid.GetChild(i).GetChild(0).GetComponent<Image>().sprite = auswahlstrategieAuswahl2[i];
+
+        for (int i = 0; i < 7; i++)
+        {
+            AuswahlstrategieGrid.GetChild(i).GetComponent<Image>().enabled = false;
+            if (AuswahlstrategieGrid.GetChild(i).GetChild(0).GetComponent<Image>().sprite.name == auswahlstrategieGewaehltesBild)
+                AuswahlstrategieGrid.GetChild(i).GetComponent<Image>().enabled = true;
+        }
+
+        int auswahlitem = -1;
+        for (int i = 0; i < 7; i++)
+            if (AuswahlstrategieGrid.GetChild(i).GetComponent<Image>().enabled)
+                auswahlitem = i;
+
+        ServerUtils.BroadcastImmediate("#AuswahlstrategieShowSecondAuswahl " + list + "|" + Config.SABOTAGE_SPIEL.auswahlstrategie.GetPlayerTurn() + "|" + auswahlitem);
+    }
+    public void AuswahlstrategieRichtig()
+    {
+        AddTeamPoints(500);
+        int auswahlitem = -1;
+        for (int i = 0; i < 7; i++)
+            if (AuswahlstrategieGrid.GetChild(i).GetComponent<Image>().enabled)
+                auswahlitem = i;
+
+        ServerUtils.BroadcastImmediate("#AuswahlstrategieRichtig " + GetTeamPoints() + "|" + GetSaboteurPoints() + "|" + auswahlitem);
+    }
+    public void AuswahlstrategieFalsch()
+    {
+        AddSaboteurPoints(500);
+        int auswahlitem = -1;
+        for (int i = 0; i < 7; i++)
+            if (AuswahlstrategieGrid.GetChild(i).GetComponent<Image>().enabled)
+                auswahlitem = i;
+
+        ServerUtils.BroadcastImmediate("#AuswahlstrategieFalsch " + GetTeamPoints() + "|" + GetSaboteurPoints() + "|" + auswahlitem);
+    }
+    public void AuswahlstrategieGenSabos()
+    {
+        foreach (var item in sabotagePlayers)
+            item.SetSaboteur(false);
+
+        GenSaboteurForRound(2);
+        string names = "";
+        foreach (var item in sabotagePlayers)
+        {
+            if (item.isSaboteur)
+                names += "\n" + item.player.name;
+        }
+        if (names.Length > 0)
+            names = names.Substring("\n".Length);
+        WerIstSabo.transform.GetChild(0).GetComponent<TMP_Text>().text = names;
+
+        ServerUtils.BroadcastImmediate("#DuBistSaboteur " + names.Replace("\n", "~"));
+    }
+    public void AuswahlstrategieZurAuflösung()
+    {
+        ServerUtils.BroadcastImmediate("#AuswahlstrategieZurAuflösung");
         StartWahlAbstimmung();
     }
     #endregion

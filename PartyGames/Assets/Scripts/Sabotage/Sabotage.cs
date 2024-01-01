@@ -5,6 +5,8 @@ using System.Text.RegularExpressions;
 using System.Text;
 using UnityEngine;
 using System.Linq;
+using System.Reflection;
+using UnityEngine.Experimental.AI;
 
 public class Sabotage
 {
@@ -150,9 +152,9 @@ public class SabotageSortieren
             {
                 sortby[index] = line.Substring("SortBy:".Length);
             }
-            else if (line.StartsWith("-"))
+            else
             {
-                runden[index].Add(line.Substring(1));
+                runden[index].Add(line);
             }
         }
         
@@ -222,17 +224,151 @@ public class SabotageMemory
 
 public class SabotageDerZugLuegt
 {
+    // 5 Runden mit je 10 Elementen - 50 Elemente insgesamt 
+    // 50 Punkte pro Element
+    // ca. 10-15 Lügen
+    public List<string> thema;
+    public List<List<string>> rounds;
+    public int index;
 
+    public SabotageDerZugLuegt()
+    {
+        if (!File.Exists(Config.MedienPath + @"/Spiele/Sabotage/DerZugLuegt.txt"))
+            File.Create(Config.MedienPath + @"/Spiele/Sabotage/DerZugLuegt.txt").Close();
+
+        index = 0;
+        this.thema = new List<string>();
+        this.rounds = new List<List<string>>();
+        for (int i = 0; i < 5; i++)
+            this.rounds.Add(new List<string>());
+
+        foreach (var item in File.ReadAllLines(Config.MedienPath + @"/Spiele/Sabotage/DerZugLuegt.txt"))
+        {
+            int index = int.Parse(item.Substring(0,1));
+            string temp = item.Substring(1);
+            if (temp.StartsWith("Title:"))
+                this.thema.Add(temp.Substring("Title:".Length));
+            else
+                this.rounds[index].Add(temp);
+        }
+
+        for (int i = 0; i < 5; i++)
+            while (this.rounds[i].Count < 10)
+                this.rounds[i].Add("False|Error");
+        while (this.thema.Count < 5)
+            this.thema.Add("Kein Thema");
+    }
+
+    public int ChangeIndex(int change)
+    {
+        if (this.index <= 0 && change == -1)
+            return 0;
+        else if (this.index == this.rounds.Count - 1 && change == 1)
+            return this.rounds.Count - 1;
+        this.index += change;
+        return this.index;
+    }
+    public string GetThema()
+    {
+        return this.thema[index];
+    }
+    public string GetElement(int i)
+    {
+        return this.rounds[index][i].Split('|')[1];
+    }
+    public bool GetElementType(int i)
+    {
+        return bool.Parse(this.rounds[index][i].Split('|')[0]);
+    }
 }
 
 // Spieler Nach einander Reinziehen
+// 3 Min Zeit
 public class SabotageTabu
 {
+    public int index;
+    public List<string> tabus;
 
+    public SabotageTabu()
+    {
+        this.tabus = new List<string>();
+        this.index = -1;
+
+        if (!File.Exists(Config.MedienPath + @"/Spiele/Sabotage/Tabu.txt"))
+            File.Create(Config.MedienPath + @"/Spiele/Sabotage/Tabu.txt").Close();
+
+        foreach (var item in File.ReadAllLines(Config.MedienPath + @"/Spiele/Sabotage/Tabu.txt"))
+        {
+            this.tabus.Add(item);
+        }
+    }
+
+    public int ChangeIndex(int change)
+    {
+        if (this.index <= 0 && change == -1)
+            return 0;
+        else if (this.index == this.tabus.Count - 1 && change == 1)
+            return this.tabus.Count - 1;
+        this.index += change;
+        return this.index;
+    }
+    public string GetWort()
+    {
+        return this.tabus[index].Split('|')[0];
+    }
+    public string GetTabus()
+    {
+        return this.tabus[index].Split('|')[1].Replace("~", "   ");
+    }
 }
 
 // Spieler rein ziehen
 public class SabotageAuswahlstrategie
 {
+    public int index;
+    public List<List<Sprite>> runden;
+    public List<string> playerturn;
 
+    public SabotageAuswahlstrategie()
+    {
+        this.index = -1;
+        this.runden = new List<List<Sprite>>();
+        for (int i = 0; i < 5; i++) 
+        {
+            List<Sprite> sprites = new List<Sprite>();
+            foreach (var item in Resources.LoadAll<Sprite>("Spiele/Sabotage/Auswahlstrategie/"))
+            {
+                if (int.Parse(item.name.Substring(0, 1)) == i)
+                {
+                    sprites.Add(item);
+                }
+            }
+            this.runden.Add(sprites);
+        }
+        this.playerturn = new List<string>();
+        this.playerturn.Add("0~4");
+        this.playerturn.Add("2~3");
+        this.playerturn.Add("1~4");
+        this.playerturn.Add("3~0");
+        this.playerturn.Add("1~2");
+    }
+    public int ChangeIndex(int change)
+    {
+        if (this.index <= 0 && change == -1)
+            return 0;
+        else if (this.index == this.runden.Count - 1 && change == 1)
+            return this.runden.Count - 1;
+        this.index += change;
+        return this.index;
+    }
+
+    public List<Sprite> GetList()
+    {
+        return runden[index];
+    }
+
+    public string GetPlayerTurn()
+    {
+        return playerturn[index];
+    }
 }
