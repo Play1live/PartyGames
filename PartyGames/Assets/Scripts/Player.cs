@@ -27,6 +27,11 @@ public class Player
         this.icon2 = new PlayerIcon();
     }
 
+    public override string ToString()
+    {
+        return "Player ID: " + id + " isConnected: " + isConnected + " TCP: " + tcp.Client.RemoteEndPoint + " Name: " + name + " Icon: " + icon2 + " Kronen: " + crowns + " Points: " + points;
+    }
+
     public static int getPosInLists(int id)
     {
         for (int i = 0; i < Config.PLAYERLIST.Length; i++)
@@ -122,6 +127,11 @@ public class PlayerIcon
         this.names = new List<string>();
         this.names.Add("empty");
         this.displayname = this.names[0];
+    }
+
+    public override string ToString()
+    {
+        return "PlayerIcon: ID: " + id + " Icon: " + icon.name + " Displayname: " + displayname + "Names: [" + string.Join(",", names) + "]";
     }
 
     public static int getIdByName(string name)

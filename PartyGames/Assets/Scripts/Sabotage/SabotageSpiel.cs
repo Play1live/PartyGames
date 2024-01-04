@@ -7,14 +7,13 @@ using UnityEngine.UI;
 
 public class SabotageSpiel
 {
-    public static int minPlayer = 3;
-    public static int maxPlayer = 9;
+    public static int minPlayer = 6;
+    public static int maxPlayer = 6;
     public static string path = "/Spiele/Sabotage";
 
     public int spielindex;
     public SabotageDiktat diktat;
     public SabotageSortieren sortieren;
-    public SabotageMemory memory;
     public SabotageDerZugLuegt derzugluegt;
     public SabotageTabu tabu;
     public SabotageAuswahlstrategie auswahlstrategie;
@@ -28,10 +27,9 @@ public class SabotageSpiel
         #region Spiele
         diktat = new SabotageDiktat();                      // s1
         sortieren = new SabotageSortieren();                // s2 + s4
-        memory = new SabotageMemory();                      // s3
         derzugluegt = new SabotageDerZugLuegt();            // s4 + s5
         tabu = new SabotageTabu();                          // s5 + s3
-        auswahlstrategie = new SabotageAuswahlstrategie();  // s2 + s1 
+        auswahlstrategie = new SabotageAuswahlstrategie();  // s2
         #endregion
     }
 
@@ -59,6 +57,8 @@ public class SabotagePlayer
     public int points;
     public bool isSaboteur;
     public int wasSaboteur;
+    public int saboteurTokens;
+    public int placedTokens;
 
     public SabotagePlayer(Player player, GameObject PlayerAnzeige)
     {
@@ -66,7 +66,8 @@ public class SabotagePlayer
         this.points = 0;
         this.isSaboteur = false;
         this.wasSaboteur = 0;
-
+        this.saboteurTokens = 100;
+        this.placedTokens = 0;
 
         this.playerAnzeige = new GameObject[7];
         this.playerAnzeige[0] = PlayerAnzeige;  // GameObject
@@ -85,6 +86,11 @@ public class SabotagePlayer
             this.playerAnzeige[6].GetComponent<TMP_InputField>().interactable = true;
         else
             this.playerAnzeige[6].GetComponent<TMP_InputField>().interactable = false;
+    }
+
+    public override string ToString()
+    {
+        return "SabotagePlayer Player: " + player + " Points: " + points + " isSaboteur: " + isSaboteur + " wasSaboteur: " + wasSaboteur + " saboteurTokens: " + saboteurTokens + " placedTokens: " + placedTokens;
     }
 
     public void SetSaboteur(bool isSaboteur)
@@ -113,8 +119,24 @@ public class SabotagePlayer
     {
         SetPunkte(this.points += punkte);
     }
+    public void SetHiddenPoins(int punkte)
+    {
+        this.points = punkte;
+    }
+    public void AddHiddenPoins(int punkte)
+    {
+        this.points += punkte;
+    }
+    public void HidePunkte()
+    {
+        this.playerAnzeige[6].GetComponent<TMP_InputField>().text = "";
+    }
     public void DeleteImage()
     {
         this.playerAnzeige[3].GetComponent<Image>().sprite = new PlayerIcon().icon;
+    }
+    public void UpdateImage()
+    {
+        this.playerAnzeige[3].GetComponent<Image>().sprite = player.icon2.icon;
     }
 }

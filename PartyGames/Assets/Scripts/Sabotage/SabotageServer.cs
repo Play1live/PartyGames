@@ -1,7 +1,9 @@
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 using TMPro;
@@ -26,10 +28,12 @@ public class SabotageServer : MonoBehaviour
     GameObject WerIstSabo;
 
     GameObject Lobby;
+    Slider LobbyTimer;
 
     GameObject SaboteurWahlAufloesung;
     GameObject SaboteurWahlAufloesungAbstimmung;
     GameObject SaboteurWahlAufloesungPunkteverteilung;
+    Slider AbstimmungTimer;
 
     GameObject Diktat;
     TMP_InputField DiktatLoesung;
@@ -40,12 +44,6 @@ public class SabotageServer : MonoBehaviour
     GameObject SortierenListe;
     GameObject SortierenAuswahl;
     GameObject SortierenLoesung;
-
-    GameObject Memory;
-    Slider MemoryTimer;
-    GameObject MemoryGrid;
-    Image MemoryTap1;
-    Image MemoryTap2;
 
     GameObject DerZugLuegt;
     GameObject DerZugLuegtAnzeigen;
@@ -165,11 +163,16 @@ public class SabotageServer : MonoBehaviour
                 break;
             case "#JoinSabotage":
                 PlayerConnected[player.id - 1] = true;
+                sabotagePlayers[player.id - 1].UpdateImage();
                 UpdateSpielerBroadcast();
                 break;
             case "#ClientFocusChange":
                 ServerUtils.BroadcastImmediate("#ClientFocusChange " + player.id + "*" + data);
                 Config.SABOTAGE_SPIEL.getPlayerByPlayer(sabotagePlayers, player).SetAusgetabbt(!bool.Parse(data));
+                break;
+
+            case "#LobbyClientplazedTokens":
+                LobbyClientplazedTokens(player, data);
                 break;
 
             case "#DiktatPlayerInput":
@@ -183,6 +186,9 @@ public class SabotageServer : MonoBehaviour
             case "#ClientStimmtFuer":
                 ClientStimmtFuer(player, data); 
                 break;
+            case "#ClientStimmtGegen":
+                ClientStimmtGegen(player, data);
+                break;
         }
     }
     #endregion
@@ -193,6 +199,8 @@ public class SabotageServer : MonoBehaviour
     {
         Logging.log(Logging.LogType.Debug, "SabotageServer", "SpielVerlassenButton", "Spiel wird beendet. Lädt ins Hauptmenü.");
         //SceneManager.LoadScene("Startup");
+        foreach (var player in sabotagePlayers)
+            player.player.points = player.points;
         ServerUtils.LoadKronen(Config.PLAYERLIST);
         ServerUtils.BroadcastImmediate(Config.GLOBAL_TITLE + "#ZurueckInsHauptmenue");
     }
@@ -230,6 +238,7 @@ public class SabotageServer : MonoBehaviour
     {
         if (!Config.SERVER_STARTED)
             return;
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "ChangePlayerPoints", input.text);
         int playerid = int.Parse(input.transform.parent.parent.name.Replace("Player (", "").Replace(")", ""));
         sabotagePlayers[playerid - 1].SetPunkte(int.Parse(input.text));
 
@@ -240,6 +249,7 @@ public class SabotageServer : MonoBehaviour
     /// </summary>
     private void InitAnzeigen()
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "InitAnzeigen", "Initialisiert die Anzeigen...");
         connectedPlayers = 0;
         Transform modi = GameObject.Find("Modi").transform;
         for (int i = 0; i < modi.childCount; i++)
@@ -261,9 +271,17 @@ public class SabotageServer : MonoBehaviour
         // Lobby
         Lobby = GameObject.Find("Lobby");
         Lobby.SetActive(true);
+        LobbyTimer = GameObject.Find("Lobby/Timer").GetComponent<Slider>();
+        LobbyTimer.maxValue = 1;
+        LobbyTimer.minValue = 0;
+        LobbyTimer.value = 0;
+        LobbyTimer.gameObject.SetActive(false);
         GameObject.Find("Lobby/Server/StartSpielIndex").GetComponent<TMP_Text>().text = "Starte Spiel: " + Config.SABOTAGE_SPIEL.spielindex;
         GameObject.Find("Punktetafel/SaboteurPunkte").GetComponent<TMP_InputField>().interactable = true;
         GameObject.Find("Punktetafel/TeamPunkte").GetComponent<TMP_InputField>().interactable = true;
+        GameObject temp = GameObject.Find("Lobby/Client");
+        if (temp != null)
+            temp.gameObject.SetActive(false);
 
         // SaboteurWahl & Aufloesung
         SaboteurWahlAufloesung = GameObject.Find("SaboteurWahl&Aufloesung");
@@ -275,6 +293,11 @@ public class SabotageServer : MonoBehaviour
         SaboteurWahlAufloesungAbstimmung.SetActive(false);
         SaboteurWahlAufloesungPunkteverteilung = SaboteurWahlAufloesung.transform.GetChild(1).gameObject;
         SaboteurWahlAufloesungPunkteverteilung.SetActive(false);
+        AbstimmungTimer = SaboteurWahlAufloesungAbstimmung.transform.GetChild(2).GetComponent<Slider>();
+        AbstimmungTimer.maxValue = 1;
+        AbstimmungTimer.minValue = 0;
+        AbstimmungTimer.value = 0;
+        AbstimmungTimer.gameObject.SetActive(false);
 
         // Diktat
         DiktatTimer = GameObject.Find("Diktat/Timer").GetComponent<Slider>();
@@ -300,20 +323,6 @@ public class SabotageServer : MonoBehaviour
         SortierenLoesung.gameObject.SetActive(false);
         Sortieren = GameObject.Find("Modi/Sortieren");
         Sortieren.SetActive(false);
-
-        // Memory
-        MemoryTimer = GameObject.Find("Memory/Timer").GetComponent<Slider>();
-        MemoryTimer.maxValue = 1;
-        MemoryTimer.minValue = 0;
-        MemoryTimer.value = 0;
-        MemoryTap1 = GameObject.Find("Memory/ServerSide/- (1)").transform.GetChild(0).GetChild(0).GetComponent<Image>();
-        MemoryTap1.sprite = null;
-        MemoryTap2 = GameObject.Find("Memory/ServerSide/- (2)").transform.GetChild(0).GetChild(0).GetComponent<Image>();
-        MemoryTap2.sprite = null;
-        MemoryGrid = GameObject.Find("Memory/Grid");
-        MemoryGrid.gameObject.SetActive(false);
-        Memory = GameObject.Find("Modi/Memory");
-        Memory.gameObject.SetActive(false);
 
         // DerZugLuegt
         DerZugLuegtAnzeigen = GameObject.Find("DerZugLuegt/GameObject");
@@ -341,36 +350,131 @@ public class SabotageServer : MonoBehaviour
     }
 
     #region Lobby
+    public void LobbyPlayerSeeAllPointsToggle(Toggle toggle)
+    {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "LobbyPlayerSeeAllPointsToggle", toggle.isOn+"");
+        ServerUtils.BroadcastImmediate("#LobbyPlayerSeeAllPointsToggle " + toggle.isOn);
+    }
     public void LobbyChangeSpielIndex(int change)
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "LobbyChangeSpielIndex", change+"");
         if (change == -1 && Config.SABOTAGE_SPIEL.spielindex <= 0)
             Config.SABOTAGE_SPIEL.spielindex = 0;
         else
             Config.SABOTAGE_SPIEL.spielindex += change;
-        GameObject.Find("Lobby/Server/StartSpielIndex").GetComponent<TMP_Text>().text = "Starte Spiel: " + Config.SABOTAGE_SPIEL.spielindex;
+        GameObject.Find("Lobby/Server/StartSpielIndex").GetComponent<TMP_Text>().text = "Starte Spiel: " + Config.SABOTAGE_SPIEL.spielindex + "/6";
         // TODO: Animiere den Spielstart
     }
     public void UpdateTeamSaboPunkte()
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "UpdateTeamSaboPunkte", "");
         ServerUtils.BroadcastImmediate("#UpdateTeamSaboPunkte " + GameObject.Find("Punktetafel/SaboteurPunkte").GetComponent<TMP_InputField>().text + "|" + GameObject.Find("Punktetafel/TeamPunkte").GetComponent<TMP_InputField>().text);
+    }
+    Coroutine lobbytokens;
+    public void LobbyStartTokenPlazierungen()
+    {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "LobbyStartTokenPlazierungen", "");
+        string playertokens = "";
+        foreach (var item in sabotagePlayers)
+            playertokens += "~" + item.saboteurTokens;
+        if (playertokens.Length > 0)
+            playertokens = playertokens.Substring(1);
+        int timerseconds = 12;
+        ServerUtils.BroadcastImmediate("#LobbyStartTokenPlacement " + timerseconds  + "|" + playertokens);
+
+        if (lobbytokens != null)
+            StopCoroutine(lobbytokens);
+        lobbytokens = StartCoroutine(LobbyRunTimer(timerseconds)); // 120
+    }
+    bool lobbyblocktokens;
+    IEnumerator LobbyRunTimer(int seconds)
+    {
+        yield return null;
+        lobbyblocktokens = false;
+        LobbyTimer.minValue = 0;
+        LobbyTimer.maxValue = seconds * 1000; // Umrechnung in Millisekunden
+        LobbyTimer.gameObject.SetActive(true);
+        int milis = seconds * 1000;
+
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "LobbyRunTimer", "Seconds: " + seconds + "  Timer started: " + DateTime.Now.ToString("HH:mm:ss:ffff"));
+        while (milis >= 0)
+        {
+            LobbyTimer.GetComponentInChildren<Slider>().value = milis;
+
+            if (milis <= 0)
+            {
+                Beeep.Play();
+            }
+            // Moep Sound bei Sekunden
+            if (milis == 1000 || milis == 2000 || milis == 3000)
+            {
+                Moeoop.Play();
+            }
+            yield return new WaitForSecondsRealtime(0.1f); // Alle 100 Millisekunden warten
+            milis -= 100;
+        }
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "LobbyRunTimer", "Seconds: " + seconds + "  Timer ended: " + DateTime.Now.ToString("HH:mm:ss:ffff"));
+
+        yield return new WaitForSeconds(4f);
+        lobbyblocktokens = true;
+        yield return new WaitForSeconds(1f);
+        for (int i = 0; i < sabotagePlayers.Length; i++)
+        {
+            sabotagePlayers[i].saboteurTokens -= sabotagePlayers[i].placedTokens;
+            Logging.log(Logging.LogType.Normal, "SabotageServer", "LobbyRunTimer", sabotagePlayers[i].player.name + ": " + sabotagePlayers[i].placedTokens);
+        }
+        LobbyTimer.gameObject.SetActive(false);
+        yield break;
+    }
+    private void LobbyClientplazedTokens(Player p, string data)
+    {
+        if (lobbyblocktokens)
+            return;
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "LobbyClientplazedTokens", p.name + " - " + data);
+        sabotagePlayers[p.id - 1].placedTokens = int.Parse(data);
+    }
+    public void LobbyGenSaboteurs(TMP_InputField input)
+    {
+        if (input.text.Length == 0 || input.text.Equals("0"))
+            return;
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "LobbyClientplazedTokens", input.text);
+
+        foreach (var item in sabotagePlayers)
+            item.SetSaboteur(false);
+
+        GenSaboteurForRound(int.Parse(input.text));
+        string names = "";
+        foreach (var item in sabotagePlayers)
+        {
+            if (item.isSaboteur)
+                names += "\n" + item.player.name;
+        }
+        if (names.Length > 0)
+            names = names.Substring("\n".Length);
+        WerIstSabo.transform.GetChild(0).GetComponent<TMP_Text>().text = names;
+
+        ServerUtils.BroadcastImmediate("#DuBistSaboteur " + names.Replace("\n", "~"));
     }
     #endregion
     #region Wahl & Abstimmung
     private void StartWahlAbstimmung()
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "StartWahlAbstimmung", "");
         // Blende alles aus
         Transform modi = GameObject.Find("Modi").transform;
         for (int i = 0; i < modi.childCount; i++)
             modi.GetChild(i).gameObject.SetActive(false);
 
         SaboteurWahlAufloesung.SetActive(true);
+        SaboteurWahlAufloesung.transform.GetChild(2).gameObject.SetActive(true);
         SaboteurWahlAufloesungAbstimmung.SetActive(false);
         SaboteurWahlAufloesungPunkteverteilung.SetActive(false);
-        abstimmungClientStimme = new int[5];
+        abstimmungClientStimme = new int[5, 5];
     }
     // Abstimmung
     public void AbstimmungStart()
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "AbstimmungStart", "");
         ServerUtils.BroadcastImmediate("#AbstimmungStart");
 
         SaboteurWahlAufloesungAbstimmung.SetActive(true);
@@ -387,82 +491,131 @@ public class SabotageServer : MonoBehaviour
             GameObject.Find("SaboteurWahl&Aufloesung/Abstimmung/Server/Icon (" + (sabotagePlayers[i].player.id) + ")").
                 GetComponentInChildren<Button>().interactable = false;
         }
-        abstimmungClientStimme = new int[5];
+        abstimmungClientStimme = new int[5, 5];
     }
-    int[] abstimmungClientStimme;
+    public void AbstimmungRunTimer(TMP_InputField input)
+    {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "AbstimmungRunTimer", "");
+        ServerUtils.BroadcastImmediate("#AbstimmungRunTimer " + input.text);
+        StartCoroutine(AbstimmungRunTimer(int.Parse(input.text)));
+    }
+    IEnumerator AbstimmungRunTimer(int seconds)
+    {
+        yield return null;
+        AbstimmungTimer.minValue = 0;
+        AbstimmungTimer.maxValue = seconds * 1000; // Umrechnung in Millisekunden
+        AbstimmungTimer.gameObject.SetActive(true);
+        int milis = seconds * 1000;
+
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "AbstimmungRunTimer", "Seconds: " + seconds + "  Timer started: " + DateTime.Now.ToString("HH:mm:ss:ffff"));
+        while (milis >= 0)
+        {
+            AbstimmungTimer.GetComponentInChildren<Slider>().value = milis;
+
+            if (milis <= 0)
+            {
+                Beeep.Play();
+            }
+            // Moep Sound bei Sekunden
+            if (milis == 1000 || milis == 2000 || milis == 3000)
+            {
+                Moeoop.Play();
+            }
+            yield return new WaitForSecondsRealtime(0.1f); // Alle 100 Millisekunden warten
+            milis -= 100;
+        }
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "AbstimmungRunTimer", "Seconds: " + seconds + "  Timer ended: " + DateTime.Now.ToString("HH:mm:ss:ffff"));
+
+        AbstimmungTimer.gameObject.SetActive(false);
+        yield return new WaitForSeconds(2f);
+
+        yield break;
+    }
+    int[,] abstimmungClientStimme;
     private void ClientStimmtFuer(Player p, string data)
     {
-        abstimmungClientStimme[p.id - 1] = int.Parse(data);
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "ClientStimmtFuer", p.name + " - " + data);
+        abstimmungClientStimme[p.id - 1, int.Parse(data)] = 1;
         int[] votes = new int[5];
-        foreach (var item in abstimmungClientStimme)
+        for (int i = 0; i < 5; i++) // Player
         {
-            if (item == 0)
-                continue;
-            votes[item-1]++;
+            for (int j = 0; j < 5; j++) // Votes
+            {
+                votes[i] += abstimmungClientStimme[i, j];
+            }
+            GameObject.Find("SaboteurWahl&Aufloesung/Abstimmung/Server/Icon (" + (i + 1) + ")").
+                GetComponentInChildren<TMP_Text>().text = "" + votes[i];
         }
-
-        for (int i = 0;i < abstimmungClientStimme.Length;i++)
+    }
+    private void ClientStimmtGegen(Player p, string data)
+    {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "ClientStimmtGegen", p.name + " - " + data);
+        abstimmungClientStimme[p.id - 1, int.Parse(data)] = 0;
+        int[] votes = new int[5];
+        for (int i = 0; i < 5; i++) // Player
         {
-            GameObject.Find("SaboteurWahl&Aufloesung/Abstimmung/Server/Icon (" + (i+1) + ")").
+            for (int j = 0; j < 5; j++) // Votes
+            {
+                votes[i] += abstimmungClientStimme[i, j];
+            }
+            GameObject.Find("SaboteurWahl&Aufloesung/Abstimmung/Server/Icon (" + (i + 1) + ")").
                 GetComponentInChildren<TMP_Text>().text = "" + votes[i];
         }
     }
     string aufloesungBonusPunkte;
     public void AufloesungStart()
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "AufloesungStart", "");
         SaboteurWahlAufloesungAbstimmung.SetActive(false);
         SaboteurWahlAufloesungPunkteverteilung.SetActive(true);
         SaboteurWahlAufloesungPunkteverteilung.transform.GetChild(6).gameObject.SetActive(false);
 
+        int[] wrongvotes = new int[5];
+        for (int i = 0; i < 5; i++) // Player
+        {
+            for (int j = 0; j < 5; j++) // Votes
+            {
+                if (abstimmungClientStimme[i, j] == 1 && !sabotagePlayers[j].isSaboteur)
+                {
+                    wrongvotes[i] += -100;
+                }
+            }
+        }
+        string aktuellepunkte = "";
+        for (int i = 0; i < sabotagePlayers.Length; i++)
+        {
+            sabotagePlayers[i].AddHiddenPoins(wrongvotes[i]);
+            aktuellepunkte += "~" + sabotagePlayers[i].points;
+        }
+        if (aktuellepunkte.Length > 0)
+            aktuellepunkte = aktuellepunkte.Substring(1);
+
         int[] votes = new int[5];
-        foreach (var item in abstimmungClientStimme)
+        for (int i = 0; i < 5; i++) // Player
         {
-            if (item == 0)
-                continue;
-            votes[item - 1]++;
+            for (int j = 0; j < 5; j++) // Votes
+            {
+                votes[j] += abstimmungClientStimme[i, j];
+            }
         }
-
-        int countSabos = 0;
-        foreach (var item in sabotagePlayers)
-            if (item.isSaboteur)
-                countSabos++;
-
         string aufoesung = "";
-        if (countSabos == 1)
+        for (int i = 0; i < sabotagePlayers.Length; i++)
         {
-            for (int i = 0; i < sabotagePlayers.Length; i++)
-            {
-                if (votes[i] == 0)
-                    aufoesung += "~" + "+100";
-                else if (votes[i] == 1)
-                    aufoesung += "~" + "0";
-                else if (votes[i] == 2)
-                    aufoesung += "~" + "-" + GetSaboteurPoints() * 0.5;
-                else if (votes[i] == 3)
-                    aufoesung += "~" + "-" + GetSaboteurPoints() * 0.75;
-                else if (votes[i] == 4)
-                    aufoesung += "~" + "-" + GetSaboteurPoints() * 1.1;
-            }
+            if (votes[i] == 0)
+                aufoesung += "~" + "-0";
+            else if (votes[i] == 1)
+                aufoesung += "~" + "-" + ((int) (GetSaboteurPoints() * 0.1 + 0.5));
+            else if (votes[i] == 2)
+                aufoesung += "~" + "-" + ((int) (GetSaboteurPoints() * 0.5 + 0.5));
+            else if (votes[i] == 3)
+                aufoesung += "~" + "-" + ((int) (GetSaboteurPoints() * 0.75 + 0.5));
+            else if (votes[i] == 4)
+                aufoesung += "~" + "-" + ((int) (GetSaboteurPoints() * 1 + 0.5));
         }
-        else if (countSabos == 2)
-        {
-            for (int i = 0; i < sabotagePlayers.Length; i++)
-            {
-                if (votes[i] == 0)
-                    aufoesung += "~" + "+100";
-                else if (votes[i] == 1)
-                    aufoesung += "~" + "-" + GetSaboteurPoints() * 0.5;
-                else if (votes[i] == 2)
-                    aufoesung += "~" + "-" + GetSaboteurPoints() * 0.75;
-                else if (votes[i] == 3)
-                    aufoesung += "~" + "-" + GetSaboteurPoints() * 1.1;
-            }
-        }
-        else
-            aufoesung = "_0~0~0~0~0";
+
         aufoesung = aufoesung.Substring(1);
         aufloesungBonusPunkte = aufoesung;
-        ServerUtils.BroadcastImmediate("#AufloesungStart " + aufoesung);
+        ServerUtils.BroadcastImmediate("#AufloesungStart " + aufoesung + "|" + aktuellepunkte);
 
         for (int i = 0; i < votes.Length; i++)
             SaboteurWahlAufloesungPunkteverteilung.transform.GetChild(1 + i).gameObject.GetComponent<TMP_Text>().text = "" + aufoesung.Split('~')[i];
@@ -476,6 +629,34 @@ public class SabotageServer : MonoBehaviour
     // Punkteverteilung
     public void AufloesungZeigeSabos()
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "AufloesungZeigeSabos", "");
+        Transform SaboAnzeige = SaboteurWahlAufloesungPunkteverteilung.transform.GetChild(6);
+        SaboAnzeige.gameObject.SetActive(false);
+        SaboAnzeige.GetChild(2).GetComponent<TMP_Text>().text = "";
+        int countSabos = 0;
+        string sabos = "";
+        foreach (var item in sabotagePlayers)
+            if (item.isSaboteur)
+            {
+                countSabos++;
+                sabos += "~" + item.player.id;
+            }
+        if (sabos.Length > 0)
+            sabos = sabos.Substring(1);
+
+        SaboAnzeige.GetChild(0).gameObject.SetActive(false);
+        SaboAnzeige.GetChild(1).gameObject.SetActive(false);
+        SaboAnzeige.gameObject.SetActive(true);
+
+        int sabopunkte = int.Parse(GameObject.Find("Punktetafel/SaboteurPunkte").GetComponent<TMP_InputField>().text);
+        int teampunkte = int.Parse(GameObject.Find("Punktetafel/TeamPunkte").GetComponent<TMP_InputField>().text);
+        ServerUtils.BroadcastImmediate("#AufloesungZeigeSabos " + countSabos + "|" + teampunkte + "|" + sabopunkte + "|" + aufloesungBonusPunkte + "|" + sabos);
+
+        StartCoroutine(AufloesungVerteilePunkte(SaboAnzeige, countSabos, teampunkte, sabopunkte, aufloesungBonusPunkte));
+    }
+    public void AufloesungZeigeSabosNicht()
+    {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "AufloesungZeigeSabosNicht", "");
         Transform SaboAnzeige = SaboteurWahlAufloesungPunkteverteilung.transform.GetChild(6);
         SaboAnzeige.gameObject.SetActive(false);
         SaboAnzeige.GetChild(2).GetComponent<TMP_Text>().text = "";
@@ -495,12 +676,13 @@ public class SabotageServer : MonoBehaviour
 
         int sabopunkte = int.Parse(GameObject.Find("Punktetafel/SaboteurPunkte").GetComponent<TMP_InputField>().text);
         int teampunkte = int.Parse(GameObject.Find("Punktetafel/TeamPunkte").GetComponent<TMP_InputField>().text);
-        ServerUtils.BroadcastImmediate("#AufloesungZeigeSabos " + countSabos + "|" + teampunkte + "|" + sabopunkte + "|" + aufloesungBonusPunkte + "|" + sabos);
+        ServerUtils.BroadcastImmediate("#AufloesungZeigeSabosNicht " + countSabos + "|" + teampunkte + "|" + sabopunkte + "|" + aufloesungBonusPunkte + "|" + sabos);
 
-        StartCoroutine(AufloesungVerteilePunkte(SaboAnzeige, countSabos, teampunkte, sabopunkte, aufloesungBonusPunkte));
+        StartCoroutine(AufloesungVerteilePunkte(SaboAnzeige, countSabos, teampunkte, sabopunkte, aufloesungBonusPunkte, false));
     }
-    IEnumerator AufloesungVerteilePunkte(Transform SaboAnzeige, int countSabos, int teampunkte, int sabopunkte, string bonuspunkte)
+    IEnumerator AufloesungVerteilePunkte(Transform SaboAnzeige, int countSabos, int teampunkte, int sabopunkte, string bonuspunkte, bool showSabos = true)
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "AufloesungVerteilePunkte", "CountSabos: " + countSabos + " TeamPunkte: " + teampunkte + " SaboPunkte: " + sabopunkte + " BonusPunkte: " + bonuspunkte + " ShowSabos: " + showSabos);
         yield return new WaitForSeconds(3);
         string sabos = "";
         Sprite Sabo1 = null;
@@ -515,19 +697,21 @@ public class SabotageServer : MonoBehaviour
                     Sabo2 = item.player.icon2.icon;
             }
         sabos = sabos.Substring(" & ".Length);
-
-        if (countSabos == 1)
+        if (showSabos == true)
         {
-            SaboAnzeige.GetChild(0).GetComponent<Image>().sprite = Sabo1;
-            SaboAnzeige.GetChild(0).gameObject.SetActive(true);
+            if (countSabos == 1)
+            {
+                SaboAnzeige.GetChild(0).GetComponent<Image>().sprite = Sabo1;
+                SaboAnzeige.GetChild(0).gameObject.SetActive(true);
+            }
+            else if (countSabos == 2)
+            {
+                SaboAnzeige.GetChild(1).GetChild(0).GetChild(0).GetComponent<Image>().sprite = Sabo2;
+                SaboAnzeige.GetChild(1).GetChild(1).GetChild(0).GetComponent<Image>().sprite = Sabo1;
+                SaboAnzeige.GetChild(1).gameObject.SetActive(true);
+            }
+            SaboAnzeige.GetChild(2).GetComponent<TMP_Text>().text = sabos;
         }
-        else if (countSabos == 2)
-        {
-            SaboAnzeige.GetChild(1).GetChild(0).GetChild(0).GetComponent<Image>().sprite = Sabo2;
-            SaboAnzeige.GetChild(1).GetChild(1).GetChild(0).GetComponent<Image>().sprite = Sabo1;
-            SaboAnzeige.GetChild(1).gameObject.SetActive(true);
-        }
-        SaboAnzeige.GetChild(2).GetComponent<TMP_Text>().text = sabos;
         yield return new WaitForSeconds(1);
         // Teampunkte & Saboteurpunkte
         foreach (var item in sabotagePlayers)
@@ -539,15 +723,18 @@ public class SabotageServer : MonoBehaviour
         }
         for (int i = 0; i < 5; i++)
         {
-            if (sabotagePlayers[i].isSaboteur)
+            if (sabotagePlayers[i].isSaboteur && showSabos)
                 sabotagePlayers[i].AddPunkte(int.Parse(bonuspunkte.Split('~')[i]));
             else
                 SaboteurWahlAufloesungPunkteverteilung.transform.GetChild(1 + i).gameObject.GetComponent<TMP_Text>().text = "";
         }
+        // Strafpunkte bei falschen Votes
+
         yield break;
     }
     public void AufloesungZurLobby()
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "AufloesungZurLobby", "");
         ServerUtils.BroadcastImmediate("#AufloesungZurLobby");
         SetTeamPoints(0);
         SetSaboteurPoints(0);
@@ -564,10 +751,15 @@ public class SabotageServer : MonoBehaviour
     #region Diktat
     public void StartDiktat()
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "StartDiktat", "");
         ServerUtils.BroadcastImmediate("#StartDiktat");
         Lobby.SetActive(false);
         Diktat.SetActive(true);
+        Diktat.transform.GetChild(0).gameObject.SetActive(true);
         DiktatLoesung.gameObject.SetActive(false);
+        GameObject ServerSide = GameObject.Find("Diktat/SaboHinweis");
+        if (ServerSide != null)
+            ServerSide.gameObject.SetActive(false);
         // Leere Eingabefelder
         Transform SpielerEingabeFelder = GameObject.Find("Diktat/SpielerEingabeFelder").transform;
         for (int i = 0; i < SpielerEingabeFelder.childCount; i++)
@@ -578,6 +770,7 @@ public class SabotageServer : MonoBehaviour
     }
     public void DiktatChangeText(int change)
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "DiktatChangeText", ""+change);
         string diktat = Config.SABOTAGE_SPIEL.diktat.GetNew(change);
         GameObject.Find("Diktat/ServerSide/Index").GetComponent<TMP_Text>().text = "Text: " + (Config.SABOTAGE_SPIEL.diktat.index+1) + "/" + Config.SABOTAGE_SPIEL.diktat.saetze.Count;
         DiktatLoesung.text = diktat;
@@ -588,7 +781,7 @@ public class SabotageServer : MonoBehaviour
         for (int i = 0; i < SpielerEingabeFelder.childCount; i++)
         {
             SpielerEingabeFelder.GetChild(i).GetComponent<TMP_InputField>().text = "";
-            SpielerEingabeFelder.GetChild(i).GetComponent<TMP_InputField>().interactable = true;
+            SpielerEingabeFelder.GetChild(i).GetComponent<TMP_InputField>().interactable = false;
         }
         diktatBlockEingabe = false;
         ServerUtils.BroadcastImmediate("#DiktatSaboTipp " + diktat);
@@ -603,6 +796,7 @@ public class SabotageServer : MonoBehaviour
     }
     public void DiktatCheckInputs()
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "DiktatCheckInputs", "");
         diktatBlockEingabe = true;
         Transform SpielerEingabeFelder = GameObject.Find("Diktat/SpielerEingabeFelder").transform;
         int correct = 0, wrong = 0;
@@ -633,6 +827,7 @@ public class SabotageServer : MonoBehaviour
     }
     private IEnumerator DiktatShowResults(int wrong, int correct, string result, string[] playerresults)
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "DiktatShowResults", "Wrong: " + wrong + " Correct: " + correct + " Result: " + result + " PlayerResults: [" + string.Join(", ", playerresults) + "]");
         DiktatLoesung.text = result;
         DiktatLoesung.gameObject.SetActive(true);
         Transform SpielerEingabeFelder = GameObject.Find("Diktat/SpielerEingabeFelder").transform;
@@ -651,31 +846,25 @@ public class SabotageServer : MonoBehaviour
         AddTeamPoints(correct * 10);
         yield break;
     }
-    public void DiktatGenSabos()
-    {
-        foreach (var item in sabotagePlayers)
-            item.SetSaboteur(false);
-        DiktatLoesung.gameObject.SetActive(false);
-
-        GenSaboteurForRound(1);
-        string names = "";
-        foreach (var item in sabotagePlayers)
-        {
-            if (item.isSaboteur)
-                names += "\n" + item.player.name;
-        }
-        if (names.Length > 0)
-            names = names.Substring("\n".Length);
-        WerIstSabo.transform.GetChild(0).GetComponent<TMP_Text>().text = names;
-
-        // TODO: broadcast, wenn mans nicht ist muss feld ausblenden
-        ServerUtils.BroadcastImmediate("#DuBistSaboteur " + names.Replace("\n", "~"));
-    }
     public void DiktatRunTimer(TMP_InputField input)
     {
+        if (input.text.Equals("0"))
+            return;
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "DiktatRunTimer", input.text);
         diktatBlockEingabe = false;
         ServerUtils.BroadcastImmediate("#DiktatRunTimer " + input.text);
-        StartCoroutine(DiktatRunTimer(int.Parse(input.text)));
+        if (diktattimer != null)
+            StopCoroutine(diktattimer);
+        diktattimer = StartCoroutine(DiktatRunTimer(int.Parse(input.text)));
+    }
+    Coroutine diktattimer;
+    public void DiktatStopTimer()
+    {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "DiktatStopTimer", "");
+        ServerUtils.BroadcastImmediate("#DiktatStopTimer");
+        if (diktattimer != null)
+            StopCoroutine(diktattimer);
+        DiktatTimer.gameObject.SetActive(false);
     }
     IEnumerator DiktatRunTimer(int seconds)
     {
@@ -685,7 +874,7 @@ public class SabotageServer : MonoBehaviour
         DiktatTimer.gameObject.SetActive(true);
         int milis = seconds * 1000;
 
-        Debug.Log("Timer startet: " + DateTime.Now.ToString("HH:mm:ss:ffff"));
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "DiktatRunTimer", "Seconds: " + seconds + "  Timer started: " + DateTime.Now.ToString("HH:mm:ss:ffff"));
         while (milis >= 0)
         {
             DiktatTimer.GetComponentInChildren<Slider>().value = milis;
@@ -702,14 +891,17 @@ public class SabotageServer : MonoBehaviour
             yield return new WaitForSecondsRealtime(0.1f); // Alle 100 Millisekunden warten
             milis -= 100;
         }
-        Debug.Log("Timer ended: " + DateTime.Now.ToString("HH:mm:ss:ffff"));
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "DiktatRunTimer", "Seconds: " + seconds + "  Timer ended: " + DateTime.Now.ToString("HH:mm:ss:ffff"));
        
-        diktatBlockEingabe = true;
         DiktatTimer.gameObject.SetActive(false);
+        yield return new WaitForSeconds(2f);
+        diktatBlockEingabe = true;
+
         yield break;
     }
     public void DiktatZurAuflösung()
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "DiktatZurAuflösung", "");
         ServerUtils.BroadcastImmediate("#DiktatZurAuflösung");
         StartWahlAbstimmung();
     }
@@ -717,9 +909,14 @@ public class SabotageServer : MonoBehaviour
     #region Sortieren
     public void StartSortieren()
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "StartSortieren", "");
         ServerUtils.BroadcastImmediate("#StartSortieren");
         Lobby.SetActive(false);
         Sortieren.SetActive(true);
+        Sortieren.transform.GetChild(0).gameObject.SetActive(true);
+        GameObject ServerSide = GameObject.Find("Sortieren/SaboHinweis");
+        if (ServerSide != null)
+            ServerSide.gameObject.SetActive(false);
 
         for (int i = 0; i < SortierenListe.transform.childCount; i++)
             SortierenListe.transform.GetChild(i).gameObject.SetActive(false);
@@ -731,6 +928,7 @@ public class SabotageServer : MonoBehaviour
     }
     public void SortierenChangeText(int change)
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "SortierenChangeText", ""+change);
         SortierenAuswahl.SetActive(false);
         int newIndex = Config.SABOTAGE_SPIEL.sortieren.ChangeIndex(change);
         GameObject.Find("Sortieren/ServerSide/Index").GetComponent<TMP_Text>().text = "Text: " + (newIndex+1) + "/" + Config.SABOTAGE_SPIEL.sortieren.runden.Count;
@@ -760,8 +958,20 @@ public class SabotageServer : MonoBehaviour
     }
     public void SortierenRunTimer(TMP_InputField input)
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "SortierenRunTimer", ""+input.text);
         ServerUtils.BroadcastImmediate("#SortierenRunTimer " + input.text);
-        StartCoroutine(SortierenRunTimer(int.Parse(input.text)));
+        if (sortierentimer != null)
+            StopCoroutine(sortierentimer);
+        sortierentimer = StartCoroutine(SortierenRunTimer(int.Parse(input.text)));
+    }
+    Coroutine sortierentimer;
+    public void SortierenStopTimer()
+    {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "SortierenStopTimer", "");
+        ServerUtils.BroadcastImmediate("#SortierenStopTimer");
+        if (sortierentimer != null)
+            StopCoroutine(sortierentimer);
+        SortierenTimer.gameObject.SetActive(false);
     }
     IEnumerator SortierenRunTimer(int seconds)
     {
@@ -771,7 +981,7 @@ public class SabotageServer : MonoBehaviour
         SortierenTimer.gameObject.SetActive(true);
         int milis = seconds * 1000;
 
-        Debug.Log("Timer startet: " + DateTime.Now.ToString("HH:mm:ss:ffff"));
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "SortierenRunTimer", "Seconds: " + seconds + "  Timer started: " + DateTime.Now.ToString("HH:mm:ss:ffff"));
         while (milis >= 0)
         {
             SortierenTimer.GetComponentInChildren<Slider>().value = milis;
@@ -788,31 +998,14 @@ public class SabotageServer : MonoBehaviour
             yield return new WaitForSecondsRealtime(0.1f); // Alle 100 Millisekunden warten
             milis -= 100;
         }
-        Debug.Log("Timer ended: " + DateTime.Now.ToString("HH:mm:ss:ffff"));
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "SortierenRunTimer", "Seconds: " + seconds + "  Timer ended: " + DateTime.Now.ToString("HH:mm:ss:ffff"));
 
         SortierenTimer.gameObject.SetActive(false);
         yield break;
     }
-    public void SortierenGenSabos()
-    {
-        foreach (var item in sabotagePlayers)
-            item.SetSaboteur(false);
-
-        GenSaboteurForRound(2);
-        string names = "";
-        foreach (var item in sabotagePlayers)
-        {
-            if (item.isSaboteur)
-                names += "\n" + item.player.name;
-        }
-        if (names.Length > 0)
-            names = names.Substring("\n".Length);
-        WerIstSabo.transform.GetChild(0).GetComponent<TMP_Text>().text = names;
-
-        ServerUtils.BroadcastImmediate("#DuBistSaboteur " + names.Replace("\n", "~"));
-    }
     public void SortierenShowGrenzen()
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "SortierenShowGrenzen", "");
         ServerUtils.BroadcastImmediate("#SortierenShowGrenzen " + Config.SABOTAGE_SPIEL.sortieren.GetSortBy());
         
         SortierenListe.transform.GetChild(0).gameObject.SetActive(true);
@@ -824,6 +1017,7 @@ public class SabotageServer : MonoBehaviour
     {
         int itemIndex = int.Parse(btn.transform.parent.name.Replace("Element (", "").Replace(")", ""));
         string item = Config.SABOTAGE_SPIEL.sortieren.GetInhalt()[itemIndex];
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "SortierenShowElementInit", itemIndex + "|" + item);
         ServerUtils.BroadcastImmediate("#SortierenInitElement " + itemIndex + "|" + item + "|" + string.Join("~", Config.SABOTAGE_SPIEL.sortieren.GetInhalt()));
         
         for (int i = 2; i < SortierenLoesung.transform.childCount-1; i++)
@@ -835,7 +1029,6 @@ public class SabotageServer : MonoBehaviour
 
         SortierenListe.transform.GetChild(itemIndex + 1).gameObject.SetActive(true);
         SortierenListe.transform.GetChild(itemIndex + 1).GetComponent<TMP_InputField>().text = item;
-        SortierenListe.transform.GetChild(itemIndex + 1).GetComponentInChildren<TMP_Text>().text = "1";
 
         SortierenAuswahl.SetActive(true);
         List<string> tempauswahl = new List<string>();
@@ -851,6 +1044,7 @@ public class SabotageServer : MonoBehaviour
     {
         if (!Config.SERVER_STARTED)
             return;
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "SortierenShowElement", btn.name);
 
         bool isCorrect;
         if (btn.name.Equals("Richtig"))
@@ -864,6 +1058,9 @@ public class SabotageServer : MonoBehaviour
         string item = Config.SABOTAGE_SPIEL.sortieren.GetInhalt()[itemIndex];
 
         ServerUtils.BroadcastImmediate("#SortierenShowElement " + isCorrect + "|" + itemIndex + "|" + item);
+
+        SortierenListe.transform.GetChild(itemIndex + 1).gameObject.SetActive(true);
+        SortierenListe.transform.GetChild(itemIndex + 1).GetComponent<TMP_InputField>().text = item;
 
         if (isCorrect)
             AddTeamPoints(10);
@@ -884,154 +1081,10 @@ public class SabotageServer : MonoBehaviour
                 }
             }
         }
-
-        SortierenListe.transform.GetChild(itemIndex + 1).gameObject.SetActive(true);
-        SortierenListe.transform.GetChild(itemIndex + 1).GetComponent<TMP_InputField>().text = item;
-        int tempcount = 0;
-        for (int i = 1; i < SortierenListe.transform.childCount-1; i++)
-        {
-            if (SortierenListe.transform.GetChild(i).gameObject.activeInHierarchy)
-            {
-                tempcount++;
-                SortierenListe.transform.GetChild(i).GetChild(1).GetComponent<TMP_Text>().text = "" + tempcount;
-            }
-        }
     }
     public void SortierenZurAuflösung()
     {
-        ServerUtils.BroadcastImmediate("#MemoryZurAuflösung");
-        StartWahlAbstimmung();
-    }
-    #endregion
-    #region Memory
-    public void StartMemory()
-    {
-        ServerUtils.BroadcastImmediate("#StartMemory");
-        Lobby.SetActive(false);
-        Memory.SetActive(true);
-        MemoryTimer.gameObject.SetActive(false);
-        MemoryGrid.SetActive(false);
-        MemoryTap1.sprite = null;
-        MemoryTap2.sprite = null;
-        memoryblockclickitem = false;
-        SetTeamPoints(500);
-    }
-    public void MemoryShowGrid()
-    {
-        string sequence = Config.SABOTAGE_SPIEL.memory.getSequence();
-        ServerUtils.BroadcastImmediate("#MemoryShowGrid " + sequence);
-        for (int i = 0; i < sequence.Split('~').Length; i++)
-        {
-            MemoryGrid.transform.GetChild(i).GetChild(0).GetChild(0).GetComponent<Image>().sprite = Resources.Load<Sprite>("Spiele/Sabotage/Memory/" + sequence.Split('~')[i]);
-            MemoryGrid.transform.GetChild(i).GetChild(1).gameObject.SetActive(true);
-            MemoryGrid.transform.GetChild(i).GetChild(1).GetComponentInChildren<TMP_Text>().text = "" + (i+1);
-            MemoryGrid.transform.GetChild(i).GetChild(1).GetComponent<Button>().enabled = true;
-            MemoryGrid.transform.GetChild(i).GetChild(1).GetComponent<Button>().interactable = true; // man sieht keine Lösung
-        }
-        MemoryGrid.SetActive(true);
-    }
-    bool memoryblockclickitem;
-    public void MemoryClickItem(GameObject go)
-    {
-        if (!Config.SERVER_STARTED)
-            return;
-        if (memoryblockclickitem)
-            return;
-        string name = go.name.Replace("- (", "").Replace(")", "");
-        if (MemoryTap1.sprite == null)
-        {
-            go.transform.GetChild(1).gameObject.SetActive(false);
-            
-            MemoryTap1.sprite = go.transform.GetChild(0).GetChild(0).GetComponent<Image>().sprite;
-            MemoryTap1.name = name;
-            go.transform.GetChild(1).gameObject.SetActive(false);
-            ServerUtils.BroadcastImmediate("#MemoryClickItem " + MemoryTap1.name + "~" + MemoryTap1.sprite.name);
-            return;
-        }
-        if (MemoryTap2.sprite == null)
-        {
-            memoryblockclickitem = true;
-            go.transform.GetChild(1).gameObject.SetActive(false);
-
-            MemoryTap2.sprite = go.transform.GetChild(0).GetChild(0).GetComponent<Image>().sprite;
-            MemoryTap2.name = name;
-            go.transform.GetChild(1).gameObject.SetActive(false);
-            // Start Auflösung
-            ServerUtils.BroadcastImmediate("#MemoryClickItems " + MemoryTap1.name + "~" + MemoryTap1.sprite.name + "|" + MemoryTap2.name + "~" + MemoryTap2.sprite.name);
-            StartCoroutine(MemoryVerifyClicks(int.Parse(MemoryTap1.name), MemoryTap1.sprite.name, int.Parse(MemoryTap2.name), MemoryTap2.sprite.name));
-        }
-    }
-    IEnumerator MemoryVerifyClicks(int pos1, string icon1, int pos2, string icon2)
-    {
-        yield return new WaitForSeconds(3f);
-        if (!icon1.Equals(icon2))
-        {
-            AddTeamPoints(-5);
-            AddSaboteurPoints(5);
-            MemoryGrid.transform.GetChild(pos1).GetChild(1).gameObject.SetActive(true);
-            MemoryGrid.transform.GetChild(pos2).GetChild(1).gameObject.SetActive(true);
-        }
-
-        MemoryTap1.sprite = null;
-        MemoryTap2.sprite = null;
-        memoryblockclickitem = false;
-        yield break;
-    }
-    public void MemoryRunTimer(TMP_InputField input)
-    {
-        ServerUtils.BroadcastImmediate("#MemoryRunTimer " + input.text);
-        StartCoroutine(MemoryRunTimer(int.Parse(input.text)));
-    }
-    IEnumerator MemoryRunTimer(int seconds)
-    {
-        yield return null;
-        MemoryTimer.minValue = 0;
-        MemoryTimer.maxValue = seconds * 1000; // Umrechnung in Millisekunden
-        MemoryTimer.gameObject.SetActive(true);
-        int milis = seconds * 1000;
-
-        Debug.Log("Timer startet: " + DateTime.Now.ToString("HH:mm:ss:ffff"));
-        while (milis >= 0)
-        {
-            MemoryTimer.GetComponentInChildren<Slider>().value = milis;
-
-            if (milis <= 0)
-            {
-                Beeep.Play();
-            }
-            // Moep Sound bei Sekunden
-            if (milis == 1000 || milis == 2000 || milis == 3000)
-            {
-                Moeoop.Play();
-            }
-            yield return new WaitForSecondsRealtime(0.1f); // Alle 100 Millisekunden warten
-            milis -= 100;
-        }
-        Debug.Log("Timer ended: " + DateTime.Now.ToString("HH:mm:ss:ffff"));
-
-        MemoryTimer.gameObject.SetActive(false);
-        yield break;
-    }
-    public void MemoryGenSabos()
-    {
-        foreach (var item in sabotagePlayers)
-            item.SetSaboteur(false);
-
-        GenSaboteurForRound(1);
-        string names = "";
-        foreach (var item in sabotagePlayers)
-        {
-            if (item.isSaboteur)
-                names += "\n" + item.player.name;
-        }
-        if (names.Length > 0)
-            names = names.Substring("\n".Length);
-        WerIstSabo.transform.GetChild(0).GetComponent<TMP_Text>().text = names;
-
-        ServerUtils.BroadcastImmediate("#DuBistSaboteur " + names.Replace("\n", "~"));
-    }
-    public void MemoryZurAuflösung()
-    {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "SortierenZurAuflösung", "");
         ServerUtils.BroadcastImmediate("#MemoryZurAuflösung");
         StartWahlAbstimmung();
     }
@@ -1040,16 +1093,24 @@ public class SabotageServer : MonoBehaviour
     Coroutine derzugluegtRunElement;
     public void StartDerZugLuegt()
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "StartDerZugLuegt", "");
         derzugluegtBlockBuzzer = true;
         ServerUtils.BroadcastImmediate("#StartDerZugLuegt");
         Lobby.SetActive(false);
         DerZugLuegt.SetActive(true);
+        DerZugLuegt.transform.GetChild(0).gameObject.SetActive(true);
         DerZugLuegtAnzeigen.SetActive(false);
-        GameObject.Find("DerZugLuegt/ClientBuzzer").SetActive(false);
+        GameObject ServerSide = GameObject.Find("DerZugLuegt/SaboHinweis");
+        if (ServerSide != null)
+            ServerSide.gameObject.SetActive(false);
+        GameObject ClientBuzzer = GameObject.Find("DerZugLuegt/ClientBuzzer");
+        if (ClientBuzzer != null)
+            ClientBuzzer.gameObject.SetActive(false);
         GameObject.Find("DerZugLuegt/ServerSide/Freigeben").GetComponentInChildren<TMP_Text>().text = "Freigeben";
     }
     public void DerZugLuegtChangeText(int change)
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "DerZugLuegtChangeText", ""+change);
         DerZugLuegtAnzeigen.SetActive(true);
         int newIndex = Config.SABOTAGE_SPIEL.derzugluegt.ChangeIndex(change);
         GameObject.Find("DerZugLuegt/ServerSide/Index").GetComponent<TMP_Text>().text = "Text: " + (newIndex + 1) + "/" + Config.SABOTAGE_SPIEL.derzugluegt.rounds.Count;
@@ -1057,13 +1118,14 @@ public class SabotageServer : MonoBehaviour
         Transform Elements = GameObject.Find("DerZugLuegt/ServerSide/Elements").transform;
         for (int i = 0; i < Elements.childCount; i++)
         {
-            Elements.GetChild(i).GetComponentInChildren<TMP_Text>().text = Config.SABOTAGE_SPIEL.derzugluegt.GetElementType(i).ToString().Replace("True", "<color=red>Drücken</color>").Replace("False", "") + ": " + Config.SABOTAGE_SPIEL.derzugluegt.GetElement(i);
+            Elements.GetChild(i).GetComponentInChildren<TMP_Text>().text = Config.SABOTAGE_SPIEL.derzugluegt.GetElementType(i).ToString().Replace("True", "<color=red>Drücken</color>").Replace("False", "") + "_" + Config.SABOTAGE_SPIEL.derzugluegt.GetElement(i);
             Elements.GetChild(i).GetComponent<Button>().interactable = true;
         }
         GameObject.Find("DerZugLuegt/ServerSide/Thema").GetComponent<TMP_Text>().text = Config.SABOTAGE_SPIEL.derzugluegt.GetThema();
     }
     public void DerZugLuegtShowRound()
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "DerZugLuegtShowRound", "");
         string thema = Config.SABOTAGE_SPIEL.derzugluegt.GetThema();
         string elements = "Lösungen:";
         for (int i = 0; i < 10; i++)
@@ -1079,7 +1141,8 @@ public class SabotageServer : MonoBehaviour
     }
     public void DerZugLuegtStartElement(GameObject ob)
     {
-        string element = ob.GetComponentInChildren<TMP_Text>().text;
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "DerZugLuegtStartElement", ob.name);
+        string element = ob.GetComponentInChildren<TMP_Text>().text.Split('_')[1];
         ob.GetComponent<Button>().interactable = false;
         ServerUtils.BroadcastImmediate("#DerZugLuegtStartElement " + element);
         derzugluegtBlockBuzzer = false;
@@ -1091,6 +1154,7 @@ public class SabotageServer : MonoBehaviour
     bool derzugluegtBlockBuzzer;
     IEnumerator DerZugLuegtRunElement(string element)
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "DerZugLuegtRunElement", element);
         try
         {
             GameObject.Find("DerZugLuegt/GameObject/Grid/Image (0)").SetActive(true);
@@ -1166,6 +1230,7 @@ public class SabotageServer : MonoBehaviour
     }
     public void DerZugLuegtRichtig()
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "DerZugLuegtRichtig", "");
         AddTeamPoints(50);
         ServerUtils.BroadcastImmediate("#DerZugLuegtRichtig " + GetTeamPoints());
         GameObject.Find("DerZugLuegt/ServerSide/Freigeben").GetComponentInChildren<TMP_Text>().text = "Freigeben";
@@ -1174,6 +1239,7 @@ public class SabotageServer : MonoBehaviour
     }
     public void DerZugLuegtFalsch()
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "DerZugLuegtFalsch", "");
         AddSaboteurPoints(50);
         ServerUtils.BroadcastImmediate("#DerZugLuegtFalsch " + GetSaboteurPoints());
         GameObject.Find("DerZugLuegt/ServerSide/Freigeben").GetComponentInChildren<TMP_Text>().text = "Freigeben";
@@ -1182,6 +1248,7 @@ public class SabotageServer : MonoBehaviour
     }
     public void DerZugLuegtFreigeben()
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "DerZugLuegtFreigeben", "");
         GameObject.Find("DerZugLuegt/ServerSide/Freigeben").GetComponentInChildren<TMP_Text>().text = "Freigeben";
         derzugluegtBlockBuzzer = false;
     }
@@ -1189,32 +1256,16 @@ public class SabotageServer : MonoBehaviour
     {
         if (derzugluegtBlockBuzzer)
             return;
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "DerZugLuegtClientBuzzer", p.name);
         derzugluegtBlockBuzzer = true;
 
         ServerUtils.BroadcastImmediate("#DerZugLuegtBuzzer");
         GameObject.Find("DerZugLuegt/ServerSide/Freigeben").GetComponentInChildren<TMP_Text>().text = "Freigeben\nP:" + p.name;
         Buzzer.Play();
     }
-    public void DerZugLuegtGenSabos()
-    {
-        foreach (var item in sabotagePlayers)
-            item.SetSaboteur(false);
-
-        GenSaboteurForRound(2);
-        string names = "";
-        foreach (var item in sabotagePlayers)
-        {
-            if (item.isSaboteur)
-                names += "\n" + item.player.name;
-        }
-        if (names.Length > 0)
-            names = names.Substring("\n".Length);
-        WerIstSabo.transform.GetChild(0).GetComponent<TMP_Text>().text = names;
-
-        ServerUtils.BroadcastImmediate("#DuBistSaboteur " + names.Replace("\n", "~"));
-    }
     public void DerZugLuegtZurAuflösung()
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "DerZugLuegtZurAuflösung", "");
         ServerUtils.BroadcastImmediate("#DerZugLuegtZurAuflösung");
         StartWahlAbstimmung();
     }
@@ -1222,72 +1273,95 @@ public class SabotageServer : MonoBehaviour
     #region Tabu
     public void StartTabu()
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "StartTabu", "");
         ServerUtils.BroadcastImmediate("#StartTabu");
         Lobby.SetActive(false);
         Tabu.SetActive(true);
+        Tabu.transform.GetChild(0).gameObject.SetActive(true);
         TabuTimer.gameObject.SetActive(false);
+        GameObject ServerSide = GameObject.Find("Tabu/SaboHinweis");
+        if (ServerSide != null)
+            ServerSide.gameObject.SetActive(false);
         GameObject.Find("Tabu/GameObject/SaboTipp").SetActive(false);
 
         tabuRichtigePunkte = 0;
     }
-    Coroutine tabutimer;
     int tabuRichtigePunkte;
     public void TabuRunTimer(TMP_InputField input)
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "TabuRunTimer", input.text);
         ServerUtils.BroadcastImmediate("#TabuRunTimer " + input.text);
         if (tabutimer != null)
             StopCoroutine(tabutimer);
         tabutimer = StartCoroutine(TabuRunTimer(int.Parse(input.text)));
     }
+    Coroutine tabutimer;
     public void TabuStopTimer()
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "TabuStopTimer", "");
         ServerUtils.BroadcastImmediate("#TabuStopTimer");
         if (tabutimer != null)
             StopCoroutine(tabutimer);
         TabuTimer.gameObject.SetActive(false);
+    }
+    public void TabuGrenzwertig()
+    {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "TabuGrenzwertig", "");
+        if (TabuTimer.value <= 10 * 1000)
+            TabuTimer.value = 0;
+        else
+            TabuTimer.value -= 10 * 1000;
+
+        ServerUtils.BroadcastImmediate("#TabuGrenzwertig");
     }
     IEnumerator TabuRunTimer(int seconds)
     {
         yield return null;
         TabuTimer.minValue = 0;
         TabuTimer.maxValue = seconds * 1000; // Umrechnung in Millisekunden
+        TabuTimer.value = seconds * 1000;
         TabuTimer.gameObject.SetActive(true);
         int milis = seconds * 1000;
 
-        Debug.Log("Timer startet: " + DateTime.Now.ToString("HH:mm:ss:ffff"));
-        while (milis >= 0)
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "TabuRunTimer", "Seconds: " + seconds + "  Timer started: " + DateTime.Now.ToString("HH:mm:ss:ffff"));
+        while (TabuTimer.value >= 0)
         {
-            TabuTimer.GetComponentInChildren<Slider>().value = milis;
+            if (((int)(TabuTimer.value) - 100) <= 0)
+                TabuTimer.value = 0;
+            else
+                TabuTimer.value -= 100;
 
-            if (milis <= 0)
+            if (TabuTimer.value <= 0)
             {
                 Beeep.Play();
+                break;
             }
             // Moep Sound bei Sekunden
-            if (milis == 1000 || milis == 2000 || milis == 3000)
+            if (TabuTimer.value == 1000 || TabuTimer.value == 2000 || TabuTimer.value == 3000)
             {
                 Moeoop.Play();
             }
             yield return new WaitForSecondsRealtime(0.1f); // Alle 100 Millisekunden warten
-            milis -= 100;
         }
-        Debug.Log("Timer ended: " + DateTime.Now.ToString("HH:mm:ss:ffff"));
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "TabuRunTimer", "Seconds: " + seconds + "  Timer ended: " + DateTime.Now.ToString("HH:mm:ss:ffff"));
 
         TabuTimer.gameObject.SetActive(false);
         yield break;
     }
     public void TabuRichtig()
     {
-        tabuRichtigePunkte += 50;
-        AddTeamPoints(50);
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "TabuRichtig", "");
+        tabuRichtigePunkte += (SabotageTabu.punkteProRichtig / 5);
+        AddTeamPoints((SabotageTabu.punkteProRichtig / 5));
 
         ServerUtils.BroadcastImmediate("#TabuRichtig " + GetTeamPoints() + "|" + GetSaboteurPoints());
     }
     public void TabuFalsch()
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "TabuFalsch", "");
         AddTeamPoints(-tabuRichtigePunkte);
         tabuRichtigePunkte = 0;
-        AddSaboteurPoints(500);
+        AddSaboteurPoints(SabotageTabu.punkteProFalsch);
         
         ServerUtils.BroadcastImmediate("#TabuFalsch " + GetTeamPoints() + "|" + GetSaboteurPoints());
 
@@ -1299,40 +1373,51 @@ public class SabotageServer : MonoBehaviour
     {
         int index = int.Parse(go.name);
         string tabu = Config.SABOTAGE_SPIEL.tabu.GetWort() + "|" + Config.SABOTAGE_SPIEL.tabu.GetTabus();
-        ServerUtils.SendMSG("#TabuShowKarteToPlayer " + tabu, sabotagePlayers[index].player, false);
+        string zusatztabu = GameObject.Find("Tabu/ServerSide/AddZusatzTabuWorte").GetComponent<TMP_InputField>().text.Replace(" ", "   ");
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "TabuShowKarteToPlayer", index + "|" + tabu + "|" + zusatztabu);
+        //ServerUtils.SendMSG("#TabuShowKarteToPlayer " + tabu + "   " + zusatztabu, sabotagePlayers[index].player, false);
+        ServerUtils.BroadcastImmediate("#TabuShowKarteToPlayer " + sabotagePlayers[index].player.id + "|" + tabu + "   " + zusatztabu);
     }
     public void TabuChangeText(int change)
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "TabuChangeText", change+"");
         tabuRichtigePunkte = 0;
         int index = Config.SABOTAGE_SPIEL.tabu.ChangeIndex(change);
         GameObject.Find("Tabu/ServerSide/Index").GetComponent<TMP_Text>().text = "Text: " + (Config.SABOTAGE_SPIEL.tabu.index + 1) + "/" + Config.SABOTAGE_SPIEL.tabu.tabus.Count;
 
         string tabu = Config.SABOTAGE_SPIEL.tabu.GetWort() + "|" + Config.SABOTAGE_SPIEL.tabu.GetTabus();
-        ServerUtils.BroadcastImmediate("#TabuSaboTipp " + tabu.Split('|')[0]);
+        ServerUtils.BroadcastImmediate("#TabuSaboTipp " + Config.SABOTAGE_SPIEL.tabu.GetWort());
 
-        GameObject.Find("Tabu/GameObject/Wort").GetComponent<TMP_Text>().text = "Start: " +sabotagePlayers[index].player.name + " - " + tabu.Split('|')[0];
+        // TODO: 
+        GameObject.Find("Tabu/GameObject/Wort").GetComponent<TMP_Text>().text = "Start: " +sabotagePlayers[index % sabotagePlayers.Length].player.name + " - " + tabu.Split('|')[0];
         GameObject.Find("Tabu/GameObject/Tabu").GetComponent<TMP_Text>().text = "<color=red>No-Go: </color>" + tabu.Split('|')[1];
-    }
-    public void TabuGenSabos()
-    {
-        foreach (var item in sabotagePlayers)
-            item.SetSaboteur(false);
 
-        GenSaboteurForRound(2);
-        string names = "";
-        foreach (var item in sabotagePlayers)
+        // Reihnfolge gen
+        Transform reihnfolge = GameObject.Find("Tabu/ServerSide/Reihnfolge").transform;
+        List<SabotagePlayer> reihnfolgeplayer = new List<SabotagePlayer>();
+        reihnfolgeplayer.AddRange(sabotagePlayers);
+        reihnfolgeplayer.Remove(sabotagePlayers[index % sabotagePlayers.Length]);
+
+        reihnfolge.GetChild(1).GetComponent<Image>().sprite = sabotagePlayers[index % sabotagePlayers.Length].player.icon2.icon;
+        int temp = 0;
+        while (reihnfolgeplayer.Count > 0)
         {
-            if (item.isSaboteur)
-                names += "\n" + item.player.name;
+            SabotagePlayer p = reihnfolgeplayer[UnityEngine.Random.Range(0, reihnfolgeplayer.Count)];
+            reihnfolgeplayer.Remove(p);
+            reihnfolge.GetChild(2 + temp++).GetComponent<Image>().sprite = p.player.icon2.icon;
         }
-        if (names.Length > 0)
-            names = names.Substring("\n".Length);
-        WerIstSabo.transform.GetChild(0).GetComponent<TMP_Text>().text = names;
-
-        ServerUtils.BroadcastImmediate("#DuBistSaboteur " + names.Replace("\n", "~"));
+    }
+    public void TabuGenNewTabuWords(TMP_InputField input)
+    {
+        if (!Config.SERVER_STARTED)
+            return;
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "TabuGenNewTabuWords", input.text);
+        if (Config.SABOTAGE_SPIEL.tabu.GetIndex() >= 0)
+            ServerUtils.BroadcastImmediate("#TabuNewTabuWords " + Config.SABOTAGE_SPIEL.tabu.GetTabus() + "   " + input.text.Replace(" ", "   "));
     }
     public void TabuZurAuflösung()
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "TabuZurAuflösung", "");
         ServerUtils.BroadcastImmediate("#TabuZurAuflösung");
         StartWahlAbstimmung();
     }
@@ -1340,9 +1425,14 @@ public class SabotageServer : MonoBehaviour
     #region Auswahlstrategie
     public void StartAuswahlstrategie()
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "StartAuswahlstrategie", "");
         ServerUtils.BroadcastImmediate("#StartAuswahlstrategie");
         Lobby.SetActive(false);
         Auswahlstrategie.SetActive(true);
+        Auswahlstrategie.transform.GetChild(0).gameObject.SetActive(true);
+        GameObject ServerSide = GameObject.Find("Auswahlstrategie/SaboHinweis");
+        if (ServerSide != null)
+            ServerSide.gameObject.SetActive(false);
         AuswahlstrategieTimer.gameObject.SetActive(false);
         AuswahlstrategieGrid.gameObject.SetActive(false);
     }
@@ -1352,6 +1442,7 @@ public class SabotageServer : MonoBehaviour
     string auswahlstrategieGewaehltesBild;
     public void AuswahlstrategieRunTimer(TMP_InputField input)
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "AuswahlstrategieRunTimer", input.text);
         ServerUtils.BroadcastImmediate("#AuswahlstrategieRunTimer " + input.text);
         if (auswahlstrategietimer != null)
             StopCoroutine(auswahlstrategietimer);
@@ -1359,6 +1450,7 @@ public class SabotageServer : MonoBehaviour
     }
     public void AuswahlstrategieStopTimer()
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "AuswahlstrategieStopTimer", "");
         ServerUtils.BroadcastImmediate("#AuswahlstrategieStopTimer");
         if (auswahlstrategietimer != null)
             StopCoroutine(auswahlstrategietimer);
@@ -1372,7 +1464,7 @@ public class SabotageServer : MonoBehaviour
         AuswahlstrategieTimer.gameObject.SetActive(true);
         int milis = seconds * 1000;
 
-        Debug.Log("Timer startet: " + DateTime.Now.ToString("HH:mm:ss:ffff"));
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "AuswahlstrategieRunTimer", "Seconds: " + seconds + "  Timer started: " + DateTime.Now.ToString("HH:mm:ss:ffff"));
         while (milis >= 0)
         {
             AuswahlstrategieTimer.GetComponentInChildren<Slider>().value = milis;
@@ -1389,13 +1481,14 @@ public class SabotageServer : MonoBehaviour
             yield return new WaitForSecondsRealtime(0.1f); // Alle 100 Millisekunden warten
             milis -= 100;
         }
-        Debug.Log("Timer ended: " + DateTime.Now.ToString("HH:mm:ss:ffff"));
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "AuswahlstrategieRunTimer", "Seconds: " + seconds + "  Timer ended: " + DateTime.Now.ToString("HH:mm:ss:ffff"));
 
         AuswahlstrategieTimer.gameObject.SetActive(false);
         yield break;
     }
     public void AuswahlstrategieChangeText(int change)
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "AuswahlstrategieChangeText", change+"");
         int index = Config.SABOTAGE_SPIEL.auswahlstrategie.ChangeIndex(change);
         GameObject.Find("Auswahlstrategie/ServerSide/Index").GetComponent<TMP_Text>().text = "Text: " + (Config.SABOTAGE_SPIEL.auswahlstrategie.index + 1) + "/" + Config.SABOTAGE_SPIEL.auswahlstrategie.runden.Count;
 
@@ -1441,6 +1534,7 @@ public class SabotageServer : MonoBehaviour
     {
         if (!Config.SERVER_STARTED)
             return;
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "AuswahlstrategieSelectItem", go.name);
 
         if (go.gameObject.GetComponent<Image>().enabled)
         {
@@ -1456,6 +1550,7 @@ public class SabotageServer : MonoBehaviour
     }
     public void AuswahlstrategieShowFirstAuswahl()
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "AuswahlstrategieShowFirstAuswahl", "");
         string list = "";
         foreach (var item in auswahlstrategieAuswahl1)
             list += "~" + item.name;
@@ -1469,6 +1564,7 @@ public class SabotageServer : MonoBehaviour
     }
     public void AuswahlstrategieShowSecondAuswahl()
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "AuswahlstrategieShowSecondAuswahl", "");
         string list = "";
         foreach (var item in auswahlstrategieAuswahl2)
             list += "~" + item.name;
@@ -1494,7 +1590,8 @@ public class SabotageServer : MonoBehaviour
     }
     public void AuswahlstrategieRichtig()
     {
-        AddTeamPoints(500);
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "AuswahlstrategieRichtig", "");
+        AddTeamPoints(100);
         int auswahlitem = -1;
         for (int i = 0; i < 7; i++)
             if (AuswahlstrategieGrid.GetChild(i).GetComponent<Image>().enabled)
@@ -1504,7 +1601,8 @@ public class SabotageServer : MonoBehaviour
     }
     public void AuswahlstrategieFalsch()
     {
-        AddSaboteurPoints(500);
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "AuswahlstrategieFalsch", "");
+        AddSaboteurPoints(100);
         int auswahlitem = -1;
         for (int i = 0; i < 7; i++)
             if (AuswahlstrategieGrid.GetChild(i).GetComponent<Image>().enabled)
@@ -1512,26 +1610,9 @@ public class SabotageServer : MonoBehaviour
 
         ServerUtils.BroadcastImmediate("#AuswahlstrategieFalsch " + GetTeamPoints() + "|" + GetSaboteurPoints() + "|" + auswahlitem);
     }
-    public void AuswahlstrategieGenSabos()
-    {
-        foreach (var item in sabotagePlayers)
-            item.SetSaboteur(false);
-
-        GenSaboteurForRound(2);
-        string names = "";
-        foreach (var item in sabotagePlayers)
-        {
-            if (item.isSaboteur)
-                names += "\n" + item.player.name;
-        }
-        if (names.Length > 0)
-            names = names.Substring("\n".Length);
-        WerIstSabo.transform.GetChild(0).GetComponent<TMP_Text>().text = names;
-
-        ServerUtils.BroadcastImmediate("#DuBistSaboteur " + names.Replace("\n", "~"));
-    }
     public void AuswahlstrategieZurAuflösung()
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "AuswahlstrategieZurAuflösung", "");
         ServerUtils.BroadcastImmediate("#AuswahlstrategieZurAuflösung");
         StartWahlAbstimmung();
     }
@@ -1540,6 +1621,7 @@ public class SabotageServer : MonoBehaviour
     #region Utils
     private void GenSaboteurForRound(int saboteurCount) // 1 oder 2
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "GenSaboteurForRound", ""+saboteurCount);
         // Diktat                       // s1
         // Sortieren (Listen)           // s2 + s4
         // Memory                       // s3
@@ -1547,71 +1629,150 @@ public class SabotageServer : MonoBehaviour
         // Tabu                         // s5 + s3
         // Auswahlstrategie             // s2 + s1
 
-        List<SabotagePlayer> nonSabos = new List<SabotagePlayer>();
+        if (saboteurCount == 0)
+            return;
+
+        List<SabotagePlayer> sortSabos = new List<SabotagePlayer>();
+        sortSabos.AddRange(sabotagePlayers);
+        //sortSabos = sortSabos.OrderByDescending(player =>  player.placedTokens).ToList();
+        // Sort by placedTokens
+        for (int i = 1; i < sortSabos.Count; i++)
+        {
+            SabotagePlayer key = sortSabos[i];
+            int j = i - 1;
+            // Move elements of array[0..i-1] that are greater than key to one position ahead of their current position
+            for (; j >= 0 && sortSabos[j].placedTokens < key.placedTokens; j--)
+            {
+                sortSabos[j + 1] = sortSabos[j];
+            }
+            sortSabos[j + 1] = key;
+        }
+
+        int security = 0;
+        while (saboteurCount > 0)
+        {
+            security++;
+            SabotagePlayer topplayer = sortSabos[0];
+            List<SabotagePlayer> sabos1 = new List<SabotagePlayer>();
+            for (int i = 0; i < sortSabos.Count; i++)
+            {
+                if (sortSabos[i].placedTokens == topplayer.placedTokens)
+                    sabos1.Add(sortSabos[i]);
+            }
+            while (sabos1.Count > 0)
+            {
+                if (saboteurCount > 0)
+                {
+                    SabotagePlayer p = sabos1[UnityEngine.Random.Range(0, sabos1.Count)];
+                    sabos1.Remove(p);
+                    sortSabos.Remove(p);
+                    p.SetSaboteur(true);
+                    saboteurCount--;
+                }
+                if (saboteurCount == 0)
+                    break;
+            }
+            if (security > 10)
+                break;
+        }
+
+        for (int i = 0; i < sabotagePlayers.Length; i++)
+        {
+            sabotagePlayers[i].placedTokens  = 0;
+        }
+
+        /*List<SabotagePlayer> nonSabos = new List<SabotagePlayer>();
         foreach (var item in sabotagePlayers)
             if (item.wasSaboteur == 0)
                 nonSabos.Add(item);
+        List<SabotagePlayer> oneSabos = new List<SabotagePlayer>();
+        foreach (var item in sabotagePlayers)
+            if (item.wasSaboteur == 1)
+                oneSabos.Add(item);
         List<SabotagePlayer> allSabos = new List<SabotagePlayer>();
         foreach (var item in sabotagePlayers)
-            if (item.wasSaboteur < 2)
+            if (item.wasSaboteur < 3)
                 allSabos.Add(item);
 
         if (allSabos.Count == 0)
             return;
 
-        if (saboteurCount == 2)
+        for (int i = 0; i < nonSabos.Count; i++)
         {
-            if (nonSabos.Count > 0)
+            if (saboteurCount > 0)
             {
                 SabotagePlayer newSabo = nonSabos[UnityEngine.Random.Range(0, nonSabos.Count)];
-                allSabos.Remove(newSabo);
                 nonSabos.Remove(newSabo);
+                allSabos.Remove(newSabo);
                 newSabo.SetSaboteur(true);
                 saboteurCount--;
             }
+            else
+                break;
+        }
 
-            for (int i = 0; i < saboteurCount; i++)
+        for (int i = 0; i < oneSabos.Count; i++)
+        {
+            if (saboteurCount > 0)
+            {
+                SabotagePlayer newSabo = oneSabos[UnityEngine.Random.Range(0, oneSabos.Count)];
+                oneSabos.Remove(newSabo);
+                allSabos.Remove(newSabo);
+                newSabo.SetSaboteur(true);
+                saboteurCount--;
+            }
+            else
+                break;
+        }
+
+        for (int i = 0; i < allSabos.Count; i++)
+        {
+            if (saboteurCount > 0)
             {
                 SabotagePlayer newSabo = allSabos[UnityEngine.Random.Range(0, allSabos.Count)];
                 allSabos.Remove(newSabo);
                 newSabo.SetSaboteur(true);
+                saboteurCount--;
             }
-        }
-        else
-        {
-            SabotagePlayer newSabo = allSabos[UnityEngine.Random.Range(0, allSabos.Count)];
-            allSabos.Remove(newSabo);
-            newSabo.SetSaboteur(true);
-        }
+            else
+                break;
+        }*/
     }
     private void SetSaboteurPoints(int punkte)
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "SetSaboteurPoints", ""+ punkte);
         GameObject.Find("Punktetafel/SaboteurPunkte").GetComponent<TMP_InputField>().text = "" + punkte;
     }
     private void SetTeamPoints(int punkte)
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "SetTeamPoints", ""+ punkte);
         GameObject.Find("Punktetafel/TeamPunkte").GetComponent<TMP_InputField>().text = "" + punkte;
     }
     private void AddSaboteurPoints(int punkte)
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "AddSaboteurPoints", ""+ punkte);
         GameObject.Find("Punktetafel/SaboteurPunkte").GetComponent<TMP_InputField>().text = "" +
             (int.Parse(GameObject.Find("Punktetafel/SaboteurPunkte").GetComponent<TMP_InputField>().text) + punkte);
     }
     private void AddTeamPoints(int punkte)
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "AddTeamPoints", ""+ punkte);
         GameObject.Find("Punktetafel/TeamPunkte").GetComponent<TMP_InputField>().text = "" +
             (int.Parse(GameObject.Find("Punktetafel/TeamPunkte").GetComponent<TMP_InputField>().text) + punkte);
     }
     private int GetSaboteurPoints()
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "GetSaboteurPoints", "");
         return int.Parse(GameObject.Find("Punktetafel/SaboteurPunkte").GetComponent<TMP_InputField>().text);
     }
     private int GetTeamPoints()
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "GetTeamPoints", "");
         return int.Parse(GameObject.Find("Punktetafel/TeamPunkte").GetComponent<TMP_InputField>().text);
     }
     public void ChangeTeamsPoints()
     {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "ChangeTeamsPoints", "");
         ServerUtils.BroadcastImmediate("#TeamPunkte " +
             GameObject.Find("Punktetafel/TeamPunkte").GetComponent<TMP_InputField>().text + "*" +
             GameObject.Find("Punktetafel/SaboteurPunkte").GetComponent<TMP_InputField>().text);

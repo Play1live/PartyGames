@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using TMPro;
@@ -659,7 +660,10 @@ public class StartupServer : MonoBehaviour
             StartCoroutine(UpdateCrownsDelayed());
             return;
         }
-        for (int i = 0; i < 10; i++)
+        char[] ziffern = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+        if (ziffern.Contains(name[name.Length - 1]))
+            name = name.Substring(0, name.Length - 1);
+        for (int i = 0; i < 20; i++)
         {
             if (i == 0)
                 name = name + i;

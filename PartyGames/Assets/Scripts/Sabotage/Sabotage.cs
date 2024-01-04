@@ -21,6 +21,9 @@ public class Sabotage
 
 public class SabotageDiktat
 {
+    public static int punkteProRichtig = 50;
+    public static int punkteProFalsch = 50;
+    public static int anzahlSaboteure = 1;
     public int index;
     public int punkteProText = 10;
     public List<string> saetze;
@@ -65,7 +68,7 @@ public class SabotageDiktat
             string referenceWord = i < referenceWords.Length ? referenceWords[i] : "";
             string userWord = i < userWords.Length ? userWords[i] : "";
 
-            if (string.Equals(referenceWord, userWord, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(referenceWord, userWord, StringComparison.Ordinal))
             {
                 // Worte sind identisch
                 resultBuilder.Append($"<color=\"green\">{userWord}</color>");
@@ -119,6 +122,9 @@ public class SabotageDiktat
 
 public class SabotageSortieren
 {
+    public static int punkteProRichtig = 50;
+    public static int punkteProFalsch = 50;
+    public static int anzahlSaboteure = 2;
     public int index;
     public int punkteProEinsortierung = 10;
     //     Runde Elemente  
@@ -185,48 +191,14 @@ public class SabotageSortieren
     }
 }
 
-public class SabotageMemory
-{
-    List<Sprite> sprites;
-    public string erklaerung = "Punkteverteilung: Start bei 500 und -5 pro falsches Paar" +
-        " Immer nach einander dran ";
-
-    public SabotageMemory() 
-    {
-        this.sprites = new List<Sprite>();
-
-        List<Sprite> temp = new List<Sprite>();
-        temp.AddRange(Resources.LoadAll<Sprite>("Spiele/Sabotage/Memory/"));
-        temp.AddRange(Resources.LoadAll<Sprite>("Spiele/Sabotage/Memory/"));
-        while (temp.Count > 0)
-        {
-            Sprite sprite = temp[UnityEngine.Random.Range(0, temp.Count)];
-            temp.Remove(sprite);
-            this.sprites.Add(sprite);
-        }
-    }
-
-    public List<Sprite> getIcons()
-    {
-        return this.sprites;
-    }
-
-    public string getSequence()
-    {
-        string sequence = "";
-        foreach (Sprite sprite in this.sprites)
-            sequence += "~" + sprite.name;
-        if (sequence.Length > 0)
-            sequence = sequence.Substring(1);
-        return sequence;
-    }
-}
-
 public class SabotageDerZugLuegt
 {
     // 5 Runden mit je 10 Elementen - 50 Elemente insgesamt 
     // 50 Punkte pro Element
     // ca. 10-15 Lügen
+    public static int punkteProRichtig = 50;
+    public static int punkteProFalsch = 50;
+    public static int anzahlSaboteure = 2;
     public List<string> thema;
     public List<List<string>> rounds;
     public int index;
@@ -282,10 +254,11 @@ public class SabotageDerZugLuegt
     }
 }
 
-// Spieler Nach einander Reinziehen
-// 3 Min Zeit
 public class SabotageTabu
 {
+    public static int punkteProRichtig = 50;
+    public static int punkteProFalsch = 50;
+    public static int anzahlSaboteure = 2;
     public int index;
     public List<string> tabus;
 
@@ -301,8 +274,16 @@ public class SabotageTabu
         {
             this.tabus.Add(item);
         }
-    }
 
+        if (this.tabus.Count < 10)
+            Logging.log(Logging.LogType.Warning, "SabotageTabu", "SabotageTabu", "Zu wenig Elemente für 10 Tabu Runden. Runden: " + this.tabus.Count);
+        while (this.tabus.Count < 10)
+            this.tabus.Add("Empty");
+    }
+    public int GetIndex()
+    {
+        return index;
+    }
     public int ChangeIndex(int change)
     {
         if (this.index <= 0 && change == -1)
@@ -325,6 +306,9 @@ public class SabotageTabu
 // Spieler rein ziehen
 public class SabotageAuswahlstrategie
 {
+    public static int punkteProRichtig = 50;
+    public static int punkteProFalsch = 50;
+    public static int anzahlSaboteure = 1;
     public int index;
     public List<List<Sprite>> runden;
     public List<string> playerturn;
@@ -345,6 +329,17 @@ public class SabotageAuswahlstrategie
             }
             this.runden.Add(sprites);
         }
+        if (this.runden.Count < 10)
+            Logging.log(Logging.LogType.Warning, "SabotageAuswahlstrategie", "SabotageAuswahlstrategie", "Zu wenig Elemente für 10 Runden. Runden: " + this.runden.Count);
+        Sprite sp = Resources.LoadAll<Sprite>("Spiele/Sabotage/Auswahlstrategie/")[0];
+        while (this.runden.Count < 10)
+        {
+            List<Sprite> sprites = new List<Sprite>();
+            for (int i = 0; i < 7; i++)
+                sprites.Add(sp);
+            this.runden.Add(sprites);
+        }
+
         this.playerturn = new List<string>();
         this.playerturn.Add("0~4");
         this.playerturn.Add("2~3");
