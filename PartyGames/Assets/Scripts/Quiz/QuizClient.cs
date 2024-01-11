@@ -362,11 +362,21 @@ public class QuizClient : MonoBehaviour
     /// <summary>
     /// Zeigt Buzzerdelay an, wenn andere vorher gebuzzert haben
     /// </summary>
-    /// <param name="time"></param>
-    public void BuzzeredTime(string time)
+    /// <param name="data"></param>
+    public void BuzzeredTime(string data)
     {
         if (BuzzerDelay.text.Length == 0)
-            BuzzerDelay.text = time.Split(',')[0] + "ms";
+            BuzzerDelay.text = data.Split('|')[0].Split(',')[0] + "ms";
+        int tempId = int.Parse(data.Split("|")[1]);
+        tempId = Player.getPosInLists(tempId);
+        if (tempId != -1)
+        {
+            if (!SpielerAnzeige[tempId, 1].activeInHierarchy)
+            {
+                SpielerAnzeige[tempId, 1].SetActive(true);
+                BuzzerSound.Play();
+            }
+        }
         if (SpielerAnzeige[Player.getPosInLists(Config.PLAYER_ID), 1].activeInHierarchy)
             BuzzerDelay.text = "";
     }

@@ -310,6 +310,7 @@ public class QuizServer : MonoBehaviour
 
         BuzzerDelay = GameObject.Find("BuzzerDelay").GetComponent<TMP_Text>();
         BuzzerDelay.text = "";
+        playerBuzzeredID = 0;
 
         SchaetzfragenSpielerInput = new TMP_InputField[Config.PLAYERLIST.Length];
         for (int i = 0; i < Config.PLAYERLIST.Length; i++)
@@ -425,18 +426,21 @@ public class QuizServer : MonoBehaviour
     /// </summary>
     /// <param name="p">Spieler</param>
     private DateTime BuzzeredTime;
+    private int playerBuzzeredID;
     private void SpielerBuzzered(Player p)
     {
         if (!buzzerIsOn)
         {
             Logging.log(Logging.LogType.Normal, "QuizServer", "SpielerBuzzered", p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
-            ServerUtils.SendMSG("#BuzzeredTime " + (DateTime.Now - BuzzeredTime).TotalMilliseconds, p, false);
+            TimeSpan difference = DateTime.Now.Subtract(BuzzeredTime);
+            ServerUtils.SendMSG("#BuzzeredTime " + difference.TotalMilliseconds + "|" + playerBuzzeredID, p, false);
             return;
         }
         Logging.log(Logging.LogType.Warning, "QuizServer", "SpielerBuzzered", "B: " + p.name + " - " + DateTime.Now.Hour + ":" + DateTime.Now.Minute + ":" + DateTime.Now.Second + ":" + DateTime.Now.Millisecond);
         buzzerIsOn = false;
         ServerUtils.BroadcastImmediate(Config.GAME_TITLE +"#AudioBuzzerPressed " + p.id);
-        ServerUtils.BroadcastImmediate(Config.GAME_TITLE + "#SpielerIstDran " + p.id);
+        playerBuzzeredID = p.id;
+        //ServerUtils.BroadcastImmediate(Config.GAME_TITLE + "#SpielerIstDran " + p.id);
         BuzzerSound.Play();
         SpielerAnzeige[p.id - 1, 1].SetActive(true);
         BuzzeredTime = DateTime.Now;
@@ -448,6 +452,7 @@ public class QuizServer : MonoBehaviour
     {
         for (int i = 0; i < Config.SERVER_MAX_CONNECTIONS; i++)
             SpielerAnzeige[i, 1].SetActive(false);
+        playerBuzzeredID = 0;
         buzzerIsOn = BuzzerAnzeige.activeInHierarchy;
         Logging.log(Logging.LogType.Warning, "QuizServer", "SpielerBuzzerFreigeben", "Buzzer freigegeben");
         ServerUtils.BroadcastImmediate(Config.GAME_TITLE +"#BuzzerFreigeben");

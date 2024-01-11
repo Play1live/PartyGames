@@ -17,6 +17,7 @@ public class SabotageSpiel
     public SabotageDerZugLuegt derzugluegt;
     public SabotageTabu tabu;
     public SabotageAuswahlstrategie auswahlstrategie;
+    public SabotageSloxikon sloxikon;
     // TODO: Zeige per Animation dem Saboteur an das er es ist (mit Sound)
 
     // https://intromaker.com/duration/under-5-seconds
@@ -30,6 +31,7 @@ public class SabotageSpiel
         derzugluegt = new SabotageDerZugLuegt();            // s4 + s5
         tabu = new SabotageTabu();                          // s5 + s3
         auswahlstrategie = new SabotageAuswahlstrategie();  // s2
+        sloxikon = new SabotageSloxikon();                  // s1 + s2
         #endregion
     }
 

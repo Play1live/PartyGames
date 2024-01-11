@@ -55,6 +55,12 @@ public class SabotageServer : MonoBehaviour
     Transform AuswahlstrategieGrid;
     Slider AuswahlstrategieTimer;
 
+    GameObject Sloxikon;
+    Slider SloxikonTimer;
+    GameObject SloxikonVorschlag1;
+    GameObject SloxikonVorschlag2;
+    GameObject SloxikonVorschlag3;
+
     void OnEnable()
     {
         PlayerConnected = new bool[Config.SERVER_MAX_CONNECTIONS];
@@ -188,6 +194,13 @@ public class SabotageServer : MonoBehaviour
                 break;
             case "#ClientStimmtGegen":
                 ClientStimmtGegen(player, data);
+                break;
+
+            case "#SloxikonWaehleVorschlag":
+                SloxikonWaehleVorschlag(player, data);
+                break;
+            case "#SloxikonSaboEingabeFeld":
+                SloxikonSaboEingabeFeld(player, data);
                 break;
         }
     }
@@ -347,6 +360,17 @@ public class SabotageServer : MonoBehaviour
         AuswahlstrategieGrid.gameObject.SetActive(false);
         Auswahlstrategie = GameObject.Find("Modi/Auswahlstrategie");
         Auswahlstrategie.gameObject.SetActive(false);
+
+        // Sloxikon
+        SloxikonTimer = GameObject.Find("Sloxikon/Timer").GetComponent<Slider>();
+        SloxikonTimer.maxValue = 1;
+        SloxikonTimer.minValue = 0;
+        SloxikonTimer.value = 0;
+        Sloxikon = GameObject.Find("Modi/Sloxikon");
+        Sloxikon.gameObject.SetActive(false);
+        SloxikonVorschlag1 = Sloxikon.transform.GetChild(3).gameObject;
+        SloxikonVorschlag2 = Sloxikon.transform.GetChild(4).gameObject;
+        SloxikonVorschlag3 = Sloxikon.transform.GetChild(5).gameObject;
     }
 
     #region Lobby
@@ -371,6 +395,12 @@ public class SabotageServer : MonoBehaviour
         ServerUtils.BroadcastImmediate("#UpdateTeamSaboPunkte " + GameObject.Find("Punktetafel/SaboteurPunkte").GetComponent<TMP_InputField>().text + "|" + GameObject.Find("Punktetafel/TeamPunkte").GetComponent<TMP_InputField>().text);
     }
     Coroutine lobbytokens;
+    public void LobbyPlaceAllTokens()
+    {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "LobbyPlaceAllTokens", "placed");
+        foreach (var item in sabotagePlayers)
+            item.placedTokens = item.saboteurTokens;
+    }
     public void LobbyStartTokenPlazierungen()
     {
         Logging.log(Logging.LogType.Debug, "SabotageServer", "LobbyStartTokenPlazierungen", "");
@@ -379,12 +409,12 @@ public class SabotageServer : MonoBehaviour
             playertokens += "~" + item.saboteurTokens;
         if (playertokens.Length > 0)
             playertokens = playertokens.Substring(1);
-        int timerseconds = 12;
+        int timerseconds = 120;
         ServerUtils.BroadcastImmediate("#LobbyStartTokenPlacement " + timerseconds  + "|" + playertokens);
 
         if (lobbytokens != null)
             StopCoroutine(lobbytokens);
-        lobbytokens = StartCoroutine(LobbyRunTimer(timerseconds)); // 120
+        lobbytokens = StartCoroutine(LobbyRunTimer(timerseconds));
     }
     bool lobbyblocktokens;
     IEnumerator LobbyRunTimer(int seconds)
@@ -1614,6 +1644,297 @@ public class SabotageServer : MonoBehaviour
     {
         Logging.log(Logging.LogType.Debug, "SabotageServer", "AuswahlstrategieZurAuflösung", "");
         ServerUtils.BroadcastImmediate("#AuswahlstrategieZurAuflösung");
+        StartWahlAbstimmung();
+    }
+    #endregion
+    #region Sloxikon
+    private SabotagePlayer sloxikonsabo1;
+    private SabotagePlayer sloxikonsabo2;
+    public void StartSloxikon()
+    {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "StartSloxikon", "");
+        ServerUtils.BroadcastImmediate("#StartSloxikon");
+        Lobby.SetActive(false);
+        Sloxikon.SetActive(true);
+        Sloxikon.transform.GetChild(0).gameObject.SetActive(true);
+        GameObject ServerSide = GameObject.Find("Sloxikon/SaboHinweis");
+        if (ServerSide != null)
+            ServerSide.gameObject.SetActive(false);
+        ServerSide = GameObject.Find("Sloxikon/SaboEingabe");
+        if (ServerSide != null)
+            ServerSide.gameObject.SetActive(false);
+        SloxikonTimer.gameObject.SetActive(false);
+        sloxikonliveupdate = true;
+        GameObject.Find("Sloxikon/ServerSide/LiveSaboVorschau").GetComponent<Toggle>().isOn = sloxikonliveupdate;
+        sloxikonVersions = new List<string>();
+        sloxikonVersions.Clear();
+        sloxikonVersions.Add("Sabo1");
+        sloxikonVersions.Add("Sabo2");
+        sloxikonVersions.Add("Loesung");
+        sloxikonVerionGO = new List<GameObject>();
+        sloxikonVerionGO.Add(SloxikonVorschlag1);
+        sloxikonVerionGO.Add(SloxikonVorschlag2);
+        sloxikonVerionGO.Add(SloxikonVorschlag3);
+        foreach (var item in sloxikonVerionGO)
+        {
+            SloxikonVersionSetLoesung(item, false);
+            SloxikonVersionActivateButton(item, false);
+        }
+        sloxikonvorschlage = new int[sabotagePlayers.Length];
+
+        sloxikonsabo1 = null;
+        sloxikonsabo2 = null;
+        foreach (var item in sabotagePlayers)
+        {
+            if (item.isSaboteur)
+            {
+                if (sloxikonsabo1 == null)
+                    sloxikonsabo1 = item;
+                else if (sloxikonsabo2 == null)
+                    sloxikonsabo2 = item;
+                else
+                    break;
+            }
+        }
+    }
+    public void SloxikonRunTimer(TMP_InputField input)
+    {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "SloxikonRunTimer", input.text);
+        ServerUtils.BroadcastImmediate("#SloxikonRunTimer " + input.text);
+        if (auswahlstrategietimer != null)
+            StopCoroutine(auswahlstrategietimer);
+        auswahlstrategietimer = StartCoroutine(SloxikonRunTimer(int.Parse(input.text)));
+    }
+    public void SloxikonStopTimer()
+    {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "SloxikonStopTimer", "");
+        ServerUtils.BroadcastImmediate("#SloxikonStopTimer");
+        if (auswahlstrategietimer != null)
+            StopCoroutine(auswahlstrategietimer);
+        AuswahlstrategieTimer.gameObject.SetActive(false);
+    }
+    IEnumerator SloxikonRunTimer(int seconds)
+    {
+        yield return null;
+        SloxikonTimer.minValue = 0;
+        SloxikonTimer.maxValue = seconds * 1000; // Umrechnung in Millisekunden
+        SloxikonTimer.gameObject.SetActive(true);
+        int milis = seconds * 1000;
+
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "SloxikonRunTimer", "Seconds: " + seconds + "  Timer started: " + DateTime.Now.ToString("HH:mm:ss:ffff"));
+        while (milis >= 0)
+        {
+            SloxikonTimer.GetComponentInChildren<Slider>().value = milis;
+
+            if (milis <= 0)
+            {
+                Beeep.Play();
+            }
+            // Moep Sound bei Sekunden
+            if (milis == 1000 || milis == 2000 || milis == 3000)
+            {
+                Moeoop.Play();
+            }
+            yield return new WaitForSecondsRealtime(0.1f); // Alle 100 Millisekunden warten
+            milis -= 100;
+        }
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "SloxikonRunTimer", "Seconds: " + seconds + "  Timer ended: " + DateTime.Now.ToString("HH:mm:ss:ffff"));
+
+        SloxikonTimer.gameObject.SetActive(false);
+        yield break;
+    }
+    private List<string> sloxikonVersions;
+    private List<GameObject> sloxikonVerionGO;
+    public void SloxikonChangeText(int change)
+    {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "SloxikonChangeText", change + "");
+        int index = Config.SABOTAGE_SPIEL.sloxikon.ChangeIndex(change);
+        GameObject.Find("Sloxikon/ServerSide/Index").GetComponent<TMP_Text>().text = "Text: " + (Config.SABOTAGE_SPIEL.sloxikon.index + 1) + "/" + Config.SABOTAGE_SPIEL.sloxikon.runden.Count;
+
+        List<string> tempList = new List<string>();
+        tempList.AddRange(sloxikonVersions);
+        sloxikonVersions.Clear();
+        while (tempList.Count > 0)
+        {
+            string item = tempList[UnityEngine.Random.Range(0, tempList.Count)];
+            tempList.Remove(item);
+            sloxikonVersions.Add(item);
+        }
+        for (int i = 0; i < sloxikonVerionGO.Count; i++)
+        {
+            SloxikonVersionSetName(sloxikonVerionGO[i], sloxikonVersions[i]);
+            SloxikonVersionActivateButton(sloxikonVerionGO[i], false);
+            SloxikonVersionSetVotes(sloxikonVerionGO[i], 0);
+            if (sloxikonVersions[i].Equals("Loesung"))
+            {
+                SloxikonVersionSetText(sloxikonVerionGO[i], Config.SABOTAGE_SPIEL.sloxikon.GetString());
+                SloxikonVersionSetLoesung(sloxikonVerionGO[i], true);
+            }
+            else
+            {
+                SloxikonVersionSetText(sloxikonVerionGO[i], "");
+                SloxikonVersionSetLoesung(sloxikonVerionGO[i], false);
+            }
+        }
+
+        string sloxisabos = "";
+        if (sloxikonsabo1 != null)
+            sloxisabos = sloxikonsabo1.player.id+"";
+        else
+            sloxisabos = "-1";
+        if (sloxikonsabo2 != null)
+            sloxisabos += "~" + sloxikonsabo2.player.id;
+        else
+            sloxisabos += "~-1";
+
+        ServerUtils.BroadcastImmediate("#SloxikonShowSaboTipp " +
+            string.Join("~", sloxikonVersions) + "|" + Config.SABOTAGE_SPIEL.sloxikon.GetString().Split('*')[1] + "|" + sloxisabos);
+    }
+    public void SloxikonVersionSetVotes(GameObject go, int text)
+    {
+        go.transform.GetChild(2).GetComponent<TMP_Text>().text = text + "";
+    }
+    private int SloxikonVersionGetVotes(GameObject go)
+    {
+        return int.Parse(go.transform.GetChild(2).GetComponent<TMP_Text>().text);
+    }
+    private void SloxikonVersionActivateButton(GameObject go, bool status)
+    {
+        go.transform.GetChild(1).gameObject.SetActive(status);
+    }
+    private string SloxikonVersionGetName(GameObject go)
+    {
+        return go.name;
+    }
+    private void SloxikonVersionSetName(GameObject go, string name)
+    {
+        go.name = name;
+    }
+    private void SloxikonVersionSetText(GameObject go, string text)
+    {
+        go.transform.GetChild(0).GetComponent<TMP_InputField>().text = text;
+    }
+    private string SloxikonVersionGetText(GameObject go)
+    {
+        return go.transform.GetChild(0).GetComponent<TMP_InputField>().text;
+    }
+    private void SloxikonVersionSetLoesung(GameObject go, bool isLoesung)
+    {
+        go.GetComponent<Image>().enabled = isLoesung;
+    }
+    private bool SloxikonVersionGetLoesung(GameObject go)
+    {
+        return go.GetComponent<Image>().enabled;
+    }
+    public void SloxikonClearFelder()
+    {
+        ServerUtils.BroadcastImmediate("#SloxikonClearFelder");
+        SloxikonVersionSetText(SloxikonVorschlag1, "");
+        SloxikonVersionSetText(SloxikonVorschlag2, "");
+        SloxikonVersionSetText(SloxikonVorschlag3, "");
+        SloxikonVersionSetLoesung(SloxikonVorschlag1, false);
+        SloxikonVersionSetLoesung(SloxikonVorschlag2, false);
+        SloxikonVersionSetLoesung(SloxikonVorschlag3, false);
+        SloxikonVersionSetVotes(SloxikonVorschlag1, 0);
+        SloxikonVersionSetVotes(SloxikonVorschlag2, 0);
+        SloxikonVersionSetVotes(SloxikonVorschlag3, 0);
+    }
+    public void SloxikonShowSaboEingabe(Toggle toggle)
+    {
+        ServerUtils.BroadcastImmediate("#SloxikonShowSaboEingabe " + toggle.isOn);
+
+    }
+    private bool sloxikonliveupdate;
+    public void SloxikonLiveSaboVorschau(Toggle toggle)
+    {
+        sloxikonliveupdate = toggle.isOn;
+    }
+    public void SloxikonZeigeMoeglichkeiten()
+    {
+        string ausgabe = "";
+        if (SloxikonVersionGetText(SloxikonVorschlag1).Contains("*"))
+            ausgabe += SloxikonVersionGetText(SloxikonVorschlag1).Split('*')[1];
+        else
+            ausgabe += SloxikonVersionGetText(SloxikonVorschlag1);
+        if (SloxikonVersionGetText(SloxikonVorschlag2).Contains("*"))
+            ausgabe += "|" + SloxikonVersionGetText(SloxikonVorschlag2).Split('*')[1];
+        else
+            ausgabe += "|" + SloxikonVersionGetText(SloxikonVorschlag2);
+        if (SloxikonVersionGetText(SloxikonVorschlag3).Contains("*"))
+            ausgabe += "|" + SloxikonVersionGetText(SloxikonVorschlag3).Split('*')[1];
+        else
+            ausgabe += "|" + SloxikonVersionGetText(SloxikonVorschlag3);
+
+        ServerUtils.BroadcastImmediate("#SloxikonZeigeMoeglichkeiten " + ausgabe);
+    }
+    public void SloxikonVerteilePunkte()
+    {
+        // 3 sind richtig - 50p
+        // 2 sind richtig - 25p
+        // 1 ist richtig - 10p
+        int correctVotes = 0;
+        foreach (var item in sloxikonVerionGO)
+        {
+            if (SloxikonVersionGetLoesung(item))
+            {
+                try
+                {
+                    correctVotes = SloxikonVersionGetVotes(item);
+                }
+                catch { }
+                break;
+            }
+        }
+        int points = 0;
+        if (correctVotes == 3)
+            points = 50;
+        else if (correctVotes == 2)
+            points = 25;
+        else if (correctVotes == 1)
+            points = 10;
+        else
+            points = 0;
+        AddTeamPoints(points);
+        AddSaboteurPoints(SabotageSloxikon.punkteProRichtig - points);
+        ChangeTeamsPoints();
+    }
+    int[] sloxikonvorschlage;
+    private void SloxikonWaehleVorschlag(Player p, string data)
+    {
+        sloxikonvorschlage[p.id - 1] = sloxikonVersions.IndexOf(data)+1;
+        foreach (var item in sloxikonVerionGO)
+            SloxikonVersionSetVotes(item, 0);
+        foreach (var item in sloxikonvorschlage)
+        {
+            if (item == 0)
+                continue;
+            SloxikonVersionSetVotes(sloxikonVerionGO[item-1], SloxikonVersionGetVotes(sloxikonVerionGO[item-1]) + 1);
+        }
+    }
+    private void SloxikonSaboEingabeFeld(Player p, string data)
+    {
+        foreach (var item in sloxikonVerionGO)
+        {
+            if (SloxikonVersionGetName(item).Equals("Sabo1") && sloxikonsabo1.player.id == p.id)
+            {
+                SloxikonVersionSetText(item, data);
+                if (sloxikonliveupdate)
+                    ServerUtils.SendMSG("#SloxikonSaboEingaben " + "Sabo1|" + data, sloxikonsabo2.player, false);
+                break;
+            }
+            else if (SloxikonVersionGetName(item).Equals("Sabo2") && sloxikonsabo2.player.id == p.id)
+            {
+                SloxikonVersionSetText(item, data);
+                if (sloxikonliveupdate)
+                    ServerUtils.SendMSG("#SloxikonSaboEingaben " + "Sabo2|" + data, sloxikonsabo1.player, false);
+                break;
+            }
+        }
+    }
+    public void SloxikonZurAuflösung()
+    {
+        Logging.log(Logging.LogType.Debug, "SabotageServer", "SloxikonZurAuflösung", "");
+        ServerUtils.BroadcastImmediate("#SloxikonZurAuflösung");
         StartWahlAbstimmung();
     }
     #endregion

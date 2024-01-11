@@ -367,3 +367,45 @@ public class SabotageAuswahlstrategie
         return playerturn[index];
     }
 }
+
+public class SabotageSloxikon
+{
+    public static int punkteProRichtig = 50; // TODO: Anteile rechnen
+    public static int punkteProFalsch = 50;
+    public static int anzahlSaboteure = 2;
+    public int index;
+    public List<string> runden;
+
+    public SabotageSloxikon()
+    {
+        this.index = -1;
+        this.runden = new List<string>();
+        this.runden.AddRange(File.ReadAllLines(Config.MedienPath + @"/Spiele/Sabotage/Sloxikon.txt"));
+
+        if (this.runden.Count < 10)
+            Logging.log(Logging.LogType.Warning, "SabotageSloxikon", "SabotageSloxikon", "Zu wenig Elemente für 10 Runden. Runden: " + this.runden.Count);
+        while (this.runden.Count < 10)
+            this.runden.Add("Thema*Slogan");
+    }
+    public int ChangeIndex(int change)
+    {
+        if (this.index <= 0 && change == -1)
+            return 0;
+        else if (this.index == this.runden.Count - 1 && change == 1)
+            return this.runden.Count - 1;
+        this.index += change;
+        return this.index;
+    }
+
+    public List<string> GetList()
+    {
+        return this.runden;
+    }
+
+    public string GetString()
+    {
+        if (index < 0)
+            return "0*0";
+        return this.runden[index];
+    }
+}
