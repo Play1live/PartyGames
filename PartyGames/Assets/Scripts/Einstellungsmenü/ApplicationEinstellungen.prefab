@@ -9694,7 +9694,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: "<size=25><b><u>1.19</u></b></size>\n<b><size=19>Sabotage</size></b>\n-
     neues Spiel\n- 5 Spieler + 1 Moderator\n- Tokens f\xFCr Saboteurauswahl\n- Erkl\xE4rungen
-    der Hinweise f\xFCr Saboteure\n- Enthaltene Modi:\n\tDiktat\n\tSortieren\n\tDerZugLuegt\n\tTabu\n\tAuswahlstrategie\n-
+    der Hinweise f\xFCr Saboteure\n- Enthaltene Modi:\n\tDiktat\n\tSortieren\n\tDerZugLuegt\n\tTabu\n\tAuswahlstrategie\n\tSloxikon\n-
     Entferne Modi:\n\tMemory\n<b><size=19>Bugfixes</size></b>\n"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
