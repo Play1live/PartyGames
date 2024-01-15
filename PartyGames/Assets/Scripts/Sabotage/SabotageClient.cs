@@ -199,8 +199,14 @@ public class SabotageClient : MonoBehaviour
                 SceneManager.LoadSceneAsync("Startup");
                 break;
             case "#ClientFocusChange":
-                Player player = Config.PLAYERLIST[int.Parse(data.Split('*')[0])-1];
-                Config.SABOTAGE_SPIEL.getPlayerByPlayer(sabotagePlayers, player).SetAusgetabbt(!bool.Parse(data.Split('*')[1]));
+                int id = int.Parse(data.Split('*')[0])-1;
+                if (id < 0 || id >= sabotagePlayers.Length)
+                    break;
+                if (sabotagePlayers == null || sabotagePlayers.Length < id || sabotagePlayers[id] == null)
+                    break;
+                sabotagePlayers[id].SetAusgetabbt(!bool.Parse(data.Split('*')[1]));
+                //Player player = Config.PLAYERLIST[id];
+                //Config.SABOTAGE_SPIEL.getPlayerByPlayer(sabotagePlayers, player).SetAusgetabbt(!bool.Parse(data.Split('*')[1]));
                 break;
             #endregion
             case "#UpdateSpieler":
@@ -1295,7 +1301,7 @@ public class SabotageClient : MonoBehaviour
     private void DerZugLuegtFalsch(string data)
     {
         Logging.log(Logging.LogType.Debug, "SabotageClient", "DerZugLuegtFalsch", data);
-        AddSaboteurPoints(int.Parse(data));
+        SetSaboteurPoints(int.Parse(data));
         Wrong.Play();
     }
     private void DerZugLuegtClientBuzzer()
@@ -1343,6 +1349,7 @@ public class SabotageClient : MonoBehaviour
         else
             GameObject.Find("Tabu/GameObject/SaboTipp").GetComponent<TMP_Text>().text = "";
 
+        tabushowkarte = false;
         TabuSaboHinweis.SetActive(false);
         if (sabotagePlayers[Config.PLAYER_ID - 1].isSaboteur)
             TabuSaboHinweis.SetActive(true);
@@ -1608,7 +1615,7 @@ public class SabotageClient : MonoBehaviour
         ServerSide = GameObject.Find("Sloxikon/ServerSide");
         if (ServerSide != null)
             ServerSide.gameObject.SetActive(false);
-        SloxikonSaboEingabe = GameObject.Find("Sloxikon/SaboEingabe");
+        SloxikonSaboEingabe = Sloxikon.transform.GetChild(6).gameObject;
         SloxikonSaboEingabe.SetActive(false);
         SloxikonTimer.gameObject.SetActive(false);
         sloxikonVerionGO = new List<GameObject>();
@@ -1844,6 +1851,11 @@ public class SabotageClient : MonoBehaviour
         }
         // TODO: Animieren
 
+        if (data.Length == 0)
+        {
+            WerIstSabo.SetActive(false);
+            return;
+        }
         WerIstSabo.SetActive(true);
         WerIstSabo.transform.GetChild(0).GetComponent<TMP_Text>().text = "DU BIST SABOTEUR";
         if (data.Split('~').Length == 1)

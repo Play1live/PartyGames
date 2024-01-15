@@ -38,6 +38,11 @@ public class SabotageDiktat
             File.Create(Config.MedienPath + @"/Spiele/Sabotage/Diktat.txt").Close();
         this.saetze = new List<string>();
         this.saetze.AddRange(File.ReadAllLines(Config.MedienPath + @"/Spiele/Sabotage/Diktat.txt"));
+
+        if (this.saetze.Count < 10)
+            Logging.log(Logging.LogType.Warning, "SabotageDiktat", "SabotageDiktat", "Zu wenig Elemente für 10 Diktat Runden. Runden: " + this.saetze.Count);
+        while (this.saetze.Count < 10)
+            this.saetze.Add("Empty");
     }
 
     public string GetNew(int change)
@@ -122,32 +127,30 @@ public class SabotageDiktat
 
 public class SabotageSortieren
 {
-    public static int punkteProRichtig = 50;
-    public static int punkteProFalsch = 50;
+    public static int punkteProRichtig = 100;
+    public static int punkteProFalsch = 100;
     public static int anzahlSaboteure = 2;
     public int index;
-    public int punkteProEinsortierung = 10;
+    public int punkteProEinsortierung = 20;
     //     Runde Elemente  
     public List<string> sortby;
     public List<List<string>> runden;
-    public string erklaerung = "10 Runden, nach einander, nur 1 kann einsortieren. Alle dürfen reden" +
+    public string erklaerung = "5 Runden, nach einander, nur 1 kann einsortieren. Alle dürfen reden" +
         " Jede Liste enthält 5 Einzusortierende Elemente und 1 Vorgegebenes." +
-        "\nPunkteverteilung: jede korrekte Einsortierung gibt 10p, jede falsche 10p"+
+        "\nPunkteverteilung: jede korrekte Einsortierung gibt 20p, jede falsche 20p"+
         " Nach einer falschen, wird aber das falsche automatisch richtig einsortiert, damit es nicht zu viele Punkte geben kann";
 
     public SabotageSortieren()
     {
         this.index = -1;
         this.sortby = new List<string>();
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 5; i++)
             this.sortby.Add("Leer-Leer");
         this.runden = new List<List<string>>();
-        while (this.runden.Count < 10)
+        while (this.runden.Count < 5)
             this.runden.Add(new List<string>());
         if (!File.Exists(Config.MedienPath + @"/Spiele/Sabotage/Sortieren.txt"))
             File.Create(Config.MedienPath + @"/Spiele/Sabotage/Sortieren.txt").Close();
-
-        
 
         foreach (var item in File.ReadAllLines(Config.MedienPath + @"/Spiele/Sabotage/Sortieren.txt"))
         {
@@ -163,7 +166,12 @@ public class SabotageSortieren
                 runden[index].Add(line);
             }
         }
-        
+
+        if (this.runden.Count < 5)
+            Logging.log(Logging.LogType.Warning, "SabotageSortieren", "SabotageSortieren", "Zu wenig Elemente für 10 Sortieren Runden. Runden: " + this.runden.Count);
+        while (this.runden.Count < 5)
+            this.runden.Add(new List<string>());
+
         for (int i = 0; i < this.runden.Count; i++)
         {
             while (this.runden[i].Count < 6)
@@ -223,6 +231,9 @@ public class SabotageDerZugLuegt
             else
                 this.rounds[index].Add(temp);
         }
+
+        if (this.thema.Count < 5)
+            Logging.log(Logging.LogType.Warning, "SabotageDerZugLuegt", "SabotageDerZugLuegt", "Zu wenig Elemente für 10 DerZugLuegt Runden. Runden: " + this.rounds.Count);
 
         for (int i = 0; i < 5; i++)
             while (this.rounds[i].Count < 10)
@@ -317,7 +328,7 @@ public class SabotageAuswahlstrategie
     {
         this.index = -1;
         this.runden = new List<List<Sprite>>();
-        for (int i = 0; i < 5; i++) 
+        for (int i = 0; i < 10; i++) 
         {
             List<Sprite> sprites = new List<Sprite>();
             foreach (var item in Resources.LoadAll<Sprite>("Spiele/Sabotage/Auswahlstrategie/"))
@@ -346,6 +357,11 @@ public class SabotageAuswahlstrategie
         this.playerturn.Add("1~4");
         this.playerturn.Add("3~0");
         this.playerturn.Add("1~2");
+        this.playerturn.Add("0~1");
+        this.playerturn.Add("3~4");
+        this.playerturn.Add("2~0");
+        this.playerturn.Add("1~3");
+        this.playerturn.Add("4~2");
     }
     public int ChangeIndex(int change)
     {
@@ -370,8 +386,8 @@ public class SabotageAuswahlstrategie
 
 public class SabotageSloxikon
 {
-    public static int punkteProRichtig = 50; // TODO: Anteile rechnen
-    public static int punkteProFalsch = 50;
+    public static int punkteProRichtig = 100; // TODO: Anteile rechnen
+    public static int punkteProFalsch = 100;
     public static int anzahlSaboteure = 2;
     public int index;
     public List<string> runden;
@@ -380,11 +396,15 @@ public class SabotageSloxikon
     {
         this.index = -1;
         this.runden = new List<string>();
+
+        if (!File.Exists(Config.MedienPath + @"/Spiele/Sabotage/Sloxikon.txt"))
+            File.Create(Config.MedienPath + @"/Spiele/Sabotage/Sloxikon.txt").Close();
+
         this.runden.AddRange(File.ReadAllLines(Config.MedienPath + @"/Spiele/Sabotage/Sloxikon.txt"));
 
-        if (this.runden.Count < 10)
-            Logging.log(Logging.LogType.Warning, "SabotageSloxikon", "SabotageSloxikon", "Zu wenig Elemente für 10 Runden. Runden: " + this.runden.Count);
-        while (this.runden.Count < 10)
+        if (this.runden.Count < 5)
+            Logging.log(Logging.LogType.Warning, "SabotageSloxikon", "SabotageSloxikon", "Zu wenig Elemente für 5 Runden. Runden: " + this.runden.Count);
+        while (this.runden.Count < 5)
             this.runden.Add("Thema*Slogan");
     }
     public int ChangeIndex(int change)
