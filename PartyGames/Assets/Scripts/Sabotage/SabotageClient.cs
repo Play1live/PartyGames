@@ -534,6 +534,7 @@ public class SabotageClient : MonoBehaviour
     /// <param name="data">#UpdateSpieler ...</param>
     private void UpdateSpieler(string data)
     {
+        Logging.log(Logging.LogType.Debug, "SabotageClient", "UpdateSpieler", data);
         int connectedplayer = 0;
         for (int i = 0; i < sabotagePlayers.Length; i++)
         {
@@ -554,7 +555,6 @@ public class SabotageClient : MonoBehaviour
             connectedPlayers = connectedplayer;
             DisconnectSound.Play();
         }
-        Logging.log(Logging.LogType.Debug, "SabotageClient", "UpdateSpieler", data);
     }
     /// <summary>
     /// Sendet eine Buzzer Anfrage an den Server
@@ -975,7 +975,7 @@ public class SabotageClient : MonoBehaviour
         Logging.log(Logging.LogType.Debug, "SabotageClient", "DiktatRunTimer", data);
         if (diktattimer != null)
             StopCoroutine(diktattimer);
-        StartCoroutine(RunTimer(int.Parse(data)));
+        diktattimer = StartCoroutine(RunTimer(int.Parse(data)));
     }
     Coroutine diktattimer;
     private void DiktatStopTimer()

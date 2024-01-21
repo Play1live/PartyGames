@@ -1119,7 +1119,7 @@ public class SabotageServer : MonoBehaviour
         for (int i = 0; i < tempauswahl.Count; i++)
         {
             SortierenAuswahl.transform.GetChild(i + 1).GetComponent<TMP_InputField>().text = tempauswahl[i];
-            SortierenAuswahl.transform.GetChild(i).gameObject.SetActive(true);
+            SortierenAuswahl.transform.GetChild(i + 1).gameObject.SetActive(true);
         }
     }
     public void SortierenShowElement(Button btn)

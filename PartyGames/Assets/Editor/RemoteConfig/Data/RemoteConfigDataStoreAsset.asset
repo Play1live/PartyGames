@@ -12,53 +12,53 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 469c24fdb3bd6431b92cc1465bd9166b, type: 3}
   m_Name: RemoteConfigDataStoreAsset
   m_EditorClassIdentifier: 
-  _rsKeyList: "[\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"2d9d5016-01b3-4382-b051-5d15be37437f\"\r\n   
+  _rsKeyList: "[\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"2b5cc156-c1b8-4247-8f15-29b82ff3eaae\"\r\n   
     },\r\n    \"rs\": {\r\n      \"key\": \"Server_Connection_IP\",\r\n      \"type\":
     \"string\",\r\n      \"value\": \"playgamesip.ddns.net\"\r\n    }\r\n  },\r\n 
-    {\r\n    \"metadata\": {\r\n      \"entityId\": \"0275b4c3-eee6-4feb-9442-ff33c4076451\"\r\n   
+    {\r\n    \"metadata\": {\r\n      \"entityId\": \"5199ac3a-e2e5-4879-befe-894d47d55b3a\"\r\n   
     },\r\n    \"rs\": {\r\n      \"key\": \"Server_Connection_Port\",\r\n      \"type\":
     \"int\",\r\n      \"value\": 11001\r\n    }\r\n  },\r\n  {\r\n    \"metadata\":
-    {\r\n      \"entityId\": \"138faa3e-dc20-4392-8a00-a8ed0f2dbc56\"\r\n    },\r\n   
+    {\r\n      \"entityId\": \"ce0aa35b-b05a-46c2-8c9d-4e05146fe4b0\"\r\n    },\r\n   
     \"rs\": {\r\n      \"key\": \"Program_Fullscreen\",\r\n      \"type\": \"bool\",\r\n     
     \"value\": true\r\n    }\r\n  },\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\":
-    \"e1fa6081-5489-44ec-84cb-48fb858aea23\"\r\n    },\r\n    \"rs\": {\r\n     
+    \"c8eb0c31-186e-4ace-9e2d-547dd73bd9b7\"\r\n    },\r\n    \"rs\": {\r\n     
     \"key\": \"Program_Download_Link\",\r\n      \"type\": \"string\",\r\n      \"value\":
     \"https://github.com/Play1live/PartyGames/releases/latest/download/PartyGames.zip\"\r\n   
-    }\r\n  },\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"5d8b70ea-22b1-472e-b0c7-fb7705fc1d0f\"\r\n   
+    }\r\n  },\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"5a4d73bd-4cd5-45e3-ac42-b9f6014e37c1\"\r\n   
     },\r\n    \"rs\": {\r\n      \"key\": \"Program_Download_Version\",\r\n     
-    \"type\": \"string\",\r\n      \"value\": \"1.19c_2\"\r\n    }\r\n  },\r\n  {\r\n   
-    \"metadata\": {\r\n      \"entityId\": \"a159e622-f2cb-44c8-819c-d5b8a5a5dfef\"\r\n   
+    \"type\": \"string\",\r\n      \"value\": \"1.19c_3\"\r\n    }\r\n  },\r\n  {\r\n   
+    \"metadata\": {\r\n      \"entityId\": \"d0a194ae-ff45-49f6-b2e1-0269bd23ddb5\"\r\n   
     },\r\n    \"rs\": {\r\n      \"key\": \"Updater_Download_Link\",\r\n      \"type\":
     \"string\",\r\n      \"value\": \"https://github.com/Play1live/PartyGames/releases/latest/download/Updater.zip\"\r\n   
-    }\r\n  },\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"0804a40d-09bf-430c-8eda-4a235c27af89\"\r\n   
+    }\r\n  },\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"7ba57f61-61c0-45b2-8acb-4064d925aa9f\"\r\n   
     },\r\n    \"rs\": {\r\n      \"key\": \"Updater_Download_Version\",\r\n     
     \"type\": \"string\",\r\n      \"value\": \"1.3\"\r\n    }\r\n  },\r\n  {\r\n   
-    \"metadata\": {\r\n      \"entityId\": \"ab6c9b33-b381-4a62-a11e-965663405ee6\"\r\n   
+    \"metadata\": {\r\n      \"entityId\": \"7d7fa047-e4b7-47e1-aca1-8ece0dfba143\"\r\n   
     },\r\n    \"rs\": {\r\n      \"key\": \"Temporary_Background\",\r\n      \"type\":
     \"string\",\r\n      \"value\": \"1212|1230|Quiz|https://www.google.de\"\r\n   
     }\r\n  }\r\n]"
-  _rsLastCachedKeyList: "[\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"2d9d5016-01b3-4382-b051-5d15be37437f\"\r\n   
+  _rsLastCachedKeyList: "[\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"2b5cc156-c1b8-4247-8f15-29b82ff3eaae\"\r\n   
     },\r\n    \"rs\": {\r\n      \"key\": \"Server_Connection_IP\",\r\n      \"type\":
     \"string\",\r\n      \"value\": \"playgamesip.ddns.net\"\r\n    }\r\n  },\r\n 
-    {\r\n    \"metadata\": {\r\n      \"entityId\": \"0275b4c3-eee6-4feb-9442-ff33c4076451\"\r\n   
+    {\r\n    \"metadata\": {\r\n      \"entityId\": \"5199ac3a-e2e5-4879-befe-894d47d55b3a\"\r\n   
     },\r\n    \"rs\": {\r\n      \"key\": \"Server_Connection_Port\",\r\n      \"type\":
     \"int\",\r\n      \"value\": 11001\r\n    }\r\n  },\r\n  {\r\n    \"metadata\":
-    {\r\n      \"entityId\": \"138faa3e-dc20-4392-8a00-a8ed0f2dbc56\"\r\n    },\r\n   
+    {\r\n      \"entityId\": \"ce0aa35b-b05a-46c2-8c9d-4e05146fe4b0\"\r\n    },\r\n   
     \"rs\": {\r\n      \"key\": \"Program_Fullscreen\",\r\n      \"type\": \"bool\",\r\n     
     \"value\": true\r\n    }\r\n  },\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\":
-    \"e1fa6081-5489-44ec-84cb-48fb858aea23\"\r\n    },\r\n    \"rs\": {\r\n     
+    \"c8eb0c31-186e-4ace-9e2d-547dd73bd9b7\"\r\n    },\r\n    \"rs\": {\r\n     
     \"key\": \"Program_Download_Link\",\r\n      \"type\": \"string\",\r\n      \"value\":
     \"https://github.com/Play1live/PartyGames/releases/latest/download/PartyGames.zip\"\r\n   
-    }\r\n  },\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"5d8b70ea-22b1-472e-b0c7-fb7705fc1d0f\"\r\n   
+    }\r\n  },\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"5a4d73bd-4cd5-45e3-ac42-b9f6014e37c1\"\r\n   
     },\r\n    \"rs\": {\r\n      \"key\": \"Program_Download_Version\",\r\n     
-    \"type\": \"string\",\r\n      \"value\": \"1.19c_2\"\r\n    }\r\n  },\r\n  {\r\n   
-    \"metadata\": {\r\n      \"entityId\": \"a159e622-f2cb-44c8-819c-d5b8a5a5dfef\"\r\n   
+    \"type\": \"string\",\r\n      \"value\": \"1.19c_3\"\r\n    }\r\n  },\r\n  {\r\n   
+    \"metadata\": {\r\n      \"entityId\": \"d0a194ae-ff45-49f6-b2e1-0269bd23ddb5\"\r\n   
     },\r\n    \"rs\": {\r\n      \"key\": \"Updater_Download_Link\",\r\n      \"type\":
     \"string\",\r\n      \"value\": \"https://github.com/Play1live/PartyGames/releases/latest/download/Updater.zip\"\r\n   
-    }\r\n  },\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"0804a40d-09bf-430c-8eda-4a235c27af89\"\r\n   
+    }\r\n  },\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"7ba57f61-61c0-45b2-8acb-4064d925aa9f\"\r\n   
     },\r\n    \"rs\": {\r\n      \"key\": \"Updater_Download_Version\",\r\n     
     \"type\": \"string\",\r\n      \"value\": \"1.3\"\r\n    }\r\n  },\r\n  {\r\n   
-    \"metadata\": {\r\n      \"entityId\": \"ab6c9b33-b381-4a62-a11e-965663405ee6\"\r\n   
+    \"metadata\": {\r\n      \"entityId\": \"7d7fa047-e4b7-47e1-aca1-8ece0dfba143\"\r\n   
     },\r\n    \"rs\": {\r\n      \"key\": \"Temporary_Background\",\r\n      \"type\":
     \"string\",\r\n      \"value\": \"1212|1230|Quiz|https://www.google.de\"\r\n   
     }\r\n  }\r\n]"
