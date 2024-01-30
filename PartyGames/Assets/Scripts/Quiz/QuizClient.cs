@@ -39,7 +39,7 @@ public class QuizClient : MonoBehaviour
         // Leertaste kann Buzzern
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            if (!pressingbuzzer)
+            if (!pressingbuzzer && !SpielerAntwortEingabe.activeInHierarchy)
             {
                 pressingbuzzer = true;
                 SpielerBuzzered();
