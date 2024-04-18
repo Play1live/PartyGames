@@ -18,6 +18,7 @@ public class StartupClient : MonoBehaviour
     [SerializeField] GameObject[] SpielerAnzeigeLobby;
     [SerializeField] GameObject SpielVorschauElemente;
     [SerializeField] GameObject[] MiniGames;
+    [SerializeField] GameObject SpielerIconAuswahl;
     private string ticktacktoe = "";
     private string ticktacktoeRes = "W0WL0LD0D";
     private bool PingWarteAufAntwort = false;
@@ -331,6 +332,9 @@ public class StartupClient : MonoBehaviour
             case "#AllowNameChange":
                 AllowNameChange(data);
                 break;
+            case "#AllowIconChange":
+                AllowIconChange(data);
+                break;
             case "#ChatMSGs":
                 AddChatMSG(data);
                 break;
@@ -386,7 +390,6 @@ public class StartupClient : MonoBehaviour
 
         Hauptmenue.SetActive(false);
         Lobby.SetActive(true);
-
         StartCoroutine(TestIfStartConnectionError());
     }
     /// <summary>
@@ -432,6 +435,26 @@ public class StartupClient : MonoBehaviour
         UmbenennenFeld.SetActive(Boolean.Parse(data));
     }
     /// <summary>
+    /// Zeigt die Iconänderungsfelder an
+    /// </summary>
+    /// <param name="data"></param>
+    private void AllowIconChange(string data)
+    {
+        Logging.log(Logging.LogType.Normal, "StartupClient", "AllowIconChange", "Iconänderungen sind nun möglich: " + data);
+        SpielerIconAuswahl.SetActive(Boolean.Parse(data));
+
+        if (Boolean.Parse(data))
+        {
+            for (int i = 0; i < SpielerIconAuswahl.transform.childCount; i++)
+                SpielerIconAuswahl.transform.GetChild(i).GetComponent<Button>().interactable = true;
+            if (Config.SERVER_PLAYER.icon2.id >= 0)
+            SpielerIconAuswahl.transform.GetChild(Config.SERVER_PLAYER.icon2.id).GetComponent<Button>().interactable = false;
+            for (int i = 0; i < Config.PLAYERLIST.Length; i++)
+                if (Config.PLAYERLIST[i].icon2.id >= 0)
+                    SpielerIconAuswahl.transform.GetChild(Config.PLAYERLIST[i].icon2.id).GetComponent<Button>().interactable = false;
+        }
+    }
+    /// <summary>
     /// Sendet Namensänderunganfrage an Server
     /// </summary>
     /// <param name="input"></param>
@@ -450,11 +473,36 @@ public class StartupClient : MonoBehaviour
         Logging.log(Logging.LogType.Normal, "StartupClient", "ChangeIcon", "Icon wechsel Anfrage.");
         ClientUtils.SendToServer("#SpielerIconChange");
     }
+    public void ChanceIconBySelectedOne(GameObject go)
+    {
+        Button im = go.GetComponent<Button>();
+        im.interactable = false;
+        int index = int.Parse(im.name.Replace("Icon (", "").Replace(")", ""));
+        ClientUtils.SendToServer("#SpielerIconChange 1-" + index);
+    }
     /// <summary>
     /// Initialisiert die Lobbyanzeigen
     /// </summary>
     private void InitPlayerLobby()
     {
+        SpielerIconAuswahl = GameObject.Find("SpielerControl/IconAuswahl");
+        // blendet Iconauswahl ein
+        GameObject iconauswahl = SpielerIconAuswahl;
+        if (iconauswahl != null && iconauswahl.activeInHierarchy)
+        {
+            for (int i = 0; i < iconauswahl.transform.childCount; i++)
+            {
+                iconauswahl.transform.GetChild(i).GetComponent<Button>().interactable = false;
+                iconauswahl.transform.GetChild(i).gameObject.SetActive(false);
+            }
+            int min = Math.Min(iconauswahl.transform.childCount, Config.PLAYER_ICONS.Count);
+            for (int i = 0; i < min; i++)
+            {
+                iconauswahl.transform.GetChild(i).gameObject.SetActive(true);
+                iconauswahl.transform.GetChild(i).GetComponent<Image>().sprite = Config.PLAYER_ICONS[i].icon;
+            }
+        }
+
         Logging.log(Logging.LogType.Normal, "StartupClient", "InitPlayerLobby", "Spielerlobby wird initialisiert.");
         // Für Server Host
         SpielerAnzeigeLobby[0].transform.GetChild(4).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/GUI/Top4");
@@ -502,6 +550,16 @@ public class StartupClient : MonoBehaviour
     {
         Logging.log(Logging.LogType.Debug, "StartupClient", "UpdateSpieler", "Spieleranzeige wird aktualisiert. "+ data);
 
+        // Icons freigeben
+        GameObject iconauswahl = SpielerIconAuswahl;
+        if (iconauswahl != null && iconauswahl.activeInHierarchy)
+        {
+            for (int i = 0; i < iconauswahl.transform.childCount; i++)
+            {
+                iconauswahl.transform.GetChild(i).GetComponent<Button>().interactable = true;
+            }
+        }
+
         string[] spieler = data.Replace("[TRENNER]", "|").Split('|');
         int spieleranzahl = 1;
         foreach (string sp in spieler)
@@ -524,6 +582,12 @@ public class StartupClient : MonoBehaviour
                 Config.SERVER_PLAYER.name = sp.Replace("[NAME]", "|").Split('|')[1];
                 SpielerAnzeigeLobby[0].SetActive(true);
                 SpielerAnzeigeLobby[0].GetComponentsInChildren<Image>()[1].sprite = Config.SERVER_PLAYER.icon2.icon;
+                if (iconauswahl != null && iconauswahl.activeInHierarchy)
+                {
+                    int iconindex = Config.SERVER_PLAYER.icon2.id;
+                    if (iconindex >= 0)
+                        iconauswahl.transform.GetChild(iconindex).GetComponent<Button>().interactable = false;
+                }
                 SpielerAnzeigeLobby[0].GetComponentsInChildren<TMP_Text>()[0].text = sp.Replace("[NAME]", "|").Split('|')[1];
             }
             // Display ClientInfos
@@ -538,6 +602,13 @@ public class StartupClient : MonoBehaviour
                 Config.PLAYERLIST[pos].name = sp.Replace("[NAME]", "|").Split('|')[1];
                 Config.PLAYERLIST[pos].points = Int32.Parse(sp.Replace("[PUNKTE]", "|").Split('|')[1]);
                 Config.PLAYERLIST[pos].icon2 = PlayerIcon.getIconById(sp.Replace("[ICON]", "|").Split('|')[1]);
+                if (iconauswahl != null && iconauswahl.activeInHierarchy)
+                {
+                    int iconindex = int.Parse(sp.Replace("[ICON]", "|").Split('|')[1]);
+                    if (iconindex >= 0)
+                        iconauswahl.transform.GetChild(iconindex).GetComponent<Button>().interactable = false;
+                }
+
                 // Display PlayerInfos                
                 SpielerAnzeigeLobby[id].GetComponentsInChildren<Image>()[1].sprite = Config.PLAYERLIST[pos].icon2.icon;
                 SpielerAnzeigeLobby[id].GetComponentInChildren<TMP_Text>().text = Config.PLAYERLIST[pos].name;

@@ -9,6 +9,9 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
+using Image = UnityEngine.UI.Image;
+using Toggle = UnityEngine.UI.Toggle;
 
 public class StartupServer : MonoBehaviour
 {
@@ -824,6 +827,7 @@ public class StartupServer : MonoBehaviour
     {
         Logging.log(Logging.LogType.Normal, "StartupServer", "SpielerIconToggle", "Spieler dürfen ihr Icon wechseln: "+ toggle.isOn);
         Config.ALLOW_ICON_CHANGE = toggle.isOn;
+        ServerUtils.BroadcastImmediate("#AllowIconChange " + Config.ALLOW_ICON_CHANGE);
     }
     /// <summary>
     /// Wechselt das Icon eines Spielers vom Server aus
@@ -859,11 +863,24 @@ public class StartupServer : MonoBehaviour
             if (neuesIcon == null)
                 return;
             IconFestlegen(p, neuesIcon);
+            Logging.log(Logging.LogType.Normal, "StartupServer", "SpielerIconChange", "Spieler " + p.name + " hat nun das Icon: " + neuesIcon.displayname);
             return;
         }
         // Spieler gewollte änderung des Icons
         if (!Config.ALLOW_ICON_CHANGE)
+        {
+            ServerUtils.BroadcastImmediate("#AllowIconChange " + Config.ALLOW_ICON_CHANGE);
             return;
+        }
+
+        if (data.StartsWith("1-")) // Filter nach neuem Iconnamen
+        {
+            int iconindex = int.Parse(data.Substring(2));
+            neuesIcon = Config.PLAYER_ICONS[iconindex % Config.PLAYER_ICONS.Count];
+            IconFestlegen(p, neuesIcon);
+            Logging.log(Logging.LogType.Normal, "StartupServer", "SpielerIconChange", "Spieler " + p.name + " hat nun das Icon: " + neuesIcon.displayname);
+            return;
+        }
 
         neuesIcon = Config.PLAYER_ICONS[(Config.PLAYER_ICONS.IndexOf(p.icon2) + 1) % Config.PLAYER_ICONS.Count];
         Logging.log(Logging.LogType.Normal, "StartupServer", "SpielerIconChange", "Spieler " + p.name + " hat nun das Icon: "+ neuesIcon.displayname);
@@ -922,7 +939,9 @@ public class StartupServer : MonoBehaviour
         for (int i = 1; i < Config.PLAYER_ICONS.Count; i++)
         {
             if (IconWirdGeradeGenutzt(neuesIcon))
+            {
                 neuesIcon = Config.PLAYER_ICONS[(Config.PLAYER_ICONS.IndexOf(neuesIcon) + 1) % Config.PLAYER_ICONS.Count];
+            }
             else
                 break;
         }

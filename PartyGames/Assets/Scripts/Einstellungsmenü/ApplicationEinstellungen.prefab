@@ -9692,7 +9692,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "<size=25><b><u>1.19</u></b></size>\n<b><size=19>Sabotage</size></b>\n-
+  m_text: "<size=25><b><u>1.19</u></b></size>\n- neue Iconauswahl der Spieler\n<b><size=19>Sabotage</size></b>\n-
     neues Spiel\n- 5 Spieler + 1 Moderator\n- Tokens f\xFCr Saboteurauswahl\n- Erkl\xE4rungen
     der Hinweise f\xFCr Saboteure\n- Enthaltene Modi:\n\tDiktat\n\tSortieren\n\tDerZugLuegt\n\tTabu\n\tAuswahlstrategie\n\tSloxikon\n-
     Entferne Modi:\n\tMemory\n<b><size=19>Bugfixes</size></b>\n"

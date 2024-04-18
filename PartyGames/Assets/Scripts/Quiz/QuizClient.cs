@@ -385,6 +385,8 @@ public class QuizClient : MonoBehaviour
     /// </summary>
     public void SpielerBuzzered()
     {
+        if (SpielerAntwortEingabe.activeInHierarchy)
+            return;
         ClientUtils.SendToServer("#SpielerBuzzered");
     }
     /// <summary>
