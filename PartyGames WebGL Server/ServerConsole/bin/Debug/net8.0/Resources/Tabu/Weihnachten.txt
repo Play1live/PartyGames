@@ -1,0 +1,144 @@
+~Festlich|Ausgela#ss#enheit-Glamour-Jubil#ae#um-Eleganz-Schick-Prunkvoll
+~Besinnlich|Gela#ss#enheit-Ruhe-Meditation-Nachdenklich-Achtsamkeit-Ausgeglichenheit
+~Geschenke|Freude-#UE#berraschungen-Austausch-Verpackungen-Mangel-Pr#ae#sente
+~Familie|Verbundenheit-Liebe-Generationen-Einsamkeit-Zusammenhalt-Streit
+~Lichter|Dunkelheit-Leuchten-Schatten-Kerzenlicht-Strahlen-Glanz
+~Schnee|Schmelzen-Schneeflocken-K#ae#lte-Rodeln-Tauwetter-Winterzauber
+~Advent|Nachl#ae##ss#igkeit-Kerzenanz#ue#nden-Erwartung-Vorbereitung-Ungeduld-Adventskranz
+~Tradition|Brauchtum-Wandel-#UE#berlieferung-Kultur-Innovation-Moderne
+~Gl#ue#hwein|Gew#ue#rze-Abstinenz-K#ae#lte-Hei#ss#-Genu#ss#-W#ae#rme
+~Pl#ae#tzchen|Weihnachtsb#ae#ckerei-Kalorienbewu#ss#tsein-Di#ae#t-Vielfalt-Naschen-Teig
+~Tannenbaum|Duft-Gr#ue#n-Weihnachtsbaumschmuck-Baumlos-K#ue#nstlicher Baum-Schm#ue#cken
+~Kerzen|Gefahr-Romantik-Dunkelheit-Dekoration-Flackern-Lichtschein
+~Christkind|Weihnachtsgeschichte-Teufelsgleich-Heiligenschein-B#oe#sewicht-Kindliche Unschuld-Geschenkebringer
+~Weihnachtsmann|Weihnachtsmuffel-Rentierschlitten-Geschenkesack-Grinch-Roter Mantel-Bart
+~Weihnachtslieder|Singen-Chor-Texte-Melodien-Unbekanntheit-Stille
+~Frohe Weihnachten|Herzlichkeit-Festtagsgru#ss#-Mi#ss#mut-Gl#ue#ckw#ue#nsche-Besinnliche Feiertage-Fr#oe#hlichkeit
+~Vorfreude|Erwartung-Begeisterung-Ungeduld-Freude-Sehnsucht-Desintere#ss#e
+~Gem#ue#tlichkeit|Kuscheligkeit-W#ae#rme-K#ae#lte-Behaglichkeit-Geborgenheit-Unbehagen
+~Liebe|Ha#ss#-F#ue#rsorge-Herzlichkeit-Gleichg#ue#ltigkeit-Zuneigung-N#ae#he
+~Frieden|Krieg-Verst#ae#ndigung-Entspannung-Ruhe-Konflikt-Harmonie
+~Nikolaus|Rute-S#ue##ss#igkeiten-Heiliger-Schimpfen-B#oe#ser Nikolaus-Geschenke
+~Weihnachtsmarkt|Buden-Geschlo#ss#en-Gl#ue#hwein-Leer-Leckereien-Handwerk
+~Schneeflocken|Schmelzen-Winterzauber-Zerbrechlich-Eisig-Tauwetter-Einzigartig
+~Punsch|Gew#ue#rze-K#ae#lte-Alkohol-Fruchtig-Abstinenz-Becher
+~Krippe|Figuren-Stroh-Stall-K#ae#lte-Unvollst#ae#ndig-Weihnachtsgeschichte
+~Stern|Leuchten-Unsichtbar-Navigation-Himmelsk#oe#rper-Dunkelheit-Weihnachtsdeko
+~Engel|B#oe#sewicht-Teufel-Besch#ue#tzer-Himmelsbote-Fl#ue#gel-Unschuld
+~Lebkuchen|Gew#ue#rze-Trocken-Verzierung-Unappetitlich-Knusprig-Duft
+~Winter|Jahreszeit-K#ae#lte-Schnee-Sommer-Gem#ue#tlichkeit-Hitze
+~Weihnacht#ss#tern|Vertrocknet-Adventsdekoration-Wei#ss#-Glanz-Bl#ue#te-Welk
+~Stille Nacht|Frieden-Schlaf-Ruhe-L#ae#rm-Kerzenschein-Hektik
+~Gottesdienst|Gebet-Gemeinschaft-S#ue#nde-Zweifel-Glaube-Kirche
+~Weihnachtsgans|Festmahl-Braten-Vegetarisch-Saftig-Tradition-Gefl#ue#gel
+~Kamin|Behaglichkeit-Feuer-K#ae#lte-Gem#ue#tlichkeit-Ru#ss#-W#ae#rme
+~Rentiere|Geweih-W#ue#ste-Schlitten-Weihnachtsmann-Rudolph-Flugzeug
+~Geschenkpapier|Verpackung-Bunte Muster-Einfarbig-Schleife-Recycling-Transparent
+~Schneemann|Karotten-Frostig-Sandmann-Schmelzen-M#ue#tze-Schal
+~Weihnachtsdekoration|Ornamente-Leer-Schlicht-Schmuck-Girlanden-Christbaumkugeln
+~Kekse|Naschen-Au#ss#techen-Trocken-Lecker-Backen-Pl#ae#tzchen
+~Adventskalender|#UE#berraschung-Vorfreude-Schokolade-T#ue#rchen-Voll-Leer
+~Heiligabend|Feste#ss#en-Einsamkeit-Arbeit#ss#tre#ss#-Bescherung-Familie-Kerzenschein
+~Weihnachtsengel|Fl#ue#gel-Besinnlichkeit-Hoffnung-B#oe#sewicht-Teufel-Lichtgestalt
+~Schokolade|Gesund-Genu#ss#-Kakao-Bitter-Naschen-S#ue##ss#
+~Wunschzettel|Leer-Geschenkideen-Verge#ss#en-Erf#ue#llt-Weihnachtsw#ue#nsche-Schreiben
+~Weihnachtse#ss#en|Fast Food-Festmahl-Schlemmen-Tradition-Di#ae#t-Braten
+~Harmonie|Zusammenklang-Eintracht-Frieden-Ausgeglichenheit-Ruhe-Konflikt
+~R#ae#ucherm#ae#nnchen|Holzfigur-Geruchlos-Rauch-Duft-Leer-Tradition
+~Weihnachtsferien|Freizeit-Alltag-Besuche-Entspannung-Reisen-Arbeit#ss#tre#ss#
+~Jahreswechsel|Silvester-Stillstand-Routine-Party-Vors#ae#tze-Neujahr
+~Silvester|Knallen-Countdown-Feiern-Party-Ruhe-Champagner
+~Bescherung|Auspacken-Entt#ae#uschung-#UE#berraschungen-Geschenke-Leere-Freude
+~Schlitten|Rodeln-Winterfreude-Geschwindigkeit-Pistenabenteuer-Kufen
+~Schneefall|Winterlandschaft-Frostig-Schneeflocken-Verschneit-Kalt
+~Weihnachtskarte|Gr#ue##ss#e-Pers#oe#nliche Nachricht-Weihnachtsmotiv-Freundschaft-Postweg
+~Lichterkette|Festlich-Beleuchtung-Glanz-Leuchten-Lichterzauber
+~Kaminfeuer|Gem#ue#tlich-W#ae#rme-Knisternd-Behaglich-Holzscheite
+~Rentierschlitten|Schlittenfahrt-Geschenkeauslieferung-Rentiere-Weihnachtsmann-Fliegen
+~Weihnachtsbaumkugeln|Verzierung-Gl#ae#nzend-Ornamente-Bunt-Schmuck
+~Weihnacht#ss#ocke|Geschenksocke-F#ue#llung-#UE#berraschungen-H#ae#ngend-Str#ue#mpfe
+~Gl#oe#ckchen|Klingen-Glockenl#ae#uten-Festlich-Klangvoll-Zierde
+~Geschenkanh#ae#nger|Personalisiert-Etikett-Namen#ss#child-Befestigen-Schleife
+~Tannenzweig|Duftend-Dekoration-Nadeln-Frisch-Gr#ue#n
+~Engelshaar|Zart-Gl#ae#nzend-Engel-Wei#ss#-Haar
+~Weihnachtsm#ue#tze|Festtagskopfbedeckung-Rot Wei#ss#-Nikolaus-Verkleidung-Winteracce#ss#oire
+~Lametta|Glitzernd-H#ae#ngend-Dekoration-Schimmernd-Festlich
+~Weihnachtsmarktstand|Budenzauber-Verkauf#ss#t#ae#nde-Gl#ue#hweinstand-Duft-Markt
+~Zuckerstange|S#ue##ss#igkeit-Rot Wei#ss#-Geschmack-Bonbon-Festlich
+~Schneeballschlacht|Wintervergn#ue#gen-Spa#ss#-Schneekugeln-Treffer-K#ae#lte
+~Weihnacht#ss#timmung|Besinnlich-Kerzenschein-Freude-Gemeinschaft-Festtagszauber
+~Weihnachtsb#ae#ckerei|Pl#ae#tzchen-Duft-Backen-Au#ss#techformen-Naschen
+~Geschenkgutschein|Pr#ae#sent-Einl#oe#sen-Auswahl-#UE#berraschung-Wert
+~Schneeschuhe|Winterwandern-Schneegehen-Spazieren-Schneetrekking-Fortbewegung
+~Weihnacht#ss#chmuck|Dekorieren-Verzierung-Baumschmuck-Festlich-Ornamente
+~Adventskranz|Kerzen-Vorweihnachtszeit-Dekoration-Advent-Tannenzweige
+~Leuchtsterne|Funkeln-Himmel-Lichter-Gl#ue#hen-Weihnachtsdekoration
+~Christbaumspitze|Baumkrone-Verzierung-Gipfel-Festlich-Dekoration
+~Weihnachtsbastelei|Kreativit#ae#t-DIY-Basteln-Handgemacht-Adventszeit
+~Weihnachtsparty|Feiern-Zusammenkommen-Freunde-Festlich-Geselligkeit
+~Rentiergeweih|Geweih-Weihnachtsdekoration-Rudolph-Rentiere-Geweihkopfschmuck
+~Weihnachtszauber|Magie-Festtagszauber-Verzauberung-Wunder-Mystisch
+~Wunschbaum|W#ue#nsche-Erf#ue#llung-H#ae#ngende Zettel-Hoffnung-Weihnachtsw#ue#nsche
+~Geschenkesack|Pr#ae#sente-Geschenke-Santa Claus-Sack-F#ue#llung
+~Weihnachtszeitung|Festtagsausgabe-Nachrichten-Weihnachtsberichte-Lesestoff-Zeitung
+~Gl#ue#hweinta#ss#e|Punsch-Hei#ss#getr#ae#nk-Winterw#ae#rme-Genu#ss#-Ta#ss#enw#ae#rmer
+~Adventslicht|Kerze-Licht-Vorweihnachtszeit-Besinnlich-Stimmung
+~Sternschnuppe|Wunsch-Himmel-Gl#ue#cksbringer-Nachthimmel-Beobachtung
+~Weihnachtsbraten|Feste#ss#en-G#ae#nsebraten-Truthahn-Fleischgericht-Hauptgang
+~Schlittschuhlaufen|Eislaufen-Kufen-Wintervergn#ue#gen-Pirouetten-Eiskunstlauf
+~Geschenkp#ae#ckchen|Verpackung-Pr#ae#sent-#UE#berraschung-Schleife-Auspacken
+~Weihnachtsverpackung|Einpacken-Geschenkpapier-Schleifenband-Geschenkverpackung-Dekoration
+~Rentierfutter|Heu-Futter-Leckerli-Rudolph-Tierverpflegung
+~Weihnachtsengelchor|Chorgesang-Engel#ss#timmen-Himmelsgesang-Festlicher Gesang-A cappella
+~Tannenzapfen|Baumzapfen-Naturdeko-Zapfen-Wald-Dekoration
+~Weihnachtsgeb#ae#ck|Pl#ae#tzchen-Kekse-Lebkuchen-Backwaren-Nascherei
+~Rentiergewand|Gewand-Kost#ue#m-Verkleidung-Rudolph-Rentieroutfit
+~Krippenspiel|Weihnachtsauff#ue#hrung-Jesuskind-Darstellung-Theaterst#ue#ck-Krippendarstellung
+~Weihnachtsparade|Umzug-Festlicher Marsch-Parade-Musik-Festtag#ss#timmung
+~Weihnachtskranz|T#ue#rschmuck-Adventskranz-Dekoration-Festlich-Tannengr#ue#n
+~Christstollen|Weihnachtsgeb#ae#ck-Backware-Rosinen-Festtagsbrot-Hefekuchen
+~Weihnachtstorte|Festtagskuchen-Backware-Sahne-Fr#ue#chte-Geb#ae#ck
+~Festliches Ambiente|einladend-langweilig-elegant-d#ue#ster-atmosph#ae#risch-Stimmungsvoll
+~Kerzenschein|dunkel-beruhigend-Romantisch-k#ue#hl-gem#ue#tlich-flackernd
+~Besinnliche Stimmung|friedvoll-hektisch-entspannt-chaotisch-l#ae#rmig-nachdenklich
+~Schneeflocken tanzen|magisch-einzigartig-starr-schmelzend-kristallklar-Zart
+~Geschenke auspacken|erfreulich-liebevoll-entt#ae#uschend-unintere#ss#ant-langweilig-#ue#berraschend
+~Leckeres E#ss#en|aromatisch-K#oe#stlich-vielf#ae#ltig-verlockend-unappetitlich-geschmacklos
+~Famili#ae#re Zusammenkunft|streitig-vertraut-distanziert-gemeinsam-gesellig-herzlich
+~Fr#oe#hliche Lieder|fr#oe#hlich-mitrei#ss#end-traurig-d#ue#ster-melodisch-beschwingt
+~Warmes Feuer|erloschen-ungem#ue#tlich-knisternd-gem#ue#tlich-Behaglich-romantisch
+~Glitzernde Dekoration|Funkelnd-pr#ae#chtig-strahlend-glamour#oe#s-festlich-trist
+~Freude teilen|egoistisch-mitf#ue#hlend-Gemeinsam-dankbar-gro#ss#z#ue#gig-gierig
+~Liebe sp#ue#ren|warmherzig-gef#ue#hllos-verbunden-gleichg#ue#ltig-empfindsam-gl#ue#cklich
+~Magische Zeit|profan-geheimnisvoll-zauberhaft-faszinierend-allt#ae#glich-mystisch
+~Strahlende Kinderaugen|gelangweilt-unschuldig-neugierig-leuchtend-desintere#ss#iert-begeistert
+~Herzliche Umarmungen|liebevoll-umfa#ss#end-warm-Innig-abweisend-distanziert
+~Traditionelle Br#ae#uche|Best#ae#ndig-#ue#berliefert-rituell-fremd-unkonventionell-kulturell
+~Weihnachtsbaum|festlich geschm#ue#ckt-strahlend-pr#ae#chtig-Duftend-farblos-h#ae##ss#lich
+~Festliche Kleidung|unpa#ss#end-schlampig-langweilig-glamour#oe#s-stilvoll-schick
+~Winterliche Landschaft|#oe#de-verschneit-Schneebedeckt-frostig-trist-malerisch
+~Besinnlichkeit|Innere Einkehr-Meditation-Ruhe-Selbstreflexion-Gela#ss#enheit.
+~Weihnacht#ss#tr#ue#mpfe|Geschenke-am Kamin-Nikolaus.
+~Feiertage|Weihnachten-Heiligabend-Weihnachtsfeiertage-Besinnung.
+~Weihnachtspost|Gru#ss#karten-Briefe-Weihnachtsgr#ue##ss#e-Familienfotos.
+~Lichterketten|Funkelnd-bunt-gl#ue#hend-Dekoration-gem#ue#tlich.
+~Weihnachtsw#ue#nsche|Liebe-Gl#ue#ck-Gesundheit-Erf#ue#llung-Zufriedenheit.
+~Schokoladenweihnachtsmann|S#ue##ss#-Genu#ss#-Naschen-Geschenk.
+~Glockenl#ae#uten|Festlich-feierlich-Klang-Kirche-Weihnachtsgottesdienst.
+~Adventszeit|Vorbereitung-Erwartung-Vorfreude-Kerzen.
+~Besondere Momente|Gemeinschaft-Zusammenkommen-Erinnerungen-Weihnachtszauber
+~Weihnachtskonzert|Musik-Chor-festlich-Auff#ue#hrung-Harmonie.
+~Kerzenlicht|Romantik-behaglich-warm-stimmungsvoll-Fackel.
+~Schokoladenadventskalender|T#ae#gliches Naschen-Vorfreude-s#ue##ss#-#ue#berraschung.
+~Weihnachtskrippe|Heilige Familie-Stall-Bethlehem-Jesus-Weisen.
+~Besinnung|Ruhe-nachdenken-Innenschau-Achtsamkeit-Dankbarkeit.
+~Winterwunderland|Schnee-Eiszapfen-Frost-M#ae#rchenlandschaft-zauberhaft.
+~Weihnachtsbasteln|Kreativit#ae#t-DIY-Geschenke selbst machen-gemeinsames Gestalten.
+~Weihnachtsduft|Zimt-Orangen-Nelken-Tannennadeln-Geb#ae#ck-aromatisch.
+~Weihnachtsurlaub|Reisen-Skifahren-Auszeit-Winterurlaub-Ferien.
+~Weihnachtsvorbereitungen|Geschenke kaufen-dekorieren-Planung-Vorfreude-Hektik.
+~Weihnachtswunsch|Herzenswunsch-Hoffnung-Erf#ue#llung-Liebe-Gl#ue#ck.
+~Weihnacht#ss#chlitten|Rentiere-Geschenke-Santa Claus-Schlittenfahrt-Winterlandschaft.
+~Weihnachtsfilm|Kla#ss#iker-Familienkino-gem#ue#tlicher Abend-Weihnachtsgeschichte-Unterhaltung.
+~Weihnachtsm#ae#rchen|M#ae#rchenwald-Zauberhaftes-Wunder-Fantasie-Weihnachtszauber.
+~Weihnachtswunschzettel|Tr#ae#ume-W#ue#nsche-Hoffnungen-Geschenkideen-Santa Claus.
