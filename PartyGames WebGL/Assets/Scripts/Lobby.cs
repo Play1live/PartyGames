@@ -107,10 +107,10 @@ public class Lobby : MonoBehaviour
                 Config.spieler = p;
                 Config.spieler.isModerator = is_moderator;
             }
-            lobby_grid.GetChild(i).gameObject.SetActive(true);
             //lobby_grid.GetChild(i).GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Ping/Ping 3"); // Ping
             lobby_grid.GetChild(i).GetChild(2).GetComponent<Image>().sprite = p.icon; // Icon
             lobby_grid.GetChild(i).GetChild(3).GetComponent<TMP_Text>().text = p.name; // Name
+            lobby_grid.GetChild(i).gameObject.SetActive(true);
         }
         for (int i = infos.Length; i < lobby_grid.childCount; i++)
         {

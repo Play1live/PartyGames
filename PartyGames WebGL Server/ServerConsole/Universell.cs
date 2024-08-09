@@ -18,7 +18,8 @@ namespace ServerConsole
                 default:
                     Utils.Log("Unbekannter Befehl: " + cmd + " " + data);
                     return;
-                case "Ping": ServerUtils.SendMessage(player, "ALL", "Pong", ""); break;
+                case "Ping": ServerUtils.SendMessage(player, "ALLE", "Pong", ""); break;
+                case "SpielVerlassen": ServerUtils.BroadcastMessage("ALLE", "SpielVerlassen", ""); Lobby.StartLobby(); break;
             }
         }
     }

@@ -9,6 +9,7 @@ namespace ServerConsole
     {
         public static void StartLobby()
         {
+            BroadcastSpielerUpdate();
         }
         public static void OnCommand(IWebSocketConnection socket, string cmd, string data)
         {

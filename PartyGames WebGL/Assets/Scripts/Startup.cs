@@ -11,11 +11,13 @@ public class Startup : MonoBehaviour
 {
     private bool lockcmds;
     [SerializeField] Button ConnectBTN;
+    private TMP_InputField inputtest;
 
     [SerializeField] AudioSource DisconnectSound;
 
     void Start()
     {
+        ConnectBTN.interactable = true;
         if (Config.connected)
             DisconnectSound.Play();
         Config.connected = false;
@@ -26,6 +28,7 @@ public class Startup : MonoBehaviour
         Config.players = null;
         Utils.LoadPlayerIcons();
         ClientUtils.SetupConnection();
+        inputtest = GameObject.Find("NameInput").GetComponent<TMP_InputField>();
     }
 
     void Update()
@@ -41,6 +44,11 @@ public class Startup : MonoBehaviour
                 message = Config.msg_queue.Dequeue();
             }
             OnCommand(message);
+        }
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            if (ConnectBTN.gameObject.activeInHierarchy)
+                ConnectToServer(inputtest);
         }
     }
 
@@ -80,6 +88,7 @@ public class Startup : MonoBehaviour
         // Verbinde zum WebSocket-Server
         Config.client.Connect();
         Config.client.OnOpen += IdentifyWithServer;
+        ConnectBTN.interactable = false;
     }
     private void IdentifyWithServer()
     {
