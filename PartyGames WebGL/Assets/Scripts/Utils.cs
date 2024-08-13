@@ -1,6 +1,7 @@
 
 using NativeWebSocket;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -15,10 +16,16 @@ public class Utils
         }
         return new string(chars);  // Konvertiere das Array zurück in einen String
     }
-    public static void Log(string text)
+    public static void Log(LogType type, object text, bool force_show = false,
+            [CallerMemberName] string methodName = "",
+            [CallerFilePath] string filePath = "",
+            [CallerLineNumber] int lineNumber = 0)
     {
-        if (!Config.hide_communication)
-            Debug.Log(text);
+        if (!Config.hide_communication || force_show)
+        {
+            string className = System.IO.Path.GetFileNameWithoutExtension(filePath);
+            Debug.Log($"{type}: [{className}.{methodName} (Zeile {lineNumber})]: {text.ToString()}");
+        }
     }
     public static void LoadPlayerIcons()
     {
@@ -33,7 +40,16 @@ public class Utils
         }
     }
 }
-
+public enum LogType
+{
+    Trace = 0,
+    Debug = 1,
+    Info = 2,
+    Warning = 3,
+    Error = 4,
+    Fatal = 5,
+    None = 6,
+}
 public class ClientUtils
 {
     public static void SetupConnection()
@@ -49,13 +65,13 @@ public class ClientUtils
     }
     public static void OnSocketOpened()
     {
-        Utils.Log("WebSocket connection opened.");
+        Utils.Log(LogType.Info, "WebSocket connection opened.", true);
     }
 
     public static void OnSocketMessage(byte[] msg)
     {
         string message = System.Text.Encoding.UTF8.GetString(msg);
-        Utils.Log($"Received Message: {message}");
+        //Utils.Log(LogType.Trace, $"Received Message: {message}");
         lock (Config.msg_queue)
         {
             Config.msg_queue.Enqueue(message);
@@ -64,12 +80,12 @@ public class ClientUtils
 
     public static void OnSocketError(string exception)
     {
-        Utils.Log($"WebSocket encountered an error: {exception}");
+        Utils.Log(LogType.Error, $"WebSocket encountered an error: {exception}", true);
     }
 
     public static void OnSocketClose(WebSocketCloseCode closeCode)
     {
-        Utils.Log($"WebSocket closed with code: {closeCode}");
+        Utils.Log(LogType.Info, $"WebSocket closed with code: {closeCode}", true);
         SceneManager.LoadScene("Startup");
     }
 
@@ -77,8 +93,8 @@ public class ClientUtils
     {
         if (Config.client.State == WebSocketState.Open)
         {
+            Utils.Log(LogType.Debug, "send: " + cmd + "|" + message);
             Config.client.SendText(gametitle + "|" + cmd + "|" + message);
-            Utils.Log("send: " + cmd + "|" + message);
         }
     }
 }

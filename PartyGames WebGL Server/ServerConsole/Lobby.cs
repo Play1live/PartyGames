@@ -1,7 +1,5 @@
 ﻿using Fleck;
 using ServerConsole.Games;
-using System.Reflection;
-using System.Reflection.PortableExecutable;
 
 namespace ServerConsole
 {
@@ -17,7 +15,7 @@ namespace ServerConsole
             switch (cmd)
             {
                 default:
-                    Utils.Log("Unbekannter Befehl: " + cmd + " " + data);
+                    Utils.Log(LogType.Warning, "Unbekannter Befehl: " + cmd + " " + data);
                     return;
                 case "GetSpielerUpdate": BroadcastSpielerUpdate(); break;
                 case "ClientSetName": SetName(socket, data); break;
@@ -47,6 +45,7 @@ namespace ServerConsole
         }
         private static void SetName(IWebSocketConnection socket, string data)
         {
+            Utils.Log(LogType.Debug, socket.ConnectionInfo.ClientIpAddress + " Name: " + data);
             // Spieler existiert noch nicht
             Player p1 = Player.getPlayerBySocket(socket);
             Guid uuid = Guid.Parse(data.Split('#')[0]);
@@ -59,7 +58,7 @@ namespace ServerConsole
             {
                 if (Config.players.Count >= 20)
                 {
-                    Utils.Log("Maximale Anzahl an Clients bereits verbunden. Client wird abgelehnt.");
+                    Utils.Log(LogType.Info, "Maximale Anzahl an Clients bereits verbunden. Client wird abgelehnt.");
                     socket.Close();
                     return;
                 }
@@ -86,6 +85,7 @@ namespace ServerConsole
         }
         private static void SetIcon(Player p, string data)
         {
+            Utils.Log(LogType.Debug, p.name + " wants new Icon: " + data);
             bool unused_icon = false;
             int selected = int.Parse(data.Split('#')[0]);
             List<string> all_icons = new List<string>();
@@ -117,7 +117,7 @@ namespace ServerConsole
             Player new_mod = Player.getPlayerByName(data);
             if (new_mod != null)
             {
-                Utils.Log(new_mod.name + " " + Config.moderator.name);
+                Utils.Log(LogType.Info, new_mod.name + " " + Config.moderator.name);
                 Config.moderator = new_mod;
                 ServerUtils.SendMessage(p, "Lobby", "ClientUnSetModerator", "");
                 ServerUtils.SendMessage(Config.moderator, "Lobby", "ClientSetModerator", "");
@@ -157,6 +157,7 @@ namespace ServerConsole
         }
         private static void StartGame(Player p, string data)
         {
+            Utils.Log(LogType.Debug, p.name + " > " + data);
             List<string> temp = data.Split('#').ToList();
             string game = temp[0];
             temp.RemoveAt(0);
@@ -164,7 +165,7 @@ namespace ServerConsole
 
             switch (game)
             {
-                default: Utils.Log("Lobby - StartGame > Unbekanntes Spiel: " + game); break;
+                default: Utils.Log(LogType.Warning, "Unbekanntes Spiel: " + game); break;
                 case "Tabu":
                     Config.tabu.SetType(values[0]);
                     Config.tabu.SetSelected(values[1]);

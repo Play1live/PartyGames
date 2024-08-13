@@ -1,5 +1,6 @@
 ﻿using Fleck;
 using ServerConsole.Games;
+using System.Runtime.CompilerServices;
 
 namespace ServerConsole
 {
@@ -14,39 +15,73 @@ namespace ServerConsole
             }
             return new string(chars);  // Konvertiere das Array zurück in einen String
         }
-        // TODO: Überarbeiten, mit ForceShow, und Traceback mit chatgpt mit klasse und methode
-        public static void Log(string text)
+        public static void Log(LogType type, object text,
+            [CallerMemberName] string methodName = "",
+            [CallerFilePath] string filePath = "",
+            [CallerLineNumber] int lineNumber = 0)
         {
-            if (!Config.hide_communication)
-                Console.WriteLine(text);
+            if (type >= Config.logtype)
+            {
+                // Setze die Farbe basierend auf dem LogType
+                switch (type)
+                {
+                    case LogType.Trace:
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
+                        break;
+                    case LogType.Debug:
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                        break;
+                    case LogType.Info:
+                        Console.ForegroundColor = ConsoleColor.White;
+                        break;
+                    case LogType.Warning:
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        break;
+                    case LogType.Error:
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        break;
+                    case LogType.Fatal:
+                        Console.ForegroundColor = ConsoleColor.Magenta;
+                        break;
+                }
+
+                string className = System.IO.Path.GetFileNameWithoutExtension(filePath);
+                Console.WriteLine($"[{className}.{methodName} (Zeile {lineNumber})]: {text.ToString()}");
+            }
         }
     }
-
+    public enum LogType
+    {
+        Trace = 0,
+        Debug = 1,
+        Info = 2,
+        Warning = 3,
+        Error = 4,
+        Fatal = 5,
+        None = 6,
+    }
     internal class ServerUtils
     {
         public static void OnSocketOpened(IWebSocketConnection socket)
         {
-            Utils.Log("Connection opened");
-            Utils.Log($"Client ID: {socket.ConnectionInfo.Id}");
-            Utils.Log($"Client IP: {socket.ConnectionInfo.ClientIpAddress}");
-            Utils.Log($"Port: {socket.ConnectionInfo.ClientPort}");
-            Utils.Log($"Is Available: {socket.IsAvailable}");
+            Utils.Log(LogType.Info, $"Connection opened Client ID: {socket.ConnectionInfo.Id} Client IP: {socket.ConnectionInfo.ClientIpAddress} Port: {socket.ConnectionInfo.ClientPort}");
         }
         public static void OnErrorHandle(Exception error, IWebSocketConnection socket)
         {
             // Log the error details and the ID of the client that caused the error
-            Utils.Log($"Error from {socket.ConnectionInfo.Id}: {error.Message}");
+            Utils.Log(LogType.Error, $"Error from {socket.ConnectionInfo.Id}: {error.Message}");
 
             // Du könntest hier auch entscheiden, ob du zusätzliche Schritte unternehmen willst,
             // wie das Senden einer Fehlermeldung an den Client oder das Schließen der Verbindung.
             if (!socket.IsAvailable)
             {
-                Utils.Log("Socket is not available, closing connection.");
+                Utils.Log(LogType.Info, "Socket is not available, closing connection.");
                 socket.Close();
             }
         }
         public static void OnSocketClose(IWebSocketConnection socket)
         {
+            Utils.Log(LogType.Info, $"Socket closed: {socket.ConnectionInfo.Id}");
             Player deadplayer = Player.getPlayerBySocket(socket);
             if (deadplayer == null)
                 return;
@@ -61,8 +96,8 @@ namespace ServerConsole
                 else
                 {
                     Config.moderator = Config.players[new Random().Next(0, Config.players.Count)];
+                    ServerUtils.SendMessage(Config.moderator, "Lobby", "ClientSetModerator", "");
                 }
-                ServerUtils.SendMessage(Config.moderator, "Lobby", "ClientSetModerator", "");
             }
 
             if (Config.game_title.Equals("Lobby"))
@@ -73,7 +108,7 @@ namespace ServerConsole
         }
         public static void OnSocketMessage(string message, IWebSocketConnection socket)
         {
-            Utils.Log($"Received message: {message}");
+            Utils.Log(LogType.Debug, $"Received message: {message}");
 
             if (message.Split('|').Length < 3)
                 return;
@@ -85,7 +120,7 @@ namespace ServerConsole
             switch (gametitle)
             {
                 default:
-                    Utils.Log("ERROR unknown gametitle");
+                    Utils.Log(LogType.Warning, "Unknown Gametitle: " + gametitle);
                     break;
                 case "ALLE": Universell.OnCommand(socket, command, data); break;
                 case "Lobby": Lobby.OnCommand(socket, command, data); break;
@@ -98,11 +133,14 @@ namespace ServerConsole
         // Methode zum Senden einer Nachricht an alle Clients
         public static void BroadcastMessage(string gametitle, string cmd, string message)
         {
+            Utils.Log(LogType.Debug, "Broadcast message: " + gametitle + "|" + cmd + "|" + message);
             List<Player> deadclients = new List<Player>();
             foreach (var client in Config.players)
             {
                 if (client.websocket.IsAvailable)
+                {
                     client.websocket.Send(gametitle + "|" + cmd + "|" + message);
+                }
             }
         }
         // Methode zum Senden einer Nachricht an einen Client
@@ -110,11 +148,11 @@ namespace ServerConsole
         {
             if (player != null)
             {
-                Utils.Log("Send message: " + player.name + ">" + gametitle + "|" + cmd + "|" + message);
+                Utils.Log(LogType.Debug, "Send message: " + player.name + ">" + gametitle + "|" + cmd + "|" + message);
                 player.websocket.Send(gametitle + "|" + cmd + "|" + message);
             }
             else
-                Utils.Log("Send message: " + "unknown" + ">" + gametitle + "|" + cmd + "|" + message);
+                Utils.Log(LogType.Debug, "Send message: " + "unknown" + ">" + gametitle + "|" + cmd + "|" + message);
         }
     }
 }

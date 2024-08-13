@@ -1,9 +1,11 @@
 ﻿using Fleck;
 using System.Globalization;
-using System.Runtime.CompilerServices;
 
 namespace ServerConsole.Games
 {
+    // TODO: ne Liste mit 15 items machen, das wörter nicht sofort doppelt sein dürfen
+    // Wenn die leer ist füllen, wenn die voll ist 1 rein und 1 raus
+
     internal class TabuHandler
     {
         private static int max_skip;
@@ -25,6 +27,8 @@ namespace ServerConsole.Games
 
         public static void StartGame()
         {
+            Utils.Log(LogType.Trace, "StartGame");
+            Utils.Log(LogType.Trace, "111111111111111111111");
             team_green = new List<Player>();
             team_blue = new List<Player>();
             InitTeams();
@@ -37,10 +41,11 @@ namespace ServerConsole.Games
         public static void OnCommand(IWebSocketConnection socket, string cmd, string data)
         {
             Player player = Player.getPlayerBySocket(socket);
+            Utils.Log(LogType.Trace, player.name + " > " + cmd + " " + data);
             switch (cmd)
             {
                 default:
-                    Utils.Log("Unbekannter Befehl: " + cmd + " " + data);
+                    Utils.Log(LogType.Warning, "Unbekannter Befehl: " + cmd + " " + data);
                     return;
                 case "GetSpielerUpdate": BroadcastSpielerUpdate(); break;
                 case "RandomTeams": RandomTeams(player); break;
@@ -161,7 +166,7 @@ namespace ServerConsole.Games
             }
             catch (Exception e) 
             {
-                Utils.Log("Fehlerhafte Eingabe: " + e);
+                Utils.Log(LogType.Warning, "Fehlerhafte Eingabe: " + e);
             }
             ServerUtils.BroadcastMessage("Tabu", "ChangeMaxSkip", "" + max_skip);
         }
@@ -179,7 +184,7 @@ namespace ServerConsole.Games
             }
             catch (Exception e)
             {
-                Utils.Log("Fehlerhafte Eingabe: " + e);
+                Utils.Log(LogType.Warning, "Fehlerhafte Eingabe: " + e);
             }
             ServerUtils.BroadcastMessage("Tabu", "ChangeSkipDelay", "" + skip_delay);
         }
@@ -197,7 +202,7 @@ namespace ServerConsole.Games
             }
             catch (Exception e)
             {
-                Utils.Log("Fehlerhafte Eingabe: " + e);
+                Utils.Log(LogType.Warning, "Fehlerhafte Eingabe: " + e);
             }
             ServerUtils.BroadcastMessage("Tabu", "ChangeTimerSec", "" + timer_sec);
         }
@@ -274,7 +279,8 @@ namespace ServerConsole.Games
                 max_skip = Tabu.settings_neandertaler[0];
             else if (Config.tabu.GetTabuType() == TabuType.battle_royale)
                 max_skip = Tabu.settings_battle_royale[0];
-            Utils.Log("Unbekannter Tabu Typ");
+            else
+                Utils.Log(LogType.Error, "Unbekannter Tabu Typ: " + Config.tabu.GetTabuType());
         }
         private static void InitSkipDelay()
         {
@@ -288,7 +294,8 @@ namespace ServerConsole.Games
                 skip_delay = Tabu.settings_neandertaler[1];
             else if (Config.tabu.GetTabuType() == TabuType.battle_royale)
                 skip_delay = Tabu.settings_battle_royale[1];
-            Utils.Log("Unbekannter Tabu Typ");
+            else
+                Utils.Log(LogType.Error, "Unbekannter Tabu Typ: " + Config.tabu.GetTabuType());
         }
         private static void InitTimerSec()
         {
@@ -302,7 +309,8 @@ namespace ServerConsole.Games
                 timer_sec = Tabu.settings_neandertaler[2];
             else if (Config.tabu.GetTabuType() == TabuType.battle_royale)
                 timer_sec = Tabu.settings_battle_royale[2];
-            Utils.Log("Unbekannter Tabu Typ");
+            else
+                Utils.Log(LogType.Error, "Unbekannter Tabu Typ: " + Config.tabu.GetTabuType());
         }
         private static void InitTeamPoints()
         {
@@ -358,7 +366,7 @@ namespace ServerConsole.Games
                 BroadcastSpielerUpdate();
             }
             else
-                Utils.Log("unbekanntes Team " + data);
+                Utils.Log(LogType.Error, "Unbekanntes Team " + data);
         }
         private static string GetTeamOfPlayer(Player p)
         {
@@ -366,7 +374,7 @@ namespace ServerConsole.Games
                 return "Green";
             else if (team_blue.Contains(p))
                 return "Blue";
-            Utils.Log("FEHLER unbekannter spieler");
+            Utils.Log(LogType.Error, "Unbekannter Spieler: " + p.ToString());
             return "ERROR";
         }
         private static void StartTimer()
@@ -384,7 +392,6 @@ namespace ServerConsole.Games
             if (Config.tabu.GetTabuType().Equals(TabuType.battle_royale))
                 decrease_points = true;
 
-            //round_sec++;
             while (round_sec >= 0 || decrease_points)
             {
                 if (cancellationToken.IsCancellationRequested)
@@ -392,10 +399,9 @@ namespace ServerConsole.Games
                     return; // Timer wurde abgebrochen
                 }
 
-                //Thread.Sleep(1000); // Eine Sekunde warten
                 if (!decrease_points)
                 {
-                    Console.WriteLine($"Verbleibende Zeit: {round_sec} Sekunden");
+                    Utils.Log(LogType.Trace, $"Verbleibende Zeit: {round_sec} Sekunden");
                     round_sec--;
                     Thread.Sleep(1000); // Eine Sekunde warten
                 }
@@ -406,7 +412,7 @@ namespace ServerConsole.Games
                     else if (team_turn.Equals("Blue"))
                         team_blue_points--;
 
-                    Console.WriteLine($"Verbleibende Zeit: {team_green_points} {team_blue_points} Sekunden");
+                    Utils.Log(LogType.Trace, $"Verbleibende Zeit: {team_green_points} {team_blue_points} Sekunden");
                     Thread.Sleep(1000); // Eine Sekunde warten
 
                     if (team_green_points <= 0 || team_blue_points <= 0)
@@ -415,7 +421,7 @@ namespace ServerConsole.Games
 
             }
 
-            Console.WriteLine("Zeit abgelaufen!");
+            Utils.Log(LogType.Trace, "Timer abgelaufen");
             RoundEnd(null, "Time");
         }
         private static void StartRound(Player spieler)
@@ -488,7 +494,7 @@ namespace ServerConsole.Games
                 HandleRoundEnd_BattleRoyale(p, indicator);
             }
             else
-                Utils.Log("Error unbekannter typ");
+                Utils.Log(LogType.Error, "Unbekannter Typ: " + Config.tabu.GetTabuType());
 
             string team_green_s = "";
             foreach (var item in team_green)
@@ -541,7 +547,7 @@ namespace ServerConsole.Games
                 round_sec = timer_sec;
             }
             else
-                Utils.Log("Error unbekannter typ");
+                Utils.Log(LogType.Error, "Unbekannter Typ: " + Config.tabu.GetTabuType());
         }
         private static void HandleRoundEnd_OneWordUse(Player p, string indicator)
         {
@@ -568,7 +574,7 @@ namespace ServerConsole.Games
                 round_sec = timer_sec;
             }
             else
-                Utils.Log("Error unbekannter typ");
+                Utils.Log(LogType.Error, "Unbekannter Typ: " + Config.tabu.GetTabuType());
         }
         private static void HandleRoundEnd_OneWordGoal(Player p, string indicator)
         {
@@ -607,7 +613,7 @@ namespace ServerConsole.Games
                 round_sec = timer_sec;
             }
             else
-                Utils.Log("Error unbekannter typ");
+                Utils.Log(LogType.Error, "Unbekannter Typ: " + Config.tabu.GetTabuType());
         }
         private static void HandleRoundEnd_Neandertaler(Player p, string indicator)
         {
@@ -646,7 +652,7 @@ namespace ServerConsole.Games
                 round_sec = timer_sec;
             }
             else
-                Utils.Log("Error unbekannter typ");
+                Utils.Log(LogType.Error, "Unbekannter Typ: " + Config.tabu.GetTabuType());
         }
         private static void HandleRoundEnd_BattleRoyale(Player p, string indicator)
         {
@@ -674,6 +680,7 @@ namespace ServerConsole.Games
                     team_green_last_turn = erklaerer;
                 else
                     team_blue_last_turn = erklaerer;
+                NeueKarte();
             }
             else if (indicator.Equals("Wrong"))
             {
@@ -694,11 +701,19 @@ namespace ServerConsole.Games
                 round_sec = timer_sec;
             }
             else
-                Utils.Log("Error unbekannter typ");
+                Utils.Log(LogType.Error, "Unbekannter Typ: " + Config.tabu.GetTabuType());
         }
         private static void NeueKarte()
         {
+            TabuItem temp = karte;
             karte = Config.tabu.GetSelected().GetRandom();
+            Utils.Log(LogType.Trace, karte.ToString());
+            if (karte == temp)
+            {
+                Utils.Log(LogType.Trace, "Neue Karte wäre eine Dopplung. Generiere neu");
+                NeueKarte();
+                return;
+            }
         }
         private static void UpdatePointsAfterRound(string team, int indicator)
         { // Indicator: Correct: 0, Wrong: 1, Skip: 2
@@ -739,7 +754,7 @@ namespace ServerConsole.Games
             }
             else
             {
-                Utils.Log("Error unbekannter typ");
+                Utils.Log(LogType.Error, "Unbekannter Typ: " + Config.tabu.GetTabuType());
             }
         }
         #endregion
@@ -775,7 +790,7 @@ namespace ServerConsole.Games
             if (sets.Count > 0)
                 selected = sets[0];
 
-            Utils.Log("Tabu wurde initialisiert.");
+            Utils.Log(LogType.Info, "Tabu wurde initialisiert.");
         }
         public TabuType GetTabuType() { return this.type; }
         public string GetTypeAsString() { return this.type.ToString(); }
@@ -824,7 +839,7 @@ namespace ServerConsole.Games
                 }
                 else
                 {
-                    Utils.Log("TabuSet - Wort kommt doppelt vor: " + word);
+                    Utils.Log(LogType.Warning, "Wort kommt doppelt vor: " + word);
                     this.need_to_safe = true;
                 }
             }
@@ -846,20 +861,13 @@ namespace ServerConsole.Games
                     .Replace("Ä", "#AE#").Replace("ä", "#ae#"));
                 }
                 File.WriteAllLines(@"Resources\Tabu\" + this.name, newFile);
-                Utils.Log("TabuSet - File: " + name + " wurde gespeichert. " + 
+                Utils.Log(LogType.Info, "File: " + name + " wurde gespeichert. " + 
                     Path.GetFullPath(@"Resources\Tabu\" + this.name + ".txt") + " " + this.worte.Count);
             }
 #endif
         }
-        public override string ToString()
-        {
-            return name;
-        }
-
-        public TabuItem GetRandom()
-        {
-            return this.worte[new Random().Next(0, this.worte.Count)];
-        }
+        public override string ToString() { return name; }
+        public TabuItem GetRandom() { return this.worte[new Random().Next(0, this.worte.Count)]; }
     }
     internal class TabuItem
     {
@@ -878,22 +886,18 @@ namespace ServerConsole.Games
                 }
                 else if (item.Contains('#'))
                 {
-                    Utils.Log("TabuItem - Wort enthält # " + item);
+                    Utils.Log(LogType.Warning, "Wort enthält # " + item);
                     set.need_to_safe = true;
                     this.tabus.Add(item.Replace("#", ""));
                 }
                 else
                 {
-                    Utils.Log("TabuItem - Dopplung bei Wort: " + this.word + " >> " + item);
+                    Utils.Log(LogType.Warning, "Dopplung bei Wort: " + this.word + " >> " + item);
                     set.need_to_safe = true;
                 }
             }
         }
-        public override string ToString()
-        {
-            return this.word + "#" + this.GenTabuListAsString();
-        }
-
+        public override string ToString() { return this.word + "#" + this.GenTabuListAsString(); }
         public string GetWord() { return this.word; }
         public List<string> GetTabus() { return this.tabus; }
         public List<string> GenTabuList()

@@ -1,10 +1,6 @@
-﻿
-using Fleck;
+﻿using Fleck;
 using ServerConsole;
 using ServerConsole.Games;
-using System;
-using System.Diagnostics;
-using System.Globalization;
 
 class Program
 {
@@ -27,7 +23,7 @@ class Program
             socket.OnPong = (data) => { };
         });
 
-        Console.WriteLine("WebSocket server started at ws://0.0.0.0:14002");
+        Utils.Log(LogType.Info, "WebSocket server started at ws://0.0.0.0:14002");
         Lobby.StartLobby();
         Console.ReadKey();  // Hält die Konsole offen
     }

@@ -62,7 +62,7 @@ public class Startup : MonoBehaviour
 
         switch (cmd)
         {
-            default: Utils.Log("Unbekannter Befehl: " + cmd + " " + data); return;
+            default: Utils.Log(LogType.Warning, "Unbekannter Befehl: " + cmd + " " + data); return;
             case "ClientSetName":
                 lockcmds = true;
                 Config.spieler = new Player(Guid.Parse(data.Split('#')[0]), data.Split('#')[1], int.Parse(data.Split('#')[2]));

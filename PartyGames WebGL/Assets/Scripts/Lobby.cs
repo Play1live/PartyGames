@@ -28,7 +28,7 @@ public class Lobby : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Utils.Log("Starting Lobby");
+        Utils.Log(LogType.Info, "Starting Lobby", true);
         lockcmds = false;
         FindFittingIconByName();
         UpdateModeratorView();
@@ -48,7 +48,7 @@ public class Lobby : MonoBehaviour
             {
                 message = Config.msg_queue.Dequeue();
             }
-            Utils.Log(message);
+            Utils.Log(LogType.Trace, message);
             OnCommand(message);
         }
     }
@@ -68,16 +68,21 @@ public class Lobby : MonoBehaviour
 
         switch (cmd)
         {
-            default: Utils.Log("Unbekannter Befehl: " + cmd + " " + data); return;
+            default: Utils.Log(LogType.Warning, "Unbekannter Befehl: " + cmd + " " + data, true); return;
             case "SpielerUpdate": UpdateSpieler(data); break;
-            case "ClientSetModerator": Utils.Log("Du bist nun Moderator"); Config.spieler.isModerator = true; UpdateModeratorView(); break;
-            case "ClientUnSetModerator": Utils.Log("Du bist nun kein Moderator mehr"); Config.spieler.isModerator = false; UpdateModeratorView(); break;
+            case "ClientSetModerator": Utils.Log(LogType.Info, "Du bist nun Moderator"); Config.spieler.isModerator = true; UpdateModeratorView(); break;
+            case "ClientUnSetModerator": Utils.Log(LogType.Info, "Du bist nun kein Moderator mehr"); Config.spieler.isModerator = false; UpdateModeratorView(); break;
             case "PlayConnectSound": ConnectSound.Play(); break;
             case "PlayDisconnectSound": DisconnectSound.Play(); break;
             case "SetPingTime": ClientUtils.SendMessage("Lobby", "PingTime", ""+ (DateTime.Now-pingtime).TotalMilliseconds); pingtime = DateTime.MinValue; break;
             case "PingUpdate": UpdatePingInfo(data); break;
             case "SetSpielData": UpdateGameselection(data); break;
             case "StartGame": lockcmds = true; SceneManager.LoadScene(data); break;
+        }
+
+        if (gametitle.Equals("Tabu"))
+        {
+            SceneManager.LoadScene(gametitle);
         }
     }
 
@@ -123,7 +128,7 @@ public class Lobby : MonoBehaviour
         Player p = Player.getPlayerByName(data.Split('#')[0]);
         if (p == null)
         {
-            Utils.Log("Spieler wurde nicht gefunden!");
+            Utils.Log(LogType.Warning, "Spieler wurde nicht gefunden! " + data);
             return;
         }
         float ms = float.Parse(data.Split('#')[1]);
@@ -212,7 +217,7 @@ public class Lobby : MonoBehaviour
         {
             switch (item.Split("[TYPE]")[1])
             {
-                default: Utils.Log("Lobby - UpdateGameselection Unbekannter Typ: " + item); break;
+                default: Utils.Log(LogType.Warning, "Unbekannter Typ: " + item); break;
                 case "Text":
                     GameObject instance = Instantiate(Gameselection_Item_Text, prefab_parent);
                     instance.transform.GetChild(1).GetComponent<TMP_Text>().text = item.Split("[TITLE]")[1];
@@ -294,14 +299,14 @@ public class Lobby : MonoBehaviour
                 ClientUtils.SendMessage("Lobby", "StartGame", name + "#" + drop_1.value);
             }
             else
-                Utils.Log("Lobby - Gameselection_Handler > Unbekannter Typ: " + item.name + " " + item.transform.parent.name);
+                Utils.Log(LogType.Warning, "Unbekannter Typ: " + item.name + " " + item.transform.parent.name);
         }
         else if (item.name.Equals("Upload"))
         {
-            Utils.Log("Lobby - Gameselection_Handler > noch nicht implementiert: Upload");
+            Utils.Log(LogType.Fatal, "noch nicht implementiert: Upload");
         }
         else
-            Utils.Log("Lobby - Gameselection_Handler > Unbekannter Knopf: " + item.name);
+            Utils.Log(LogType.Warning, "Unbekannter Knopf: " + item.name);
     }
     #endregion
 }

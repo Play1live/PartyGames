@@ -47,7 +47,7 @@ public class Tabu : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Utils.Log("Starting Lobby");
+        Utils.Log(LogType.Info, "Starting Lobby", true);
         lockcmds = false;
         moderator_menue.SetActive(false);
         if (Config.spieler.isModerator)
@@ -81,7 +81,7 @@ public class Tabu : MonoBehaviour
             {
                 message = Config.msg_queue.Dequeue();
             }
-            Utils.Log(message);
+            Utils.Log(LogType.Trace, message);
             OnCommand(message);
         }
     }
@@ -100,7 +100,7 @@ public class Tabu : MonoBehaviour
 
         switch (cmd)
         {
-            default: Utils.Log("Unbekannter Befehl: " + cmd + " " + data); return;
+            default: Utils.Log(LogType.Warning, "Unbekannter Befehl: " + cmd + " " + data); return;
             case "Pong": break;
             case "SetGameInfo": GameObject.Find("Moderator/GameTypeAndPack").GetComponent<TMP_Text>().text = data; break;
             case "SpielVerlassen": lockcmds = true; SceneManager.LoadScene("Lobby"); break;
@@ -259,7 +259,7 @@ public class Tabu : MonoBehaviour
             ClientUtils.SendMessage("Tabu", "JoinTeam", "Blue");
         }
         else
-            Utils.Log("Fehlerhaftes Team" + team);
+            Utils.Log(LogType.Warning, "Fehlerhaftes Team" + team);
     }
     public void StartAlsErklaerer()
     {
@@ -614,7 +614,7 @@ public class Tabu : MonoBehaviour
             HandleRoundEnd_BattleRoyale(indicator, karte, green_team, blue_team);
         }
         else
-            Utils.Log("Error unbekannter typ");
+            Utils.Log(LogType.Error, "Unbekannter Typ: " + tabu_type, true);
         ZeigeCorrektWrongSkip(erklaerer, green_team, blue_team);
         //ZeigeCorrektWrongSkip(started);
         ClientUtils.SendMessage("Tabu", "GetUpdate", "");
@@ -642,7 +642,7 @@ public class Tabu : MonoBehaviour
             started = false;
         }
         else
-            Utils.Log("Error unbekannter typ");
+            Utils.Log(LogType.Error, "Unbekannter Typ: " + tabu_type, true);
     }
     private void HandleRoundEnd_OneWordUse(string indicator, string karte, string team_green_s, string team_blue_s)
     {
@@ -666,7 +666,7 @@ public class Tabu : MonoBehaviour
             started = false;
         }
         else
-            Utils.Log("Error unbekannter typ");
+            Utils.Log(LogType.Error, "Unbekannter Typ: " + tabu_type, true);
     }
     private void HandleRoundEnd_OneWordGoal(string indicator, string karte, string team_green_s, string team_blue_s)
     {
@@ -696,7 +696,7 @@ public class Tabu : MonoBehaviour
             started = false;
         }
         else
-            Utils.Log("Error unbekannter typ");
+            Utils.Log(LogType.Error, "Unbekannter Typ: " + tabu_type, true);
     }
     private void HandleRoundEnd_Neandertaler(string indicator, string karte, string team_green_s, string team_blue_s)
     {
@@ -726,7 +726,7 @@ public class Tabu : MonoBehaviour
             started = false;
         }
         else
-            Utils.Log("Error unbekannter typ");
+            Utils.Log(LogType.Error, "Unbekannter Typ: " + tabu_type, true);
     }
     private void HandleRoundEnd_BattleRoyale(string indicator, string karte, string team_green_s, string team_blue_s)
     {
@@ -752,6 +752,6 @@ public class Tabu : MonoBehaviour
             started = false;
         }
         else
-            Utils.Log("Error unbekannter typ");
+            Utils.Log(LogType.Error, "Unbekannter Typ: " + tabu_type, true);
     }
 }
