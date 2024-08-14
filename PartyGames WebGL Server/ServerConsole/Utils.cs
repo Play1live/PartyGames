@@ -105,6 +105,14 @@ namespace ServerConsole
                 Lobby.BroadcastSpielerUpdate();
                 ServerUtils.BroadcastMessage("Lobby", "PlayDisconnectSound", "");
             }
+            else if (Config.game_title.Equals("Tabu"))
+            {
+                TabuHandler.BroadcastSpielerUpdate();
+                ServerUtils.BroadcastMessage("Tabu", "PlayDisconnectSound", "");
+            }
+
+            if (Config.players.Count == 0)
+                Config.game_title = "Lobby";
         }
         public static void OnSocketMessage(string message, IWebSocketConnection socket)
         {

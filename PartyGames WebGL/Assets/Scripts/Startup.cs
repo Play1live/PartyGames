@@ -60,6 +60,9 @@ public class Startup : MonoBehaviour
         string cmd = message.Split('|')[1];
         string data = message.Split('|')[2];
 
+        if (!gametitle.Equals(this.GetType().Name))
+            Utils.Log(LogType.Warning, "Befehl kann in dieser Klasse nicht ausgeführt werden: " + message);
+
         switch (cmd)
         {
             default: Utils.Log(LogType.Warning, "Unbekannter Befehl: " + cmd + " " + data); return;
@@ -78,7 +81,7 @@ public class Startup : MonoBehaviour
         if (input.text.Length <= 3)
             ConnectBTN.gameObject.SetActive(false);
         else if (input.text.Length > 14)
-            input.text = input.text.Substring(0, 14);
+            input.text = input.text[..14];
         if (input.text.Length > 3 && input.text.Length <= 14)
             ConnectBTN.gameObject.SetActive(true);
     }

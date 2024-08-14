@@ -3,9 +3,6 @@ using System.Globalization;
 
 namespace ServerConsole.Games
 {
-    // TODO: ne Liste mit 15 items machen, das wörter nicht sofort doppelt sein dürfen
-    // Wenn die leer ist füllen, wenn die voll ist 1 rein und 1 raus
-
     internal class TabuHandler
     {
         private static int max_skip;
@@ -28,7 +25,7 @@ namespace ServerConsole.Games
         public static void StartGame()
         {
             Utils.Log(LogType.Trace, "StartGame");
-            Utils.Log(LogType.Trace, "111111111111111111111");
+            Config.game_title = "Tabu";
             team_green = new List<Player>();
             team_blue = new List<Player>();
             InitTeams();
@@ -54,7 +51,10 @@ namespace ServerConsole.Games
                 case "ChangeMaxSkip": ChangeMaxSkip(player, data); break;
                 case "ChangeSkipDelay": ChangeSkipDelay(player, data); break;
                 case "ChangeTimerSec": ChangeTimerSec(player, data); break;
-                case "GetGameInfo": ServerUtils.SendMessage(player, "Tabu", "SetGameInfo", Config.tabu.GetTabuType() + " " + Config.tabu.GetSelected().name); InitModeratorView(); break;
+                case "GetGameInfo": 
+                    ServerUtils.SendMessage(player, "Tabu", "SetGameInfo", Config.tabu.GetTabuType() + " " + Config.tabu.GetSelected().name); 
+                    InitModeratorView(); 
+                    break;
 
                 case "GetUpdate": ServerUtils.SendMessage(player, "Tabu", "SpielerUpdate", SpielerUpdate()); break;
                 case "JoinTeam": JoinTeam(player, data); break;
@@ -345,13 +345,26 @@ namespace ServerConsole.Games
                 team_blue_points = 0;
             }
         }
+        private static void JoinTeamIfSpectator(Player p)
+        {
+            if (team_green.Contains(p) || team_blue.Contains(p))
+                return;
+
+            if (team_green.Count > team_blue.Count)
+                team_green.Add(p);
+            else
+                team_blue.Add(p);
+
+            BroadcastSpielerUpdate();
+        }
         private static void JoinTeam(Player p, string data)
         {
             if (data.Equals("Green"))
             {
                 if (!team_green.Contains(p))
                 {
-                    team_blue.Remove(p);
+                    if (team_blue.Contains(p))
+                        team_blue.Remove(p);
                     team_green.Add(p);
                 }
                 BroadcastSpielerUpdate();
@@ -360,7 +373,8 @@ namespace ServerConsole.Games
             {
                 if (!team_blue.Contains(p))
                 {
-                    team_green.Remove(p);
+                    if (team_green.Contains(p))
+                        team_green.Remove(p);
                     team_blue.Add(p);
                 }
                 BroadcastSpielerUpdate();
@@ -811,11 +825,13 @@ namespace ServerConsole.Games
         public bool need_to_safe = false;
         public string name;
         public List<TabuItem> worte;
+        private Queue<TabuItem> last_recent_items;
 
         public TabuSet(string name, string inhalt, Tabu parent)
         {
             this.name = name;
             this.need_to_safe = false;
+            this.last_recent_items = new Queue<TabuItem>(15);
             this.worte = new List<TabuItem>();
             List<string> words = new List<string>();
             foreach (string item in inhalt.Split('~'))
@@ -867,7 +883,22 @@ namespace ServerConsole.Games
 #endif
         }
         public override string ToString() { return name; }
-        public TabuItem GetRandom() { return this.worte[new Random().Next(0, this.worte.Count)]; }
+        public TabuItem GetRandom()
+        {
+            TabuItem item = this.worte[new Random().Next(0, this.worte.Count)];
+            for (int i = 0; i < 15; i++)
+            {
+                if (!last_recent_items.Contains(item))
+                    break;
+                item = this.worte[new Random().Next(0, this.worte.Count)];
+            }
+            this.last_recent_items.Enqueue(item);
+
+            if (this.last_recent_items.Count > 15)
+                this.last_recent_items.Dequeue();
+
+            return this.worte[new Random().Next(0, this.worte.Count)]; 
+        }
     }
     internal class TabuItem
     {

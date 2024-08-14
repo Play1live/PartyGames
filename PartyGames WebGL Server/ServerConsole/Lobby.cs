@@ -7,6 +7,7 @@ namespace ServerConsole
     {
         public static void StartLobby()
         {
+            Config.game_title = "Lobby";
             BroadcastSpielerUpdate();
         }
         public static void OnCommand(IWebSocketConnection socket, string cmd, string data)
@@ -24,7 +25,7 @@ namespace ServerConsole
                 case "GetPingTime": ServerUtils.SendMessage(player, "Lobby", "SetPingTime", ""); break;
                 case "PingTime": ServerUtils.BroadcastMessage("Lobby", "PingUpdate", player.name + "#" + data); break;
                 case "GetSpielData": ServerUtils.SendMessage(player, "Lobby", "SetSpielData", GetSpielData()); break;
-                case "StartGame": StartGame(player, data); TabuHandler.StartGame(); break;
+                case "StartGame": StartGame(player, data); break;
             }
         }
         
@@ -73,7 +74,7 @@ namespace ServerConsole
                     player.name += new Random().Next(0, 10);
                 }
                 Config.players.Add(player);
-                if (Config.players.Count == 1)
+                if (Config.players.Count == 1 || Config.moderator == null)
                     Config.moderator = player;
                 ServerUtils.SendMessage(player, "Startup", "ClientSetName", player.ToString());
                 ServerUtils.SendMessage(player, "Startup", "HideCommunication", "" + Config.hide_communication);
@@ -123,7 +124,6 @@ namespace ServerConsole
                 ServerUtils.SendMessage(Config.moderator, "Lobby", "ClientSetModerator", "");
             }
         }
-        // TODO: universelle machen
         // Wenn Host spielauswahl öffnet
         // schicke ich ihm was bei mir alles da ist 
         // das wird bei ihm aktualisiert (ob nun mit 1 oder 2 auswahlfeldern)
@@ -169,6 +169,7 @@ namespace ServerConsole
                 case "Tabu":
                     Config.tabu.SetType(values[0]);
                     Config.tabu.SetSelected(values[1]);
+                    TabuHandler.StartGame();
                     ServerUtils.BroadcastMessage("Lobby", "StartGame", game);
                     break;
             }

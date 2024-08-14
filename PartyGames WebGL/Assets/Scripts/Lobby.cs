@@ -66,6 +66,9 @@ public class Lobby : MonoBehaviour
         string cmd = message.Split('|')[1];
         string data = message.Split('|')[2];
 
+        if (!gametitle.Equals(this.GetType().Name))
+            Utils.Log(LogType.Warning, "Befehl kann in dieser Klasse nicht ausgeführt werden: " + message);
+
         switch (cmd)
         {
             default: Utils.Log(LogType.Warning, "Unbekannter Befehl: " + cmd + " " + data, true); return;
@@ -78,16 +81,22 @@ public class Lobby : MonoBehaviour
             case "PingUpdate": UpdatePingInfo(data); break;
             case "SetSpielData": UpdateGameselection(data); break;
             case "StartGame": lockcmds = true; SceneManager.LoadScene(data); break;
-        }
-
-        if (gametitle.Equals("Tabu"))
-        {
-            SceneManager.LoadScene(gametitle);
+            //case "SetActiveGame": CheckActiveGame(data); break; // Damit ein später Joinender Spieler dem aktuellen Spiel beitritt
+            // TODO: iwi dafür sorgen das die anderen clients den neuen Spieler hinzufügen, mit id bild etc UnknownPlayerSet aus Tabu
         }
     }
-
+    private void CheckActiveGame(string data)
+    {
+        switch (data)
+        {
+            default: break;
+            case "Tabu": SceneManager.LoadScene(data); break;
+        }
+    }
     private IEnumerator SendPingUpdate()
     {
+        yield return new WaitForSeconds(5);
+        ClientUtils.SendMessage("ALLE", "GetActiveGame", "");
         while (true)
         {
             pingtime = DateTime.Now;
@@ -96,7 +105,6 @@ public class Lobby : MonoBehaviour
             yield return new WaitForSeconds(10);
             yield return new WaitForSeconds(new Random().Next(0, 5));
         }
-        yield break;
     }
     private void UpdateSpieler(string data)
     {
@@ -163,7 +171,7 @@ public class Lobby : MonoBehaviour
                 }
             }
         }
-        iconindex = iconindex % Config.player_icons.Count;
+        iconindex %= Config.player_icons.Count;
         string liste_aller_icons = string.Join(",", Enumerable.Range(0, Config.player_icons.Count));
         ClientUtils.SendMessage("Lobby", "SetIcon", iconindex + "#" + liste_aller_icons);
     }

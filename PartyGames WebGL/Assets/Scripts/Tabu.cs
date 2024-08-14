@@ -97,6 +97,9 @@ public class Tabu : MonoBehaviour
         string gametitle = message.Split('|')[0];
         string cmd = message.Split('|')[1];
         string data = message.Split('|')[2];
+        if (!gametitle.Equals(this.GetType().Name))
+
+            Utils.Log(LogType.Warning, "Befehl kann in dieser Klasse nicht ausgeführt werden: " + message);
 
         switch (cmd)
         {
@@ -104,6 +107,7 @@ public class Tabu : MonoBehaviour
             case "Pong": break;
             case "SetGameInfo": GameObject.Find("Moderator/GameTypeAndPack").GetComponent<TMP_Text>().text = data; break;
             case "SpielVerlassen": lockcmds = true; SceneManager.LoadScene("Lobby"); break;
+            case "UnknownPlayerSetData": UnknownPlayerSet(data); break;
             case "SpielerUpdate": UpdateSpieler(data); break;
             case "PlayConnectSound": ConnectSound.Play(); break;
             case "PlayDisconnectSound": DisconnectSound.Play(); break;
@@ -126,7 +130,13 @@ public class Tabu : MonoBehaviour
             ClientUtils.SendMessage("ALLE", "Ping", "");
             yield return new WaitForSeconds(new System.Random().Next(10, 15));
         }
-        yield break;
+    }
+    private void UnknownPlayerSet(string data_s)
+    { // listpos, uuid, name, iconid
+        string[] data = data_s.Split('*');
+        Config.players.Insert(int.Parse(data[0]), 
+            new Player(Guid.Parse(data[1]), data[2], int.Parse(data[3])));
+        ClientUtils.SendMessage("Tabu", "GetSpielerUpdate", "");
     }
     private void UpdateSpieler(string data)
     {
@@ -134,6 +144,11 @@ public class Tabu : MonoBehaviour
         for (int i = 0; i < green.Length; i++)
         {
             Player p = Player.getPlayerById(Guid.Parse(green[i]));
+            if (p == null)
+            {
+                ClientUtils.SendMessage("ALLE", "UnknownPlayerGetData", "guid*" + green[i]);
+                continue; 
+            }
             team_green_grid.GetChild(2).GetChild(i).gameObject.SetActive(true);
             team_green_grid.GetChild(2).GetChild(i).GetChild(0).GetComponent<Image>().sprite = p.icon;
             team_green_grid.GetChild(2).GetChild(i).GetChild(1).GetComponent<TMP_Text>().text = p.name;
@@ -147,6 +162,11 @@ public class Tabu : MonoBehaviour
         for (int i = 0; i < blue.Length; i++)
         {
             Player p = Player.getPlayerById(Guid.Parse(blue[i]));
+            if (p == null)
+            {
+                ClientUtils.SendMessage("ALLE", "UnknownPlayerGetData", "guid*" + blue[i]);
+                continue;
+            }
             team_blue_grid.GetChild(2).GetChild(i).gameObject.SetActive(true);
             team_blue_grid.GetChild(2).GetChild(i).GetChild(0).GetComponent<Image>().sprite = p.icon;
             team_blue_grid.GetChild(2).GetChild(i).GetChild(1).GetComponent<TMP_Text>().text = p.name;
@@ -300,7 +320,7 @@ public class Tabu : MonoBehaviour
                 skip.SetActive(true);
         yield break;
     }
-    private void DisplayKarte(bool show, string erklaerer, string team_turn, string team_green_s, string team_blue_s, string karte_data, bool showAll = false)
+    private void DisplayKarte(bool show, string erklaerer, string team_green_s, string team_blue_s, string karte_data, bool showAll = false)
     {
         if (!show)
         {
@@ -319,7 +339,6 @@ public class Tabu : MonoBehaviour
         }
         karte.gameObject.SetActive(show);
 
-        //Player erkl = Player.getPlayerById(Guid.Parse(erklaerer));
         Player erkl = Player.getPlayerByName(erklaerer);
         string erkl_id = erkl?.uuid.ToString();
         // Team Green
@@ -353,6 +372,12 @@ public class Tabu : MonoBehaviour
                 karte.GetChild(0).GetChild(1).GetComponent<TMP_Text>().text = karte_data.Split('#')[0];
                 karte.GetChild(0).GetChild(3).GetComponent<TMP_Text>().text = karte_data.Split('#')[1].Replace("-", "\n");
             }
+        }
+        // Zuschauer
+        if (!team_green_s.Contains(Config.spieler.uuid.ToString()) && !team_blue_s.Contains(Config.spieler.uuid.ToString()))
+        {
+            karte.GetChild(0).GetChild(1).GetComponent<TMP_Text>().text = karte_data.Split('#')[0];
+            karte.GetChild(0).GetChild(3).GetComponent<TMP_Text>().text = karte_data.Split('#')[1].Replace("-", "\n");
         }
         // Zeige dem Erklärer was er sehen muss
         if (Config.spieler.uuid.ToString() == erkl_id)
@@ -388,9 +413,9 @@ public class Tabu : MonoBehaviour
         else if (indicator.Equals("Skip"))
             new_item.transform.GetChild(2).GetChild(0).gameObject.SetActive(true);
         new_item.SetActive(true);
-        StartCoroutine(HistoryEnumerator(new_item));
+        StartCoroutine(HistoryEnumerator());
     }
-    private IEnumerator HistoryEnumerator(GameObject go)
+    private IEnumerator HistoryEnumerator()
     {
         yield return new WaitForSeconds(0.0001f);
         historie.transform.parent.GetChild(0).gameObject.SetActive(false);
@@ -429,7 +454,7 @@ public class Tabu : MonoBehaviour
             }
         }
         // Team Blue
-        else
+        else if (team_turn.Equals("Blue"))
         {
             if (team_blue_s.Contains(Config.spieler.uuid.ToString()))
             {
@@ -443,6 +468,13 @@ public class Tabu : MonoBehaviour
                 wrong.SetActive(true);
                 skip.SetActive(false);
             }
+        }
+        // Zuschaue
+        if (!team_green_s.Contains(Config.spieler.uuid.ToString()) && !team_blue_s.Contains(Config.spieler.uuid.ToString()))
+        {
+            correct.SetActive(false);
+            wrong.SetActive(false);
+            skip.SetActive(false);
         }
     }
     private void ZeigeCorrektWrongSkip(bool started)
@@ -518,9 +550,9 @@ public class Tabu : MonoBehaviour
             if (decrease_points)
             {
                 if (team_turn.Equals("Green"))
-                    team_green_points = team_green_points - 1;
+                    team_green_points--;
                 else if (team_turn.Equals("Blue"))
-                    team_blue_points = team_blue_points - 1;
+                    team_blue_points--;
 
                 team_green_grid.GetChild(1).GetChild(1).GetComponent<TMP_Text>().text = "" + team_green_points;
                 team_blue_grid.GetChild(1).GetChild(1).GetComponent<TMP_Text>().text = "" + team_blue_points;
@@ -547,7 +579,7 @@ public class Tabu : MonoBehaviour
         string team_blue_s = data[4];
         UpdatePoints(data[5] + "*" + data[6]);
         string karte = data[7];
-        DisplayKarte(true, erklaerer, team_turn, team_green_s, team_blue_s, karte);
+        DisplayKarte(true, erklaerer, team_green_s, team_blue_s, karte);
         max_skip_int = int.Parse(data[8]);
         max_skip.text = "" + max_skip_int;
         round_skip_int = max_skip_int;
@@ -592,6 +624,8 @@ public class Tabu : MonoBehaviour
         MarkAlsErklaerer();
         round_skip_int = round_skip;
         timer_sec_int = timer_sec;
+        skip_delay_int = skip_delay;
+        this.skip_delay.text = skip_delay_int.ToString();
 
         if (tabu_type == "normal")
         {
@@ -616,6 +650,8 @@ public class Tabu : MonoBehaviour
         else
             Utils.Log(LogType.Error, "Unbekannter Typ: " + tabu_type, true);
         ZeigeCorrektWrongSkip(erklaerer, green_team, blue_team);
+        if (timer_coroutine != null && started)
+            StartTimer(timer_sec_int);
         //ZeigeCorrektWrongSkip(started);
         ClientUtils.SendMessage("Tabu", "GetUpdate", "");
     }
@@ -624,19 +660,22 @@ public class Tabu : MonoBehaviour
     {
         if (indicator.Equals("Correct"))
         {
-            DisplayKarte(true, erklaerer_name, team_turn, team_green_s, team_blue_s, karte);
+            started = true;
+            DisplayKarte(true, erklaerer_name, team_green_s, team_blue_s, karte);
         }
         else if (indicator.Equals("Wrong"))
         {
-            DisplayKarte(true, erklaerer_name, team_turn, team_green_s, team_blue_s, karte);
+            started = true;
+            DisplayKarte(true, erklaerer_name, team_green_s, team_blue_s, karte);
         }
         else if (indicator.Equals("Skip"))
         {
-            DisplayKarte(true, erklaerer_name, team_turn, team_green_s, team_blue_s, karte);
+            started = true;
+            DisplayKarte(true, erklaerer_name, team_green_s, team_blue_s, karte);
         }
         else if (indicator.Equals("Time"))
         {
-            DisplayKarte(true, erklaerer_name, team_turn, team_green_s, team_blue_s, karte, true);
+            DisplayKarte(true, erklaerer_name, team_green_s, team_blue_s, karte, true);
             StopCoroutine(timer_coroutine);
             time.SetActive(false);
             started = false;
@@ -648,19 +687,22 @@ public class Tabu : MonoBehaviour
     {
         if (indicator.Equals("Correct"))
         {
-            DisplayKarte(true, erklaerer_name, team_turn, team_green_s, team_blue_s, karte);
+            started = true;
+            DisplayKarte(true, erklaerer_name, team_green_s, team_blue_s, karte);
         }
         else if (indicator.Equals("Wrong"))
         {
-            DisplayKarte(true, erklaerer_name, team_turn, team_green_s, team_blue_s, karte);
+            started = true;
+            DisplayKarte(true, erklaerer_name, team_green_s, team_blue_s, karte);
         }
         else if (indicator.Equals("Skip"))
         {
-            DisplayKarte(true, erklaerer_name, team_turn, team_green_s, team_blue_s, karte);
+            started = true;
+            DisplayKarte(true, erklaerer_name, team_green_s, team_blue_s, karte);
         }
         else if (indicator.Equals("Time"))
         {
-            DisplayKarte(true, erklaerer_name, team_turn, team_green_s, team_blue_s, karte, true);
+            DisplayKarte(true, erklaerer_name, team_green_s, team_blue_s, karte, true);
             StopCoroutine(timer_coroutine);
             time.SetActive(false);
             started = false;
@@ -672,25 +714,26 @@ public class Tabu : MonoBehaviour
     {
         if (indicator.Equals("Correct"))
         {
-            DisplayKarte(true, erklaerer_name, team_turn, team_green_s, team_blue_s, karte, true);
+            DisplayKarte(true, erklaerer_name, team_green_s, team_blue_s, karte, true);
             StopCoroutine(timer_coroutine);
             time.SetActive(false);
             started = false;
         }
         else if (indicator.Equals("Wrong"))
         {
-            DisplayKarte(true, erklaerer_name, team_turn, team_green_s, team_blue_s, karte, true);
+            DisplayKarte(true, erklaerer_name, team_green_s, team_blue_s, karte, true);
             StopCoroutine(timer_coroutine);
             time.SetActive(false);
             started = false;
         }
         else if (indicator.Equals("Skip"))
         {
-            DisplayKarte(true, erklaerer_name, team_turn, team_green_s, team_blue_s, karte);
+            started = true;
+            DisplayKarte(true, erklaerer_name, team_green_s, team_blue_s, karte);
         }
         else if (indicator.Equals("Time"))
         {
-            DisplayKarte(true, erklaerer_name, team_turn, team_green_s, team_blue_s, karte, true);
+            DisplayKarte(true, erklaerer_name, team_green_s, team_blue_s, karte, true);
             StopCoroutine(timer_coroutine);
             time.SetActive(false);
             started = false;
@@ -702,25 +745,26 @@ public class Tabu : MonoBehaviour
     {
         if (indicator.Equals("Correct"))
         {
-            DisplayKarte(true, erklaerer_name, team_turn, team_green_s, team_blue_s, karte, true);
+            DisplayKarte(true, erklaerer_name, team_green_s, team_blue_s, karte, true);
             StopCoroutine(timer_coroutine);
             time.SetActive(false);
             started = false;
         }
         else if (indicator.Equals("Wrong"))
         {
-            DisplayKarte(true, erklaerer_name, team_turn, team_green_s, team_blue_s, karte, true);
+            DisplayKarte(true, erklaerer_name, team_green_s, team_blue_s, karte, true);
             StopCoroutine(timer_coroutine);
             time.SetActive(false);
             started = false;
         }
         else if (indicator.Equals("Skip"))
         {
-            DisplayKarte(true, erklaerer_name, team_turn, team_green_s, team_blue_s, karte);
+            started = true;
+            DisplayKarte(true, erklaerer_name, team_green_s, team_blue_s, karte);
         }
         else if (indicator.Equals("Time"))
         {
-            DisplayKarte(true, erklaerer_name, team_turn, team_green_s, team_blue_s, karte, true);
+            DisplayKarte(true, erklaerer_name, team_green_s, team_blue_s, karte, true);
             StopCoroutine(timer_coroutine);
             time.SetActive(false);
             started = false;
@@ -732,21 +776,24 @@ public class Tabu : MonoBehaviour
     {
         if (indicator.Equals("Correct"))
         {
-            DisplayKarte(true, erklaerer_name, team_turn, team_green_s, team_blue_s, karte);
+            started = true;
+            DisplayKarte(true, erklaerer_name, team_green_s, team_blue_s, karte);
             if (Config.spieler.name.Equals(erklaerer_name))
                 SpielerIstDran.Play();
         }
         else if (indicator.Equals("Wrong"))
         {
-            DisplayKarte(true, erklaerer_name, team_turn, team_green_s, team_blue_s, karte);
+            started = true;
+            DisplayKarte(true, erklaerer_name, team_green_s, team_blue_s, karte);
         }
         else if (indicator.Equals("Skip"))
         {
-            DisplayKarte(true, erklaerer_name, team_turn, team_green_s, team_blue_s, karte);
+            started = true;
+            DisplayKarte(true, erklaerer_name, team_green_s, team_blue_s, karte);
         }
         else if (indicator.Equals("Time"))
         {
-            DisplayKarte(true, erklaerer_name, team_turn, team_green_s, team_blue_s, karte, true);
+            DisplayKarte(true, erklaerer_name, team_green_s, team_blue_s, karte, true);
             StopCoroutine(timer_coroutine);
             time.SetActive(false);
             started = false;
