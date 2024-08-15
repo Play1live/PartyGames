@@ -97,8 +97,7 @@ public class Tabu : MonoBehaviour
         string gametitle = message.Split('|')[0];
         string cmd = message.Split('|')[1];
         string data = message.Split('|')[2];
-        if (!gametitle.Equals(this.GetType().Name))
-
+        if (!gametitle.Equals(this.GetType().Name) && !gameObject.Equals("ALLE"))
             Utils.Log(LogType.Warning, "Befehl kann in dieser Klasse nicht ausgeführt werden: " + message);
 
         switch (cmd)
@@ -107,7 +106,8 @@ public class Tabu : MonoBehaviour
             case "Pong": break;
             case "SetGameInfo": GameObject.Find("Moderator/GameTypeAndPack").GetComponent<TMP_Text>().text = data; break;
             case "SpielVerlassen": lockcmds = true; SceneManager.LoadScene("Lobby"); break;
-            case "UnknownPlayerSetData": UnknownPlayerSet(data); break;
+            case "ClientSetModerator": Config.spieler.isModerator = true; if (Config.spieler.isModerator) moderator_menue.SetActive(true); break;
+            case "UnknownPlayerSetData": UnknownPlayerSet(data);  break;
             case "SpielerUpdate": UpdateSpieler(data); break;
             case "PlayConnectSound": ConnectSound.Play(); break;
             case "PlayDisconnectSound": DisconnectSound.Play(); break;
@@ -141,6 +141,8 @@ public class Tabu : MonoBehaviour
     private void UpdateSpieler(string data)
     {
         string[] green = data.Split("[GREEN_LIST]")[1].Split('*');
+        for (int i = 0; i < 10; i++)
+            team_green_grid.GetChild(2).GetChild(i).gameObject.SetActive(false);
         for (int i = 0; i < green.Length; i++)
         {
             Player p = Player.getPlayerById(Guid.Parse(green[i]));
@@ -153,12 +155,12 @@ public class Tabu : MonoBehaviour
             team_green_grid.GetChild(2).GetChild(i).GetChild(0).GetComponent<Image>().sprite = p.icon;
             team_green_grid.GetChild(2).GetChild(i).GetChild(1).GetComponent<TMP_Text>().text = p.name;
         }
-        for (int i = green.Length; i < 10; i++)
-            team_green_grid.GetChild(2).GetChild(i).gameObject.SetActive(false);
         team_green_points = int.Parse(data.Split("[GREEN_POINTS]")[1]);
         team_green_grid.GetChild(1).GetChild(1).GetComponent<TMP_Text>().text = "" + team_green_points;
 
         string[] blue = data.Split("[BLUE_LIST]")[1].Split('*');
+        for (int i = 0; i < 10; i++)
+            team_blue_grid.GetChild(2).GetChild(i).gameObject.SetActive(false);
         for (int i = 0; i < blue.Length; i++)
         {
             Player p = Player.getPlayerById(Guid.Parse(blue[i]));
@@ -171,8 +173,6 @@ public class Tabu : MonoBehaviour
             team_blue_grid.GetChild(2).GetChild(i).GetChild(0).GetComponent<Image>().sprite = p.icon;
             team_blue_grid.GetChild(2).GetChild(i).GetChild(1).GetComponent<TMP_Text>().text = p.name;
         }
-        for (int i = blue.Length; i < 10; i++)
-            team_blue_grid.GetChild(2).GetChild(i).gameObject.SetActive(false);
         team_blue_points = int.Parse(data.Split("[BLUE_POINTS]")[1]);
         team_blue_grid.GetChild(1).GetChild(1).GetComponent<TMP_Text>().text = "" + team_blue_points;
 

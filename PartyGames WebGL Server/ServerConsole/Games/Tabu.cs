@@ -3,6 +3,8 @@ using System.Globalization;
 
 namespace ServerConsole.Games
 {
+    // TODO: tabuworte werden in history unteranderem falsch gezeigt. von vielen werden dann andere genommen iwi
+
     internal class TabuHandler
     {
         private static int max_skip;
@@ -21,6 +23,7 @@ namespace ServerConsole.Games
         private static Player erklaerer;
         private static string team_turn;
         private static TabuItem karte;
+        private static DateTime wrongtime;
 
         public static void StartGame()
         {
@@ -33,6 +36,7 @@ namespace ServerConsole.Games
             InitSkipDelay();
             InitTimerSec();
             InitTeamPoints();
+            wrongtime = DateTime.MinValue;
         }
 
         public static void OnCommand(IWebSocketConnection socket, string cmd, string data)
@@ -55,12 +59,11 @@ namespace ServerConsole.Games
                     ServerUtils.SendMessage(player, "Tabu", "SetGameInfo", Config.tabu.GetTabuType() + " " + Config.tabu.GetSelected().name); 
                     InitModeratorView(); 
                     break;
-
                 case "GetUpdate": ServerUtils.SendMessage(player, "Tabu", "SpielerUpdate", SpielerUpdate()); break;
                 case "JoinTeam": JoinTeam(player, data); break;
                 case "StarteAlsErklaerer": StartRound(player); break;
                 case "ClickRichtig": RoundEnd(player, "Correct"); break;
-                case "ClickFalsch": RoundEnd(player, "Wrong"); break;
+                case "ClickFalsch": ClickWrong(player); break;
                 case "ClickSkip": 
                     if (round_skip == -1 || round_skip > 0)
                     {
@@ -78,6 +81,19 @@ namespace ServerConsole.Games
         }
         private static string SpielerUpdate()
         {
+            for (int i = 0; i < team_green.Count; i++)
+                if (!Config.players.Contains(team_green[i]))
+                {
+                    team_green.RemoveAt(i);
+                    i--;
+                }
+            for (int i = 0; i < team_blue.Count; i++)
+                if (!Config.players.Contains(team_blue[i]))
+                {
+                    team_blue.RemoveAt(i);
+                    i--;
+                }
+
             string green = "";
             foreach (var item in team_green)
                 green += "*" + item.id;
@@ -473,6 +489,16 @@ namespace ServerConsole.Games
                 + "*" + timer_sec);
             StartTimer();
         }
+        private static void ClickWrong(Player player)
+        {
+            TimeSpan timeDifference = DateTime.Now - wrongtime;
+            if (timeDifference.TotalMilliseconds >= 0 && timeDifference.TotalMilliseconds < 1000)
+            {
+                return;
+            }
+            wrongtime = DateTime.Now;
+            RoundEnd(player, "Wrong");
+        }
         private static void RoundEnd(Player p, string indicator)
         {
             if (erklaerer == null)
@@ -825,13 +851,13 @@ namespace ServerConsole.Games
         public bool need_to_safe = false;
         public string name;
         public List<TabuItem> worte;
-        private Queue<TabuItem> last_recent_items;
+        private Queue<string> last_recent_items;
 
         public TabuSet(string name, string inhalt, Tabu parent)
         {
             this.name = name;
             this.need_to_safe = false;
-            this.last_recent_items = new Queue<TabuItem>(15);
+            this.last_recent_items = new Queue<string>(15);
             this.worte = new List<TabuItem>();
             List<string> words = new List<string>();
             foreach (string item in inhalt.Split('~'))
@@ -888,13 +914,13 @@ namespace ServerConsole.Games
             TabuItem item = this.worte[new Random().Next(0, this.worte.Count)];
             for (int i = 0; i < 15; i++)
             {
-                if (!last_recent_items.Contains(item))
+                if (!last_recent_items.Contains(item.GetWord().ToLower()))
                     break;
                 item = this.worte[new Random().Next(0, this.worte.Count)];
             }
-            this.last_recent_items.Enqueue(item);
+            this.last_recent_items.Enqueue(item.GetWord().ToLower());
 
-            if (this.last_recent_items.Count > 15)
+            if (this.last_recent_items.Count > 100)
                 this.last_recent_items.Dequeue();
 
             return this.worte[new Random().Next(0, this.worte.Count)]; 
@@ -904,6 +930,7 @@ namespace ServerConsole.Games
     {
         private string word;
         private List<string> tabus;
+        private List<string> generated_tabus;
 
         public TabuItem(string word, string tabus, TabuSet set)
         {
@@ -927,6 +954,7 @@ namespace ServerConsole.Games
                     set.need_to_safe = true;
                 }
             }
+            this.generated_tabus = GenTabuList();
         }
         public override string ToString() { return this.word + "#" + this.GenTabuListAsString(); }
         public string GetWord() { return this.word; }
@@ -949,7 +977,7 @@ namespace ServerConsole.Games
             else
                 return GetTabus();
         }
-        public string GenTabuListAsString() { return string.Join("-", GenTabuList()); }
+        public string GenTabuListAsString() { return string.Join("-", this.generated_tabus); }
 
     }
     enum TabuType
