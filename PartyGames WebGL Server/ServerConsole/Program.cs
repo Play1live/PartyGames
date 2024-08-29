@@ -10,6 +10,7 @@ class Program
         Config.game_title = "Lobby";
 
         Config.tabu = new Tabu();
+        Config.quiz = new Quiz();
 
         Config.server = new WebSocketServer("ws://0.0.0.0:14002");
         Config.server.Start(socket =>

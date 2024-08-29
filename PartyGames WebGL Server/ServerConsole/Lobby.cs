@@ -124,20 +124,22 @@ namespace ServerConsole
                 ServerUtils.SendMessage(Config.moderator, "Lobby", "ClientSetModerator", "");
             }
         }
-        // Wenn Host spielauswahl öffnet
+        // TODO: Wenn Host spielauswahl öffnet
         // schicke ich ihm was bei mir alles da ist 
         // das wird bei ihm aktualisiert (ob nun mit 1 oder 2 auswahlfeldern)
         // der soll die möglichkeit haben eine datei hochzuladen
         private static string GetSpielData()
         {
+            //gamedata.Add("[TYPE]Select_1,Upload[TYPE][SELECTION_1]...[TRENNER]...[SELECTION_1]");
+            //gamedata.Add("[TYPE]Select_1[TYPE][SELECTION_1]...[TRENNER]...[SELECTION_1]");
+            //gamedata.Add("[TYPE]Upload[TYPE]");
+
             List<string> gamedata = new List<string>();
             // Moderierte Spiele
             gamedata.Add("[TYPE]Text[TYPE][TITLE]<b><i>Moderierte Spiele</i></b>[TITLE]");
             // Flaggen
             // Quiz
-            //gamedata.Add("[TYPE]Select_1,Upload[TYPE][SELECTION_1]...[TRENNER]...[SELECTION_1]");
-            //gamedata.Add("[TYPE]Select_1[TYPE][SELECTION_1]...[TRENNER]...[SELECTION_1]");
-            //gamedata.Add("[TYPE]Upload[TYPE]");
+            gamedata.Add("[TYPE]Select_1,Upload[TYPE][TITLE]Quiz[TITLE][SPIELER_ANZ]" + Quiz.min_player + "-" + Quiz.max_player + "[SPIELER_ANZ][SELECTION_1]" + Config.quiz.GetSetsAsString() + "[SELECTION_1]");
             // Listen
             // Mosaik
             // WerBietetMehr
@@ -170,6 +172,11 @@ namespace ServerConsole
                     Config.tabu.SetType(values[0]);
                     Config.tabu.SetSelected(values[1]);
                     TabuHandler.StartGame();
+                    ServerUtils.BroadcastMessage("Lobby", "StartGame", game);
+                    break;
+                case "Quiz":
+                    Config.quiz.SetSelected(values[0]);
+                    QuizHandler.StartGame();
                     ServerUtils.BroadcastMessage("Lobby", "StartGame", game);
                     break;
             }

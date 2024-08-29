@@ -12,6 +12,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Lobby.unity
     guid: 085865f8325325342b61961006323d83
   - enabled: 1
+    path: Assets/Scenes/Quiz.unity
+    guid: 15f119ad25171874fb651d615e0b1c47
+  - enabled: 1
     path: Assets/Scenes/Tabu.unity
     guid: fdf96c7a5847ff84888ad768d72e833d
   m_configObjects: {}

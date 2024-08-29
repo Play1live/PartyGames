@@ -14,5 +14,6 @@ namespace ServerConsole
         public static string game_title;
 
         public static Tabu tabu;
+        public static Quiz quiz;
     }
 }

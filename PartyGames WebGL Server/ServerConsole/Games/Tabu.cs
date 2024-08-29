@@ -3,8 +3,6 @@ using System.Globalization;
 
 namespace ServerConsole.Games
 {
-    // TODO: tabuworte werden in history unteranderem falsch gezeigt. von vielen werden dann andere genommen iwi
-
     internal class TabuHandler
     {
         private static int max_skip;
@@ -810,7 +808,7 @@ namespace ServerConsole.Games
         public static int[] points_one_word_use = { 1, 0, 0};
         public static int[] points_one_word_goal = { 1, 0, 0 };
         public static int[] points_neandertaler = { 1, 0, 0 };
-        public static int[] points_battle_royale = { 15, -20, -5 };
+        public static int[] points_battle_royale = { 20, -30, -15 };
         //                                  MaxSkip SkipDelay TimerSec, TeamPoints
         public static int[] settings_normal = { -1, 1, 60, 0 };
         public static int[] settings_one_word_use = { -1, 1, 60, 0 };
@@ -851,6 +849,7 @@ namespace ServerConsole.Games
         public bool need_to_safe = false;
         public string name;
         public List<TabuItem> worte;
+        public List<TabuItem> backworte;
         private Queue<string> last_recent_items;
 
         public TabuSet(string name, string inhalt, Tabu parent)
@@ -859,6 +858,7 @@ namespace ServerConsole.Games
             this.need_to_safe = false;
             this.last_recent_items = new Queue<string>(15);
             this.worte = new List<TabuItem>();
+            this.backworte = new List<TabuItem>();
             List<string> words = new List<string>();
             foreach (string item in inhalt.Split('~'))
             {
@@ -885,6 +885,7 @@ namespace ServerConsole.Games
                     this.need_to_safe = true;
                 }
             }
+            this.backworte.AddRange(this.worte);
             parent.AddAvailableWords(this.worte.Count);
 #if DEBUG
             if (need_to_safe)
@@ -911,6 +912,9 @@ namespace ServerConsole.Games
         public override string ToString() { return name; }
         public TabuItem GetRandom()
         {
+            if (this.worte.Count == 0 && this.backworte.Count > 0)
+                this.worte.AddRange(this.backworte);
+
             TabuItem item = this.worte[new Random().Next(0, this.worte.Count)];
             for (int i = 0; i < 15; i++)
             {
@@ -918,12 +922,12 @@ namespace ServerConsole.Games
                     break;
                 item = this.worte[new Random().Next(0, this.worte.Count)];
             }
-            this.last_recent_items.Enqueue(item.GetWord().ToLower());
+            this.worte.Remove(item);
+            /*this.last_recent_items.Enqueue(item.GetWord().ToLower());
+            if (this.last_recent_items.Count > 500)
+                this.last_recent_items.Dequeue();*/
 
-            if (this.last_recent_items.Count > 100)
-                this.last_recent_items.Dequeue();
-
-            return this.worte[new Random().Next(0, this.worte.Count)]; 
+            return item; 
         }
     }
     internal class TabuItem

@@ -142,11 +142,11 @@ public class Lobby : MonoBehaviour
         float ms = float.Parse(data.Split('#')[1]);
         int pid = Config.players.IndexOf(p);
 
-        if (ms < 15)
+        if (ms < 25)
             lobby_grid.GetChild(pid).GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Ping/Ping 3");
-        else if (ms < 30)
+        else if (ms < 50)
             lobby_grid.GetChild(pid).GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Ping/Ping 2");
-        else if (ms < 75)
+        else if (ms < 100)
             lobby_grid.GetChild(pid).GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Ping/Ping 1");
         else
             lobby_grid.GetChild(pid).GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Ping/Ping 0");

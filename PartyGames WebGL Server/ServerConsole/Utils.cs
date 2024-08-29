@@ -110,6 +110,11 @@ namespace ServerConsole
                 TabuHandler.BroadcastSpielerUpdate();
                 ServerUtils.BroadcastMessage("Tabu", "PlayDisconnectSound", "");
             }
+            else if (Config.game_title.Equals("Quiz"))
+            {
+                QuizHandler.BroadcastSpielerUpdate();
+                ServerUtils.BroadcastMessage("Quiz", "PlayDisconnectSound", "");
+            }
 
             if (Config.players.Count == 0)
                 Config.game_title = "Lobby";
@@ -133,6 +138,7 @@ namespace ServerConsole
                 case "ALLE": Universell.OnCommand(socket, command, data); break;
                 case "Lobby": Lobby.OnCommand(socket, command, data); break;
 
+                case "Quiz": QuizHandler.OnCommand(socket, command, data); break;
                 case "Tabu": TabuHandler.OnCommand(socket, command, data); break;
             }
         }

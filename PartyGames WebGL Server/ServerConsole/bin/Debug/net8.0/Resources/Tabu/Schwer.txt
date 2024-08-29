@@ -23,7 +23,7 @@
 ~Hymne|Nationalhymne-Lied-Melodie-Hochgesang-Huldigung-Musik
 ~Wahrzeichen|Symbol-Bauwerk-Markenzeichen-Erkennungszeichen-Denkmal-Ikone-Unbekanntheit-Belanglosigkeit-Unwichtigkeit-Bedeutungslosigkeit-Anonymit#ae#t
 ~Zeremonie|Feier-Ritual-Veranstaltung-Ablauf-Zelebration-Feierlichkeit-Alltag-Gew#oe#hnlichkeit-Informalit#ae#t-L#ae##ss#igkeit-Zwanglosigkeit
-~Feier|Jubil#ae#um-Fest-Anlass-Zusammenkunft-Veranstaltung-Party-Trauer-Zur#ue#ckhaltung-Einsamkeit-Stille-Zur#ue#ckgezogenheit-Abgeschiedenheit-Isolation
+~Feier|Jubil#ae#um-Fest-Anlass-Zusammenkunft-Veranstaltung-Party-Trauer-Zur#ue#ckhaltung-Einsamkeit-Stille-Zur#ue#ckgezogenheit
 ~Vielfalt|Diversit#ae#t-Unterschiedlichkeit-Varianz-Abwechslung-Mannigfaltigkeit-Heterogenit#ae#t
 ~Einheit|Verbundenheit-Gemeinschaft-Harmonie-Konsens-Gleichheit-Zusammenhalt
 ~Identifikation|Erkennung-Kennzeichnung-Zuordnung-Verbindung-Best#ae#tigung-Zugeh#oe#rigkeit-Verbundenheit-Identit#ae#tsbildung-Gemeinschaft-Entfremdung-Anonymit#ae#t-Verlust der Identit#ae#t
@@ -106,7 +106,7 @@
 ~Polizei|Sicherheit-Ordnung-Strafverfolgung-Uniform-Einsatz-Fahrzeug-Beamte-Notruf-Verbrechen-Kriminalit#ae#t-Diebstahl-Kriminelle-Anarchie-Gesetzlosigkeit
 ~Feuerwehr|Brand-Einsatz-Feuer-Notruf-Rettung-Flammen-Helfer-Feuerwache-L#oe#schung-Auto-L#oe#schen-Schlauch-Verteiler-Hydranten-Rot
 ~Hotel|#UE#bernachtung-Unterkunft-Reisen-Zimmer-Service-Reservierung-Aufenthalt-Luxus-Annehmlichkeiten-Buchung-G#ae#steservice-Ferienhaus-Airbnb-Gastfreundschaft
-~Staudamm|Wa#ss#er-Energie-Flu#ss#-Bauwerk-Stausee-Wa#ss#erkraft-Umwelt-Speicher-Wa#ss#erstand
+~Staudamm|Wa#ss#er-Energie-Fluss-Bauwerk-Stausee-Wa#ss#erkraft-Umwelt-Speicher-Wa#ss#erstand
 ~Stra#ss#e|Verkehr-Weg-Asphalt-Pflaster-Stra#ss#enverkehr-Ga#ss#e-Belag-Fahrbahn-Schild-Schilder-Markierung-Baustelle-Netz-Sicherheit-Autobahn-Landstra#ss#e-Allee-Boulevards-Kreuzung-verla#ss#en
 ~Ampel|Verkehr-Signal-Farben-Verkehrsampel-Kreuzung-Rot-Gr#ue#n-Verkehrsregel
 ~Vorhang|Fenster-Dekoration-Stoff-Abdeckung-Raum-Trennung-Blickschutz-Vorh#ae#nge-B#ue#hne-Theater-Offenheit-Sichtbarkeit-Transparenz-Enth#ue#llung-Freilegung-Entbl#oe##ss#ung
@@ -121,7 +121,7 @@
 ~Maus|Tier-Klein-Nager-Schweif-Nagt-Haus-Mausbewegung-DPI-Sensor-Klicks-Scrollrad-Gaming-Pr#ae#zision-Ergonomie
 ~Ameise|Insekt-Klein-Flei#ss#ig-Sommer-Nest-Kolonie-krabbeln-Ameisenhaufen-organisieren-Arbeiterinnen-gesch#ae#ftig
 ~Ameisenb#ae#r|Tier-S#ue#damerika-Fell-Insektivore-Nasen-Ameisen
-~Lachs|Fisch-Flu#ss#-Rosa-Lecker-Omega
+~Lachs|Fisch-Fluss-Rosa-Lecker-Omega
 ~Tunfisch|Fisch-Meer-Lecker-Konserve-Hochseefisch
 ~Nordsee|Meer-K#ue#ste-Europa-Deutschland-Urlaub-Fischerei
 ~Ventilator|Luftzirkulation-Kue#hlung-Ger#ae#usch-Wind-Einstellungen-Stromverbrauch-L#ue#ftungstechnik-Erfrischung-Drehen-Rad
@@ -138,7 +138,7 @@
 ~Ma#ss#band|Messung-Messen-Werkzeug-L#ae#nge-Flexible-Genauigkeit-Rollen-Metall
 ~Kopfh#oe#rer|Audio-H#oe#ren-Musik-Ohren-B#ue#gel-Ger#ae#uschisolierung-Kabellos-Klangqualit#ae#t
 ~Fernbedienung|Steuerung-Elektronik-Ger#ae#t-Entfernung-Funktion-Knopf-TV-Remote
-~Mauspad|Maus#ue#-Pr#ae#zision-Komfort-Design-Unterlage-Qualit#ae#t-Haltbarkeit-Computer-Tastatur
+~Mauspad|Maus-Pr#ae#zision-Komfort-Design-Unterlage-Qualit#ae#t-Haltbarkeit-Computer-Tastatur
 ~Tastatur|Eingabe-Layout-Schreibmaschine-Tasten-Computer-Zubeh#oe#r#ue#-Tippen-Technologie-Maus
 ~LED|Licht-Energie-Halbleiter-Farben-Effizienz-Beleuchtung-Technologie-Innovation-Umwelt-Nachhaltigkeit
 ~L#ue#fter|Bel#ue#ftung-K#ue#hlung-Wind-Bewegung-Ger#ae#usch-Elektrisch-Luftstrom-Technologie
@@ -207,7 +207,7 @@
 ~K#ae#fig|Haltung-Gitter-Vogel-Tier-Gehege-T#ue#r-Zoo
 ~Gold|Edelmetall-Barren-Schmuck-M#ue#nze-Preis-Vorkommen-Rausch-Farbe-Gelb-Schatz-Silber-Platin-Reichtum-Wert
 ~Promi|Ber#ue#hmtheit-VIP-Star-Pers#oe#nlichkeit-Status-Bekanntheit
-~wichtig|bedeutend-wesentlich-bedeutsam-relevant-signifikant-ma#ss#geblich-essentiell-e#ss#enziell-unerheblich-nebens#ae#chlich
+~wichtig|bedeutend-wesentlich-bedeutsam-relevant-signifikant-ma#ss#geblich-essentiell-essenziell-unerheblich-nebens#ae#chlich
 ~Lounge|Aufenthaltsraum-Bereich-Empfangs-Entspannungs-Warte-Bar-Musik-Stil
 ~Status|Stellung-Position-Rang-Stand-Ansehen-Reputation-sozial-gesellschaftlich
 ~Sprache|Kommunikation-Verst#ae#ndigung-Ausdrucksmittel-Gebrauch-Kompetenz-Kenntnisse-Vielfalt-Kultur
@@ -336,7 +336,7 @@
 ~Leder|Tierhaut-Rindsleder-Lederartikel-Gerbung-Lederwaren-Lederjacke-Ledermaterial-Lederverarbeitung
 ~springen|H#ue#pfen-Sprung-Hochspringen-lassen-Sprungbewegung-Sprungkraft-Weitsprung-h#ue#pfend-sprungbereit-fliegen-st#ue#rzen
 ~Rei#ss#leine|Notbremse-Sicherungsseil-Abbruchseil-Ausl#oe#ser-Nothilfeseil-Rettungsleine-Schutzseil-Schnelll#oe#sevorrichtung
-~#oe#ffnen|Aufmachen-Entriegeln-#OE#ffnung-Entbl#oe##ss#en-Entfalten-Zug#ae#nglich-Freilegen-Enth#ue#llen-aufklappen-aufschlie#ss#en-Zugang-aufgedeckt
+~#oe#ffnen|Aufmachen-Entriegeln-#OE#ffnung-Entbl#oe##ss#en-Entfalten-Zug#ae#nglich-Freilegen-Enth#ue#llen-aufklappen-aufschliessen-Zugang-aufgedeckt
 ~Viertel|Viertelstunde-Stadtviertel-Viertelkreis-Quartal-Vierteljahr-Bezirk-Stadtteil-Viertelmeile
 ~arm|Gliedma#ss#e-Unterarm-Armmuskulatur-Armkraft-Armumfang-Armbeuge-Oberarm-Armbanduhr
 ~leben|Existieren-Dasein-f#ue#hren-Lebewesen-Lebensqualit#ae#t-Lebensweise-Lebensfreude
@@ -421,7 +421,7 @@
 ~schweben| Bewegung-schwerelos-Position-Gef#ue#hl
 ~Propeller|Schraube-Luftschraube-Antriebspropeller-Schiffspropeller-Flugzeugpropeller-Rotationsblatt-Propellerantrieb-Propellerdrehung
 ~Hovercraft|Luftkissenboot-Luftkissenfahrzeug-Kissenboot-Schwebefahrzeug-Fahrzeug-Technologie-Antrieb-Design
-~Bett|Schlafst#ae#tte-Ruheplatz-Schlafgelegenheit-Lagerstatt-Schlafplatz-Schlafgemach-Schlafzimmer-Bettgestell-Schlaf-Matratze-Schlafen-Ruhe-Ki#ss#en-Nachtruhe-Decke
+~Bett|Schlafst#ae#tte-Ruheplatz-Schlafgelegenheit-Lagerstatt-Schlafplatz-Schlafgemach-Schlafzimmer-Bettgestell-Schlaf-Matratze-Schlafen-Ruhe-Kissen-Nachtruhe-Decke
 ~Wert|Bedeutung-Nutzen-Wertigkeit-Stellenwert-G#ue#ltigkeit-Preis-Wichtigkeit-sch#ae#tzen-unbeachtet-bedeutungslos
 ~verleihen|ausleihen-#ue#bergeben-#ue#berreichen-vergeben-Verf#ue#gung-aush#ae#ndigen-beisteuern-#ue#bertragen
 ~versetzen|verlagern-verschieben-umstellen-transferieren-verpflanzen-ver#ae#ndern-bewegen-verlegen-transportieren-#ue#bertragen
@@ -574,7 +574,7 @@
 ~gewinnen|siegen-siegreich sein-triumphieren-erringen-verlieren-unterliegen-Unentschieden-Niederlage
 ~Sorgen|Besorgnis-Sorge-Unruhe-Bef#ue#rchtung-#AE#ngste-Bedenken-Belastung
 ~Problem|Schwierigkeit-Herausforderung-Hindernis-Aufgabe-Komplikation
-~Zeitschrift|Magazin-Journal-Publikation-Printmedium-Periodikum-Presseerzeugnis-Pre#ss#e-Internet-Online-Druck-digital-offline
+~Zeitschrift|Magazin-Journal-Publikation-Printmedium-Periodikum-Presseerzeugnis-Presse-Internet-Online-Druck-digital-offline
 ~Telefon|Telefonapparat-Handy-Mobiltelefon-Kommunikationsger#ae#t-Telekommunikation-Kommunikation-Anruf-Smartphone-Stille-Verbindung-Gespr#ae#ch-Empfang
 ~Gebiss|Z#ae#hne-Zahnsatz-Zahnreihen-Zahnbogen-Gebissprothese-Zahnersatz
 ~Ziehen|zerren-schleppen-heranziehen-wegziehen
@@ -587,7 +587,7 @@
 ~dr#ue#cken|pressen-zusammendr#ue#cken-niederdr#ue#cken-eindr#ue#cken-festhalten-aus#ue#ben
 ~Punkte|Punktzahl-Z#ae#hlerstand-Punktewertung-Bewertung-Punktesystem-Noten-Rangliste-Z#ae#hler-Wertung-Ergebnis-Skala
 ~Zuschauer|Publikum-Zuschauermenge-Zuh#oe#rer-Besucher-Anwesende-G#ae#ste-Beobachter-Zuseher-Fans-Auditorium-Betrachter
-~beobachten|betrachten-anschauen-ansehen-wahrnehmen-#ue#berwachen-verfolgen-zuschauen-ignorieren-aufpa#ss#en-ausblenden
+~beobachten|betrachten-anschauen-ansehen-wahrnehmen-#ue#berwachen-verfolgen-zuschauen-ignorieren-aufpassen-ausblenden
 ~Anwendung|Software-Programm-Applikation-App-Softwareprogramm-Anwendungssoftware-Anwendungsprogramm
 ~Store|Laden-Gesch#ae#ft-Einkaufszentrum-Verkaufsstelle-Einzelhandel-Shop
 ~Arme|Arm-Oberarm-Unterarm-Hand-Armbeuge-Ellenbogen
@@ -996,7 +996,7 @@
 ~Wal|Tier-Blau-Gro#ss#-Gesang-Beobachtung-Sterben-Fangen
 ~Birne|Obst-Frucht-Apfel-Baum-Reif-Essen
 ~Butter|Lebensmittel-Milch-Herstellung-Kuh-Streichfett-Margarine-Brotaufstrich-Speisefett-kalt-schmelzen-braten-cremig-fest-fl#ue##ss#ig
-~Hamburger|Essen-Food-Burger-Belag-Zubereitung-Restaurant-Stadt-King-Fast Food-Br#oe#tchen-Fleisch-Pommes-Cheeseburger-Imbi#ss#
+~Hamburger|Essen-Food-Burger-Belag-Zubereitung-Restaurant-Stadt-King-Fast Food-Br#oe#tchen-Fleisch-Pommes-Cheeseburger-Imbiss
 ~K#ae#fer|Insekt-Fl#ue#gel-Leensraum-Klein-Tier-Nahrung
 ~Klavier|Musik-Instrument-Tasten-Saiten-Hammer-Piano-Melodie-klang-Ton
 ~L#oe#ffel|Essen-Besteck-Gabel-Messe-Nahrung
@@ -1013,7 +1013,7 @@
 ~Nase|K#oe#rperteil-Riechen-Mund-Ohr-Loch-Atmen-Geruch-Auge
 ~Ohr|K#oe#rperteil-H#oe#ren-Nase-Mund-Augen-Wange-Muschel-L#ae#ppchen-Sin
 ~Huhn|Tier-Gefl#ue#gel-Farm-Stall-K#ae#fig-Ei-Nugget
-~K#ae#se|Lebensmittel-Milchprodukt-Geschmack-Herstellung-Verpackung-Milch-Kuh-Ern#ae#hrung-genie#ss#en-meiden-laktosefrei-vegan
+~K#ae#se|Lebensmittel-Milchprodukt-Geschmack-Herstellung-Verpackung-Milch-Kuh-Ern#ae#hrung-geniessen-meiden-laktosefrei-vegan
 ~Luft|Gas-Atmen-Qualit#ae#t-Sauerstoff-Feuchtigkeit-Temperatur-Verschmutzung-Wind
 ~Zug|Transportmittel-Reisen-Bahn-Fahrplan-Schnell-Wagon-Strecke-Gleise-Lockf#ue#hrer
 ~Zuhause|Wohnort-Familie-Wohnung-Einrichtung-Entspannung-Leben-Miete-Kosten
@@ -1151,7 +1151,7 @@
 ~Ball|Spiel-Sport-Werfen-Fangen-Fu#ss#ball-Volleyball-Basketball-Spielzeug-Rund-Kugel-Rollen
 ~Sandburg|Strand-Sand-Bauen-K#ue#ste-Wettbewerb-Meer-Spaten-Muscheln-Wasser
 ~Schneemann|Winter-Schnee-Karotte-Ball-Frostig-M#ue#tze-Kohle
-~Teller|Geschirr-Essen-Servieren-Speisen-Porzellan-Sp#ue#ler-E#ss#en-Tafel-Abende#ss#en-aufnehmen-abr#ae#umen
+~Teller|Geschirr-Essen-Servieren-Speisen-Porzellan-Sp#ue#ler-E#ss#en-Tafel-Abendessen-aufnehmen-abr#ae#umen
 ~Rennauto|Geschwindigkeit-Rennen-Motorsport-Strecke-Auto-Rennfahrer-Design-Reifen-Formel
 ~Taschenlampe|Licht-Beleuchtung-Batterie-Dunkelheit-LED-leuchten
 ~Hosen|Kleidung-Beine-Jeans-Stoff-Knopf
@@ -1235,7 +1235,7 @@
 ~Schmetterling|Insekt-Fl#ue#gel-Falter-bunt-Natur-Flug-Nektar-Raupe
 ~Fernseher|TV-Programm-Fernbedienung-Bildschirm-Serien-Filme-Nachrichten-Unterhaltung-ARD-ZDF-Tagesschau
 ~Gebirge|Berge-Gipfel-Alpen-Bergsteigen-Wanderung-Panorama-Klettern-Berglandschaft
-~Apotheke|Medikamente-Arzneimittel-Rezept-Pillen-Gesundheit-Beratung-Schmerz-Pharmazie-Krankheit-Heilung-Krankenhaus-Wellne#ss#
+~Apotheke|Medikamente-Arzneimittel-Rezept-Pillen-Gesundheit-Beratung-Schmerz-Pharmazie-Krankheit-Heilung-Krankenhaus-Wellness
 ~Kamera|Foto-Objektiv-Fotos-Bild-Aufnahmen-Blitz-Zoom-Speicherkarte-Stativ
 ~Ozean|Meer-Wasser-Wellen-K#ue#ste-Meeresbewohner-Tauchen-Schiff-Brandung-Fische
 ~Teddyb#ae#r|Pl#ue#schtier-Kuscheltier-B#ae#r-Stofftier-Spielzeug-Kinder-Kuscheln-Teddy
@@ -1373,7 +1373,7 @@
 ~m#oe#gen|gerne haben-lieben-gernhaben-sch#ae#tzen-geniessen-gefallen
 ~Hass|Abneigung-Feindschaft-Verachtung-Wut-Abscheu
 ~Gondel|Boot-Wasserfahrzeug-Ruderboot-Kahn-Paddelboot
-~Kanal|Schifffahrtsstra#ss#e-Wasserstra#ss#e-Wasserlauf-Flie#ss#gew#ae#sser-Fluss-Flu#ss#-Wa#ss#erweg-R#oe#hre-Sender-Empf#ae#nger-Frequenz-digital-analog
+~Kanal|Schifffahrtsstra#ss#e-Wasserstra#ss#e-Wasserlauf-Flie#ss#gew#ae#sser-Fluss-Wa#ss#erweg-R#oe#hre-Sender-Empf#ae#nger-Frequenz-digital-analog
 ~Gericht|Richter-Justiz-Rechtsprechung-Verfahren-Verteidiger-Angeklagter-Anwalt-T#ae#ter-Opfer
 ~albern|kindisch-Verhalten-dumm-t#oe#richt-Witz-l#ae#cherlich
 ~Rat|Empfehlung-Tipp-Hinweis-Anleitung
@@ -1540,7 +1540,7 @@
 ~sozial|Gesellig-Gemeinschaft-Allein-Introvertiert-Gesellschaft-Sozialphobie-Freunde-Einsamkeit
 ~anstupsen|Ber#ue#hren-Kitzeln-Stubsen-Sto#ss#en-Ignorieren-Fernhalten-Blockieren-Zur#ue#ckweichen-antippen-Kontakt-leicht-Interaktion-anregen-sanft
 ~Rasen|Gras-Garten-M#ae#hen-Langsam-Schnell-Stoppen-Wachsen-D#ue#ngen-Wiese
-~Fr#ue#hst#ue#ck|Essen-Morgen-Brot-Kaffee-M#ue#sli-Abendessen-Mittagessen-Nachtisch-Morgenmahlzeit-E#ss#en-Mittage#ss#en-Abende#ss#en-brunchen-fasten-#ue#bere#ss#en-Mahlzeit
+~Fr#ue#hst#ue#ck|Essen-Morgen-Brot-Kaffee-M#ue#sli-Abendessen-Mittagessen-Nachtisch-Morgenmahlzeit-E#ss#en-brunchen-fasten-#ue#beressen-Mahlzeit
 ~Becken|K#oe#rper-H#ue#fte-Schwimmbad-Wasser-Taille-Brust-Schultern-Beine-Wa#ss#er-Schwimmen-Pool-Badezimmer
 ~untot|Zombie-Tot-Lebendig-Untoten-Geist-Mensch-Wiederbelebung-Sterblich
 ~Geist|Seele-Verstand-Denken-K#oe#rper-Kreativit#ae#t-Materie-Physisch-Realit#ae#t-Intelligenz-paranormal-Gedanken-Spiritualit#ae#t-Bewu#ss#tsein
@@ -1599,7 +1599,7 @@
 ~Dellen|Beulen-Unebenheiten-Glatt-Rund-Defekt-Reparieren-Perfekt-Makellos
 ~Pfeife|Rauchen-Tabak-Melodie-Pfeifen-Blasen-Mundst#ue#ck-Stumm-Stille-Musikinstrument-Signal-Fl#oe#te-Ton
 ~Paddel|Boot-Wasser-Kanu-Rudern-Fluss-Steuern-Festhalten-Loslassen
-~Kajak|Wasser-Fluss-Boot-Paddeln-Abenteuer-Kanufahren-Land-Trocken-Wa#ss#er-Wildwa#ss#er-Wa#ss#ersport-Flu#ss#
+~Kajak|Wasser-Fluss-Boot-Paddeln-Abenteuer-Kanufahren-Land-Trocken-Wa#ss#er-Wildwa#ss#er-Wa#ss#ersport
 ~Feigling|Mutig-Tapfer-Furchtlos-#AE#ngstlich-Zaghaft-Sch#ue#chtern-R#ue#ckgratlos-Held
 ~Mut|Tapferkeit-St#ae#rke-Furchtlosigkeit-Feigheit-Schw#ae#che-Zaghaftigkeit-#AE#ngstlichkeit-Unsicherheit
 ~Panik|Angst-Furcht-Ruhe-Gelassenheit-Besonnenheit-Entspannung-Kontrolle-Sicherheit
@@ -1620,7 +1620,7 @@
 ~Galaxis|Universum-Milchstra#ss#e-Sterne-Sonnensystem-Erde-Planet-Mond-Dunkelheit
 ~Degen|Schwert-Waffe-Kampf-Duell-Frieden-Verteidigung-Angriff-R#ue#stung
 ~k#ae#mpfen|streiten-konflikt-sich ergeben-kooperieren-harmonieren-friedlich-aufgeben-unterwerfen
-~Duell|Kampf-Streit-Herausforderung-Zusammenarbeit-Frieden-Einigkeit-Koexistenz-Harmonie-Zweikampf-Wettkampf-Konfrontation-Auseinandersetzung-Kr#ae#fteme#ss#en
+~Duell|Kampf-Streit-Herausforderung-Zusammenarbeit-Frieden-Einigkeit-Koexistenz-Harmonie-Zweikampf-Wettkampf-Konfrontation-Auseinandersetzung-Kr#ae#ftemessen
 ~tief|flach-oberfl#ae#chlich-seicht-hoch-erh#oe#ht-angehoben-aufsteigend
 ~Stimme|Sprechen-Singen-Klang-Stille-Lautlosigkeit-Stimmlosigkeit-Schweigen-Stottern-redet-Ton-Gesang-Laut-Stimmlage-Stimmrecht-Ausdruck
 ~gesund|fit-vital-Arzt-krank-unwohl-krankhaft-bleiben-Erk#ae#ltung
@@ -1638,7 +1638,7 @@
 ~rasieren|Bart-Haare-glatt-stoppeln-wachsen-nat#ue#rlichen-Wildwuchs-ungepflegt
 ~kratzen|jucken-reiben-Haut-lindern-beruhigen-streicheln-z#ae#rtlich-sanft-K#oe#rper-Juckreiz-kratziger
 ~Dezember|Winter-Weihnachten-Advent-Januar-Sommer-Fr#ue#hling-Herbst-kalender
-~Sack|Beutel-Tasche-Rucksack-offen-leer-voll-geschlossen-versteckt-S#ae#ckchen-gef#ue#llt-verschlo#ss#en-dicht
+~Sack|Beutel-Tasche-Rucksack-offen-leer-voll-geschlossen-versteckt-S#ae#ckchen-gef#ue#llt-verschlossen-dicht
 ~violette|lila-violett-rosa-rot-blau-gr#ue#n-gelb-orange
 ~Lavendel|Duft-Pflanze-Blume-beruhig-Entspannung-Aromatherapie-Parf#ue#m
 ~versteigern|Auktionshaus-bieten-verkaufen-ersteigern-behalten-kaufen-behaupten-verwerfen
@@ -1660,7 +1660,7 @@
 ~Raumschiff|Spaceshuttle-Rakete-Astronaut-UFO-Erde-Flugzeug-Auto-Schiff
 ~Neil Armstrong|Astronaut-Mondlandung-Apollo 11-Raumfahrt-Weltraum-Fu#ss#abdruck-Flagge-Raumfahrer-erster Mensch auf dem Mond-Pionier-historisch
 ~Dr#ue#se|Organ-Hormon-K#oe#rper-Funktion-gesund-krank-Medizin-Arzt
-~Sauna|Schwitzen-Wellness-Entspannung-Hitze-K#ae#lte-Erholung-Dampfbad-Badehaus-Wellne#ss#-Abk#ue#hlung-Wellne#ss#bereich
+~Sauna|Schwitzen-Wellness-Entspannung-Hitze-K#ae#lte-Erholung-Dampfbad-Badehaus-Abk#ue#hlung-Wellnessbereich
 ~erwischen|fangen-schnappen-verpassen-entkommen-entgehen-verfehlen
 ~erinnern|Ged#ae#chtnis-Erinnerung-vergessen-verdr#ae#ngen-ignorieren-ausblenden
 ~Gedanken|Denken-Ideen-Verstand-Hirn-Geist-K#oe#rper-Handeln-Gef#ue#hl
@@ -1769,7 +1769,7 @@
 ~treiben|bewegen-antreiben-stillstehen-aufhalten-anhalten-verlangsamen-stoppen-bremsen-aktiv-Aktivit#ae#t-Sport-Fortschritt
 ~Kunst|Kreativit#ae#t-Ausdruck-#AE#sthetik-Emotion-Einfallsreichtum-Unkreativit#ae#t-Banalit#ae#t-Trivialit#ae#t
 ~Protest|Demonstration-Widerstand-Forderung-Zustimmung-Unterst#ue#tzung-Apathie-Gleichg#ue#ltigkeit-Passivit#ae#t
-~dagegen|contra-gegen-daf#ue#r
+~dagegen|contra-gegen-daf#ue#r-entspreche-Meinung-Abstimmung-Wahl-Positiv-Negativ
 ~daf#ue#r|f#ue#r-bef#ue#rworten-unterst#ue#tzen-ablehnen-gegen
 ~marschieren|gehen-laufen-stoppen-ruhen-stehen-verweilen-z#oe#gern-zur#ue#ckweichen
 ~Laden|Gesch#ae#ft-Einkauf-Verkauf-Online-entladen-leeren-abladen-aufgeben
@@ -1798,7 +1798,7 @@
 ~Sto#ss#|Schlag-Ansto#ss#-sanft-vorsichtig-behutsam-zart-leicht
 ~Aua|Schmerz-Verletzung-Unfall-Wunde-Heilung-Freude-Wohlbefinden-Genesung
 ~Regeln|Anweisungen-Vorschriften-Gesetze-Chaos-Unordnung-Freiheit-Ungehorsam-Missachtung
-~sch#ue#tten|giessen-versch#ue#tten-trocknen-sparen-bewahren-behalten-zur#ue#ckhalten-bew#ae#ssern-gie#ss#en-ausgie#ss#en-Fl#ue##ss#igkeit-Ausgie#ss#er-ausleeren-ergie#ss#en
+~sch#ue#tten|giessen-versch#ue#tten-trocknen-sparen-bewahren-behalten-zur#ue#ckhalten-bew#ae#ssern-ausgiessen-Fl#ue##ss#igkeit-Ausgie#ss#er-ausleeren-ergiessen
 ~flattern|schwingen-fliegen-ruhen-stillstehen-stabil-fest-reglos-unbeweglich
 ~hissen|aufziehen-senken-herunterlassen-herunterziehen-ablassen-absenken
 ~Akten|Dokumente-Unterlagen-Papierkram-Ordnung-Chaos-Unordnung-Vernachl#ae#ssigung-Verwahrlosung
@@ -1890,7 +1890,7 @@
 ~Baby|S#ae#ugling-Kleinkind-Kind-Erwachsener-Jugendlicher-Erwachsene-#ae#lter-Senior-Teenager
 ~Platte|Scheibe-Teller-Vinyl-CD-Schallplatte-Kugel-Ball-Zylinder
 ~fr#ue#her|damals-vorher-einst-fr#ue#herhin-zuvor-sp#ae#ter-jetzt-gegenw#ae#rtig-heute-zuk#ue#nftig
-~treten|schreiten-gehen-laufen-rennen-marschieren-stehen-sitzen-ruhen-schie#ss#en-kicken-sto#ss#en-zur#ue#ckweichen-fallen-ausrutschen-stolpern-st#ue#rzen
+~treten|schreiten-gehen-laufen-rennen-marschieren-stehen-sitzen-ruhen-schiessen-kicken-sto#ss#en-zur#ue#ckweichen-fallen-ausrutschen-stolpern-st#ue#rzen
 ~Schalter|Knopf-Taste-Hebel-Regler-Button-offen-geschlossen-kaputt
 ~helfen|unterst#ue#tzen-assistieren-beistehen-f#oe#rdern-behindern-st#oe#ren-hemmen-a#ss#istieren-schaden
 ~Oktober|Herbst-Monat-Kalender-Jahreszeit-Sommer-November-Dezember-Winter
@@ -1898,8 +1898,8 @@
 ~Erinnerung|Ged#ae#chtnis-Erinnerungsverm#oe#gen-Andenken-Vergessen-Verdr#ae#ngen-Gegenwart-Zukunft-Vergangenheit
 ~Gegenstand|Objekt-Sache-Ding-Artikel-Utensil-Abstrakt-Konzept-Gedanke
 ~Tourist|Reisender-Besucher-Gast-Einheimischer-Bewohner-Abenteurer-Ortsans#ae#ssiger-Einwohner-Ortsans#ae##ss#iger-Urlauber-Immigrant
-~mitbringen|bringen-mitnehmen-transportieren-holen-abholen-zur#ue#cklassen-vergessen-zur#ue#ckgeben-zur#ue#ckla#ss#en-wegnehmen-verge#ss#en-verlieren-finden-entdecken
-~danach|nachher-sp#ae#ter-anschliessend-folgend-vorher-davor-zuvor-vorangehen-anschlie#ss#end-hinterher
+~mitbringen|bringen-mitnehmen-transportieren-holen-abholen-zur#ue#cklassen-vergessen-zur#ue#ckgeben-zur#ue#ckla#ss#en-wegnehmen-verlieren-finden-entdecken
+~danach|nachher-sp#ae#ter-anschliessend-folgend-vorher-davor-zuvor-vorangehen-hinterher
 ~Perle|Schmuck-Perlenkette-Perlmutt-Schatz-Juwel-h#ae#sslich-grob-unscheinbar
 ~Betreuung|Pflege-F#ue#rsorge-Unterst#ue#tzung-Beaufsichtigung-Vernachl#ae#ssigung-Ignoranz-Alleinlassen
 ~Aufsicht|#UE#berwachung-Kontrolle-Beobachtung-Aufmerksamkeit-Vernachl#ae#ssigung-Ignoranz-Sorglosigkeit-Nachl#ae#ssigkeit
@@ -1951,7 +1951,7 @@
 ~Jahrmarkt|Volksfest-Karneval-Kirmes-Langeweile-Veranstaltung-Spa#ss#-Unterhaltung-Freizeit
 ~Stecker|Steckdose-Kabel-Strom-Batterie-Draht-Verbindung-Kabelsalat-Ger#ae#t-einstecken-au#ss#tecken-ziehen-Stromversorgung
 ~Schein|Licht-Echtheit-Wahrheit-Dunkelheit-Falschheit-T#ae#uschung
-~Schlauch|Rohr-Leitung-trocken-Gartenschlauch-flexibel-fest-starr-Pflanzen-Gie#ss#en
+~Schlauch|Rohr-Leitung-trocken-Gartenschlauch-flexibel-fest-starr-Pflanzen-Giessen
 ~wechseln|#ae#ndern-bleiben-beibehalten-gleichbleiben-stabil-gleichbleibend-festhalten-fest
 ~platt|flach-niedrig-dick-aufgeblasen-aufgeplustert-geschwollen-hoch-erhaben-eben-rund-fl#ae#chig-leer-trocken
 ~Hunger|Durst-S#ae#ttigung-Appetit-essen-voll-befriedigt-#UE#berfluss-Genuss-E#ss#en-Mangel-Nahrung-Fasten
@@ -1960,12 +1960,12 @@
 ~Promis|Stars-Unbekannte-Normalb#ue#rger-Anonyme-Durchschnitt-Nicht-Alltagsmenschen-Durchschnittsb#ue#rger
 ~Stars|Promis-Durchschnitt-Normalb#ue#rger-Anonyme-Nicht-Alltagsmenschen-Durchschnittsb#ue#rger-Gew#oe#hnliche Menschen-Prominente-Ber#ue#hmtheiten-Sternchen-Normalos-Unbekannte-Anonymit#ae#t-Ruhm
 ~Stange|Stiel-Runde-Ecke-Kante-Fl#ae#che-Ebene-Seite
-~So#ss#e|Braten-Trockenheit-Essen-Gericht-Mahlzeit-Speise-Hauptgang-Sauce-E#ss#en-Fl#ue##ss#igkeit-w#ue#rzen-gie#ss#en-trocken-fade
+~So#ss#e|Braten-Trockenheit-Essen-Gericht-Mahlzeit-Speise-Hauptgang-Sauce-E#ss#en-Fl#ue##ss#igkeit-w#ue#rzen-giessen-trocken-fade
 ~Ecke|Kurve-Biegung-Gerade-Linie-Mittelpunkt-Zentrum-Fl#ae#che-Breite-Winkel-Kante-Eckpunkt-Rundung-schr#ae#g-rechter Winkel
 ~kriegen|erhalten-geben-verlieren-wegnehmen-abgeben-nehmen-behalten-bekommen-gewinnen-aufgeben-aufnehmen
 ~B#ae#cker|Konditor-Metzger-B#ae#ckerei-Supermarkt-Kuchen-Br#oe#tchen-Verk#ae#ufer-Kunde
 ~aufbrechen|schliessen-bleiben-ankommen-anhalten-starten-beenden-enden-stoppen
-~Zettel|Notiz-Merkmal-Erinnerung-Gedanke-Kopf-Ged#ae#chtnis-Gehirn-Denken-Papier-Nachricht-schreiben-lesen-verge#ss#en-erinnern-Mitteilung
+~Zettel|Notiz-Merkmal-Erinnerung-Gedanke-Kopf-Ged#ae#chtnis-Gehirn-Denken-Papier-Nachricht-schreiben-lesen-vergessen-erinnern-Mitteilung
 ~Speise|Essen-Getr#ae#nk-Fl#ue#ssigkeit-Durst-Hunger-Mahlzeit-Snack-Fastfood
 ~Knick|Gerade-Kurve-Biegung-Linie-Fl#ae#che-Ebene-Strecke-Weg
 ~merken|vergessen-verlieren-ignorieren-missachten
@@ -2047,7 +2047,7 @@
 ~Haube|Kapuze-Motorhaube-Abdeckung-M#ue#tze-Hut-Nackenschutz-Enth#ue#llung-Aufdeckung-Kopfbedeckung-Schal-Ohrensch#ue#tzer-warm-kalt
 ~Kn#oe#llchen|Strafzettel-Bu#ss#geld-Verwarnung-Geldstrafe-Mahnung-Belohnung-Bonus-Anerkennung
 ~parken|abstellen-Auto-fahren-losfahren-weiterfahren-wegfahren-Einkauf
-~aufschreiben|notieren-aufzeichnen-merken-vergessen-l#oe#schen-streichen-ausl#oe#schen-entfernen-verge#ss#en-behalten-verwerfen
+~aufschreiben|notieren-aufzeichnen-merken-vergessen-l#oe#schen-streichen-ausl#oe#schen-entfernen-behalten-verwerfen
 ~Comic|Cartoon-Comicstrip-Bildergeschichte-humorvoll-ernst-langweilig-traurig-realistisch
 ~Mutant|Superheld-au#ss#ergew#oe#hnlich-normal-Mensch-unscheinbar-gew#oe#hnlich-durchschnittlich-typisch
 ~Wolverine|Logan-Klaue-X-Men-Superheld-Krallen-friedlich-harmlos-zahm-Comicfigur-Mutant-Adamantium
@@ -2070,7 +2070,7 @@
 ~Kontakt|Verbindung-Kommunikation-trennen-isolieren-distanziert-einsam-allein-getrennt-Isolation-Sozial-Netzwerk-Freunde-Beziehung-Einsamkeit
 ~schwenken|schwingen-drehen-stillhalten-festhalten-ruhig-unbeweglich-stabil
 ~giessen|bew#ae#ssern-w#ae#ssern-trocknen-austrocknen-sparen-versch#ue#tten-ablassen-entleeren
-~Ged#ae#chtnis|Erinnerung-vergessen-merken-verlieren-vergangen-Erinnerungsl#ue#cke-Ged#ae#chtnisverlust-Amnesie-Verge#ss#en-Wi#ss#en-Denken-Lernen-Verlust-Speicher
+~Ged#ae#chtnis|Erinnerung-vergessen-merken-verlieren-vergangen-Erinnerungsl#ue#cke-Ged#ae#chtnisverlust-Amnesie-Wi#ss#en-Denken-Lernen-Verlust-Speicher
 ~Kralle|Kratzen-Greifen-Hand-Finger-streicheln-weich-sanft-glatt
 ~Zange|greifen-l#oe#sen-#oe#ffnen-lose-freigeben-loslassen-freilassen-entlassen
 ~atem|Luft-atmen-einatmen-ausatmen-Atemnot-ersticken-Atemstillstand-Atemlosigkeit
@@ -2123,7 +2123,7 @@
 ~Intelligenz|klug-intelligent-scharfsinnig-gebildet-kreativ-dumm-unintelligent-einf#ae#ltig-naiv-begriff#ss#tutzig
 ~Brot|Backware-Teig-Mehl-knusprig-duftend-hart-trocken-altbacken-matschig-weich-Fr#ue#st#ue#ck-Backwaren-Br#oe#tchen-frisch-fr#ue#hst#ue#cken
 ~H#ue#lsenfrucht|Bohne-Erbse-Linse-proteinreich-gesund-fleischig-k#oe#rnig-weich-ungenie#ss#bar-fade
-~T#ue#r|Eingang-Ausgang-verschlo#ss#en-offen-Holz-Glas-gro#ss#-klein-Schrank-Fenster-Tor-geschlo#ss#en
+~T#ue#r|Eingang-Ausgang-verschlossen-offen-Holz-Glas-gro#ss#-klein-Schrank-Fenster-Tor-geschlo#ss#en
 ~schnurren|schnurrend-zufrieden-kuschelig-sanft-brummen-laut-knurren-aufgeregt-unruhig-Katze-miauen-kuscheln-Motor
 ~Ruhe|still-friedlich-entspannt-gelassen-L#ae#rm-Chaos-Hektik-Stre#ss#-Unruhe-Aufregung
 ~Einigkeit|#UE#bereinstimmung-Harmonie-Eintracht-Einheit-Uneinigkeit-Konflikt-Streit-Zwietracht-Meinungsverschiedenheit
@@ -2132,7 +2132,7 @@
 ~handeln|agieren-handelnd-aktiv-pa#ss#iv-unt#ae#tig-ruhend-reagieren-nachdenken-planen-#ue#berlegen-tun-unternehmen-verhalten-agitieren-inaktiv
 ~Zimmer|Raum-Wohnung-Schlafzimmer-Wohnzimmer-klein-eng-gro#ss#-ger#ae#umig-unordentlich-chaotisch
 ~Stich|Nadelstich-stechen-schmerzhaft-M#ue#cke-Insekt-jucken-kratzen-heilen-beruhigen-lindern
-~reizen|reizend-anregend-verlockend-reizvoll-langweilig-absto#ss#end-unintere#ss#ant-abschreckend
+~reizen|reizend-anregend-verlockend-reizvoll-langweilig-absto#ss#end-uninteressant-abschreckend
 ~Vieh|Tier-Haustier-Nutztier-wild-zahm-Mensch-Pflanze-Objekt-Gegenstand
 ~Argent|Silber-Geld-reich-wertvoll-arm-wertlos-minderwertig-unbedeutend-gering
 ~Objektiv|neutral-sachlich-objektiviert-fair-subjektiv-voreingenommen-befangen-einseitig-parteiisch
@@ -2166,7 +2166,7 @@
 ~Tortilla|mexikanisch-Fladenbrot-Wraps-Tacos-F#ue#llung-Bohnen-Fleisch-Gem#ue#se
 ~dreieckig|geometrisch-eckig-rechtwinklig-quadratisch-rund-oval-l#ae#nglich-unregelm#ae##ss#ig
 ~rausgehen|hinausgehen-verlassen-bleiben-drinnenbleiben-eintreten-hereingehen-ankommen-anbleiben
-~langweilig|#oe#de-eint#oe#nig-monoton-aufregend-spannend-intere#ss#ant-fe#ss#elnd-packend-unintere#ss#ant-abwechslungsreich-unterhaltsam-langweilen
+~langweilig|#oe#de-eint#oe#nig-monoton-aufregend-spannend-intere#ss#ant-fe#ss#elnd-packend-uninteressant-abwechslungsreich-unterhaltsam-langweilen
 ~Dromedar|Kamel-W#ue#stentier-Tier-S#ae#ugetier-L#oe#we-Raubtier-Haus-Zootier
 ~w#ue#rzen|abschmecken-verfeinern-aromatisieren-mildern-ungew#ue#rzt-fade-geschmacklos-ungesalzen
 ~M#ue#hle|Mahlwerk-Zerkleinerer-Getreidem#ue#hle-Kaffeem#ue#hle-Stillstand-Mahlen-Mehl-Korn-drehen-Zermahlen
@@ -2271,7 +2271,7 @@
 ~meditieren|ablenken-st#oe#ren-zerstreuen-hektisch-rastlos-unruhig-aufgeregt-bewegt
 ~H#ae#lfte|Ganzes-Vollst#ae#ndig-Gesamt-Komplett-Ganze-Einheit-Total-Gesamtheit
 ~Stufen|Treppen-Schritte-Aufstieg-Abstieg-Niveaus-Ebenen-Stufenleiter-Leiter
-~anlehnen|abst#ue#tzen-auflehnen-zur#ue#cklehnen-entgegenkommen-anpa#ss#en-widersetzen-aufstehen-aufb#ae#umen
+~anlehnen|abst#ue#tzen-auflehnen-zur#ue#cklehnen-entgegenkommen-anpassen-widersetzen-aufstehen-aufb#ae#umen
 ~bl#ue#hen|gedeihen-wachsen-aufbl#ue#hen-erbl#ue#hen-verwelken-welken-verbl#ue#hen-absterben
 ~dicht|eng-locker-weit-offen-durchl#ae##ss#ig-d#ue#nn-transparent-lichtdurchl#ae##ss#ig
 ~umschalten|wechseln-#ae#ndern-beibehalten-bleiben-fixieren-festschreiben-fix
@@ -2284,7 +2284,7 @@
 ~zw#oe#lf|Zahl-Uhr-Dutzend-Ziffer-Z#ae#hlung-Uhrzeit-Stunde-Sekunde
 ~Werk|Fabrik-Betrieb-Manufaktur-Produktion-Fertigung-Handwerk-Herstellung-Unternehmen
 ~Sumpf|Moor-Feuchtgebiet-Morast-Schlamm-N#ae##ss#e-Trockenheit-Steppe-W#ue#ste
-~Snack|Zwischenmahlzeit-Imbi#ss#-Happen-Nascherei-Vesper-Brotzeit-Mahlzeit-Hauptgericht
+~Snack|Zwischenmahlzeit-Imbiss-Happen-Nascherei-Vesper-Brotzeit-Mahlzeit-Hauptgericht
 ~platzen|explodieren-zerplatzen-zerbrechen-zerrei#ss#en-zerspringen-bersten-rei#ss#en-aufgehen
 ~Rollfeld|Startbahn-Landebahn-Piste-Flugfeld-Asphalt-Landefl#ae#che-Startfl#ae#che-Flugbahn
 ~Start|Abflug-Beginn-Anfang-Startschu#ss#-Auftakt-Er#oe#ffnung-Einleitung-Startposition
@@ -2295,14 +2295,13 @@
 ~Balaton|See-Ungarn-Plattensee-Wasser-Urlaub-Strand-Erholung-Ferien
 ~Ungarn|Budapest-Puszta-Donau-Land-Europa-Sprache-Kultur-Magyaren-Mitteleuropa-Ungarisch-#OE#sterreich-Rum#ae#nien
 ~Block|Hindernis-Klotz-Mauer-Stau-Barriere-Blockade-Hemmnis-Verstopfung-Geb#ae#ude-Wohnung-Freigabe-Lockerung-Entsperrung-Weg
-~au#ss#ehen|erscheinen-wirken-scheinen-pr#ae#sentieren-darstellen-zeigen-Optik-Eindruck-verbergen-verschleiern-tarnen-kaschieren
 ~H#oe#rnchen|Geb#ae#ck-Croi#ss#ant-Backwaren-Teig-B#ae#ckerei-Fr#ue#hst#ue#ck-Butter-Bl#ae#tterteig
 ~knusprig|weich-z#ae#h-hart-labberig-trocken-matschig-zart-knuspern-knackig-kro#ss#-labbrig
 ~Dunst|Nebel-Dunstschleier-Tr#ue#bung-Dampf-Feuchtigkeit-Kondensation-Vernebelung-Verdunstung
 ~Dampf|Rauch-Nebel-Dunst-Feuchtigkeit-Kondensation-Vernebelung-Verdunstung-Trockenheit
 ~d#ue#ster|finster-dunkel-tr#ue#be-hell-strahlend-sonnig-heiter-leuchtend
 ~herab|hinunter-abw#ae#rts-nieder-runter-aufw#ae#rts-hinauf-oben-empor
-~Niagara|Wasserfall-Kanada-Fluss-Naturwunder-tosend-spektakul#ae#r-Abenteuer-Ausflug-Wa#ss#erfall-Flu#ss#-Touristenattraktion-Stromschnellen-ruhig
+~Niagara|Wasserfall-Kanada-Fluss-Naturwunder-tosend-spektakul#ae#r-Abenteuer-Ausflug-Wa#ss#erfall-Touristenattraktion-Stromschnellen-ruhig
 ~Herbst|Jahreszeit-bunt-Laub-K#ue#hle-Ernte-Nebel-Kastanien-Halloween
 ~Getreide|Korn-Weizen-Hafer-Gerste-Reis-Mais-Roggen-Hirse
 ~Herd|K#ue#che-Kochen-Ofen-Kochfeld-Feuerstelle-Kochplatte-Backofen-Gas
@@ -2312,7 +2311,7 @@
 ~Geier|Raubvogel-Aasfre#ss#er-Adler-Vogel-Gier-Geierwally-Geierlay-Geier Sturzflug-scavenger-R#ae#uber-Fleischfre#ss#er-hygienisch-eklig-sauber
 ~M#oe#bel|Einrichtung-Au#ss#tattung-Einrichtungsgegenst#ae#nde-Hausrat-Mobiliar-Inneneinrichtung-Interieur-Sitzgelegenheiten-Design-Stil-Dekor-Minimalismus-#UE#berladenheit
 ~Thema|Inhalt-Betreff-Frage-Problem-Gegenstand-Angelegenheit-Disku#ss#ion
-~Medien|Nachrichten-Kommunikation-Information-Pre#ss#e-Journalismus-#OE#ffentlichkeit-Propaganda-Zensur
+~Medien|Nachrichten-Kommunikation-Information-Presse-Journalismus-#OE#ffentlichkeit-Propaganda-Zensur
 ~Begeisterung|Enthusiasmus-Freude-Euphorie-Leidenschaft-Begeisterungsf#ae#higkeit-Begeisterung#ss#turm-Desintere#ss#e-Gleichg#ue#ltigkeit-Apathie-Langeweile
 ~retten|helfen-sch#ue#tzen-bergen-unterst#ue#tzen-befreien-gef#ae#hrden-ignorieren-opfern
 ~Not|Krise-Gefahr-Elend-Bedrohung-Schwierigkeit-Sicherheit-Wohlstand-Komfort
@@ -2393,7 +2392,7 @@
 ~S#ae#ugling|Baby-klein-unschuldig-weinen-wachsen-erwachsen-reif-alt
 ~Handgelenk|Arm-Gelenk-Hand-verletzen-brechen-heilen-stark-stabil
 ~messen|me#ss#bar-L#ae#nge-Gr#oe##ss#e-sch#ae#tzen-erraten-unbekannt-unbestimmt
-~z#ae#hlen|Zahlen-rechnen-addieren-ignorieren-#ue#bersehen-abziehen-subtrahieren-vernachl#ae##ss#igen-multiplizieren-dividieren-sch#ae#tzen-me#ss#en-wiegen
+~z#ae#hlen|Zahlen-rechnen-addieren-ignorieren-#ue#bersehen-abziehen-subtrahieren-vernachl#ae##ss#igen-multiplizieren-dividieren-sch#ae#tzen-messen-wiegen
 ~Satan|Teufel-b#oe#se-h#oe#llisch-gut-heilig-engelhaft-g#oe#ttlich-rein
 ~kommen|erscheinen-auftauchen-gehen-verlassen-weggehen-verschwinden-bleiben
 ~h#ue#pfen|springen-ruhen-liegen-sitzen-stehen-fallen-hinlegen
@@ -2418,7 +2417,7 @@
 ~Schauspielerin|Schauspiel-B#ue#hne-talentiert-m#ae#nnlich-Regi#ss#eur-unerfahren-schlecht-untalentiert
 ~Oscar|Auszeichnung-Filmpreis-gewinnen-verlieren-irrelevant-unbedeutend-unwichtig-mi#ss#achten
 ~Chihuahua|Hund-klein-niedlich-gro#ss#-h#ae#sslich-gemein-b#oe#se-Hundera#ss#e-Kleinhund-Tier-Labrador-Bulldogge-Mops
-~Hobby|Freizeit-Leidenschaft-langweilig-unintere#ss#ant-ungeliebt-Ha#ss#-Arbeit-Pflicht-Freizeitbesch#ae#ftigung-Intere#ss#e-Profe#ss#ion-Desintere#ss#e
+~Hobby|Freizeit-Leidenschaft-langweilig-uninteressant-ungeliebt-Ha#ss#-Arbeit-Pflicht-Freizeitbesch#ae#ftigung-Intere#ss#e-Profe#ss#ion-Desintere#ss#e
 ~weise|klug-intelligent-dumm-ungebildet-unklug-t#oe#richt-naiv-unerfahren-unwi#ss#end-erfahren-belehrt
 ~#OE#sterreich|Alpen-Wien-Deutsch-Bayern-flach-Nordsee-Norddeutschland-Niederlande-Land-EU-Zentraleuropa-Nachbarland-Bergland
 ~Mozart|Komponist-Musik-kla#ss#isch-talentiert-unbedeutend-unbegabt-untalentiert-mi#ss#verstanden
@@ -2528,7 +2527,7 @@
 ~#UE#berweisung|Geld-Bezahlen-Transaktion-Zahlung-Sparen-Abheben-Auszahlung-Entnahme
 ~Bohrer|Bohren-Schraubenzieher-Mei#ss#el-Hammer-Bauen-Konstruieren-Reparieren-Zerst#oe#ren
 ~Zahnreinigung|Zahnarzt-Bohren-F#ue#llen-Extraktion-Prophylaxe-Mundhygiene-Zahnfleisch-Karies
-~Termin|Verpa#ss#en-Vergessen-Absage-Versp#ae#tung-Unp#ue#nktlichkeit-Abwesenheit-Freizeit-Nichtstun
+~Termin|Verpassen-Vergessen-Absage-Versp#ae#tung-Unp#ue#nktlichkeit-Abwesenheit-Freizeit-Nichtstun
 ~Erholung|Stre#ss#-Arbeit-Ersch#oe#pfung-M#ue#digkeit-Belastung-Anstrengung-Druck-Strapaze
 ~Auszeit|Weitermachen-Fortfahren-Weiterspielen-Anhalten-Verweilen-Stehenbleiben-Pause-Inaktivit#ae#t
 ~Bl#ae#tter|Baum-Fr#ue#hling-Herbst-Laub-Gr#ue#n-Blumen-Bl#ue#hen-Blattlos
@@ -2555,7 +2554,7 @@
 ~#AE#pfel|Obst-Frucht-Birne-Orange-Banane-Gem#ue#se-Gem#ue#sesorte-Gurke
 ~Pinsel|Malen-Farbe-Kunst-K#ue#nstler-Zeichnen-Stift-Radiergummi-Bleistift
 ~Farbt#oe#pfe|Farbe-Malen-Kunst-K#ue#nstler-Leere-Leer-Ausgego#ss#en-Ungef#ue#llt
-~Entdecken|Erforschen-Erfahren-Erkunden-Finden-Verbergen-Verstecken-Verpa#ss#en-Ignorieren
+~Entdecken|Erforschen-Erfahren-Erkunden-Finden-Verbergen-Verstecken-Verpassen-Ignorieren
 ~Abenteuer|Spannung-Aufregung-Risiko-Langeweile-Alltag-Routine-Sicherheit-Stagnation
 ~Blicken|Sehen-Schauen-Betrachten-Anschauen-Ignorieren-Wegschauen-Vermeiden-#UE#bersehen
 ~Blinzeln|Augen-Sehen-Schauen-#OE#ffnen-Wegschauen-Ignorieren-Vermeiden-Stieren
@@ -2631,7 +2630,7 @@
 ~Vogelgezwitscher|Singen-Natur-Stille-Ruhe-L#ae#rm-Lautst#ae#rke-Ger#ae#uschlosigkeit
 ~Wedeln|Schwanz-Hund-Ruhe-Stillstand-Bewegungslosigkeit-Ruhig-Stehen-Stagnation
 ~Pfote|Tier-Katze-Hand-Menschen-Pfotenlos-Handlos-H#ae#nde-Handlosigkeit
-~Pre#ss#e|Nachrichten-Medien-Freigeben-Ver#oe#ffentlichen-Geheimhalten-Verbergen-Zur#ue#ckhalten-Unterdr#ue#cken
+~Presse|Nachrichten-Medien-Freigeben-Ver#oe#ffentlichen-Geheimhalten-Verbergen-Zur#ue#ckhalten-Unterdr#ue#cken
 ~Artikel|Text-Beitrag-Leer-Leerseite-Ohne Inhalt-Inhaltslos-Textlos-Leere
 ~Becher|Trinken-Ta#ss#e-Leer-Trocken-Durst-Durstlos-Austrocknen-Entleeren
 ~Gebi#ss#|Z#ae#hne-Mund-Zahnlos-Zahnschmerzen-Zahnausfall-Zahnl#ue#cke-Zahngesundheit-Zahnhygiene
@@ -2758,7 +2757,7 @@
 ~F#ue##ss#e|Gehen-Laufen-Treten-Stolpern-Schweben-Schrumpfen-Schrumpelig-Vergr#oe##ss#ern
 ~Scrollen|Bildschirm-Hoch-Runter-Langsam-Schnell-Stoppen-Bewegen-Stillstand-Internet
 ~Kabellos|Drahtlos-Freiheit-Verbunden-Verbindung-Kabelgebunden-Eingeschr#ae#nkt-Begrenzt-Verkabelt
-~Nager|Nagetier-Z#ae#hne-N#ue##ss#e-Knabbern-Kauen-Fleischfre#ss#er-Raubtier-Pflanzenfre#ss#er
+~Nager|Nagetier-Z#ae#hne-N#ue##ss#e-Knabbern-Kauen-Fleischfre#ss#er-Raubtier-Pflanzenfresser
 ~Weidezaun|Tier-Schutz-Einz#ae#unung-Offen-Freiheit-Grenze-Begrenzung-Durchl#ae##ss#ig
 ~Magie|Zauber-Illusion-Realit#ae#t-Wirklichkeit-Potter-Hexe-N#ue#chternheit-Allt#ae#glichkeit
 ~Stab|Zauberstab-Magier-Hexe-Lang-Kurz-Dick-D#ue#nn-Fest
@@ -2897,7 +2896,7 @@
 ~Schleim|Schmierig-Glitschig-Ekelhaft-Trocken-Fest-Sauber-Glatt-Rutschig
 ~Spirale|Kurve-Form-Drehung-Gerade-Linear-Statisch-Stabil-Stillstand
 ~Gehweg|Fu#ss#g#ae#ngerweg-B#ue#rgersteig-Stra#ss#e-Asphalt-Unbefestigt-Natur-Uneben-Glatt
-~Raubtier|Tier-Jagen-Wild-Beute-Pflanzenfre#ss#er-Harmlos-Sanft-Z#ae#hmen
+~Raubtier|Tier-Jagen-Wild-Beute-Pflanzenfresser-Harmlos-Sanft-Z#ae#hmen
 ~Heulen|Weinen-Traurig-Schreien-Lachen-Fr#oe#hlich-Stille-Schweigen-Ruhe
 ~Streichfett|Butter-Aufstrich-Streichbar-Hart-Fl#ue##ss#ig-Fest-Trocken-Br#oe#selig
 ~Aufstrich|Brotaufstrich-Schmieren-Creme-Trocken-Br#oe#selig-Hart-Fest-Klumpig
@@ -3225,7 +3224,7 @@
 ~Autonome|Selbstst#ae#ndige-Eigenst#ae#ndige-Autonomeinkigkeit-Abh#ae#ngigkeit-Unterordnung-Fremdbestimmung-Kontrolliert
 ~Fahrzeuge|Autos-Fahrzeugins-Verkehrsmittel-Fahrzeuglosigkeit-Fu#ss#g#ae#nger-Radfahrer-Fu#ss#marsch
 ~Einrichten|Gestalten-Au#ss#tatten-Dekorieren-Einrichtungslosigkeit-Kargheit-Einfachheit-Minimalismus
-~Einrichtung#ss#til|Design-#AE#sthetik-Einrichtung#ss#tillosigkeit-Unordnung-Chaos-Mi#ss#geschmack-Geschmacklosigkeit
+~Einrichtungsstil|Design-#AE#sthetik-Einrichtungsstillosigkeit-Unordnung-Chaos-Mi#ss#geschmack-Geschmacklosigkeit
 ~Gestaltung|Kreativit#ae#t-Design-Kunst-Gestaltungslosigkeit-Monotonie-Einfallslosigkeit-Uniformit#ae#t
 ~Akzente|Betonung-Hervorhebung-Akzenteslosigkeit-Unauff#ae#lligkeit-Verschmelzung-Anpa#ss#ung-Neutralit#ae#t
 ~Stil|Design-Eleganz-Individualit#ae#t-Stillosigkeit-Chaos-Unordnung-Geschmacklosigkeit
@@ -3308,7 +3307,7 @@
 ~Lebensweise|Gewohnheiten-Alltag-Verhalten-Routine-Flexibilit#ae#t-Unkonventionell-Abweichend-Unregelm#ae##ss#ig
 ~Grenzen|Begrenzung-Limit-Beschr#ae#nkung-Freiheit-Grenzenlosigkeit-Unbegrenztheit-Unbeschr#ae#nktheit
 ~Territorium|Gebiet-Land-Hoheitsgebiet-Fremdes Gebiet-Grenzgebiet-Heimatland-Staatsgebiet-Gebietsverlust
-~Erkunden|Entdecken-Erforschen-Erkundungstour-Verlassen-Aufgeben-Verpa#ss#en-Ignorieren-Vernachl#ae##ss#igen
+~Erkunden|Entdecken-Erforschen-Erkundungstour-Verlassen-Aufgeben-Verpassen-Ignorieren-Vernachl#ae##ss#igen
 ~Besichtigung|Besuch-Tour-Rundgang-Ignorieren-#UE#berspringen-Vermeiden-Unterlassen-Nichtbesichtigung
 ~Migration|Wanderung-V#oe#lkerwanderung-se#ss#haft-Verbleib-Stagnation-Stillstand-Einwanderung-Einb#ue#rgerung
 ~Urbanisierung|Stadtentwicklung-Stadtwachstum-L#ae#ndlichkeit-D#oe#rfer-Provinz-Entv#oe#lkerung-Deurbanisierung-Entst#ae#dterung
@@ -3360,9 +3359,9 @@
 ~besch#ae#mend|dem#ue#tigend-erniedrigend-peinlich-entw#ue#rdigend-dem#ue#tig-stolz-selbstbewu#ss#t-erhaben
 ~dem#ue#tigend|erniedrigend-besch#ae#mend-entw#ue#rdigend-erniedrigt-selbstbewu#ss#t-erhaben-stolz-erhoben
 ~entw#ue#rdigend|erniedrigend-dem#ue#tigend-besch#ae#mend-dem#ue#tig-erhoben-selbstbewu#ss#t-erhaben-stolz
-~unpa#ss#end|ungeeignet-unangemessen-unangebracht-untauglich-pa#ss#end-geeignet-angemessen-tauglich
+~unpassend|ungeeignet-unangemessen-unangebracht-untauglich-passend-geeignet-angemessen-tauglich
 ~peinigend|qu#ae#lend-qualvoll-schmerzhaft-leidvoll-erl#oe#send-angenehm-wohltuend-erleichternd
-~unangemessen|unpa#ss#end-ungeeignet-unpa#ss#ig-untauglich-angemessen-pa#ss#end-geeignet-tauglich
+~unangemessen|unpassend-ungeeignet-unpa#ss#ig-untauglich-angemessen-passend-geeignet-tauglich
 ~Nervosit#ae#t|Aufregung-Anspannung-Unruhe-Hektik-Gelassenheit-Ruhe-Entspannung-Gem#ue#tlichkeit
 ~Erregung|Aufregung-Anspannung-Nervosit#ae#t-Spannung-Beruhigung-Entspannung-Gem#ue#tlichkeit-Ruhe
 ~Unruhe|Rastlosigkeit-Hektik-Aufregung-Nervosit#ae#t-Ruhe-Gelassenheit-Entspannung-Gem#ue#tlichkeit
@@ -3388,11 +3387,11 @@
 ~annehmen|akzeptieren-anerkennen-zustimmen-empfangen-ablehnen-verweigern-au#ss#chlagen-zur#ue#ckweisen
 ~aufzeichnen|aufnehmen-dokumentieren-festhalten-notieren-l#oe#schen-entfernen-ausl#oe#schen-vergessen
 ~registrieren|erfa#ss#en-aufnehmen-vermerken-wahrnehmen-ignorieren-#ue#bersehen-#ue#berh#oe#ren-vergessen
-~aufschnappen|mitbekommen-aufnehmen-mitlauschen-belauschen-#ue#berh#oe#ren-ignorieren-verpa#ss#en-entgehen
+~aufschnappen|mitbekommen-aufnehmen-mitlauschen-belauschen-#ue#berh#oe#ren-ignorieren-verpassen-entgehen
 ~einpr#ae#gen|merken-behalten-erinnern-vergessen-ausblenden-l#oe#schen-verdr#ae#ngen
 ~Rundfunk|Radio-H#oe#rfunk-Sendung-Programm-Fernsehen-Stille-Schweigen-Ruhe
 ~Station|Haltestelle-Bahnhof-Standort-Ort-Abfahrt-Weiterfahrt-Zwischenstopp-Abreise
-~au#ss#ehend|optisch-#ae#u#ss#erlich-sichtbar-erscheinend-unsichtbar-verborgen-unscheinbar-versteckt
+~aussehend|optisch-#ae#u#ss#erlich-sichtbar-erscheinend-unsichtbar-verborgen-unscheinbar-versteckt
 ~Altersgruppe|Generation-Jahrgang-Alterskla#ss#e-Jugendliche-Erwachsene-Kinder-Senioren-Kleinkinder
 ~Erwachsen|reif-vollj#ae#hrig-jugendlich-minderj#ae#hrig-kindlich-unreif-naiv-#ue#ber
 ~lieblich|s#ue##ss#-zart-charmant-bezaubernd-sanft-bitter-herb-grob
@@ -3547,9 +3546,9 @@
 ~Belletristik|Literatur-Sachbuch-Fachliteratur-Fachbuch-Trockenheit-Sachlichkeit-Wi#ss#enschaft
 ~Prosa|Belletristik-Lyrik-Dichtung-Gedicht-Fachliteratur-Sachbuch-Fachbuch-Trockenheit
 ~Werke|B#ue#cher-Texte-Schriften-Nichtstun-Leerlauf-Unt#ae#tigkeit-Inaktivit#ae#t-Passivit#ae#t
-~Bistro|Restaurant-Café-Imbi#ss#-Lokal-Ruhe-Stille-Rast-Gastst#ae#tte
-~Kaffeehaus|Café-Bistro-Imbi#ss#-Lokal-Ruhe-Stille-Rast-Gastst#ae#tte
-~Imbi#ss#|Restaurant-Café-Bistro-Kaffeehaus-Ruhe-Stille-Rast-Gastst#ae#tte
+~Bistro|Restaurant-Café-Imbiss-Lokal-Ruhe-Stille-Rast-Gastst#ae#tte
+~Kaffeehaus|Café-Bistro-Imbiss-Lokal-Ruhe-Stille-Rast-Gastst#ae#tte
+~Imbiss|Restaurant-Café-Bistro-Kaffeehaus-Ruhe-Stille-Rast-Gastst#ae#tte
 ~Witterung|Wetter-Klima-Sturm-Regen-Schnee-Sonnenschein-Himmel-Wetterph#ae#nomen
 ~Wetterlage|Witterung-Klima-Sturm-Regen-Schnee-Sonnenschein-Himmel-Wetterph#ae#nomen
 ~Meteorologie|Wetter-Witterung-Klima-Sturm-Regen-Schnee-Sonnenschein-Himmel
@@ -3783,13 +3782,13 @@
 ~Realit#ae#tsbezug|Bezug zur Realit#ae#t-Praxisbezug-Relevanz-Abstraktion-Unwirklichkeit-Fantasie-Irrealit#ae#t-Illusion
 ~Realit#ae#tscheck|Realit#ae#ts#ue#berpr#ue#fung-Faktencheck-Realit#ae#tsabgleich-Illusionsaufl#oe#sung-Traumzerst#oe#rung-Fantasieentlarvung-Irrealit#ae#tsbewu#ss#tsein
 ~Gastgewerbe|Gastronomie-Gastst#ae#ttenbetrieb-Hotel-Gewerbe-Beherbergungsbetrieb-Besucherunterkunft-Gastlichkeit-Hotelwesen-Unterkunftsgewerbe
-~Bewirtungsbetrieb|Gastst#ae#tte-Restaurant-Speisewirtschaft-Gasthof-Imbi#ss#-Selbstbedienungsrestaurant-Speiselokal-Fast Food
+~Bewirtungsbetrieb|Gastst#ae#tte-Restaurant-Speisewirtschaft-Gasthof-Imbiss-Selbstbedienungsrestaurant-Speiselokal-Fast Food
 ~#UE#berpr#ue#fen|Pr#ue#fen-Nachpr#ue#fen-Verifizieren-Kontrollieren-Best#ae#tigen-Ignorieren-#UE#berspringen-Vernachl#ae##ss#igen
 ~Kontrollieren|#UE#berwachen-#UE#berpr#ue#fen-Beaufsichtigen-Pr#ue#fen-Loslassen-Vernachl#ae##ss#igen-Ignorieren-Lockerlassen
 ~Testen|Pr#ue#fen-#UE#berpr#ue#fen-Ausprobieren-Untersuchen-Verwerfen-Ignorieren-Vernachl#ae##ss#igen-#UE#berspringen
 ~Nachschauen|#UE#berpr#ue#fen-Kontrollieren-Pr#ue#fen-Schauen-Ignorieren-Vernachl#ae##ss#igen-#UE#berspringen-Wegschauen
 ~Evaluieren|Bewerten-Beurteilen-Einsch#ae#tzen-Analyse-Ignorieren-Vernachl#ae##ss#igen-Ablehnen-Mi#ss#achten
-~#UE#berwachen|Kontrollieren-Beaufsichtigen-Beobachten-Aufpa#ss#en-Vernachl#ae##ss#igen-Ignorieren-Loslassen-Nachl#ae##ss#igkeit
+~#UE#berwachen|Kontrollieren-Beaufsichtigen-Beobachten-Aufpassen-Vernachl#ae##ss#igen-Ignorieren-Loslassen-Nachl#ae##ss#igkeit
 ~Zeichenfolge|Abfolge von Zeichen-Zeichenkette-Text-Code-Muster-Leerzeichen-Zahlen-Symbole
 ~Hinweis|Tipp-Ratschlag-Anweisung-Empfehlung-Verwirrung-Fehlinformation-Desinformation-T#ae#uschung
 ~Zeichensprache|Geb#ae#rdensprache-Kommunikation-Nonverbale Kommunikation-Gestik-Lautsprache-Mi#ss#verst#ae#ndnis-Sprachbarriere-Verst#ae#ndigung#ss#chwierigkeiten
@@ -3847,10 +3846,10 @@
 ~#UE#bertragen|Weitergeben-#UE#bermitteln-Senden-Aufnehmen-Behalten-Zur#ue#ckhalten-Abschalten-Trennen
 ~Verlagern|Verschieben-Umsiedeln-Ver#ae#ndern-Festhalten-Stabilisieren-Ruhigstellen-Stillstehen-Unbeweglich
 ~Verschieben|Verlagern-Umstellen-Bewegen-Fixieren-Stabilisieren-Ruhen-Stillstehen-Unbeweglich
-~Umstellen|Verschieben-Ver#ae#ndern-Anpa#ss#en-Beibehalten-Stabilisieren-Ruhigstellen-Stillstehen-Unbeweglich
+~Umstellen|Verschieben-Ver#ae#ndern-Anpassen-Beibehalten-Stabilisieren-Ruhigstellen-Stillstehen-Unbeweglich
 ~Transferieren|#UE#bertragen-Verschieben-Verlagern-Behalten-Stabilisieren-Ruhigstellen-Stillstehen-Unbeweglich
 ~verpflanzen|umsetzen-transplantieren-versetzen-verlagern-neu anpflanzen-verankern-fixieren-bewurzeln
-~ver#ae#ndern|#ae#ndern-modifizieren-anpa#ss#en-umgestalten-transformieren-stabilisieren-bewahren-unver#ae#ndert lassen
+~ver#ae#ndern|#ae#ndern-modifizieren-anpassen-umgestalten-transformieren-stabilisieren-bewahren-unver#ae#ndert lassen
 ~Gadget|Ger#ae#t-technisches Spielzeug-Innovation-Technikspielerei-elektronisches Acce#ss#oire-n#ue#tzliches Hilfsmittel-Verzicht-Obsoleszenz
 ~frostig|kalt-eisig-winterlich-klirrend-eisgek#ue#hlt-warm-mild-hei#ss#
 ~eiskalt|frostig-eisig-eisgek#ue#hlt-kalt-k#ue#hl-warm-mild-hei#ss#
@@ -3929,7 +3928,7 @@
 ~triumphieren|siegen-gewinnen-jubeln-verlieren-scheitern-unterliegen-verzweifeln
 ~erringen|gewinnen-erlangen-erzielen-verlieren-scheitern-unterliegen-verzweifeln
 ~Bef#ue#rchtung|Sorge-Angst-Bedenken-Besorgnis-Hoffnung-Zuversicht-Vertrauen-Sicherheit
-~Pre#ss#eerzeugnis|Zeitung-Magazin-Zeitschrift-Printmedium-Publikation-Online-digital-elektronisch
+~Presseerzeugnis|Zeitung-Magazin-Zeitschrift-Printmedium-Publikation-Online-digital-elektronisch
 ~Telefonapparat|Telefon-Festnetztelefon-Telefonanlage-Telekommunikationsger#ae#t-Handy-Smartphone-Mobilger#ae#t
 ~Mobiltelefon|Smartphone-Handy-Mobilger#ae#t-Mobiltelefonie-Telefon-Festnetztelefon-Telefonapparat-Tischtelefon
 ~Kommunikationsger#ae#t|Telefon-Smartphone-Funkger#ae#t-Mobiltelefon-Computer-Empfangsger#ae#t-#UE#bertragungsger#ae#t-Endger#ae#t
@@ -4162,7 +4161,7 @@
 ~Primat|Affe-Menschenaffe-Gorilla-Schimpanse-Affenart-Insekt-Reptil-Fisch
 ~Bonobo|Affe-Primat-Schimpanse-Menschenaffe-Gorilla-Raubtier-Beuteltier-Reptil
 ~Maki|Affe-Primat-Schimpanse-Menschenaffe-Gorilla-Raubtier-Beuteltier-Reptil
-~Wolfsart|Wolf-Raubtier-Rudel-Wildtier-Tierart-Haustier-Herdentier-Pflanzenfre#ss#er
+~Wolfsart|Wolf-Raubtier-Rudel-Wildtier-Tierart-Haustier-Herdentier-Pflanzenfresser
 ~Jagt|Jagd-f#ae#ngt-erbeutet-verfolgt-sch#ue#tzt-hegt-beobachtet
 ~Zubereitung|Kochen-vorbereiten-braten-abk#ue#hlen-backen-servieren
 ~King|K#oe#nig-Herrscher-Monarch-Queen-Prinz-Sklave-Untertan-Diener
@@ -4378,7 +4377,7 @@
 ~nichts|nichtsdestotrotz-null-leer-Leere-Leerstelle-Fehlen-Abwesenheit-Mangel-viel-alles-etwas-einiges
 ~ja|Nein-ReWe-sicher-gewi#ss#-bestimmt-positiv-Zustimmung-einverstanden-vielleicht-unsicher
 ~rein|sauber-makellos-ordentlich-schmutzig-verunreinigt-unsauber-befleckt-schmuddelig-dreckig
-~St#ae#bchen|Zahnstocher-Holzst#ae#bchen-E#ss#st#ae#bchen-L#oe#ffel-Gabel-Me#ss#er-Besteck
+~St#ae#bchen|Zahnstocher-Holzst#ae#bchen-Essst#ae#bchen-L#oe#ffel-Gabel-Me#ss#er-Besteck
 ~roh|ungekocht-unbearbeitet-unreif-verarbeitet-gekocht-zubereitet-fertig-durchgebraten
 ~System|Organisation-Struktur-Methode-Chaos-Unordnung-Verwirrung-Systemausfall-St#oe#rung
 ~Grundst#ue#ck|Land-Immobilie-Areal-Fl#ae#che-Leere-Brache-bebaut-verla#ss#en-unbebaut
@@ -4391,8 +4390,7 @@
 ~bewerten|einsch#ae#tzen-beurteilen-ignorieren-#ue#bersehen-mi#ss#achten-abwerten
 ~fangen|greifen-fa#ss#en-einfangen-entkommen-losla#ss#en-freila#ss#en-aufnehmen-erwischen-erbeuten-f#ae#ngig-jagen
 ~Kr#oe#te|Amphibie-Frosch-quaken-h#ue#pfen-springen-trocken-Haut
-~e#ss#e|genie#ss#en-schmecken-kauen-erbrechen-aufh#oe#ren-verweigern-Fast Food-gesund
-~gie#ss#en|bew#ae##ss#ern-begie#ss#en-trocken-durstig-einschenken-ausleeren-#ue#berschwemmen-ausla#ss#en
+~e#ss#e|geniessen-schmecken-kauen-erbrechen-aufh#oe#ren-verweigern-Fast Food-gesund
 ~selig|gl#ue#cklich-zufrieden-erf#ue#llt-elend-ungl#ue#cklich-betr#ue#bt-deprimiert
 ~runter|hinunter-abw#ae#rts-herunter-rauf-aufw#ae#rts-hinauf
 ~Fasching|Karneval-Fastnacht-Maskerade-Feiern-n#ue#chtern-ern#ue#chternd-feierlich
@@ -4414,15 +4412,13 @@
 ~Schamane|Heiler-Medizinmann-Zauberer-Rationalist-Skeptiker-Kritiker-Laie-Nicht-Gl#ae#ubiger
 ~Gesang|Singen-Lied-Musik-Stille-Ton-Ger#ae#usch-Harmonie-Melodie
 ~Drogen|Rauschmittel-Medikamente-Droge-n#ue#chtern-entgiftet-clean-gesund
-~zuschnappen|schlie#ss#en-schnappen-zuklappen-#oe#ffnen-aufgehen-auseinanderklappen-verriegeln-entriegeln
+~zuschnappen|schliessen-schnappen-zuklappen-#oe#ffnen-aufgehen-auseinanderklappen-verriegeln-entriegeln
 ~M#ue#nchen|Stadt-Bayern-Deutschland-Oktoberfest-Gro#ss#stadt-Vorort-Landeshauptstadt-l#ae#ndlich
-~Wellne#ss#|Entspannung-Erholung-Spa-Stre#ss#-Anspannung-Unruhe-Gesundheit-Wohlbefinden
 ~Antrieb|Motivation-Triebkraft-Energie-Stillstand-Lethargie-Unlust-Hemmung-Tr#ae#gheit
 ~0|null-nichts-leer-viel-Zahlen-unendlich-negativ-positiv
 ~Gang|Flur-Lauf-Fortschritt-Geschwindigkeit-Stillstand-R#ue#ckw#ae#rtsgang-neutral-vorw#ae#rts
 ~scharf|w#ue#rzig-pikant-mild-geschmacklos-ungew#ue#rzt-fade-angenehm
-~Kohl|Gem#ue#se-Kohlrabi-Kraut-Gr#ue#n-e#ss#en-gesund-Kohlsuppe-Blumenkohl
-~verge#ss#en|erinnern-merken-vermi#ss#en-verdr#ae#ngen-verlegen
+~Kohl|Gem#ue#se-Kohlrabi-Kraut-Gr#ue#n-essen-gesund-Kohlsuppe-Blumenkohl
 ~g#ae#hnen|m#ue#de-verschlafen-wach-ausgeruht-energiegeladen-aktiv-rege-munter
 ~hacken|zerkleinern-schneiden-s#ae#gen-heilen-reparieren-intakt-ganz-unbesch#ae#digt
 ~Alarm|Warnung-Sirene-Benachrichtigung-Ruhe-Entwarnung-Gela#ss#enheit-Unaufmerksamkeit
@@ -4430,15 +4426,14 @@
 ~steigen|klettern-aufsteigen-fallen-absteigen-sinken-ansteigen-aufkommen-absinken
 ~zehn|neun-elf-zw#oe#lf-acht-sieben-sechs-f#ue#nf
 ~Schwierigkeiten|Probleme-Herausforderungen-H#ue#rden-Leichtigkeit-Bew#ae#ltigung-Scheitern-Versagen-Mi#ss#erfolg
-~nagen|kauen-bei#ss#en-knabbern-verschlingen-sparen-verbrauchen-e#ss#en-genie#ss#en
-~Damm|Deich-Flu#ss#-Wa#ss#er-#UE#berschwemmung-Natur-Umwelt-Hochwa#ss#er-Schutz
+~nagen|kauen-bei#ss#en-knabbern-verschlingen-sparen-verbrauchen-essen-geniessen
+~Damm|Deich-Fluss-Wa#ss#er-#UE#berschwemmung-Natur-Umwelt-Hochwa#ss#er-Schutz
 ~Klo#ss#|Klumpen-Teig-Kn#oe#del-E#ss#en-Kartoffeln-Fleisch-Beilage-z#ae#h
 ~abtasten|tasten-f#ue#hlen-ber#ue#hren-sp#ue#ren-grob-sanft-oberfl#ae#chlich-tief
 ~Schlips|Krawatte-Kleidung-Anzug-Kragen-Hemd-Dre#ss#code-locker-formell
 ~Kragen|Halsband-Kleidung-Hemd-Schlips-Anzug-enger-weiter-locker
 ~Rowling|Autorin-Schriftstellerin-Harry Potter-B#ue#cher-Literatur-Bestseller-Magie-Fantasy
 ~House|Musik-Tanz-DJ-Party-Elektro-Musikstil-Beat-Groove
-~pa#ss#en|anpa#ss#en-zusammenpa#ss#en-pa#ss#end-unpa#ss#end-pa#ss#ieren-pa#ss#ierbar-gelegen-ungeeignet
 ~fellen|sch#ae#len-enth#ae#uten-abziehen-bekleiden-enth#ue#llen-schm#ue#cken-ausziehen-bedecken
 ~Gene|Erbgut-DNA-Vererbung-Mutation-Genetik-Erbanlage-Genpool-Genom
 ~brechen|zerbrechen-kaputt-reparieren-fixieren-heilen-ganz-gesund
@@ -4446,7 +4441,6 @@
 ~Benehmen|Verhalten-Manieren-Anstand-Ungehorsam-H#oe#flichkeit-Respekt-Disziplin
 ~Umgang|Kontakt-Beziehung-Miteinander-Isolation-Gesellschaft-Umgangsformen-sozial-isoliert
 ~Zeuge|Beobachter-Au#ss#age-Zeugenau#ss#age-Unbeteiligter-T#ae#ter-Kriminalfall-Gericht-Anklage
-~schlie#ss#en|#oe#ffnen-aufmachen-verschlie#ss#en-offen-geschlo#ss#en-abschlie#ss#en-aufschlie#ss#en
 ~007|James Bond-Geheimagent-Spionage-MI6-Action-Sean Connery-Lizenz zum T#oe#ten-Agent
 ~Daniel Craig|Schauspieler-James Bond-Darsteller-007-Casino Royale-Hollywood-Filme-Britisch
 ~digital|elektronisch-analog-vernetzt-physisch-online-offline-Cyber-Technologie
@@ -4460,7 +4454,6 @@
 ~Nudel|Teigwaren-Pasta-Spaghetti-Penne-Lasagne-Kochen-Gericht-Nudelsalat
 ~4:3|Seitenverh#ae#ltnis-Bildschirmformat-16:9-4K-Aufl#oe#sung-Standard-Breitbild-Fernseher
 ~Ha#ss#|Abneigung-Feindschaft-Liebe-Antipathie-Wut-Konflikt-Feindlichkeit-Ha#ss#gef#ue#hle
-~Flu#ss#|Gew#ae##ss#er-Wa#ss#erlauf-Bach-Strom-Quelle-M#ue#ndung-Ufer-Flu#ss#bett
 ~quietchen|quietschen-Ger#ae#usch-laut-leise-quietschend-quietschig-quietschvergn#ue#gt-quietschfrei
 ~Abschlu#ss#|Ende-Fertigstellung-Abschlu#ss#zeugnis-Abschlu#ss#arbeit-Finish-Beendigung-Finale-Schlu#ss#
 ~E#ss#ig|sauer-Fl#ue##ss#igkeit-S#ae#ure-Geschmack-W#ue#rze-K#ue#che-Konservierung-Marinade
@@ -4475,13 +4468,13 @@
 ~Bettlaken|Bett-Schlafzimmer-Decke-Bettw#ae#sche-Leintuch-Matratze-sauber-Spannbettlaken
 ~Maul|Mund-Gesicht-Maulwurf-Tierschnauze-Maulkorb-Zahnarzt-Maul halten-Maulsperre
 ~verkleiden|Kost#ue#m-Verkleidung-Maskerade-Karneval-Fasching-ver#ae#ndern-Tarnung
-~entscheiden|w#ae#hlen-bestimmen-beschlie#ss#en-Auswahl treffen-entscheidend-Wahl-Urteil f#ae#llen-entscheidungsfreudig
+~entscheiden|w#ae#hlen-bestimmen-beschliessen-Auswahl treffen-entscheidend-Wahl-Urteil f#ae#llen-entscheidungsfreudig
 ~Urteil|Entscheidung-Meinung-Bewertung-Gericht-Richter-Verbrechen-Vergehen
 ~w#ue#nsche|Tr#ae#ume-Hoffnungen-Vorstellungen-Sehnsucht-Erwartungen-Begehren-Verlangen
 ~Ku#ss#|K#ue##ss#en-Z#ae#rtlichkeit-Lippen-Leidenschaft-Intimit#ae#t-Zuneigung-Zungenspiel-Ku#ss#mund
 ~Taste|Knopf-Druckknopf-Schalter-Bedienung-Keyboard-Tastatur-Eingabe
 ~Schlag|Schlagen-Treffer-Schlagzeug-Anschlag-Beat-Rhythmus-Takt-Trommeln
-~geschlo#ss#en|zu-abgeschlo#ss#en-versperrt-verschlo#ss#en-dicht-nicht ge#oe#ffnet-verriegelt-versiegelt
+~geschlo#ss#en|zu-abgeschlo#ss#en-versperrt-verschlossen-dicht-nicht ge#oe#ffnet-verriegelt-versiegelt
 ~366|Schaltjahr-Tage-365-Kalenderjahr-Jahreszeit-Tagesanzahl-Datum-Kalendertag
 ~29|Zahl-neunundzwanzig-Primzahl-Tagesdatum-Februar-Tag-Geburtstag-Jahrestag
 ~Ne#ss#|See-Schottland-Loch Ne#ss#-Monster-Legende-mythisches Wesen-Sichtung-Kryptozoologie
@@ -4626,7 +4619,7 @@
 ~Ablehnung|Verweigerung-Zur#ue#ckweisung-Abweisung-Negation-Abneigung-Widerspruch-Non-Compliance-Verneinung
 ~Entzug|Entziehung-R#ue#cknahme-Entnahme-Herausnahme-Entfernung-Suspendierung-Abzug-Retraktion
 ~Karton|Verpackung-Schachtel-Kartonage-Packung-Beh#ae#lter-Kiste-Pappkarton-Umverpackung
-~Verpacken|Einpacken-einh#ue#llen-einwickeln-einbetten-einschlie#ss#en-einlagern
+~Verpacken|Einpacken-einh#ue#llen-einwickeln-einbetten-einschliessen-einlagern
 ~Auspacken|Entpacken-aufmachen-herausnehmen-entnehmen-ausbreiten-ausrollen-entfalten
 ~Offen|Zug#ae#nglich-nicht verschlossen-unverschlossen-ge#oe#ffnet-nicht geschlossen-einladend-offenherzig-transparent
 ~Kaufhaus|Warenhaus-Handelsunternehmen-Einkaufshaus-Kaufgesch#ae#ft-Einkaufszentrum-Shoppingcenter-Handelszentrum-Einkaufshalle
@@ -4682,7 +4675,6 @@
 ~Suche|Recherche-Untersuchung-Erkundung-Forschung-Exploration-Durchsuchung-Analyse-Nachforschung
 ~Tab|Registerkarte-Tabulator-Reiter-Register-Lasche-Auswahl-Tabulatorfunktion-Schaltfl#ae#che
 ~Messung|Vermessung-Quantifizierung-Ausmessung-Bestimmung-Abmessung-Dimensionierung-Ermittlung-Feststellung
-~Maus#ue#|Mauszeiger-Mauszeigereinheit-Mauszeigerelement-Zeigeger#ae#t-Zeiger-Mauspfeil-Mauscursor-Cursor
 ~Komfort|Bequemlichkeit-Annehmlichkeit-Komfortabilit#ae#t-Wohlgef#ue#hl-Gem#ue#tlichkeit-Behaglichkeit-Komfortniveau
 ~Unterlage|Mauspad-Unterlagefl#ae#che-Mousepad-Unterlagestoff-Auflage-Unterlegematte-Untergrundschaft-Mousematte
 ~Tippen|Tastendruck-Schreiben-Eintippen-Eingabe-Texteingabe-Tippvorgang-Tipparbeit-Niederschreiben
@@ -4691,7 +4683,6 @@
 ~W#oe#rter|Wortschatz-Lexikon-Vokabular-Sprachgebrauch-Ausdr#ue#cke-Begriffe-Worte-Sprache
 ~dr#oe#hnend|laut-ohrenbet#ae#ubend-schallend-tosend-donnernd-dr#oe#hnender L#ae#rm-krachend-ohrenzersplitternd
 ~Erfassen|wahrnehmen-registrieren-erkennen-aufnehmen-verarbeiten-begreifen-mitbekommen
-~aussehend|optisch-visuell-#ae#u#ss#erlich-Erscheinung-Aussehen-Anblick-optische Erscheinung-visuelle Wahrnehmung
 ~herzhaft|deftig-kr#ae#ftig-w#ue#rzig-schmackhaft-herzhaftes Essen-herzhaft w#ue#rzen-herzhafter Geschmack-kr#ae#ftiger Genuss
 ~pikant|w#ue#rzig-scharf-w#ue#rziger Geschmack-pikantes Essen-pikante Gew#ue#rze-feurig-geschmackvoll-scharf gew#ue#rzt
 ~Toast|ger#oe#stetes Brot-Toastbrot-ger#oe#stete Scheibe-getoastetes Brot-Brotscheibe-Knusperbrot-Toasten-R#oe#sten
@@ -4708,7 +4699,7 @@
 ~Creme|Sahne-Hautcreme-Gesichtscreme-Creme auftragen-Pflegecreme-K#oe#rpercreme-Konsistenz-Cremeprodukt
 ~Modell|Vorbild-Muster-Abbild-Entwurf-Prototyp-Modellbau-Modellieren-Modellfahrzeug
 ~Grund|Ursache-Hintergrund-Basis-Motiv-Ausl#oe#ser-Anlass-Ursprung-Begr#ue#ndung
-~Stopfen|verschlie#ss#en-abdichten-verstopfen-zustopfen-f#ue#llen-zukorken-stopfende Bewegung-Verschluss
+~Stopfen|verschliessen-abdichten-verstopfen-zustopfen-f#ue#llen-zukorken-stopfende Bewegung-Verschluss
 ~Zapfen|St#oe#psel-Kegel-Zapfhahn-Holzstift-Flaschenverschluss-Zapfenform-Zapfenverbindung-Zapfenloch
 ~Schall|Klang-Ger#ae#usch-Laut-Ton-Akustik-T#oe#ne-Schallwellen-Schallpegel
 ~flink|schnell-geschwind-rasant-z#ue#gig-fix-hurtig-rasch-eilig
@@ -4910,7 +4901,7 @@
 ~#ue#bersehen|#ue#berblicken-verpassen-nicht bemerken
 ~verbergen|verstecken-verheimlichen-verschleiern-kaschieren-tarnen
 ~konsumieren|verbrauchen-nutzen-verwenden-einsetzen-anwenden
-~genie#ss#en|schmecken-zelebrieren-auskosten-erfreuen
+~geniessen|schmecken-zelebrieren-auskosten-erfreuen
 ~durstl#oe#schen|trinken-Durst stillen-hydrieren
 ~nippen|schl#ue#rfen-kosten-trinken-einen Schluck nehmen
 ~dehydriert|ausgetrocknet-durstig-entw#ae#ssert-trocken
@@ -5042,11 +5033,11 @@
 ~Zauberei|Illusion-Magie-Trick-Staunen-Show-Realit#ae#t-Klarheit-Offenheit
 ~Likes|Zustimmung-Anerkennung-Lob-Daumen hoch-Sympathie-Ablehnung-Kritik-Gleichg#ue#ltigkeit
 ~Follower|Anh#ae#nger-Abonnent-Fan-Publikum-Gemeinschaft-Ignorant-Gegner-Einzelg#ae#nger
-~Hashtag|Schlagwort-Tag-Markierung-Kennzeichnung-Stichwort-Anonymit#ae#t-Undefiniertheit-Verge#ss#en
+~Hashtag|Schlagwort-Tag-Markierung-Kennzeichnung-Stichwort-Anonymit#ae#t-Undefiniertheit-Vergessen
 ~Kommentar|Bemerkung-R#ue#ckmeldung-Meinung-Antwort-Feedback-Schweigen-Vermeidung-Unt#ae#tigkeit
 ~Influencer|Meinungsf#ue#hrer-Promoter-Trendsetter-Repr#ae#sentant-Idol-Zuschauer-Unbekannter-Pa#ss#iver
 ~Profil|Identit#ae#t-Darstellung-Pr#ae#sentation-Benutzerkonto-Bild-Anonymit#ae#t-Unsichtbarkeit-Abwesenheit
-~Viralit#ae#t|Verbreitung-Popularit#ae#t-Reichweite-Anziehungskraft-Ma#ss#enph#ae#nomen-Isolation-Stagnation-Verge#ss#enheit
+~Viralit#ae#t|Verbreitung-Popularit#ae#t-Reichweite-Anziehungskraft-Ma#ss#enph#ae#nomen-Isolation-Stagnation-Vergessenheit
 ~Feed|Nachrichtenstrom-Inhalt-Aktualisierung-Information-#UE#bersicht-Stillstand-Langeweile-Abwesenheit
 ~Direktnachricht|Mitteilung-Text-Gespr#ae#ch-Chat-Privatnachricht-#OE#ffentlichkeit-Stille-Desintere#ss#e
 ~Abonnenten|Follower-Leser-Anh#ae#nger-Unterst#ue#tzer-Zuschauerschaft-Ignorant-Verweigerer-Ablehner
@@ -5056,7 +5047,7 @@
 ~Verschl#ue##ss#elung|Sicherheit-Schutz-Code-Geheimnis-Privatsph#ae#re-Offenlegung-Klarheit-Einfachheit-Transparenz
 ~Cookies|Tracker-Browser-Speicherung-Website-Daten-Sauberkeit-Papier-Buch-Ordnung
 ~Suchmaschine|Google-Bing-Suche-Treffer-Algorithmus-Zufall-Irrtum-Chaos-Willk#ue#r
-~Online-Shopping|E-Commerce-Einkauf-Versand-Plattform-Produkt-Laden-Markt-Spaziergang-Direktkauf
+~Online-Shopping|E Commerce-Einkauf-Versand-Plattform-Produkt-Laden-Markt-Spaziergang-Direktkauf-Amazon
 ~Cyberkriminalit#ae#t|Hacker-Betrug-Datenklau-Angriff-Internetverbrechen-Sicherheit-Gesetz-Ordnung-Schutz
 ~URL|Adre#ss#e-Link-Webseite-Pfad-Domain-Buch-Karte-Wegweiser-Stra#ss#e
 ~Digitalisierung|Elektrifizierung-Datenverarbeitung-Technologisierung-Online-Automatisierung-Analog-Papier-Handarbeit
@@ -5076,7 +5067,6 @@
 ~Dekor|Vorh#ae#nge-Teppiche-Bilder-Vasen-Lampen-Kargheit-N#ue#chternheit-Trockenheit
 ~Au#ss#tattung|Ger#ae#te-M#oe#belst#ue#cke-Utensilien-Textilien-Acce#ss#oires-Leere-Unvollst#ae#ndigkeit-Mangel
 ~Wandfarbe|Anstrich-Farbe-Nuance-T#oe#nung-Schattierung-Tapete-Holz-Metall
-~Ki#ss#en|Polster-Zierki#ss#en-Sitzki#ss#en-Kopfki#ss#en-Nackenst#ue#tze-H#ae#rte-Unbequemlichkeit-Stuhl
 ~Teppichboden|Verlegung-Faser-Belag-Design-Textil-Fliesen-Holz-Laminat
 ~Regal|B#ue#cherregal-Wandregal-Stehregal-F#ae#cher-Ablage-Boden-Schublade-Aufbewahrung
 ~Tischlampe|Lichtquelle-Schreibtischlampe-Beleuchtung-Design-Schirm-Dunkelheit-Schatten-Blende
@@ -5095,8 +5085,8 @@
 ~Fashionista|Modefan-Trendliebhaber-Stilbewu#ss#ter-Modekenner-#AE#sthet-Unintere#ss#iert-Laie-Ignorant
 ~Textilindustrie|Produktion-Weberei-Modebranche-Stoffherstellung-Gewerbe-Handarbeit-Kleinstproduktion-Einzelst#ue#cke
 ~Stilrichtung|Kla#ss#ik-Boho-Casual-Eleganz-Avantgarde-Uniformit#ae#t-Altmodisch-Langeweile
-~Herbivor|Pflanzenfre#ss#er-Gras-Sanft-Pflanzen-Vegetarisch-Raubtier-Fleischfre#ss#er-Aggre#ss#iv
-~Pflanzenfre#ss#er|Herbivor-Vegetarisch-Gras-Bl#ae#tter-Sanft-Raubtier-Fleischfre#ss#er-Aggre#ss#iv
+~Herbivor|Pflanzenfresser-Gras-Sanft-Pflanzen-Vegetarisch-Raubtier-Fleischfre#ss#er-Aggre#ss#iv
+~Pflanzenfresser|Herbivor-Vegetarisch-Gras-Bl#ae#tter-Sanft-Raubtier-Fleischfre#ss#er-Aggre#ss#iv
 ~Katzentier|Schnurren-Krallen-J#ae#ger-Geschmeidig-Haustier-Hund-Reptil-Fisch
 ~Pflanzen|Wurzeln-Gr#ue#n-Photosynthese-Blumen-Station#ae#r-Tier-Bewegung-Fleisch
 ~K#oe#rperbehaarung|Fell-Haare-Schutz-W#ae#rme-Textur-Nackt-Glatt-Kahl
@@ -5113,7 +5103,7 @@
 ~Wa#ss#ertemperatur|W#ae#rmegrad-K#ae#lte-Temperatur-Thermometer-Klima-Hitze-Trockenheit-Festigkeit
 ~Felsen|Hart-Gestein-K#ue#ste-Stabilit#ae#t-Struktur-Sand-Schlamm-Biegung
 ~Tiergarten|Tiere-Gehege-Wildpark-Besuch-Attraktion-Urbanit#ae#t-Beton-Leere
-~Arten|Vielfalt-Spezies-Gruppierung-Kla#ss#ifikation-Differenzierung-Einfalt-Homogenit#ae#t-Einheit
+~Arten|Vielfalt-Spezies-Gruppierung-Klassifikation-Differenzierung-Einfalt-Homogenit#ae#t-Einheit
 ~Wildpark|Natur-Freiland-Auslauf-Reservat-Habitat-Gehege-Eingrenzung-Begrenzung
 ~Besucher|G#ae#ste-Touristen-Publikum-Besucherzahlen-Besucherfreundlichkeit-Einsamkeit-Abwesenheit-Isolation
 ~Tierschutz|Wohlergehen-Betreuung-Schutzma#ss#nahmen-Aufmerksamkeit-F#ue#rsorge-Mi#ss#handlung-Grausamkeit-Vernachl#ae##ss#igung
@@ -5122,7 +5112,7 @@
 ~Erlebnis|Erfahrung-Abenteuer-Ereignis-Impre#ss#ion-Eindruck-Allt#ae#glichkeit-Routine-Gew#oe#hnlichkeit
 ~Geografie|Standort-Lage-Gel#ae#nde-Position-Verteilung-Einheit-Zentrum-Planlosigkeit
 ~Luchs|Wildkatze-Schneereich-Schnelligkeit-Raubtier-Einzelg#ae#nger-Warm-Herbivor-Langsamkeit
-~Hippopotamus|Wa#ss#er-Gro#ss#tier-Afrika-Pflanzenfre#ss#er-Schwimmen-Trocken-Klein-Fleischfre#ss#er
+~Hippopotamus|Wa#ss#er-Gro#ss#tier-Afrika-Pflanzenfresser-Schwimmen-Trocken-Klein-Fleischfre#ss#er
 ~Tierbeobachtung|Beobachten-Erforschen-Studieren-Tracking-Dokumentation-Ignorieren-Distanz-Unaufmerksamkeit
 ~Naturschutzgebiet|Schutzbereich-Reserve-Park-Landschaft#ss#chutz-Erhaltungszone-Bebauungsgebiet-Industriegebiet-Stadtpark
 ~Naturpark|Landschaft-Erholungsgebiet-Ausflugsziel-Schutzgebiet-Wandergebiet-Stadtpark-Industriezone-Bebauungsgebiet
@@ -5141,7 +5131,7 @@
 ~Souvenirshop|Andenken-Geschenke-Erinnerungen-Kauf-Artikel-Leere-Mangel-Verzicht
 ~Kinderbereich|Spielplatz-Klein-Sicher-Farbenfroh-Spa#ss#-Erwachsene-Gefahr-Monotonie
 ~Lichtershow|Farben-Lichter-Musik-Spektakel-Glanz-Dunkelheit-Triste#ss#e-Stille
-~Schnellrestaurant|Fast Food-Schnell-Snack-Bequem-Imbi#ss#-Langsam-Gourmet-Ruhe
+~Schnellrestaurant|Fast Food-Schnell-Snack-Bequem-Imbiss-Langsam-Gourmet-Ruhe
 ~Wildwa#ss#erbahn|Rafting-Spritzwa#ss#er-Geschwindigkeit-Abenteuer-N#ae##ss#e-Trockenheit-Langsamkeit-Stillstand
 ~Eingangsbereich|Eintritt-Empfang-Ticketkontrolle-Willkommen-Orientierung-Abwesenheit-Chaos-Verwirrung
 ~Wa#ss#erpark|Rutschen-Pools-Spritzen-Schwimmen-Erfrischung-Trockenheit-K#ae#lte-Schmutz
@@ -5149,7 +5139,7 @@
 ~Vergn#ue#gungspark|Fahrgesch#ae#fte-Shows-Aktivit#ae#ten-Events-Menschenmengen-Leere-Langeweile-Triste#ss#e
 ~Abenteuerpark|Kletterwand-Seilrutsche-Hindernis-Natur-Herausforderung-Komfort-Ruhe-Bequemlichkeit
 ~Fahrgesch#ae#ft|Fahrt-Attraktion-Erlebnis-Geschwindigkeit-Technik-Stillstand-Langeweile-Bequemlichkeit
-~Souvenirs|Erinnerung#ss#t#ue#cke-Andenken-Geschenke-Merchandise-Dekoration-Verge#ss#en-Allt#ae#glichkeit-Austausch
+~Souvenirs|Erinnerung#ss#t#ue#cke-Andenken-Geschenke-Merchandise-Dekoration-Vergessen-Allt#ae#glichkeit-Austausch
 ~Familienbereich|Kinder-Aktivit#ae#ten-Erholung-Sicherheit-Spielplatz-Einsamkeit-Abgeschiedenheit-Unruhe
 ~Eintrittspreis|Ticket-Kosten-Geb#ue#hr-Zugang-Preis-Gratis-Kostenlos-Erm#ae##ss#igung
 ~Parkplan|Karte-Wegbeschreibung-Orientierung-Struktur-#UE#bersicht-Verwirrung-Chaos-Orientierungslosigkeit
@@ -5178,17 +5168,17 @@
 ~Tiefdruckgebiet|Sturm-Unwetter-Niederschlag-Zyklon-Wetterfront-Hochdruckgebiet-Klarheit-Ruhe
 ~Luftfilter|Reinigung-Luftqualit#ae#t-Filter-Schutz-Partikel-Verschmutzung-Blockade-Dichtigkeit
 ~Sauerstoffmangel|Hypoxie-Ersch#oe#pfung-Atemnot-Mangel-Gesundheitsrisiko-#UE#berflu#ss#-Normalit#ae#t-Stabilit#ae#t
-~Kiemen|Atmung-Filter-Sauerstoff-Wa#ss#er-Organ-Lunge-Luft-Mund
+~Kiemen|Atmung-Filter-Sauerstoff-Wasser-Organ-Lunge-Luft-Mund
 ~Flo#ss#en|Schwimmen-Steuern-Bewegung-Stabilit#ae#t-K#oe#rperteil-Bein-Festigkeit-Trockenkraft
 ~S#ue##ss#wa#ss#er|Fl#ue##ss#e-Seen-Teiche-niedrig-weich-Salzwa#ss#er-Ozean-Meer
-~Salzwa#ss#er|Meer-Ozean-salzig-salin-Korallen-S#ue##ss#wa#ss#er-Flu#ss#-Teich
+~Salzwa#ss#er|Meer-Ozean-salzig-salin-Korallen-S#ue##ss#wa#ss#er-Fluss-Teich
 ~Karpfen|Fisch-Teich-S#ue##ss#wa#ss#er-gro#ss#-gold-Hai-Salzwa#ss#er-Raubtier
 ~Koralle|Riff-Bunt-Unterwa#ss#er-Schutz-Lebensraum-Algen-Flach-S#ue##ss#wa#ss#er
 ~Tropenfisch|Bunt-warm-Korallen-Lebensraum-Kaltwa#ss#er-Nordsee-Eisb#ae#r
 ~Riff|Korallen-Unterwa#ss#er-Lebensraum-Struktur-Schutz-Flachland-Berg-Offenes Meer
 ~Schwimmblase|Auftrieb-Kontrolle-Druck-Gas-Balance-Festigkeit-Schwere-Trockene
 ~Laichen|Fortpflanzung-Eier-Nachwuchs-Fortpflanzen-Brutpflege-Sterilit#ae#t-Einzelst#ue#ck-Unfruchtbarkeit
-~Raubfisch|J#ae#ger-aggre#ss#iv-Beute-scharf-stark-Pflanzenfre#ss#er-friedlich-sanft
+~Raubfisch|J#ae#ger-aggre#ss#iv-Beute-scharf-stark-Pflanzenfresser-friedlich-sanft
 ~Hallenbad|Schwimmen-Becken-Wa#ss#er-Fitne#ss#-Sport-B#ue#ro-Schule-Bibliothek
 ~Stadion|Sport-Zuschauer-Spielfeld-Trib#ue#ne-Event-Schule-B#ue#ro-Hotel
 ~Wohnheim|Unterkunft-Studenten-Gemeinschaft-Zimmer-Verpflegung-B#ue#ro-Hotel-Lager
@@ -5239,7 +5229,7 @@
 ~E-Scooter|Elektroroller-Urban-Mobilit#ae#t-Umweltfreundlich-Schnell-Fahrrad-Auto-Bus
 ~Taxi|Fahrdienst-Mietwagen-Fahrer-Stadt-Kurier-Bus-Fahrrad-Stau
 ~E-Bike|Elektrorad-Akku-Motor-Pedale-Geschwindigkeit-Fahrrad-Roller-Fu#ss#weg
-~Kanu|Paddelboot-Wa#ss#er-Flu#ss#-Kajak-Natur-Schiff-Auto-Meer
+~Kanu|Paddelboot-Wa#ss#er-Fluss-Kajak-Natur-Schiff-Auto-Meer
 ~Motorschlitten|Schneemobil-Winter-Schnee-Geschwindigkeit-Outdoor-Auto-Bus-Sommer
 ~Tretboot|Wa#ss#erfahrzeug-Pedale-Freizeit-See-Boot-Segelboot-Motorboot-Schwimmen
 ~Schwebebahn|Monorail-Luftfahrt-Schiene-Transport-Pendler-Auto-Bus-Stra#ss#enbahn
@@ -5250,7 +5240,7 @@
 ~Zappeln|Unruhig sein-Bewegen-Zittern-Schwanken-Flattern-Stabilit#ae#t-Ruhen
 ~Nicken|Bewegen-Zustimmen-Wackeln-Sch#ue#tteln-K#oe#pfen-Stillstand-Stabilit#ae#t-Ruhe
 ~Rutsche|Abrutschen-Wa#ss#erspa#ss#-Neigung-Geschwindigkeit-Spa#ss#-Sicherheit-Stabilit#ae#t-Ruhe
-~E#ss#en#ss#t#ae#nde|Snacks-Getr#ae#nke-Imbi#ss#-Fastfood-Verpflegung-Gourmet-Luxus-Restaurant
+~E#ss#en#ss#t#ae#nde|Snacks-Getr#ae#nke-Imbiss-Fastfood-Verpflegung-Gourmet-Luxus-Restaurant
 ~Achterbahn-Gesichtsausdruck|Nervenkitzel-Schreien-Aufregung-#UE#berraschung-Emotionen-Gela#ss#enheit-Ruhe-Unbeteiligtheit
 ~Freizeitparkplan|Karte-Orientierung-Wege-#UE#bersicht-Informationen-Unklarheit-Verwirrung-Chaos
 ~Kinderattraktionen|Spielplatz-Miniatur-Abenteuer-Lernen-Spa#ss#-Erwachsenenbereiche-Komplexit#ae#t-Ernst
@@ -5293,8 +5283,8 @@
 ~Schulden|Verbindlichkeiten-Kredit-R#ue#ckzahlung-Verpflichtungen-Defizit-Verm#oe#gen-Gewinn-R#ue#ckstand
 ~Wirtschaft#ss#trategie|Planung-Ziele-Wachstum-Markt-Investitionen-Chaos-R#ue#ckgang-Stagnation
 ~Erfindungen|Innovation-Neuerung-Entdeckung-Technik-Fortschritt-Tradition-Stillstand-R#ue#ckschritt
-~Druckerpre#ss#e|Buchdruck-Papier-Text-Gutenberg-Verbreitung-Mundpropaganda-Handarbeit-Zeichnung
-~Buchdruck|Schrift-Pre#ss#e-Verlag-Texte-Ma#ss#enproduktion-Handschrift-Manuskript-Einzelexemplar
+~Druckerpresse|Buchdruck-Papier-Text-Gutenberg-Verbreitung-Mundpropaganda-Handarbeit-Zeichnung
+~Buchdruck|Schrift-Presse-Verlag-Texte-Ma#ss#enproduktion-Handschrift-Manuskript-Einzelexemplar
 ~Radar|Ortung-Wellen-Me#ss#ung-Erkennung-Navigation-Unsicherheit-Blindheit-Stille
 ~Zahnarztbohrer|Behandlung-Zahn-Bohrer-Ger#ae#t-Pflege-Schmerz-Abwesenheit-Vernachl#ae##ss#igung
 ~Wa#ss#erkocher|Erhitzen-Wa#ss#er-Kochvorgang-Ger#ae#t-Tee-K#ae#lte-Ungekochtes-Raumtemperatur
@@ -5366,7 +5356,7 @@
 ~Gnus|Herde-Grasfre#ss#er-Migration-Afrika-Wildnis-Ruhe-B#ae#ume-Einzelg#ae#nger
 ~Elefanten|R#ue##ss#el-Herdentier-Afrika-Asien-gro#ss#-Fliegen-Trockenheit-Z#ae#higkeit
 ~Giraffen|Hals-B#ae#ume-Afrika-Herbivoren-Hoch-Boden-K#ae#lte-Versteck
-~Leoparden|Raubtier-Flecken-B#ae#ume-Afrika-Jaguar-Pflanzenfre#ss#er-Tag-Hell
+~Leoparden|Raubtier-Flecken-B#ae#ume-Afrika-Jaguar-Pflanzenfresser-Tag-Hell
 ~L#oe#wen|Raubtier-Rudel-M#ae#hne-Afrika-stark-Beute-Scheu-K#ae#lte
 ~Zebras|Streifen-Herde-Afrika-Grasfre#ss#er-Flucht-Ruhe-Baum-Nacht
 ~Antilopen|Grasland-Schnell-Afrika-Herdentiere-Scheu-Wald-Nacht-Ruhe
@@ -5442,7 +5432,7 @@
 ~Energiesparlampe|Kompaktleuchtstofflampe-Sparlampe-Wirtschaftlichkeit-Lichtquelle-LED-Gl#ue#hbirne-W#ae#rme-Ineffizienz
 ~Helligkeitsregler|Dimmer-Steuerung-Anpa#ss#ung-Lichtintensit#ae#t-Regler-Stufen-Fixierung-Standard
 ~Lichtst#ae#rke|Intensit#ae#t-Helligkeit-Leuchtkraft-Strahlung-Beleuchtung-Dunkelheit-Schw#ae#che-Mattheit
-~Lampenfa#ss#ung|Sockel-Halterung-Adapter-Anschlu#ss#-Montierung-Abwesenheit-Nichtpa#ss#end-Locker
+~Lampenfa#ss#ung|Sockel-Halterung-Adapter-Anschlu#ss#-Montierung-Abwesenheit-Nichtpassend-Locker
 ~Scheinwerfer|Spot-Projektor-Beleuchtung-Leuchte-Strahler-Schatten-Dunkelheit-Abwesenheit
 ~Gl#ue#hlampe|Gl#ue#hfaden-Leuchte-Beleuchtung-Edison-Lampe-LED-Energiesparlampe-Fluoreszent
 ~Lichtintensit#ae#t|Leuchtkraft-Helligkeit-Strahlung-Lichtst#ae#rke-Beleuchtung-Schw#ae#che-Dunkelheit-Mattheit
@@ -5527,7 +5517,7 @@
 ~Weinprobe|Degustation-Bewertung-Geschmackstest-Verkostung-Auswahl-Zur#ue#ckweisung-Mangel-Ablehnung
 ~Weintraube|Frucht-Beere-S#ue##ss#-Saft-Traube-Gem#ue#se-Schale-Kern
 ~Traubensaft|Getr#ae#nk-Frisch-Saft-Nat#ue#rliche-Zucker-Alkohol-Kohlens#ae#ure-Teer
-~Kelter|Pre#ss#e-Saftgewinnung-Weinbereitung-Traubenpre#ss#e-Technik-Lagerung-Abf#ue#llung-Genu#ss#
+~Kelter|Presse-Saftgewinnung-Weinbereitung-Traubenpresse-Technik-Lagerung-Abf#ue#llung-Genu#ss#
 ~Vineyard|Terrain-Anbaufl#ae#che-Reben-Weingut-Landwirtschaft-Stadt-Betongarten-Fabrik
 ~Trestern|Schalen-Abf#ae#lle-Weinproduktion-Nebenprodukt-Reststoffe-Saft-Frisch-Unrein
 ~Sorte|Typ-Variet#ae#t-Qualit#ae#t-Art-Vielfalt-Einheitsgr#oe##ss#e-Monotonie-Einheitlichkeit
@@ -5564,7 +5554,7 @@
 ~Bananensplit|De#ss#ert-Eis-s#ue##ss#-Banane-Sahne-Hauptgericht-herzhaft-trocken
 ~#AE#ra|Epoche-Periode-Zeitalter-Phase-Zeitraum-Augenblick-Moment-Sofort
 ~Sekunde|Bruchteil-Interval-Einheit-Takt-Zeitspanne-Tag-Woche-Jahr
-~Moment|Augenblick-Ereignis-Sekunde-Begebenheit-Zeitraum-Ewigkeit-Verge#ss#en-Unbest#ae#ndigkeit
+~Moment|Augenblick-Ereignis-Sekunde-Begebenheit-Zeitraum-Ewigkeit-Vergessen-Unbest#ae#ndigkeit
 ~Ewigkeit|Unendlichkeit-Dauer-Endlosigkeit-Unbegrenztheit-Fortdauer-Zeitspanne-Verg#ae#nglichkeit-Kurzfristigkeit
 ~Zeitalter|#AE#ra-Epoche-Periode-#AE#on-Phase-Moment-Augenblick-Sekunde
 ~Kalender|Zeitplan-Termine-Jahres#ue#bersicht-Planung-Agenda-Spontaneit#ae#t-Unregelm#ae##ss#igkeit-Chaos
@@ -5606,13 +5596,13 @@
 ~Nachtaktivit#ae#t|T#ae#tigkeit-Nachtleben-Besch#ae#ftigung-Aktivit#ae#t-Schlaf-Ruhe-Stille-Tageslicht
 ~Nachtwanderung|Spaziergang-Dunkelheit-Erkundung-Abend-Sterne-Tageslicht-Sonne-Helligkeit
 ~Mitternachtsgebet|Andacht-Gebet-Ruhe-Nacht-Spiritualit#ae#t-Tagesbeginn-Aktivit#ae#t-Arbeit
-~Mittage#ss#en|Mahlzeit-Lunch-E#ss#en-Pause-Speise-Fr#ue#hst#ue#ck-Abende#ss#en-Snack
+~Mittagessen|Mahlzeit-Lunch-E#ss#en-Pause-Speise-Fr#ue#hst#ue#ck-Abendessen-Snack
 ~Tageszeit|Uhrzeit-Tagesablauf-Stunde-Licht-Zeitspanne-Nacht-Dunkelheit-Morgen
 ~H#oe#hepunkt|Spitzenwert-Maximum-Zenit-H#oe#he-Kulmination-Tiefpunkt-Minimum-Basis
 ~Mahlzeit|E#ss#en-Gericht-Portion-Speise-Festmahl-Snack-Getr#ae#nk-Fr#ue#hst#ue#ck
-~Lunch|Mittage#ss#en-Snack-Mahlzeit-Pause-Gericht-Fr#ue#hst#ue#ck-Abende#ss#en-E#ss#en
+~Lunch|Mittagessen-Snack-Mahlzeit-Pause-Gericht-Fr#ue#hst#ue#ck-Abendessen-E#ss#en
 ~Feierabend|Arbeitsende-Entspannung-Abend-Ruhe-Freizeit-Arbeit-Tagesbeginn-Stre#ss#
-~Nebens#ae#chlich|Sekund#ae#r-unwesentlich-randst#ae#ndig-marginal-zentral-e#ss#enziell-wichtig
+~Nebens#ae#chlich|Sekund#ae#r-unwesentlich-randst#ae#ndig-marginal-zentral-essenziell-wichtig
 ~Unbedeutsam|Erheblich-geringf#ue#gig-unwichtig-belanglos-irrelevant-bedeutend-entscheidend-wichtig
 ~Kleinigkeit|Detail-Bagatelle-Nichtigkeit-Unbedeutendheit-Trivialit#ae#t-Wichtigkeit-Kernpunkt-Hauptsache
 ~Fl#ue#chtig|Vor#ue#bergehend-tempor#ae#r-kurzzeitig-kurz-leicht-dauerhaft-best#ae#ndig-intensiv
@@ -5638,15 +5628,15 @@
 ~Fruchtgummi|Gummib#ae#rchen-Fruchtgummis-Jelly Beans-Kaubonbons-Zuckerwaren-Schokolade-Chips-N#ue##ss#e
 ~Waffeln|Butterwaffeln-Eiswaffeln-Zuckerwaffeln-Herzwaffeln-Snack-Kuchen-Torte-Pl#ae#tzchen
 ~T#oe#rtchen|Mini-Kuchen-Geb#ae#ckst#ue#ck-De#ss#ert-Cupcake-Muffin-Hauptgericht-Snack-Salz
-~Zwischenmahlzeit|Snack-Imbi#ss#-H#ae#ppchen-Appetithappen-Leckerbi#ss#en-Hauptgericht-De#ss#ert-Getr#ae#nk
-~Fastfood|Schnell-Fertig-Imbi#ss#-Burger-Pommes-Frisch-Hausgemacht-Gesund
-~Kiosk|Verkauf#ss#tand-Imbi#ss#bude-Snack-Getr#ae#nk-Mini-Laden-Restaurant-Café-Hotel
-~Café|Kaffee-Kuchen-Snacks-Treffpunkt-Gem#ue#tlichkeit-Imbi#ss#-Fastfood-Bistro
+~Zwischenmahlzeit|Snack-Imbiss-H#ae#ppchen-Appetithappen-Leckerbi#ss#en-Hauptgericht-De#ss#ert-Getr#ae#nk
+~Fastfood|Schnell-Fertig-Imbiss-Burger-Pommes-Frisch-Hausgemacht-Gesund
+~Kiosk|Verkauf#ss#tand-Imbissbude-Snack-Getr#ae#nk-Mini-Laden-Restaurant-Café-Hotel
+~Café|Kaffee-Kuchen-Snacks-Treffpunkt-Gem#ue#tlichkeit-Imbiss-Fastfood-Bistro
 ~H#ae#ppchen|Kleinigkeit-Snack-Appetizer-Fingerfood-Portion-Hauptgericht-Men#ue#-Mahlzeit
-~Wrap|Tortilla-F#ue#llung-Snack-Rolle-Imbi#ss#-Salat-Beilage-Suppe
-~Taco|Mexikanisch-F#ue#llung-Tortilla-Snack-Imbi#ss#-Pizza-Hauptgericht-De#ss#ert
-~Nachos|Chips-K#ae#se-Beilage-Snack-Imbi#ss#-Hauptgericht-Pizza-Suppe
-~Muffin|Geb#ae#ck-S#ue##ss#-Snack-Imbi#ss#-De#ss#ert-Kuchen-Beilage-Hauptgericht
+~Wrap|Tortilla-F#ue#llung-Snack-Rolle-Imbiss-Salat-Beilage-Suppe
+~Taco|Mexikanisch-F#ue#llung-Tortilla-Snack-Imbiss-Pizza-Hauptgericht-De#ss#ert
+~Nachos|Chips-K#ae#se-Beilage-Snack-Imbiss-Hauptgericht-Pizza-Suppe
+~Muffin|Geb#ae#ck-S#ue##ss#-Snack-Imbiss-De#ss#ert-Kuchen-Beilage-Hauptgericht
 ~Globus|Weltkugel-Erde-Modell-Karte-Planeten-Flachkarte-Papier-Mangel
 ~Hemisph#ae#re|Erdh#ae#lfte-Nordhalbkugel-S#ue#dhalbkugel-Bereich-Region-Ganzes-Zentrum-Linie
 ~Breitengrad|Latitude-#AE#quator-Linie-Me#ss#ung-Koordinate-L#ae#nge-Meridian-Punkt
