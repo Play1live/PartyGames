@@ -97,7 +97,7 @@ public class Tabu : MonoBehaviour
         string gametitle = message.Split('|')[0];
         string cmd = message.Split('|')[1];
         string data = message.Split('|')[2];
-        if (!gametitle.Equals(this.GetType().Name) && !gameObject.Equals("ALLE"))
+        if (!gametitle.Equals(this.GetType().Name) && !gametitle.Equals("ALLE"))
             Utils.Log(LogType.Warning, "Befehl kann in dieser Klasse nicht ausgeführt werden: " + message);
 
         switch (cmd)
@@ -106,7 +106,7 @@ public class Tabu : MonoBehaviour
             case "Pong": break;
             case "SetGameInfo": GameObject.Find("Moderator/GameTypeAndPack").GetComponent<TMP_Text>().text = data; break;
             case "SpielVerlassen": lockcmds = true; SceneManager.LoadScene("Lobby"); break;
-            case "ClientSetModerator": Config.spieler.isModerator = true; if (Config.spieler.isModerator) moderator_menue.SetActive(true); break;
+            case "ClientSetModerator": Config.spieler.isModerator = true; if (Config.spieler.isModerator) moderator_menue.SetActive(true); ClientUtils.SendMessage("Tabu", "GetGameInfo", ""); break;
             case "UnknownPlayerSetData": UnknownPlayerSet(data);  break;
             case "SpielerUpdate": UpdateSpieler(data); break;
             case "PlayConnectSound": ConnectSound.Play(); break;

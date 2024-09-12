@@ -100,21 +100,14 @@ namespace ServerConsole
                 }
             }
 
-            if (Config.game_title.Equals("Lobby"))
+            switch (Config.game_title)
             {
-                Lobby.BroadcastSpielerUpdate();
-                ServerUtils.BroadcastMessage("Lobby", "PlayDisconnectSound", "");
+                default: break;
+                case "Lobby": Lobby.BroadcastSpielerUpdate(); break;
+                case "Tabu": TabuHandler.BroadcastSpielerUpdate(); break; 
+                case "Quiz": QuizHandler.BroadcastSpielerUpdate(); break;
             }
-            else if (Config.game_title.Equals("Tabu"))
-            {
-                TabuHandler.BroadcastSpielerUpdate();
-                ServerUtils.BroadcastMessage("Tabu", "PlayDisconnectSound", "");
-            }
-            else if (Config.game_title.Equals("Quiz"))
-            {
-                QuizHandler.BroadcastSpielerUpdate();
-                ServerUtils.BroadcastMessage("Quiz", "PlayDisconnectSound", "");
-            }
+            ServerUtils.BroadcastMessage(Config.game_title, "PlayDisconnectSound", "");
 
             if (Config.players.Count == 0)
                 Config.game_title = "Lobby";

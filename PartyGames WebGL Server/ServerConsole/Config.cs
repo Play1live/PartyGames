@@ -6,7 +6,7 @@ namespace ServerConsole
     internal class Config
     {
         public static LogType logtype = LogType.Trace;
-        public static bool hide_communication = true;
+        public static bool hide_communication = false;
 
         public static WebSocketServer server;
         public static List<Player> players;

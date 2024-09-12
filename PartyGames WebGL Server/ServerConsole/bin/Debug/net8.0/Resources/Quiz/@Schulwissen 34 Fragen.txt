@@ -1,0 +1,102 @@
+Frage: Welche Farbe hat die Haut eines Eisbären?
+Antwort: Schwarz
+Info: Plan: Bio, Deutsch, Erdkunde, Geschichte, Musik, Physik
+Frage: Das teuerste Gewürz der Welt ist Safran. Aus der Blüte welcher Pflanze wird Safran gewonnen?
+Antwort: Griffel der Krokusblüte
+Info: 
+Frage: Was produziert eine Pflanze, wenn sie Photosynthese betreibt?
+Antwort: Glucose & Sauerstoff
+Info: 
+Frage: Wie heißt das Sinnesorgan, das einem Fisch ermöglicht, in völliger Dunkelheit in einem ihm fremden Aquarium nirgends anzustoßen? 
+Antwort: Seitenlinienorgan
+Info: 
+Frage: Welcher Teil des Darms ist der Längste?
+Antwort: Dünndarm
+Info: etwa 5 Meter lang
+Frage: Was legt das 23. Chromosomenpaar fest?
+Antwort: Geschlecht
+Info: 
+Frage: Den Vererbungsvorgang beschreiben die ___ Regeln?
+Antwort: Mendelnsche Regeln
+Info: 
+Frage: Wie viele Wirbel besitzt ein Mensch in der Regel?\nA) 13 B) 23 C) 33 D) 43
+Antwort: C) 33
+Info: 7 Halswirbel. \n12 Brustwirbel. \n5 Lendenwirbel.
+Frage: Wem begegnet Robinson Crusoe auf der einsamen Insel?
+Antwort: Freitag
+Info: Ab jz Deutsch fragen
+Frage: Was ist der 3. Kasus und wie fragt man nach diesem?
+Antwort: Dativ Wem?
+Info: 1.Nominativ: Wer oder Was?\n2. Genitiv: Wessen\n3. Dativ Wem?\n4. Akkusativ Wen oder was
+Frage: Wie lautet der Plural von "Stachel"?
+Antwort: die Stacheln
+Info: 
+Frage: Um welche Zeitform handelt es sich bei dem Satz: "Ich hatte Tennis gespielt."?
+Antwort: Plusquamperfekt
+Info: 
+Frage: Wie viele Wörter (Grundformen) stehen im Deutschen Duden?\nA) 98.000 B) 115.000 C) 132.000 D) 148.000
+Antwort: D) 148.000
+Info: Die vorliegende, aktuelle 28. Auflage des  Rechtschreibdudens enthält rund 148 000 Stichwörter (Grundformen). https://www.duden.de/sprachwissen/sprachratgeber/Zum-Umfang-des-deutschen-Wortschatzes
+Frage: Nenne 3 Rhetorische Stilmittel.
+Antwort: https://de.wikipedia.org/wiki/Liste_rhetorischer_Stilmittel
+Info: Das wars mit Deutsch
+Frage: Wie heißt die Hauptstadt von Kenia?
+Antwort: Nairobi
+Info: Jz Erdkunde
+Frage: Aus welchem Material besteht Bernstein?
+Antwort: Baumharz
+Info: das vor Jahrmillionen aus den Wunden von Kiefern und anderen Nadelhölzern ausgetreten und an der Luft sehr schnell ausgehärtet ist.
+Frage: Welcher Ozean ist der größte und tiefste?
+Antwort: Der Pazifische Ozean
+Info: 
+Frage: Was bedeutet "Arides Klima"?
+Antwort: trockenes Klima
+Info: Weniger Niederschlag fällt, als verdunstet
+Frage: Auf welcher Skala werden Erdbeben eingestuft?
+Antwort: Richterskala
+Info: Das wars mit Deutsch
+Frage: Welche Zeichen schrieben die alten Ägypter?
+Antwort: Hieroglyphen
+Info: Ab jz Geschichte
+Frage: Was erfand Johannes Gutenberg?
+Antwort: moderne Buchdruck
+Info: 
+Frage: Welche Französische Stadt ist zum Synonym für verlustreiche Schlachten im ersten Weltkrieg geworden?
+Antwort: Schlacht um Verdun
+Info: 
+Frage: Wie viele Thesen hängte Martin Luther an die Türen der Schlosskirche in Wittenberg?
+Antwort: 95 Thesen
+Info: 
+Frage: Wer wurde 1871 erster deutscher Reichskanzler?
+Antwort: Otto von Bismarck
+Info: 
+Frage: Welcher deutsche Bundeskanzler erhielt den Friedensnobelpreis?
+Antwort: Willy Brandt
+Info: 
+Frage: Wie lautet Caesars vollständiger Name?
+Antwort: Gaius Iulius Caesar
+Info: Das wars mit Geschichte
+Frage: Welches Instrument hat Saiten, Tasten und Pedale?
+Antwort: Flügel (Klavier)
+Info: Jz Musik
+Frage: Von welchem Komponisten stammen "Die vier Jahreszeiten"?
+Antwort: Antonio Vivaldi
+Info: 
+Frage: Wie heißt die hohe männliche Stimmlage?
+Antwort: Tenor
+Info: Countertenor, Tenor, Bariton und Bass.
+Frage: Nenne ein Zupfinstrument (Außer Gitarre).
+Antwort: Banjo, Bass, Laute, Harfe, Mandoline, Ukulele
+Info: Das wars mit Musik
+Frage: Du ziehst einen Luftballon über den Hals einer Glasflasche und stellst das Konstrukt eine Stunde in den Kühlschrank. Was passiert? \nA) Nichts \nB) Der Luftballon bläht sich auf, bis er von der Flasche fliegt \nC) Der Luftballon zieht sich in die Flasche \D) Der Ballon wechselt die Farbe
+Antwort: C) Der Ballon zieht sich in die Flasche
+Info: Jz Physik
+Frage: Was wird mit der Einheit Ampere angegeben?
+Antwort: Die Einheit für Stromstärke
+Info: Spannung: Volt, Ohm: Widerstand
+Frage: Wie heißt der Prozess vom Gasförmigen zum Flüssigen Aggregatzustand?
+Antwort: Kondensieren
+Info: 
+Frage: Wofür steht die Abkürzung "AC"?
+Antwort: Wechselstrom
+Info: 

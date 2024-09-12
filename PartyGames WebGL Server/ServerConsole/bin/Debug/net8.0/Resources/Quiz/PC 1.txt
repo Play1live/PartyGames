@@ -1,0 +1,57 @@
+Frage: Welche Farbe hat der berühmte Windows-Fehlerbildschirm, der häufig bei Abstürzen von Windows auftritt?
+Antwort: Blau
+Info: 
+Frage: Was passiert, wenn man aus einem PC die BIOS-Batterie entfernt?
+Antwort: Die Einstellungen werden zurückgesetzt
+Info: 
+Frage: Was passiert, wenn man auf der Tastatur die "Windows-Taste" und "L" drückt?
+Antwort: Der Bildschirm wird gesperrt.
+Info: 
+Frage: Was bedeutet "CC" in einer Email?
+Antwort: Carbon Copy
+Info: 
+Frage: Der berühmte "Affengriff" besteht aus den Tasten STRG + ALT + ___?
+Antwort: STRG + ALT + ENTF
+Info: beendet nicht mehr reagierende Programme oder startet abgestürzte Computer neu
+Frage: Welche Monitorauflösung (in Pixelbreite x Pixelhöhe) wird als "FullHD" bezeichnet?
+Antwort: 1920x1080
+Info: 
+Frage: Was schützt vor unerwünschten Netzwerkzugriffen (außer stecker ziehen)?
+Antwort: Firewall
+Info: 
+Frage: Wie bezeichnet man das deutsche Keyboard-Layout?
+Antwort: QWERTZ
+Info: 
+Frage: Welche beiden Ziffern stellen die grundlegende Basis für jede Operation eines Computers dar?
+Antwort: 0, 1
+Info: 
+Frage: Ergänze folgenden IT-Leitstatz: "Bei Computerfehlern sitzt das Problem zu 95% ...?
+Antwort: vor dem Bildschirm
+Info: 
+Frage: Was soll der Konsolenbefehl "Format C:" erreichen?
+Antwort: Die Festplatte C zu formatieren
+Info: 
+Frage: TUX ist das offizielle Maskottchen des freien, alternativen Betriebssystems Linux. Welches Tier stellt es dar?
+Antwort: Pinguin
+Info: 
+Frage: Schätzfrage: Wann wurde der erste moderne PC, der APPLE I, veröffentlicht?
+Antwort: 1976
+Info: 
+Frage: Wie nennt man die Betrugsmasche, bei der man gefälschte Internetseiten oder E-Mails verwendet, um Internetnutzer persönliche Daten zu entlocken?
+Antwort: Phishing
+Info: 
+Frage: Wie bezeichnet man Software, die ohne zu bezahlen genutzt und weitergegeben werden kann?
+Antwort: Freeware
+Info: 
+Frage: Welche Peripheriegeräte müssen mindestens an einen PC angeschlossen sein, damit er erfolgreich startet?
+Antwort: keine :)
+Info: 
+Frage: Was ist der grundlegende unterschied zwischen einer HDD und einer SSD?
+Antwort: SSD: digitale Speicherung, HDD: physische Speicherung
+Info: 
+Frage: Wie heißt die PC-Firmware, die das BIOS im PC ca. 2010 effektiv ablöste?
+Antwort: UEFI
+Info: 
+Frage: Frage 29.
+Antwort: 
+Info: 

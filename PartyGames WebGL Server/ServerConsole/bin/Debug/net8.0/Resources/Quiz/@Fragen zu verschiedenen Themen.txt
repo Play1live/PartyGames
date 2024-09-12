@@ -1,0 +1,81 @@
+Frage: Botanik: Aus welcher Pflanze werden Hagebutten gewonnen?
+Antwort: Rosen
+Info: 
+Frage: Marken: "Quadratisch. Praktisch. Gut" - Ritter Sport trug früher den Namen "Sport-Schokolade". Doch warum ist der Begriff "Sport" Teil des Markennamens?
+Antwort: Weil die Schokolade durch die Form in jede Sport Tasche passen
+Info: 
+Frage: Disney: Wie lautet Aladdins letzter Wunsch im Gleichnamigen Disney Klassiker aus dem Jahr 1992?
+Antwort: Er wünscht den Gini frei
+Info: 
+Frage: Chemie: Welche Eigenschaft haben Substanzen, die als Lipophil bezeichnet werden?
+Antwort: Fettlöslich
+Info: 
+Frage: Informatik: Kernanzahl und Takt sind wohl die zwei bekanntesten CPU Spezifikationen. Doch wofür benötigt ein Prozessor einen sogenannten "Cache"?
+Antwort: Zwischenspeicher für schnellere Zugriffe 
+Info: 
+Frage: Europa: Wie viele Sterne sind auf der Europaflagge?
+Antwort: 12
+Info: Pro Gründungsland ein Stern
+Frage: Physik: Welches Metall ist der beste Elektrische Leiter?
+Antwort: Silber
+Info: 
+Frage: Religion: Welche 3 Städte sind für Muslime besonders wichtig bzw. Heilig?
+Antwort: Mekka, Jerusalem, Medina
+Info: 
+Frage: Politik: Wer war während der jahrtausendwende von 1999 bis 2004 Deutscher Bundespräsident?
+Antwort: Johannes Rau
+Info: 
+Frage: Wirtschaft: Die USA und China sind die mit abstand größten Volkswirtschaften der Welt. Welches Land reiht sich auf Platz 3 sein? (Stand 2022)
+Antwort: Japan
+Info: (1) USA, (2) China, (3) Japan (4) Deutschland, (5) Indien, (6) Großbritannien, (7) Frankreich, (8) Russland
+Frage: Herr der Ringe; Wer war laut Tolkien der wohl größte Drache, der jemals im Herr der Ringe-Universum existierte?
+Antwort: Ancalagon der Schwarze
+Info: 
+Frage: Prominente: Der Titel "King of Pop" wird gerne mit Michael Jackson in Verbindung gebracht. Doch wer gilt als "Queen of Pop"?
+Antwort: Madonna
+Info: 
+Frage: Essen: Unter welchem alternativen Namen ist die Blaubeere auch noch bekannt?
+Antwort: Heidelbeere
+Info: 
+Frage: Englisch: Was bei uns "Zwei fliegen mit einer Klappe schlagen" heißt, heißt im Englischen wie?
+Antwort: Two birds with one stone
+Info: 
+Frage: Ereignisse: Als die Titanic am 15. April 1912 Sank, starben wohl über 1500 Menschen. in wie vielen Metern Tiefe befindet sich das Wrack?
+Antwort: 3.800 Metern
+Info: 
+Frage: Multiplayer-Spiele: Nenne alle Granaten aus CS2, die man in einem Matschmaking werfen kann?
+Antwort: HE Grenade, Flashbang, Smoke, Decoy, Molotov, Incendiary 
+Info: 
+Frage: Waffen: Das Russische Ak-47 gehört wohl zu den bekanntesten Waffen weltweit. Doch wofür steht das "K" im Kürzel "AK"?
+Antwort: Kalaschnikow
+Info: 
+Frage: Dinisaurier: In welchem heutigen Land befindet sich der Krater des Asteroideneinschlags, der mit dem Aussterben der Dinosaurier in Verbindung gebracht wird?
+Antwort: Mexiko
+Info: 
+Frage: Internet: In welchem Jahr hat Youtube ihre Sternebewertung bei Videos durch Likes und Dislikes ersetzt?
+Antwort: 2010
+Info: Gegründet 2005
+Frage: Konsolen: Welches Unternehmen hat die Grafikeinheit und den Prozessor der Playstation 5 sowie xBox Series X entwickelt?
+Antwort: AMD
+Info: 
+Frage: Europa: In welchem Land wurde vor der Einführung des Euros mit Drachmen bezahlt?
+Antwort: Griechenland
+Info: 
+Frage: Autos: Porsche ist einer der bekanntesten Sportwagenhersteller weltweit. In welchem Jahr erschien der allererste Porsche 911?
+Antwort: 1964 
+Info: 
+Frage: Anatomie: Welches menschliche Organ hat die Form eines Schmetterlings?
+Antwort: Schilddrüse
+Info: 
+Frage: Tourismus: Die Felsenstadt Petra gehört zu den neuen 7 Weltwundern. In welches Land muss man reisen, um sie bestaunen zu können?
+Antwort: Jordanien
+Info: 
+Frage: Bauwerk: der Eurotunnel verbindet Frankreich mit dem Vereinigten Königreich. Doch wie lang ist er?
+Antwort: 50,45 km
+Info: 
+Frage: Astronomie: Welches ist der hellste Stern am Nachthimmel?
+Antwort: Sirius
+Info: 
+Frage: Mythologie: Mars ist in der Römischen Mythologie der Gott des Krieges. Wer ist sein Gegenstück in der Griechischen Mythologie?
+Antwort: Ares
+Info: 

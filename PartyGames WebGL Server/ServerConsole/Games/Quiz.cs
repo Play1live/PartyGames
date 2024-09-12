@@ -14,6 +14,13 @@ namespace ServerConsole.Games
     internal class QuizHandler
     {
         private static List<QuizPlayer> qplist;
+        private static int pointsprorichtig;
+        private static int pointsprofalsch;
+        private static bool buzzerisactive;
+        private static bool buzzerisfreigegeben;
+        private static bool showtabbedout;
+        private static int fragenindex;
+        private static int wronganswers;
 
         public static void StartGame()
         {
@@ -22,6 +29,13 @@ namespace ServerConsole.Games
             qplist = new List<QuizPlayer>();
             foreach (Player p in Config.players)
                 qplist.Add(new QuizPlayer(p));
+            pointsprofalsch = 1;
+            pointsprorichtig = Math.Max(2, qplist.Count);
+            buzzerisactive = false;
+            buzzerisfreigegeben = true;
+            showtabbedout = false;
+            fragenindex = 0;
+            wronganswers = 0;
         }
 
         public static void OnCommand(IWebSocketConnection socket, string cmd, string data)
@@ -34,7 +48,21 @@ namespace ServerConsole.Games
                     Utils.Log(LogType.Warning, "Unbekannter Befehl: " + cmd + " " + data);
                     return;
                 case "GetSpielerUpdate": BroadcastSpielerUpdate(); break;
-                case "GetUpdate": ServerUtils.SendMessage(player, "Tabu", "SpielerUpdate", SpielerUpdate()); break;
+                case "GetGameInfo": SendModeratorInit(player); break;
+                case "GetUpdate": ServerUtils.SendMessage(player, "Quiz", "SpielerUpdate", SpielerUpdate()); break;
+                case "GetFragePreview": GetFragePreview(player, data); break;
+                case "GetAntwortPreview": SendAntwortPreview(player); break;
+                case "ChangePunkteprorichtig": ChangePunkteprorichtig(data); break;
+                case "ChangePunkteprofalsche": ChangePunkteprofalsche(data); break;
+                case "SetBuzzer": buzzerisactive = bool.Parse(data); if (buzzerisactive) buzzerisfreigegeben = true; ServerUtils.BroadcastMessage("Quiz", "BuzzerIsActive", buzzerisactive.ToString()); break;
+                case "SetTabbedout": showtabbedout = bool.Parse(data); break;
+                case "PlayerInputAntwort": PlayerInputAntwort(player, data);  break;
+                case "PlayerRichtig": PlayerRichtig(data); break;
+                case "PlayerFalsch": PlayerFalsch(data); break;
+                case "PlayerIstDran": PlayerIstDran(data); break;
+                case "PlayerBuzzerFreigeben": PlayerBuzzerFreigeben(); break;
+                case "PressBuzzer": PressBuzzer(player); break;
+                case "PlayerPointsAdd": PlayerPointsAdd(data); break;
             }
         }
 
@@ -45,8 +73,11 @@ namespace ServerConsole.Games
         private static string SpielerUpdate()
         {
             string msg = "";
+            qplist.RemoveAll(p => p.p == null);
             foreach (QuizPlayer p in qplist)
             {
+                if (p.p == null)
+                    continue;
                 if (!Config.moderator.id.Equals(p.p.id))
                     msg += "[TRENNER][ID]" + p.p.id + "[ID][PUNKTE]" + p.points + "[PUNKTE]";
             }
@@ -54,7 +85,112 @@ namespace ServerConsole.Games
                 msg = msg.Substring("[TRENNER]".Length);
             return msg;
         }
+        private static void PressBuzzer(Player p)
+        {
+            if (!buzzerisactive)
+                return;
+            if (!buzzerisfreigegeben)
+                return;
+            buzzerisfreigegeben = false;
+            QuizPlayer.GetByID(p.id.ToString(), qplist).istdran = true;
+            ServerUtils.BroadcastMessage("Quiz", "PlayerPressedBuzzer", p.id.ToString());
+        }
         #region Moderator
+        // TODO: wenn moderator quittet das dann ein spieler joint und aus der liste unten verschwindet
+        private static void SendModeratorInit(Player p)
+        {
+            string msg = pointsprorichtig + "*" + pointsprofalsch + "*" +
+                (fragenindex + 1) + "/" + Config.quiz.GetSelected().getFragenCount() + "*" + wronganswers;
+            ServerUtils.SendMessage(p, "Quiz", "SetGameInfo", msg);
+            SendFragenPreview(p, fragenindex);
+        }
+        private static void SendFragenPreview(Player p, int index)
+        {
+            ServerUtils.SendMessage(p, "Quiz", "FragenPreview",
+                "Frage:\\n" + Config.quiz.GetSelected().getFrage(index).getFrage() +
+                "\\n\\nInfo:\\n" + Config.quiz.GetSelected().getFrage(index).getInfo());
+        }
+        private static void SendAntwortPreview(Player p)
+        {
+            ServerUtils.SendMessage(p, "Quiz", "AntwortPreview",
+                "Antwort:\n" + Config.quiz.GetSelected().getFrage(fragenindex).getAntwort());
+        }
+        private static void GetFragePreview(Player p, string data)
+        {
+            sbyte type = sbyte.Parse(data);
+            if ((fragenindex + type) >= 0 && (fragenindex + type) < Config.quiz.GetSelected().getFragenCount())
+            {
+                fragenindex += type;
+            }
+            ServerUtils.SendMessage(p, "Quiz", "FragenIndex", (fragenindex + 1) + "/" + Config.quiz.GetSelected().getFragenCount());
+            SendFragenPreview(p, fragenindex);
+        }
+        private static void ChangePunkteprorichtig(string data)
+        {
+            pointsprorichtig = int.Parse(data);
+        }
+        private static void ChangePunkteprofalsche(string data)
+        {
+            pointsprofalsch = int.Parse(data);
+        }
+
+        private static void PlayerPointsAdd(string data_s)
+        {
+            string uuid = data_s.Split('~')[0];
+            int type = int.Parse(data_s.Split("~")[1]);
+            QuizPlayer.GetByID(uuid, qplist).points += type;
+            BroadcastSpielerUpdate();
+        }
+        private static void PlayerRichtig(string data_s)
+        {
+            string uuid = data_s;
+            QuizPlayer.GetByID(uuid, qplist).points += pointsprorichtig;
+            ServerUtils.BroadcastMessage("Quiz", "PlayRichtig", "");
+            BroadcastSpielerUpdate();
+        }
+        private static void PlayerFalsch(string data_s)
+        {
+            string uuid = data_s;
+            foreach (var item in qplist)
+                if (!item.p.id.ToString().Equals(uuid))
+                    item.points += pointsprofalsch;
+            ServerUtils.BroadcastMessage("Quiz", "PlayFalsch", "");
+            BroadcastSpielerUpdate();
+        }
+        private static void PlayerIstDran(string data_s)
+        {
+            string uuid = data_s.Split('~')[0];
+            bool type = bool.Parse(data_s.Split('~')[1]);
+            QuizPlayer.GetByID(uuid, qplist).istdran = type;
+            if (type)
+                buzzerisfreigegeben = false;
+            else
+            {
+                bool allenichtdran = true;
+                foreach (var item in qplist)
+                {
+                    if (item.istdran)
+                        allenichtdran = false;
+                }
+                if (allenichtdran)
+                    buzzerisfreigegeben = true;
+            }
+            ServerUtils.BroadcastMessage("Quiz", "PlayerIstDran", data_s);
+        }
+        private static void PlayerBuzzerFreigeben()
+        {
+            buzzerisfreigegeben = true;
+            foreach (var item in qplist)
+            {
+                item.istdran = false;
+            }
+            ServerUtils.BroadcastMessage("Quiz", "PlayerBuzzerFreigeben", "");
+        }
+        private static void PlayerInputAntwort(Player p, string data)
+        {
+            QuizPlayer.GetByID(p.id.ToString(), qplist).antwort = data;
+            ServerUtils.SendMessage(Config.moderator, "Quiz", "ModShowPlayerInputAntwort", p.id + "~" + data);
+        }
         #endregion
     }
 
@@ -62,11 +198,25 @@ namespace ServerConsole.Games
     {
         public Player p;
         public int points;
+        public bool istdran;
+        public string antwort;
 
         public QuizPlayer(Player p)
         {
             this.p = p;
             this.points = 0;
+            istdran = false;
+            antwort = "";
+        }
+
+        public static QuizPlayer GetByID(string uuid, List<QuizPlayer> list)
+        {
+            foreach (var item in list)
+            {
+                if (item.p.id.ToString().Equals(uuid))
+                    return item;
+            }
+            return null;
         }
     }
 
@@ -83,7 +233,7 @@ namespace ServerConsole.Games
             this.sets = new List<QuizSet>();
             this.sets.Add(new QuizSet());
             foreach (var item in Directory.EnumerateFiles("Resources/Quiz/"))
-                this.sets.Add(new QuizSet(Path.GetFileName(item), File.ReadAllText(item)));
+                this.sets.Add(new QuizSet(Path.GetFileName(item), File.ReadAllLines(item)));
 
             if (sets.Count > 0)
                 selected = sets[0];
@@ -99,7 +249,7 @@ namespace ServerConsole.Games
         public QuizSet GetSelected() { return this.selected; }
         public void SetSelected(QuizSet set) { this.selected = set; }
         public void SetSelected(int set) { SetSelected(GetSets()[set]); }
-        public string GetAvailableSets() { return this.available_sets.ToString("N", new CultureInfo("de-DE")); }
+        public string GetAvailableSets() { return this.available_sets.ToString("N0", new CultureInfo("de-DE")); }
         public void AddAvailableSets(int counter) { this.available_sets += counter; }
     }
 
@@ -115,11 +265,13 @@ namespace ServerConsole.Games
             fragen.Add(new QuizItem("Freestyle", "Freestyle", "Freestyle"));
         }
 
-        public QuizSet(string name, string inhalt)
+        public QuizSet(string name, string[] inhalt)
         {
             this.name = name;
+            Utils.Log(LogType.Debug, name);
             fragen = new List<QuizItem>();
-            string[] temp = inhalt.Split('~');
+            //string[] temp = inhalt.Split('~');
+            string[] temp = inhalt;
             for (int i = 0; i < temp.Length;)
             {
                 string frage = temp[i];
@@ -169,9 +321,9 @@ namespace ServerConsole.Games
 
         public QuizItem(string frage, string antwort, string info)
         {
-            this.frage = frage;
-            this.antwort = antwort;
-            this.info = info;
+            this.frage = frage.Replace("\n", "\\n");
+            this.antwort = antwort.Replace("\n", "\\n");
+            this.info = info.Replace("\n", "\\n");
         }
 
         public string getFrage() { return this.frage; }

@@ -9,6 +9,10 @@ using UnityEngine.UI;
 using Toggle = UnityEngine.UI.Toggle;
 using Button = UnityEngine.UI.Button;
 using Image = UnityEngine.UI.Image;
+using UnityEngine.Windows;
+using UnityEditor;
+using UnityEngine.UIElements;
+using Newtonsoft.Json.Bson;
 
 public class Quiz : MonoBehaviour
 {
@@ -20,10 +24,14 @@ public class Quiz : MonoBehaviour
 
 
     public GameObject moderator_menue;
+    public TMP_Text fragenindex;
+    public TMP_Text falscheantworten;
+    public TMP_InputField FragenVorschau;
 
     [SerializeField] AudioSource ConnectSound;
     [SerializeField] AudioSource DisconnectSound;
     [SerializeField] AudioSource GameStartSound;
+    [SerializeField] AudioSource BuzzerSound;
     [SerializeField] AudioSource ErratenSound;
     [SerializeField] AudioSource FalschSound;
     [SerializeField] AudioSource SpielerIstDran;
@@ -40,6 +48,8 @@ public class Quiz : MonoBehaviour
             moderator_menue.SetActive(true);
         StartCoroutine(SendPingUpdate());
         GameStartSound.Play();
+        if (Config.spieler.isModerator)
+            ClientUtils.SendMessage("Quiz", "GetGameInfo", "");
         ClientUtils.SendMessage("Quiz", "GetUpdate", "");
 
         InitScene();
@@ -74,7 +84,7 @@ public class Quiz : MonoBehaviour
         string gametitle = message.Split('|')[0];
         string cmd = message.Split('|')[1];
         string data = message.Split('|')[2];
-        if (!gametitle.Equals(this.GetType().Name) && !gameObject.Equals("ALLE"))
+        if (!gametitle.Equals(this.GetType().Name) && !gametitle.Equals("ALLE"))
             Utils.Log(LogType.Warning, "Befehl kann in dieser Klasse nicht ausgeführt werden: " + message);
 
         switch (cmd)
@@ -82,9 +92,25 @@ public class Quiz : MonoBehaviour
             default: Utils.Log(LogType.Warning, "Unbekannter Befehl: " + cmd + " " + data); return;
             case "Pong": break;
             case "SpielVerlassen": lockcmds = true; SceneManager.LoadScene("Lobby"); break;
-            case "ClientSetModerator": Config.spieler.isModerator = true; if (Config.spieler.isModerator) moderator_menue.SetActive(true); break;
+            case "SetGameInfo": SetGameInfo(data); break;
+            case "ClientSetModerator": Config.spieler.isModerator = true; if (Config.spieler.isModerator) moderator_menue.SetActive(true); ClientUtils.SendMessage("Quiz", "GetGameInfo", ""); break;
             case "UnknownPlayerSetData": UnknownPlayerSet(data); break;
             case "SpielerUpdate": UpdateSpieler(data); break;
+            case "FragenPreview": FragenPreview(data); break;
+            case "FragenIndex": fragenindex.text = data; break;
+            case "AntwortPreview": AntwortPreview(data); break;
+            case "PlayerPressedBuzzer": PlayerPressedBuzzer(data); break;
+            case "PlayRichtig": ErratenSound.Play(); break;
+            case "PlayFalsch": FalschSound.Play(); break;
+            case "PlayerIstDran": PlayerIstDran(data); break;
+            case "BuzzerIsActive": 
+                ToggleBuzzer(bool.Parse(data));
+                if (bool.Parse(data))
+                    foreach (var item in quizplayer)
+                        item.ToggleBuzzered(false);
+                break;
+            case "PlayerBuzzerFreigeben": PlayerBuzzerFreigeben(); break;
+            case "ModShowPlayerInputAntwort": ModShowPlayerInputAntwort(data); break;
         }
     }
     private IEnumerator SendPingUpdate()
@@ -96,7 +122,7 @@ public class Quiz : MonoBehaviour
         }
     }
     private void UnknownPlayerSet(string data_s)
-    { // listpos, uuid, name, iconid
+    {   // listpos, uuid, name, iconid
         string[] data = data_s.Split('*');
         Config.players.Insert(int.Parse(data[0]),
             new Player(Guid.Parse(data[1]), data[2], int.Parse(data[3])));
@@ -107,12 +133,6 @@ public class Quiz : MonoBehaviour
         UpdateModeratorView();
         ToggleBuzzer(false);
         ToggleSpielerantwortEingabe(false);
-        if (Config.spieler.isModerator)
-        {
-            // TODO iwi mit bools lösen
-            GameObject.Find("Moderator/BuzzerAktivierenToggle").GetComponent<Toggle>().isOn = false;
-            GameObject.Find("Moderator/AusgetabbtAnzeigen").GetComponent<Toggle>().isOn = false;
-        }
         for (int i = 0; i < SpieleranzeigeListe.transform.childCount; i++)
         {
             SpieleranzeigeListe.transform.GetChild(i).gameObject.SetActive(false);
@@ -123,9 +143,9 @@ public class Quiz : MonoBehaviour
         string[] data = data_s.Split("[TRENNER]");
         if (quizplayer == null)
         {
+            quizplayer = new List<QuizPlayer>();
             for (int i = 0; i < data.Length; i++)
             {
-                quizplayer = new List<QuizPlayer>();
                 Player p = Player.getPlayerById(Guid.Parse(data[i].Split("[ID]")[1]));
                 QuizPlayer qp_ = new QuizPlayer(SpieleranzeigeListe.transform.GetChild(i).gameObject, p);
                 quizplayer.Add(qp_);
@@ -150,28 +170,67 @@ public class Quiz : MonoBehaviour
                 }
             }
             else 
-                qp.SetPoints(int.Parse(data[i].Split("[POINTS]")[1]));
+                qp.SetPoints(int.Parse(data[i].Split("[PUNKTE]")[1]));
         }
     }
     private void ToggleSpielerantwortEingabe(bool toggle)
     {
         SpielerantwortEingabe.transform.parent.gameObject.SetActive(toggle);
-        SpielerantwortEingabe.text = "";
+        if (toggle)
+            SpielerantwortEingabe.text = "";
     }
     private void ToggleBuzzer(bool toggle)
     {
         Buzzer.interactable = toggle;
     }
+    public void PressBuzzer()
+    {
+        ClientUtils.SendMessage("Quiz", "PressBuzzer", "");
+    }
+    public void PlayerInputAntwort(TMP_InputField input)
+    {
+        ClientUtils.SendMessage("Quiz", "PlayerInputAntwort", input.text);
+    }
+    private void PlayerPressedBuzzer(string data)
+    {
+        BuzzerSound.Play();
+        QuizPlayer.GetPlayer(data, quizplayer)?.ToggleBuzzered(true);
+    }
+    private void PlayerIstDran(string data)
+    {
+        QuizPlayer.GetPlayer(data.Split('~')[0], quizplayer)?.ToggleBuzzered(bool.Parse(data.Split('~')[1]));
+    }
+    private void PlayerBuzzerFreigeben()
+    {
+        foreach (var item in quizplayer)
+            item.ToggleBuzzered(false);
+    }
 
     #region Moderator
     // TODO: wenn mod die settings öffnet muss das auch eine möglichkeit haben das zu schließen
-    public void SetBuzzer(Toggle toggle)
+    public void ModSpielVerlassen()
     {
-        ToggleBuzzer(toggle.isOn);
+        ClientUtils.SendMessage("ALLE", "SpielVerlassen", "");
     }
-    public void SetSpielerantwortEingabe(Toggle toggle)
+    public void ModSetBuzzer(Toggle toggle)
     {
-        ToggleSpielerantwortEingabe(toggle.isOn);
+        ClientUtils.SendMessage("Quiz", "SetBuzzer", toggle.isOn.ToString());
+    }
+    public void ModSetTabbedout(Toggle toggle)
+    {
+        ClientUtils.SendMessage("Quiz", "SetTabbedout", toggle.isOn.ToString());
+    }
+    public void ModSetSpielerantwortEingabe(Toggle toggle)
+    {
+        ClientUtils.SendMessage("Quiz", "SetSpielerantwortEingabe", toggle.isOn.ToString());
+    }
+    public void ModChangePunkteprorichtig(TMP_InputField input)
+    {
+        ClientUtils.SendMessage("Quiz", "ChangePunkteprorichtig", input.text);
+    }
+    public void ModChangePunkteprofalsche(TMP_InputField input)
+    {
+        ClientUtils.SendMessage("Quiz", "ChangePunkteprofalsche", input.text);
     }
     private void UpdateModeratorView()
     {
@@ -181,12 +240,82 @@ public class Quiz : MonoBehaviour
             return;
         }
         moderator_menue.SetActive(true);
+        GameObject.Find("Moderator/BuzzerAktivierenToggle").GetComponent<Toggle>().isOn = false;
         Buzzer.gameObject.SetActive(false);
         SpielerantwortEingabe.gameObject.SetActive(false);
         SpielerantwortEingabe.transform.parent.gameObject.SetActive(false);
-
-
     }
+    private void SetGameInfo(string data_s)
+    {
+        string[] data = data_s.Split('*');
+        GameObject.Find("Moderator/PunkteProRichtigeAntwort").GetComponent<TMP_InputField>().text = data[0];
+        GameObject.Find("Moderator/PunkteProFalscheAntwort").GetComponent<TMP_InputField>().text = data[1];
+        fragenindex.text = data[2];
+        falscheantworten.text = "FA:" + data[3];
+    }
+    private void FragenPreview(string data_s)
+    {
+        FragenVorschau.text = data_s.Replace("\\n", "\n");
+    }
+    private void AntwortPreview(string data_s)
+    {
+        FragenVorschau.text = data_s.Replace("\\n", "\n");
+    }
+    private void ModShowPlayerInputAntwort(string data_s)
+    {
+        string uuid = data_s.Split('~')[0];
+        string msg = data_s.Split('~')[1];
+        QuizPlayer.GetPlayer(uuid, quizplayer)?.SetAnswer(msg);
+    }
+    public void ModGetFragenPreview(int type) { ClientUtils.SendMessage("Quiz", "GetFragePreview", type.ToString()); }
+    public void ModGetAntwortPreview() { ClientUtils.SendMessage("Quiz", "GetAntwortPreview", ""); }
+
+    public void PlayerPointsAdd(GameObject go)
+    {
+        string uuid = go.transform.parent.parent.gameObject.name;
+        if (uuid.StartsWith("Player ("))
+            return;
+        int type = int.Parse(go.name);
+        ClientUtils.SendMessage("Quiz", "PlayerPointsAdd", uuid + "~" + type);
+    }
+    public void PlayerPointsAddX(TMP_InputField input)
+    {
+        if (input.text.Length == 0)
+            return;
+        string uuid = input.transform.parent.parent.gameObject.name;
+        if (uuid.StartsWith("Player ("))
+            return;
+        int type = int.Parse(input.text);
+        input.text = "";
+        ClientUtils.SendMessage("Quiz", "PlayerPointsAdd", uuid + "~" + type);
+    }
+    public void PlayerRichtig(GameObject go)
+    {
+        string uuid = go.transform.parent.parent.gameObject.name;
+        if (uuid.StartsWith("Player ("))
+            return;
+        ClientUtils.SendMessage("Quiz", "PlayerRichtig", uuid);
+    }
+    public void PlayerFalsch(GameObject go)
+    {
+        string uuid = go.transform.parent.parent.gameObject.name;
+        if (uuid.StartsWith("Player ("))
+            return;
+        ClientUtils.SendMessage("Quiz", "PlayerFalsch", uuid);
+        falscheantworten.text = "FA:" + (int.Parse(falscheantworten.text.Substring(3)) + 1).ToString();
+    }
+    public void PlayerIstDran(Toggle toggle)
+    {
+        string uuid = toggle.transform.parent.parent.gameObject.name;
+        if (uuid.StartsWith("Player ("))
+            return;
+        ClientUtils.SendMessage("Quiz", "PlayerIstDran", uuid + "~" + toggle.isOn);
+    }
+    public void ModPlayerBuzzerFreigeben()
+    {
+        ClientUtils.SendMessage("Quiz", "PlayerBuzzerFreigeben", "");
+    }
+    // TODO anzeigen wechsel mit schätufragen etc
     #endregion
 }
 
@@ -210,11 +339,12 @@ public class QuizPlayer
         ToggleBuzzered(false);
         parent.transform.GetChild(1).GetChild(0).GetComponent<Image>().sprite = p.icon;
         this.tabbedout = parent.transform.GetChild(2).gameObject;
-        this.tabbedout.SetActive(false);
+        ToggleTabbedOut(false);
         parent.transform.GetChild(3).GetChild(1).GetComponent<TMP_Text>().text = p.name;
         this.pointsTXT = parent.transform.GetChild(3).GetChild(2).GetComponent<TMP_Text>();
         SetPoints(0);
         this.answerTXT = parent.transform.GetChild(4).GetChild(0).GetComponent<TMP_InputField>();
+        ToggleAnswer(false);
         UpdateModerator();
     }
 
@@ -239,10 +369,14 @@ public class QuizPlayer
     {
         return this.answerTXT.text;
     }
+    public void SetAnswer(string data)
+    {
+        this.answerTXT.text = data;
+    }
     public void SetPoints(int points)
     {
         this.points = points;
-        this.pointsTXT.text = this.points.ToString("N", new CultureInfo("de-DE"));
+        this.pointsTXT.text = this.points.ToString("N0", new CultureInfo("de-DE"));
     }
     public void AddPoints(int points)
     {

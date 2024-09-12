@@ -1,0 +1,126 @@
+Frage: Wer komponierte "Die Zauberflöte"?
+Antwort: Wolfgang Amadeus Mozart
+Info: 
+Frage: Mit welcher Tiergruppe sind die Dinosaurier am engsten verwandt?
+Antwort: Vögel
+Info: 
+Frage: In welcher Stadt lebte der Detektiv Sherlock Holmes?
+Antwort: London
+Info: 
+Frage: Wie lang ist die Strecke eines Marathons?
+Antwort: 42,195 km
+Info: 
+Frage: Wie heißt die Hauptstadt von Ungarn?
+Antwort: Budapest
+Info: 
+Frage: Woraus besteht ein Diamant?
+Antwort: Kohlenstoff
+Info: 
+Frage: Wie heißt die gesetzgebende Gewalt?
+Antwort: Legislative
+Info: 
+Frage: Was bedeutet der lateinische Spruch "Carpe Diem"?
+Antwort: Nutze den Tag
+Info: 
+Frage: Welche Farbe bekommst du, wenn du blau und gelb mischt?
+Antwort: Grün
+Info: 
+Frage: Wie schnell ist die Lichtgeschwindigkeit (in der Sekunde)?
+Antwort: 299.792,458 km/s
+Info: 
+Frage: In welchem Jahr wurde Angela Merkel Bundeskanzlerin?
+Antwort: 2005
+Info: 
+Frage: Welches Vitamin wird mithilfe von Sonnenlicht im Körper gebildet?
+Antwort: Vitamin D
+Info: 
+Frage: Nach wie vielen Jahren wird das Amt des Bundespräsidenten neu gewählt?
+Antwort: 5 Jahre
+Info: 
+Frage: Was ist eine Primzahl?
+Antwort: Eine Zahl, die nur durch 1 und sich selbst teilbar ist
+Info: 
+Frage: Welche deutsche Stadt ist nach Einwohnern die größte nach Berlin?
+Antwort: Hamburg
+Info: 
+Frage: Nenne mir eine Primzahl, die größer als 40 und kleiner als 100 ist.
+Antwort: 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97
+Info: 
+Frage: Welches ist das leichteste Element im Periodensystem?
+Antwort: Wasserstoff
+Info: Ordnungszahl 1
+Frage: Wie viel verschiedene Euromünzen gibt es?
+Antwort: 8 (2€, 1€, 50Ce, 20Ce, 10Ce, 5Ce, 2Ce, 1Ce)
+Info: 
+Frage: Was ist auch unter dem Begriff Erdapfel bekannt?
+Antwort: Kartoffel
+Info: 
+Frage: Was ist das größte Tier der Welt?
+Antwort: Blauwaal
+Info: 
+Frage: Welches ist das nächstgrößere Flächenmaß nach Quadratzentimeter?
+Antwort: Quadratdezimeter
+Info: 
+Frage: Aus welchen Elementen besteht Wasser?
+Antwort: H²O
+Info: 
+Frage: Viele Menschen sind farbenblind. Wenn dies von Geburt an der Fall ist, haben Betroffene häufig kaum Einschränkungen, da sie die Welt nicht anders kennen. Die häufigste Art der Farbblindheit ist die Rot-Grün-Schwäche mit knapp 10%. Welche Farbe können diese Menschen denn sehr gut Unterscheiden bzw welche 3te Farbe ähnelt sich Rot und Grün am häufigsten?
+Antwort: Braun - Bräunliche Farben
+Info: 
+Frage: Von welchem Land ist Lima die Hauptstadt?
+Antwort: Peru
+Info: 
+Frage: Wie lautet die Messeinheit für den elektrischen Widerstand?
+Antwort: Ohm
+Info: 
+Frage: Was ist 5+5x5/5-5?
+Antwort: 5
+Info: 
+Frage: Das wertvollste börsennotierte Unternehmen der Welt ist Apple, aber wie viel Mrd Us-Dollar war Apple am 22.April 2022 Wert?
+Antwort: 2.640,3 Mrd. USD
+Info: 
+Frage: Nenne mir 2 weitere Unternehmen der Top 6 wertvollsten börsennotierten Unternehmen der Welt.
+Antwort: 1) Apple: 2.640,3 Mrd USD\n2) Saudi Arabian Oil Company: 2.292,1 Mrd USD\n3) Microsoft: 2.054,4 Mrd USD\n4) Alphabet: 1.581,7 Mrd USD\n5) Amazon: 1.468,4 Mrd USD\6) Tesla: 1.038,7 Mrd USD
+Info: 
+Frage: Wie heißt der tiefste Graben im Atlantischen Ozean?
+Antwort: Puerto-Rico-Graben (Milwaukeetief) 8.376 m
+Info: 
+Frage: Wie viel Einwohner haben die USA? (Stand 2021)
+Antwort: 331,9 Millionen
+Info: 
+Frage: Welches Gerät misst Erschütterungen eines Erbebens?
+Antwort: Seismograph
+Info: 
+Frage: Wie nennt man Natriumchlorid umgangssprachlich?
+Antwort: Salz
+Info: 
+Frage: Wie heißt der größte Berg in Deutschland?
+Antwort: Zugspitze
+Info: 
+Frage: Wann kam das erste Iphone auf den Markt?
+Antwort: 2007
+Info: 
+Frage: Wofür steht USB?
+Antwort: Universal Serial Bus
+Info: 
+Frage: Wie heißt der kleinste Planet in unserem Sonnensystem?
+Antwort: Merkur
+Info: 
+Frage: Nennt mir die Teile der Gewaltenteilung, mit Erklärung.
+Antwort: Judikative (Recht sprechende), Exekutive (vollziehende oder ausübende), Legislative (gesetzgebende Gewalt)
+Info: 
+Frage: Welches Regierungssystem herrscht in Deutschland?
+Antwort: parlamentarische Demokratie
+Info: 
+Frage: Wie hoch ist der Siedepunkt von Wasser in Fahrenheit?
+Antwort: 212°F
+Info: 
+Frage: Welche Ordnungszahl hat Uran?
+Antwort: 92
+Info: 
+Frage: Welcher Staat ist als letztes der Nato beigetreten?
+Antwort: Finnland
+Info: Ist am 04.04.2023 beigetreten
+Frage: Wie viele Staaten sind Teil der NATO?
+Antwort: 31
+Info: 
