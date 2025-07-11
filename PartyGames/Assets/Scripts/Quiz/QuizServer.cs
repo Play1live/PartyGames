@@ -215,7 +215,7 @@ public class QuizServer : MonoBehaviour
         FragenIndex2.GetComponentInChildren<TMP_Text>().text = "";
         FalscheAntworten = GameObject.Find("QuizAnzeigen/FalscheAntwortenCounter");
         Config.SERVER_PLAYER.points = 0;
-        FalscheAntworten.GetComponent<TMP_Text>().text = "Falsche Antworten: "+Config.SERVER_PLAYER.points;
+        FalscheAntworten.GetComponent<TMP_Text>().text = "Falsche Antworten: " + Config.SERVER_PLAYER.points;
         // Buzzer Deaktivieren
         GameObject.Find("ServerSide/BuzzerAktivierenToggle").GetComponent<Toggle>().isOn = false;
         BuzzerAnzeige = GameObject.Find("ServerSide/BuzzerIstAktiviert");

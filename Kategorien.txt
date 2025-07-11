@@ -1,0 +1,15 @@
+Kannst du mit zu den folgenden begriffen jeweils bis zu 5 Worte geben, die diese beschreiben. Bitte füge auch 3 gengenteilige Worte mit dazu ein, in der selben Zeile. Diese sollen nicht nicht doppeln oder das gegebene Wort enthalten oder den Wortstamm des gegebenen Wortes enthalten.
+Bitte formatiere diese wie folgt: Wort: Wort1, Wort2, Wort3, Wort4, Wort5, Wort6, Wort7, Wort8
+
+gib mir 20 Begriffe die zum Thema ___.
+Kannst du mit zu den von dir gerade gegebenen begriffen jeweils bis zu 5 Worte geben, die diese beschreiben. Bitte füge auch 3 gengenteilige Worte mit dazu ein, in der selben Zeile. Diese sollen nicht doppeln oder das gegebene Wort enthalten oder den Wortstamm des gegebenen Wortes enthalten.
+Bitte formatiere diese wie folgt: Wort: Wort1, Wort2, Wort3, Wort4, Wort5, Wort6, Wort7, Wort8
+ohne zusatzsätze, damit ich es direkt kopieren kann
+
+
+
+
+
+
+
+
